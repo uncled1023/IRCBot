@@ -1,12 +1,12 @@
 ---------------------
-|	About IRCBot	|
+About IRCBot
 ---------------------
 Created by: Chris Woodward
 
 The IRCBot is designed to provide an all-in-one solution for those who wish to run an IRC bot easily.
 
 ---------------------
-|	Installation	|
+Installation
 ---------------------
 1) Copy IRCBot.exe, config, logs, and modules to a folder of your choosing
 2) Run start.exe
@@ -14,12 +14,12 @@ The IRCBot is designed to provide an all-in-one solution for those who wish to r
 4) Click File>Disconnect and then File>Connect to restart the bot with the new configuration
 
 ---------------------
-|		Bugs		|
+Bugs/Feature Requests
 ---------------------
 Please report all bugs you find to me so I can fix them as soon as possible.  Also if you have any feature requests, feel free to send them to me as well.
 
 ---------------------
-|	Contact Info	|
+Contact Info
 ---------------------
 Email: admin@inb4u.com
 IRC: (Rizon)#/g/technology

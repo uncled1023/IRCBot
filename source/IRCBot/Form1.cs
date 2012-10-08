@@ -18,6 +18,9 @@ using Microsoft.Win32;
 using System.Runtime.InteropServices;
 using System.Management;
 using System.Web;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using search.api;
 
 struct IRCConfig
 {
@@ -1633,6 +1636,45 @@ namespace IRCBot
                                             sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
                                         }
                                         break;
+                                    case "google":
+                                        spam_count++;
+                                        if (line.GetUpperBound(0) > 3)
+                                        {
+                                            if (line[4].StartsWith("DCC SEND"))
+                                            {
+                                                sendData("PRIVMSG", line[2] + " :Invalid Search Term");
+                                            }
+                                            else
+                                            {
+                                                ISearchResult searchClass = new GoogleSearch(line[4]);
+                                                try
+                                                {
+                                                    var list = searchClass.Search();
+                                                if (list.Count > 0)
+                                                {
+                                                    foreach (var searchType in list)
+                                                    {
+                                                        sendData("PRIVMSG", line[2] + " :" + searchType.title.Replace("<b>", "").Replace("</b>", "").Replace("&quot;", "\"").Replace("&#39", "'") + ": " + searchType.content.Replace("<b>", "").Replace("</b>", "").Replace("&quot;", "\"").Replace("&#39", "'"));
+                                                        sendData("PRIVMSG", line[2] + " :" + searchType.url);
+                                                        break;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    sendData("PRIVMSG", line[2] + " :No Results Found");
+                                                }
+                                                }
+                                                catch (Exception ex)
+                                                {
+                                                    MessageBox.Show(ex.ToString());
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
+                                        }
+                                        break;
                                 }
                             }
                             else // From Query
@@ -2769,7 +2811,7 @@ namespace IRCBot
                         {
                             sendData("PRIVMSG", nick + " :" + intro_nick[0] + " has left you a message on: " + intro_nick[2]);
                             sendData("PRIVMSG", nick + " :\"" + intro_nick[3] + "\"");
-                            sendData("PRIVMSG", nick + " :If you would like to reply to him, please type !message " + nick + " <your_message>");
+                            sendData("PRIVMSG", nick + " :If you would like to reply to him, please type .message " + nick + " <your_message>");
                         }
                         else
                         {
@@ -3314,6 +3356,62 @@ namespace IRCBot
             {
                 connect();
             }
+        }
+    }
+}
+
+namespace search.api
+{
+    public struct SearchType
+    {
+        public string url;
+        public string title;
+        public string content;
+        public FindingEngine engine;
+        public enum FindingEngine { Google };
+    }
+
+    public interface ISearchResult
+    {
+        SearchType.FindingEngine Engine { get; set; }
+        string SearchExpression { get; set; }
+        List<SearchType> Search();
+    }
+
+    public class GoogleSearch : ISearchResult
+    {
+        public GoogleSearch(string searchExpression)
+        {
+            this.Engine = SearchType.FindingEngine.Google;
+            this.SearchExpression = searchExpression;
+        }
+        public SearchType.FindingEngine Engine { get; set; }
+        public string SearchExpression { get; set; }
+
+        public List<SearchType> Search()
+        {
+            const string urlTemplate = @"http://ajax.googleapis.com/ajax/services/search/web?v=1.0&rsz=large&safe=active&q={0}&start={1}";
+            var resultsList = new List<SearchType>();
+            int[] offsets = { 0, 8, 16, 24, 32, 40, 48 };
+            foreach (var offset in offsets)
+            {
+                var searchUrl = new Uri(string.Format(urlTemplate, SearchExpression, offset));
+                var page = new WebClient().DownloadString(searchUrl);
+                var o = (JObject)JsonConvert.DeserializeObject(page);
+
+                var resultsQuery =
+                  from result in o["responseData"]["results"].Children()
+                  select new SearchType
+                  {
+                      url = result.Value<string>("url").ToString(),
+                      title = result.Value<string>("title").ToString(),
+                      content = result.Value<string>("content").ToString(),
+                      engine = this.Engine
+                  };
+
+                resultsList.AddRange(resultsQuery);
+            }
+            return resultsList;
         }
     }
 }

@@ -38,3 +38,4 @@ Get Current Weather:User:w <zip code|city name>:Displays the current weather con
 Get 5 Day Forecast:User:forecast <zip code|city name>:Displays the 5 day forecast for the city you search for.
 Get 5 Day Forecast:User:f <zip code|city name>:Displays the 5 day forecast for the city you search for.
 Channel Quote:User:quote:Gets a random quote from the channel.
+Google:User:google <query>:Returns the first result from Google.

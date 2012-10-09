@@ -38,7 +38,6 @@ struct IRCConfig
     public int spam_count_max;
     public int spam_threshold;
     public int spam_timout;
-    public string yahooapi;
 }
 
 namespace IRCBot
@@ -60,6 +59,8 @@ namespace IRCBot
         private System.Windows.Forms.Timer Spam_Timer = new System.Windows.Forms.Timer();
         private bool spam_activated = false;
         private int spam_count = 0;
+        private bool restart = false;
+        private int restart_attempts = 0;
         bool shouldRun = true;
         string[] file;
 
@@ -147,7 +148,7 @@ namespace IRCBot
             connectToolStripMenuItem.Text = "Disconnect";
             cur_dir = Directory.GetCurrentDirectory();
 
-            updateOutput.Interval = 15;
+            updateOutput.Interval = 100;
             updateOutput.Start();
 
             checkRegisterationTimer.Interval = 60000;
@@ -234,7 +235,6 @@ namespace IRCBot
             conf.spam_count_max = Convert.ToInt32(list["spam_count"].InnerText);
             conf.spam_threshold = Convert.ToInt32(list["spam_threshold"].InnerText);
             conf.spam_timout = Convert.ToInt32(list["spam_timeout"].InnerText);
-            conf.yahooapi = "dj0yJmk9WkRXNmFRcm50TVZ1JmQ9WVdrOVlYcGxjMHgyTXpnbWNHbzlNVEl6TmpJeE56VTJNZy0tJnM9Y29uc3VtZXJzZWNyZXQmeD04ZQ--";
 
             Spam_Check_Timer.Interval = conf.spam_threshold;
             Spam_Check_Timer.Start();
@@ -254,13 +254,43 @@ namespace IRCBot
             string input_tmp = input_box.Text;
             char[] charSeparator = new char[] { ' ' };
             string[] input = input_tmp.Split(charSeparator, 2);
-            if (input.GetUpperBound(0) > 0)
+            if (input[0].StartsWith("/"))
             {
-                sendData(input[0], input[1]);
+                if (input.GetUpperBound(0) > 0)
+                {
+                    sendData(input[0].TrimStart('/'), input[1]);
+                }
+                else
+                {
+                    sendData(input[0].TrimStart('/'), null);
+                }
             }
             else
             {
-                sendData(input[0], null);
+                if (tabControl1.SelectedIndex == 0)
+                {
+                    output = Environment.NewLine + "No channel joined. Try /join #<channel>";
+
+                    lock (listLock)
+                    {
+                        if (queue_text.Count >= 1000)
+                        {
+                            queue_text.RemoveAt(0);
+                        }
+                        queue_text.Add(output);
+                    }
+                }
+                else
+                {
+                    if (input.GetUpperBound(0) > 0)
+                    {
+                        sendData("PRIVMSG", tabControl1.SelectedTab.Text + " :" + input[0] + " " + input[1]);
+                    }
+                    else
+                    {
+                        sendData("PRIVMSG", tabControl1.SelectedTab.Text + " :" + input[0]);
+                    }
+                }
             }
             input_box.Text = "";
         }
@@ -281,7 +311,18 @@ namespace IRCBot
             Control control = new Control();
             control = tabControl1.Controls.Find("output_box_system", true)[0];
             RichTextBox output_box = (RichTextBox)control;
-            output_box.AppendText(Environment.NewLine + "Exited");
+            if (restart == true)
+            {
+                Thread.Sleep(1000);
+                output_box.AppendText(Environment.NewLine + "Restart Attempt " + restart_attempts + Environment.NewLine);
+                Thread.Sleep(1000);
+                connect();
+            }
+            else
+            {
+                restart_attempts = 0;
+                output_box.AppendText(Environment.NewLine + "Exited" + Environment.NewLine);
+            }
         }
 
         public void IRCBot(BackgroundWorker bw)
@@ -304,74 +345,87 @@ namespace IRCBot
                     }
                     queue_text.Add(output);
                 }
+                restart = true;
+                restart_attempts++;
             }
 
-            try
+            if (restart == false)
             {
-                ns = IRCConnection.GetStream();
-                sr = new StreamReader(ns);
-                sw = new StreamWriter(ns);
-                sendData("PASS", config.pass);
-                sendData("USER", config.nick + " inb4u.com " + " inb4u.com" + " :" + config.name);
-                sendData("NICK", config.nick);
-                IRCWork();
-            }
-            catch
-            {
-                output = Environment.NewLine + "Communication error";
-
-                lock (listLock)
+                try
                 {
-                    if (queue_text.Count >= 1000)
-                    {
-                        queue_text.RemoveAt(0);
-                    }
-                    queue_text.Add(output);
+                    ns = IRCConnection.GetStream();
+                    sr = new StreamReader(ns);
+                    sw = new StreamWriter(ns);
+                    sendData("PASS", config.pass);
+                    sendData("USER", config.nick + " inb4u.com " + " inb4u.com" + " :" + config.name);
+                    sendData("NICK", config.nick);
+                    IRCWork();
                 }
-            }
-            finally
-            {
-                if (sr != null)
-                    sr.Close();
-                if (sw != null)
-                    sw.Close();
-                if (ns != null)
-                    ns.Close();
-                if (IRCConnection != null)
-                    IRCConnection.Close();
+                catch
+                {
+                    output = Environment.NewLine + "Communication error";
+
+                    lock (listLock)
+                    {
+                        if (queue_text.Count >= 1000)
+                        {
+                            queue_text.RemoveAt(0);
+                        }
+                        queue_text.Add(output);
+                    }
+                }
+                finally
+                {
+                    if (sr != null)
+                        sr.Close();
+                    if (sw != null)
+                        sw.Close();
+                    if (ns != null)
+                        ns.Close();
+                    if (IRCConnection != null)
+                        IRCConnection.Close();
+                    if (bw.CancellationPending != true)
+                    {
+                        restart = true;
+                        restart_attempts++;
+                    }
+                }
             }
         }
 
         public void sendData(string cmd, string param)
         {
-            if (param == null)
+            if (sw != null)
             {
-                sw.WriteLine(cmd);
-                sw.Flush();
-                output = Environment.NewLine + ":" + conf.nick + " " + cmd;
-
-                lock (listLock)
+                if (param == null)
                 {
-                    if (queue_text.Count >= 1000)
+                    sw.WriteLine(cmd);
+                    sw.Flush();
+                    output = Environment.NewLine + ":" + conf.nick + " " + cmd;
+
+                    lock (listLock)
                     {
-                        queue_text.RemoveAt(0);
+                        if (queue_text.Count >= 1000)
+                        {
+                            queue_text.RemoveAt(0);
+                        }
+                        queue_text.Add(output);
                     }
-                    queue_text.Add(output);
                 }
-            }
-            else
-            {
-                sw.WriteLine(cmd + " " + param);
-                sw.Flush();
-                output = Environment.NewLine + ":" + conf.nick + " " + cmd + " " + param;
-
-                lock (listLock)
+                else
                 {
-                    if (queue_text.Count >= 1000)
+                    sw.WriteLine(cmd + " " + param);
+                    sw.Flush();
+                    output = Environment.NewLine + ":" + conf.nick + " " + cmd + " " + param;
+
+                    lock (listLock)
                     {
-                        queue_text.RemoveAt(0);
+                        if (queue_text.Count >= 1000)
+                        {
+                            queue_text.RemoveAt(0);
+                        }
+                        queue_text.Add(output);
                     }
-                    queue_text.Add(output);
                 }
             }
         }
@@ -384,6 +438,8 @@ namespace IRCBot
             joinChannels();
             while (shouldRun)
             {
+                restart = false;
+                restart_attempts = 0;
                 Thread.Sleep(20);
                 data = sr.ReadLine();
 
@@ -2170,27 +2226,28 @@ namespace IRCBot
             string file_name = "#" + tab_name + ".log";
             DateTime current_date = DateTime.Now;
             string msg = "";
-            if (line[1].Equals("QUIT"))
+            line[1] = line[1].ToLower();
+            if (line[1].Equals("quit"))
             {
                 msg = "Quitting";
             }
-            else if (line[1].Equals("JOIN"))
+            else if (line[1].Equals("join"))
             {
                 msg = "Joining " + channel;
             }
-            else if (line[1].Equals("PART"))
+            else if (line[1].Equals("part"))
             {
                 msg = "Leaving " + channel;
             }
-            else if (line[1].Equals("KICK"))
+            else if (line[1].Equals("kick"))
             {
                 msg = "getting kicked from " + channel;
             }
-            else if (line[1].Equals("MODE"))
+            else if (line[1].Equals("mode"))
             {
                 msg = "setting mode " + " in " + channel;
             }
-            else if (line[1].Equals("PRIVMSG"))
+            else if (line[1].Equals("privmsg"))
             {
                 if (line.GetUpperBound(0) > 3)
                 {
@@ -2949,27 +3006,175 @@ namespace IRCBot
             }
             else
             {
-                string channel = "System";
-                string tab_name = "System";
-                string message = "";
-                string nickname = "";
-                string pattern = "[^a-zA-Z0-9]"; //regex pattern
-                Control control = tabControl1.Controls.Find("output_box_system", true)[0];
-                char[] charSeparator = new char[] { ' ' };
-                string[] tmp_lines = text.Split(charSeparator, 4);
-                string time_stamp = DateTime.Now.ToString("hh:mm tt");
-                string date_stamp = DateTime.Now.ToString("yyyy-MM-dd");
-                string font_color = "#000000";
-                if (tmp_lines.GetUpperBound(0) > 1)
+                try
                 {
-                    if (tmp_lines[1].Equals("NOTICE"))
+                    string channel = "System";
+                    string tab_name = "System";
+                    string message = "";
+                    string nickname = "";
+                    string pattern = "[^a-zA-Z0-9]"; //regex pattern
+                    Control control = tabControl1.Controls.Find("output_box_system", true)[0];
+                    char[] charSeparator = new char[] { ' ' };
+                    string[] tmp_lines = text.Split(charSeparator, 4);
+                    string time_stamp = DateTime.Now.ToString("hh:mm tt");
+                    string date_stamp = DateTime.Now.ToString("yyyy-MM-dd");
+                    string font_color = "#000000";
+                    tmp_lines[1] = tmp_lines[1].ToLower();
+                    if (tmp_lines.GetUpperBound(0) > 1)
                     {
-                        channel = tmp_lines[3].TrimStart(':').TrimStart('[');
-                        string[] tmp_msg = channel.Split(charSeparator, 2);
-                        if (channel.StartsWith("#"))
+                        if (tmp_lines[1].Equals("notice"))
                         {
-                            tab_name = tmp_msg[0].TrimStart('#').TrimEnd(']');
-                            channel = "#" + tab_name;
+                            channel = tmp_lines[3].TrimStart(':').TrimStart('[');
+                            string[] tmp_msg = channel.Split(charSeparator, 2);
+                            if (channel.StartsWith("#"))
+                            {
+                                tab_name = tmp_msg[0].TrimStart('#').TrimEnd(']');
+                                channel = "#" + tab_name;
+                                if (tmp_msg.GetUpperBound(0) > 0)
+                                {
+                                    message = tmp_msg[1];
+                                }
+                                else
+                                {
+                                    message = tmp_msg[0];
+                                }
+                            }
+                            else
+                            {
+                                tab_name = "System";
+                                channel = "System";
+                                if (tmp_msg.GetUpperBound(0) > 0)
+                                {
+                                    message = tmp_msg[0] + " " + tmp_msg[1];
+                                }
+                                else
+                                {
+                                    message = tmp_msg[0];
+                                }
+                            }
+                            nickname = "--<" + tmp_lines[0].TrimStart(':').Split('!')[0] + ">--  ";
+                            font_color = "#B037B0";
+                        }
+                        else if (tmp_lines[1].Equals("privmsg"))
+                        {
+                            channel = tmp_lines[2].TrimStart(':');
+                            nickname = tmp_lines[0].TrimStart(':').Split('!')[0];
+                            if (channel.StartsWith("#"))
+                            {
+                                tab_name = channel.TrimStart('#');
+                                if (!nickname.Equals(conf.nick) && !tmp_lines[3].Remove(0, 1).StartsWith("."))
+                                {
+                                    string new_tab_name = Regex.Replace(tab_name, pattern, "_");
+                                    string[] server = conf.server.Split('.');
+                                    string file_name = server[1] + "-#" + new_tab_name + ".log";
+                                    if (Directory.Exists(cur_dir + "\\modules\\quotes\\logs") == false)
+                                    {
+                                        Directory.CreateDirectory(cur_dir + "\\modules\\quotes\\logs");
+                                    }
+                                    StreamWriter log_file = File.AppendText(cur_dir + "\\modules\\quotes\\logs\\" + file_name);
+                                    log_file.WriteLine(tmp_lines[3].Remove(0, 1) + " [" + nickname + "]");
+                                    log_file.Close();
+                                }
+                            }
+                            else if (channel.Equals(conf.nick))
+                            {
+                                tab_name = nickname;
+                                channel = nickname;
+                            }
+                            else if (nickname.Equals(conf.nick))
+                            {
+                                tab_name = channel;
+                            }
+                            message = tmp_lines[3].Remove(0, 1);
+                            nickname = "<" + nickname + ">  ";
+                            // Last Seen Module
+                            add_seen(tmp_lines[0].TrimStart(':').Split('!')[0], channel, tmp_lines);
+                            font_color = "#000000";
+                        }
+                        else if (tmp_lines[1].Equals("join"))
+                        {
+                            channel = tmp_lines[2].TrimStart(':');
+                            nickname = tmp_lines[0].TrimStart(':').Split('!')[0];
+                            if (channel.StartsWith("#"))
+                            {
+                                tab_name = channel.TrimStart('#');
+                            }
+                            else
+                            {
+                                tab_name = "System";
+                                channel = "System";
+                            }
+                            message = nickname + " has joined " + channel;
+                            nickname = "";
+                            // Last Seen Module
+                            add_seen(tmp_lines[0].TrimStart(':').Split('!')[0], channel, tmp_lines);
+                            font_color = "#3DCC3D";
+                        }
+                        else if (tmp_lines[1].Equals("part"))
+                        {
+                            channel = tmp_lines[2];
+                            nickname = tmp_lines[0].TrimStart(':').Split('!')[0];
+                            if (channel.StartsWith("#"))
+                            {
+                                tab_name = channel.TrimStart('#');
+                            }
+                            else
+                            {
+                                tab_name = "System";
+                                channel = "System";
+                            }
+                            message = nickname + " has left " + channel;
+                            nickname = "";
+                            // Last Seen Module
+                            add_seen(tmp_lines[0].TrimStart(':').Split('!')[0], channel, tmp_lines);
+                            font_color = "#66361F";
+                        }
+                        else if (tmp_lines[1].Equals("mode"))
+                        {
+                            channel = tmp_lines[2];
+                            nickname = tmp_lines[0].TrimStart(':').Split('!')[0];
+                            if (channel.StartsWith("#"))
+                            {
+                                tab_name = channel.TrimStart('#');
+                            }
+                            else if (channel.Equals(conf.nick))
+                            {
+                                tab_name = "System";
+                                channel = "System";
+                            }
+                            message = nickname + " has set Mode " + tmp_lines[3];
+                            nickname = "";
+                            // Last Seen Module
+                            add_seen(tmp_lines[0].TrimStart(':').Split('!')[0], channel, tmp_lines);
+                            font_color = "#000000";
+                        }
+                        else if (tmp_lines[1].Equals("kick"))
+                        {
+                            channel = tmp_lines[2];
+                            nickname = tmp_lines[0].TrimStart(':').Split('!')[0];
+                            if (channel.StartsWith("#"))
+                            {
+                                tab_name = channel.TrimStart('#');
+                            }
+                            else if (channel.Equals(conf.nick))
+                            {
+                                tab_name = "System";
+                                channel = "System";
+                            }
+                            message = nickname + " has kicked " + tmp_lines[3].Replace(':', '(') + ")";
+                            nickname = "";
+                            // Last Seen Module
+                            string[] new_nick = tmp_lines[3].Split(' ');
+                            add_seen(new_nick[0], channel, tmp_lines);
+                            font_color = "#C73232";
+                        }
+                        else
+                        {
+                            channel = "System";
+                            tab_name = "System";
+                            nickname = tmp_lines[0].TrimStart(':').Split('!')[0] + ": ";
+                            charSeparator = new char[] { ':' };
+                            string[] tmp_msg = text.Split(charSeparator, 2, StringSplitOptions.RemoveEmptyEntries);
                             if (tmp_msg.GetUpperBound(0) > 0)
                             {
                                 message = tmp_msg[1];
@@ -2978,219 +3183,78 @@ namespace IRCBot
                             {
                                 message = tmp_msg[0];
                             }
+                            font_color = "000000";
+                        }
+                        tab_name = Regex.Replace(tab_name, pattern, "_");
+                        string[] nick = tmp_lines[0].Split('!');
+                        if (tabControl1.Controls.Find("output_box_" + tab_name, true).GetUpperBound(0) >= 0)
+                        {
+                            control = tabControl1.Controls.Find("output_box_" + tab_name, true)[0];
                         }
                         else
                         {
-                            tab_name = "System";
-                            channel = "System";
-                            if (tmp_msg.GetUpperBound(0) > 0)
-                            {
-                                message = tmp_msg[0] + " " + tmp_msg[1];
-                            }
-                            else
-                            {
-                                message = tmp_msg[0];
-                            }
+                            add_tab(channel);
+                            control = tabControl1.Controls.Find("output_box_" + tab_name, true)[0];
                         }
-                        nickname = "--<" + tmp_lines[0].TrimStart(':').Split('!')[0] + ">--  ";
-                        font_color = "#B037B0";
                     }
-                    else if (tmp_lines[1].Equals("PRIVMSG"))
+                    output_box = (RichTextBox)control;
+                    if (nickname != "" || message != "")
                     {
-                        channel = tmp_lines[2].TrimStart(':');
-                        nickname = tmp_lines[0].TrimStart(':').Split('!')[0];
-                        if (channel.StartsWith("#"))
+                        int before_length = output_box.Text.Length + 1;
+                        int nickname_length = nickname.Length;
+                        int message_length = message.Length;
+                        int timestamp_length = time_stamp.Length;
+                        string line = "[" + time_stamp + "] " + nickname + message;
+                        int line_length = line.Length;
+                        Color actColor;
+                        actColor = System.Drawing.ColorTranslator.FromHtml(font_color);
+                        output_box.AppendText(line + Environment.NewLine);
+                        //timstamp coloring
+                        output_box.SelectionStart = before_length;
+                        output_box.SelectionLength = timestamp_length + 2;
+                        output_box.SelectionColor = Color.Black;
+                        if (nickname_length > 0)
                         {
-                            tab_name = channel.TrimStart('#');
-                            if (!nickname.Equals(conf.nick) && !tmp_lines[3].Remove(0,1).StartsWith("."))
-                            {
-                                string new_tab_name = Regex.Replace(tab_name, pattern, "_");
-                                string[] server = conf.server.Split('.');
-                                string file_name = server[1] + "-#" + new_tab_name + ".log";
-                                if (Directory.Exists(cur_dir + "\\modules\\quotes\\logs") == false)
-                                {
-                                    Directory.CreateDirectory(cur_dir + "\\modules\\quotes\\logs");
-                                }
-                                StreamWriter log_file = File.AppendText(cur_dir + "\\modules\\quotes\\logs\\" + file_name);
-                                log_file.WriteLine(tmp_lines[3].Remove(0, 1) + " [" + nickname + "]");
-                                log_file.Close();
-                            }
+                            //nick coloring
+                            output_box.SelectionStart = before_length + timestamp_length + 2;
+                            output_box.SelectionLength = nickname_length - 1;
+                            output_box.SelectionColor = System.Drawing.ColorTranslator.FromHtml("#C73232");
                         }
-                        else if (channel.Equals(conf.nick))
-                        {
-                            tab_name = nickname;
-                            channel = nickname;
-                        }
-                        else if (nickname.Equals(conf.nick))
-                        {
-                            tab_name = channel;
-                        }
-                        message = tmp_lines[3].Remove(0, 1);
-                        nickname = "<" + nickname + ">  ";
-                        // Last Seen Module
-                        add_seen(tmp_lines[0].TrimStart(':').Split('!')[0], channel, tmp_lines);
-                        font_color = "#000000";
-                    }
-                    else if (tmp_lines[1].Equals("JOIN"))
-                    {
-                        channel = tmp_lines[2].TrimStart(':');
-                        nickname = tmp_lines[0].TrimStart(':').Split('!')[0];
-                        if (channel.StartsWith("#"))
-                        {
-                            tab_name = channel.TrimStart('#');
-                        }
-                        else
-                        {
-                            tab_name = "System";
-                            channel = "System";
-                        }
-                        message = nickname + " has joined " + channel;
-                        nickname = "";
-                        // Last Seen Module
-                        add_seen(tmp_lines[0].TrimStart(':').Split('!')[0], channel, tmp_lines);
-                        font_color = "#3DCC3D";
-                    }
-                    else if (tmp_lines[1].Equals("PART"))
-                    {
-                        channel = tmp_lines[2];
-                        nickname = tmp_lines[0].TrimStart(':').Split('!')[0];
-                        if (channel.StartsWith("#"))
-                        {
-                            tab_name = channel.TrimStart('#');
-                        }
-                        else
-                        {
-                            tab_name = "System";
-                            channel = "System";
-                        }
-                        message = nickname + " has left " + channel;
-                        nickname = "";
-                        // Last Seen Module
-                        add_seen(tmp_lines[0].TrimStart(':').Split('!')[0], channel, tmp_lines);
-                        font_color = "#66361F";
-                    }
-                    else if (tmp_lines[1].Equals("MODE"))
-                    {
-                        channel = tmp_lines[2];
-                        nickname = tmp_lines[0].TrimStart(':').Split('!')[0];
-                        if (channel.StartsWith("#"))
-                        {
-                            tab_name = channel.TrimStart('#');
-                        }
-                        else if (channel.Equals(conf.nick))
-                        {
-                            tab_name = "System";
-                            channel = "System";
-                        }
-                        message = nickname + " has set Mode " + tmp_lines[3];
-                        nickname = "";
-                        // Last Seen Module
-                        add_seen(tmp_lines[0].TrimStart(':').Split('!')[0], channel, tmp_lines);
-                        font_color = "#000000";
-                    }
-                    else if (tmp_lines[1].Equals("KICK"))
-                    {
-                        channel = tmp_lines[2];
-                        nickname = tmp_lines[0].TrimStart(':').Split('!')[0];
-                        if (channel.StartsWith("#"))
-                        {
-                            tab_name = channel.TrimStart('#');
-                        }
-                        else if (channel.Equals(conf.nick))
-                        {
-                            tab_name = "System";
-                            channel = "System";
-                        }
-                        message = nickname + " has kicked " + tmp_lines[3].Replace(':', '(') + ")";
-                        nickname = "";
-                        // Last Seen Module
-                        string[] new_nick = tmp_lines[3].Split(' ');
-                        add_seen(new_nick[0], channel, tmp_lines);
-                        font_color = "#C73232";
-                    }
-                    else
-                    {
-                        channel = "System";
-                        tab_name = "System";
-                        nickname = tmp_lines[0].TrimStart(':').Split('!')[0] + ": ";
-                        charSeparator = new char[] { ':' };
-                        string[] tmp_msg = text.Split(charSeparator, 2, StringSplitOptions.RemoveEmptyEntries);
-                        if (tmp_msg.GetUpperBound(0) > 0)
-                        {
-                            message = tmp_msg[1];
-                        }
-                        else
-                        {
-                            message = tmp_msg[0];
-                        }
-                        font_color = "000000";
-                    }
-                    tab_name = Regex.Replace(tab_name, pattern, "_");
-                    string[] nick = tmp_lines[0].Split('!');
-                    if (tabControl1.Controls.Find("output_box_" + tab_name, true).GetUpperBound(0) >= 0)
-                    {
-                        control = tabControl1.Controls.Find("output_box_" + tab_name, true)[0];
-                    }
-                    else
-                    {
-                        add_tab(channel);
-                        control = tabControl1.Controls.Find("output_box_" + tab_name, true)[0];
-                    }
-                                    }
-                output_box = (RichTextBox)control;
-                if (nickname != "" || message != "")
-                {
-                    int before_length = output_box.Text.Length + 1;
-                    int nickname_length = nickname.Length;
-                    int message_length = message.Length;
-                    int timestamp_length = time_stamp.Length;
-                    string line = "[" + time_stamp + "] " + nickname + message;
-                    int line_length = line.Length;
-                    Color actColor;
-                    actColor = System.Drawing.ColorTranslator.FromHtml(font_color);
-                    output_box.AppendText(line + Environment.NewLine);
-                    //timstamp coloring
-                    output_box.SelectionStart = before_length;
-                    output_box.SelectionLength = timestamp_length + 2;
-                    output_box.SelectionColor = Color.Black;
-                    if (nickname_length > 0)
-                    {
-                        //nick coloring
-                        output_box.SelectionStart = before_length + timestamp_length + 2;
-                        output_box.SelectionLength = nickname_length - 1;
-                        output_box.SelectionColor = System.Drawing.ColorTranslator.FromHtml("#C73232");
-                    }
-                    //message coloring
-                    output_box.SelectionStart = before_length + timestamp_length + 2 + nickname_length;
-                    output_box.SelectionLength = message_length;
-                    output_box.SelectionColor = actColor;
+                        //message coloring
+                        output_box.SelectionStart = before_length + timestamp_length + 2 + nickname_length;
+                        output_box.SelectionLength = message_length;
+                        output_box.SelectionColor = actColor;
 
-                    output_box.SelectionStart = output_box.Text.Length;
-                    output_box.ScrollToCaret();
+                        output_box.SelectionStart = output_box.Text.Length;
+                        output_box.ScrollToCaret();
+                    }
+                    this.Text = conf.name;
+                    if (conf.keep_logs.Equals("True"))
+                    {
+                        string[] server = conf.server.Split('.');
+                        string file_name = server[1] + "-#" + tab_name + ".log";
+                        if (conf.logs_path == "")
+                        {
+                            conf.logs_path = cur_dir + "\\logs";
+                        }
+                        if (Directory.Exists(conf.logs_path))
+                        {
+                            StreamWriter log_file = File.AppendText(conf.logs_path + "\\" + file_name);
+                            log_file.WriteLine(text);
+                            log_file.Close();
+                        }
+                        else
+                        {
+                            Directory.CreateDirectory(conf.logs_path);
+                            StreamWriter log_file = File.AppendText(conf.logs_path + "\\" + file_name);
+                            log_file.WriteLine(text);
+                            log_file.Close();
+                        }
+                    }
                 }
-                updateOutput.Start();
-                this.Text = conf.name;
-                if (conf.keep_logs.Equals("True"))
+                catch (Exception ex)
                 {
-                    string[] server = conf.server.Split('.');
-                    string file_name = server[1] + "-#" + tab_name + ".log";
-                    if (conf.logs_path == "")
-                    {
-                        conf.logs_path = cur_dir + "\\logs";
-                    }
-                    if (Directory.Exists(conf.logs_path))
-                    {
-                        StreamWriter log_file = File.AppendText(conf.logs_path + "\\" + file_name);
-                        log_file.WriteLine(text);
-                        log_file.Close();
-                    }
-                    else
-                    {
-                        Directory.CreateDirectory(conf.logs_path);
-                        StreamWriter log_file = File.AppendText(conf.logs_path + "\\" + file_name);
-                        log_file.WriteLine(text);
-                        log_file.Close();
-                    }
+                    MessageBox.Show(ex.ToString());
                 }
             }
         }
@@ -3202,7 +3266,6 @@ namespace IRCBot
                 if (queue_text.Count > 0)
                 {
                     string text = "";
-                    updateOutput.Stop();
                     lock (listLock)
                     {
                         text = string.Join("", queue_text.ToArray());
@@ -3212,7 +3275,14 @@ namespace IRCBot
                     string[] lines = text.Split(stringSeparators, StringSplitOptions.RemoveEmptyEntries);
                     for (int x = 0; x <= lines.GetUpperBound(0); x++)
                     {
-                        UpdateOutput_final(lines[x]);
+                        try
+                        {
+                            UpdateOutput_final(lines[x]);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.ToString());
+                        }
                     }
                 }
             }
@@ -3282,13 +3352,43 @@ namespace IRCBot
                 string input_tmp = input_box.Text;
                 char[] charSeparator = new char[] { ' ' };
                 string[] input = input_tmp.Split(charSeparator, 2);
-                if (input.GetUpperBound(0) > 0)
+                if (input[0].StartsWith("/"))
                 {
-                    sendData(input[0], input[1]);
+                    if (input.GetUpperBound(0) > 0)
+                    {
+                        sendData(input[0].TrimStart('/'), input[1]);
+                    }
+                    else
+                    {
+                        sendData(input[0].TrimStart('/'), null);
+                    }
                 }
                 else
                 {
-                    sendData(input[0], null);
+                    if (tabControl1.SelectedIndex == 0)
+                    {
+                        output = Environment.NewLine + "No channel joined. Try /join #<channel>";
+
+                        lock (listLock)
+                        {
+                            if (queue_text.Count >= 1000)
+                            {
+                                queue_text.RemoveAt(0);
+                            }
+                            queue_text.Add(output);
+                        }
+                    }
+                    else
+                    {
+                        if (input.GetUpperBound(0) > 0)
+                        {
+                            sendData("PRIVMSG", tabControl1.SelectedTab.Text + " :" + input[0] + " " + input[1]);
+                        }
+                        else
+                        {
+                            sendData("PRIVMSG", tabControl1.SelectedTab.Text + " :" + input[0]);
+                        }
+                    }
                 }
                 input_box.Text = "";
             }

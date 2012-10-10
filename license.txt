@@ -1,4 +1,4 @@
-Copyright (c) 2012, Jimmy Rustlers, Inc.
+Copyright (c) 2012, Chris Woodward
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

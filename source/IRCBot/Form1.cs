@@ -2039,6 +2039,22 @@ namespace IRCBot
                                             }
                                         }
                                         break;
+                                    case "ud":
+                                        spam_count++;
+                                        nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
+                                        if (nick_access >= 1)
+                                        {
+                                            if (line.GetUpperBound(0) > 3)
+                                            {
+                                                // Add introduction
+                                                get_ud(line[4], line[2]);
+                                            }
+                                            else
+                                            {
+                                                sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
+                                            }
+                                        }
+                                        break;
                                 }
                             }
                             else // From Query
@@ -2220,6 +2236,58 @@ namespace IRCBot
                 }
             }
             return shouldRun;
+        }
+
+        private void get_ud(string search, string channel)
+        {
+            string URL = "http://www.urbandictionary.com/define.php?term=";
+            List<KeyValuePair<string, string>> ret = new List<KeyValuePair<string, string>>();
+            try
+            {
+                string c = new WebClient().DownloadString(URL + HttpUtility.UrlEncode(search));
+                MatchCollection mc = Regex.Matches(c, "<div class=\"definition\">(.*?)</div>");
+                MatchCollection mc2 = Regex.Matches(c, "<td class='word'>(.*?)</td>", RegexOptions.Singleline);
+                if (mc.Count <= mc2.Count)
+                {
+                    for (int i = 0; i < mc.Count; i++)
+                    {
+                        ret.Add(new KeyValuePair<string, string>(mc2[i].Groups[1].Value.Trim(), System.Web.HttpUtility.HtmlDecode(mc[i].Groups[1].Value.Trim())));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                sendData("PRIVMSG", channel + " :UrbanDictionary/Search Error: " + ex);
+            }
+            if (ret.Count > 0)
+            {
+                int index = 0;
+                if (ret.Count > 3)
+                {
+                    sendData("PRIVMSG", channel + " :Showing top 3 results");
+                }
+                else
+                {
+                    sendData("PRIVMSG", channel + " :Showing " + ret.Count + " results");
+                }
+                foreach (KeyValuePair<string, string> pair in ret)
+                {
+                    if (index < 3)
+                    {
+                        sendData("PRIVMSG", channel + " :" + pair.Key + ": " + pair.Value);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                    index++;
+                }
+                sendData("PRIVMSG", channel + " :" + URL + search);
+            }
+            else
+            {
+                sendData("PRIVMSG", channel + " :No Results Found.");
+            }
         }
 
         private void list_access_list(string nick, string channel)
@@ -3256,7 +3324,7 @@ namespace IRCBot
                         {
                             sendData("PRIVMSG", nick + " :" + intro_nick[0] + " has left you a message on: " + intro_nick[2]);
                             sendData("PRIVMSG", nick + " :\"" + intro_nick[3] + "\"");
-                            sendData("PRIVMSG", nick + " :If you would like to reply to him, please type .message " + nick + " <your_message>");
+                            sendData("PRIVMSG", nick + " :If you would like to reply to them, please type .message " + nick + " <your_message>");
                         }
                         else
                         {

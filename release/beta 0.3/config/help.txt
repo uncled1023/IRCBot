@@ -50,3 +50,4 @@ Get 5 Day Forecast:1:forecast <zip code|city name>:Displays the 5 day forecast f
 Get 5 Day Forecast:1:f <zip code|city name>:Displays the 5 day forecast for the city you search for.
 Channel Quote:1:quote:Gets a random quote from the channel.
 Google:1:google <query>:Returns the first result from Google.
+Urban Dictionary:1:ud <query>:Returns up to 3 results from Urban Dictionary.

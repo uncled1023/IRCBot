@@ -623,7 +623,7 @@ namespace IRCBot
             return access;
         }
 
-        private string get_user_access(string nick, string channel)
+        private int get_user_access(string nick, string channel)
         {
             string access = "";
             string user_access = "";
@@ -651,41 +651,58 @@ namespace IRCBot
                 }
                 if (user_access.Contains('~'))
                 {
-                    access = "Founder";
+                    access = "9";
                 }
                 else if (user_access.Contains('&'))
                 {
-                    access = "SOP";
+                    access = "8";
                 }
                 else if (user_access.Contains('@'))
                 {
-                    access = "OP";
+                    access = "7";
                 }
                 else if (user_access.Contains('%'))
                 {
-                    access = "HOP";
+                    access = "4";
                 }
                 else if (user_access.Contains('+'))
                 {
-                    access = "Voice";
+                    access = "3";
                 }
                 else if (user_access != "")
                 {
-                    access = "User";
+                    access = "1";
                 }
                 else
                 {
-                    access = "None";
+                    access = "0";
                 }
             }
-            return access;
+            string[] owners = conf.owner.Split(','); // Get list of owners
+            for (int x = 0; x <= owners.GetUpperBound(0); x++)
+            {
+                if (nick.Equals(owners[x]))
+                {
+                    access += "," + "10";
+                }
+            }
+            string[] tmp_access = access.Split(',');
+            int access_num = 0;
+            foreach (string access_line in tmp_access)
+            {
+                if (Convert.ToInt32(access_line) > access_num)
+                {
+                    access_num = Convert.ToInt32(access_line);
+                }
+            }
+            return access_num;
         }
 
         private bool parse_message(string[] line)
         {
             bool nick_owner = false;
             bool access_needed = false;
-            string nick_access = "None";
+            int nick_access = 0;
 
             // On Message Events events
             if (line[1] == "PRIVMSG")
@@ -742,6 +759,45 @@ namespace IRCBot
                                                 sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
                                             }
                                         }
+                                        else
+                                        {
+                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
+                                        }
+                                        break;
+                                    case "listaccess":
+                                        if (nick_owner == true)
+                                        {
+                                            list_access_list(nick[0].TrimStart(':'), line[2]);
+                                        }
+                                        else
+                                        {
+                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
+                                        }
+                                        break;
+                                    case "delaccess":
+                                        if (nick_owner == true)
+                                        {
+                                            if (line.GetUpperBound(0) > 3)
+                                            {
+                                                string[] parse = line[4].Split(' ');
+                                                if (parse.GetUpperBound(0) > 0)
+                                                {
+                                                    del_access_list(parse[0], line[2], parse[1]);
+                                                }
+                                                else
+                                                {
+                                                    sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
+                                                }
+                                            }
+                                            else
+                                            {
+                                                sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
+                                        }
                                         break;
                                     case "addowner":
                                         if (nick_owner == true)
@@ -754,6 +810,10 @@ namespace IRCBot
                                             {
                                                 sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
                                             }
+                                        }
+                                        else
+                                        {
+                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
                                         }
                                         break;
                                     case "delowner":
@@ -768,11 +828,19 @@ namespace IRCBot
                                                 sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
                                             }
                                         }
+                                        else
+                                        {
+                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
+                                        }
                                         break;
                                     case "id":
                                         if (nick_owner == true)
                                         {
                                             identify();
+                                        }
+                                        else
+                                        {
+                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
                                         }
                                         break;
                                     case "join":
@@ -788,6 +856,10 @@ namespace IRCBot
                                                 sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
                                             }
                                         }
+                                        else
+                                        {
+                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
+                                        }
                                         break;
                                     case "part":
                                         if (nick_owner == true)
@@ -802,6 +874,10 @@ namespace IRCBot
                                                 sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
                                             }
                                         }
+                                        else
+                                        {
+                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
+                                        }
                                         break;
                                     case "say":
                                         if (nick_owner == true)
@@ -814,6 +890,10 @@ namespace IRCBot
                                             {
                                                 sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
                                             }
+                                        }
+                                        else
+                                        {
+                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
                                         }
                                         break;
                                     case "quit":
@@ -829,107 +909,135 @@ namespace IRCBot
                                             }
                                             shouldRun = false; //turn shouldRun to false - the server will stop sending us data so trying to read it will not work and result in an error. This stops the loop from running and we will close off the connections properly
                                         }
+                                        else
+                                        {
+                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
+                                        }
                                         break;
                                     case "founder":
                                         spam_count++;
                                         nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
-                                        if (nick_access == "Founder" || nick_owner == true)
+                                        if (nick_access >= 9)
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 sendData("MODE", line[2] + " +q " + line[4]);
-                                                set_access_list(line[4], line[2], "Founder");
+                                                set_access_list(line[4], line[2], "9");
                                             }
                                             else
                                             {
                                                 sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
                                             }
+                                        }
+                                        else
+                                        {
+                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
                                         }
                                         break;
                                     case "defounder":
                                         spam_count++;
                                         nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
-                                        if (nick_access == "Founder" || nick_owner == true)
+                                        if (nick_access >= 9)
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 sendData("MODE", line[2] + " -q " + line[4]);
-                                                set_access_list(line[4], line[2], "User");
+                                                del_access_list(line[4], line[2], "9");
                                             }
                                             else
                                             {
                                                 sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
                                             }
+                                        }
+                                        else
+                                        {
+                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
                                         }
                                         break;
                                     case "sop":
                                         spam_count++;
                                         nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
-                                        if (nick_access == "SOP" || nick_access == "Founder" || nick_owner == true)
+                                        if (nick_access >= 8)
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 sendData("MODE", line[2] + " +a " + line[4]);
-                                                set_access_list(line[4], line[2], "SOP");
+                                                set_access_list(line[4], line[2], "8");
                                             }
                                             else
                                             {
                                                 sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
                                             }
+                                        }
+                                        else
+                                        {
+                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
                                         }
                                         break;
                                     case "desop":
                                         spam_count++;
                                         nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
-                                        if (nick_access == "SOP" || nick_access == "Founder" || nick_owner == true)
+                                        if (nick_access >= 8)
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 sendData("MODE", line[2] + " -a " + line[4]);
-                                                set_access_list(line[4], line[2], "User");
+                                                del_access_list(line[4], line[2], "8");
                                             }
                                             else
                                             {
                                                 sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
                                             }
+                                        }
+                                        else
+                                        {
+                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
                                         }
                                         break;
                                     case "op":
                                         spam_count++;
                                         nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
-                                        if (nick_access == "OP" || nick_access == "SOP" || nick_access == "Founder" || nick_owner == true)
+                                        if (nick_access >= 7)
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 sendData("MODE", line[2] + " +o " + line[4]);
-                                                set_access_list(line[4], line[2], "OP");
+                                                set_access_list(line[4], line[2], "7");
                                             }
                                             else
                                             {
                                                 sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
                                             }
+                                        }
+                                        else
+                                        {
+                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
                                         }
                                         break;
                                     case "deop":
                                         spam_count++;
                                         nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
-                                        if (nick_access == "OP" || nick_access == "SOP" || nick_access == "Founder" || nick_owner == true)
+                                        if (nick_access >= 7)
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 sendData("MODE", line[2] + " -o " + line[4]);
-                                                set_access_list(line[4], line[2], "User");
+                                                del_access_list(line[4], line[2], "7");
                                             }
                                             else
                                             {
                                                 sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
                                             }
                                         }
+                                        else
+                                        {
+                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
+                                        }
                                         break;
                                     case "mode":
                                         spam_count++;
                                         nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
-                                        if (nick_access == "OP" || nick_access == "SOP" || nick_access == "Founder" || nick_owner == true)
+                                        if (nick_access >= 7)
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
@@ -948,11 +1056,15 @@ namespace IRCBot
                                                 sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
                                             }
                                         }
+                                        else
+                                        {
+                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
+                                        }
                                         break;
                                     case "topic":
                                         spam_count++;
                                         nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
-                                        if (nick_access == "OP" || nick_access == "SOP" || nick_access == "Founder" || nick_owner == true)
+                                        if (nick_access >= 7)
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
@@ -971,11 +1083,15 @@ namespace IRCBot
                                                 sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
                                             }
                                         }
+                                        else
+                                        {
+                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
+                                        }
                                         break;
                                     case "invite":
                                         spam_count++;
                                         nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
-                                        if (nick_access == "OP" || nick_access == "SOP" || nick_access == "Founder" || nick_owner == true)
+                                        if (nick_access >= 7)
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
@@ -987,11 +1103,15 @@ namespace IRCBot
                                                 sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
                                             }
                                         }
+                                        else
+                                        {
+                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
+                                        }
                                         break;
                                     case "b":
                                         spam_count++;
                                         nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
-                                        if (nick_access == "OP" || nick_access == "SOP" || nick_access == "Founder" || nick_owner == true)
+                                        if (nick_access >= 6)
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
@@ -1019,27 +1139,11 @@ namespace IRCBot
                                                 }
                                                 else
                                                 {
-                                                    string sent_nick_access = get_user_access(new_line[0].TrimStart(':'), line[2]);
+                                                    int sent_nick_access = get_user_access(new_line[0].TrimStart(':'), line[2]);
                                                     bool allowed = false;
-                                                    if(nick_access == "OP" && (sent_nick_access == "User" || sent_nick_access == "Voice" || sent_nick_access == "HOP" || sent_nick_access == "OP"))
+                                                    if (nick_access >= sent_nick_access)
                                                     {
                                                         allowed = true;
-                                                    }
-                                                    else if(nick_access == "SOP" && (sent_nick_access == "User" || sent_nick_access == "Voice" || sent_nick_access == "HOP" || sent_nick_access == "OP" || sent_nick_access == "SOP"))
-                                                    {
-                                                        allowed = true;
-                                                    }
-                                                    else if(nick_access == "Founder" && (sent_nick_access == "User" || sent_nick_access == "Voice" || sent_nick_access == "HOP" || sent_nick_access == "OP" || sent_nick_access == "SOP" || sent_nick_access == "Founder"))
-                                                    {
-                                                        allowed = true;
-                                                    }
-                                                    else if(nick_owner)
-                                                    {
-                                                        allowed = true;
-                                                    }
-                                                    else
-                                                    {
-                                                        allowed = false;
                                                     }
                                                     if (allowed == true)
                                                     {
@@ -1052,6 +1156,10 @@ namespace IRCBot
                                                             sendData("MODE", line[2] + " +b " + new_line[0] + " :No Reason");
                                                         }
                                                     }
+                                                    else
+                                                    {
+                                                        sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
+                                                    }
                                                 }
                                             }
                                             else
@@ -1059,11 +1167,15 @@ namespace IRCBot
                                                 sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
                                             }
                                         }
+                                        else
+                                        {
+                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
+                                        }
                                         break;
                                     case "kb":
                                         spam_count++;
                                         nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
-                                        if (nick_access == "OP" || nick_access == "SOP" || nick_access == "Founder" || nick_owner == true)
+                                        if (nick_access >= 6)
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
@@ -1099,27 +1211,11 @@ namespace IRCBot
                                                 }
                                                 else
                                                 {
-                                                    string sent_nick_access = get_user_access(new_line[0].TrimStart(':'), line[2]);
+                                                    int sent_nick_access = get_user_access(new_line[0].TrimStart(':'), line[2]);
                                                     bool allowed = false;
-                                                    if(nick_access == "OP" && (sent_nick_access == "User" || sent_nick_access == "Voice" || sent_nick_access == "HOP" || sent_nick_access == "OP"))
+                                                    if (nick_access >= sent_nick_access)
                                                     {
                                                         allowed = true;
-                                                    }
-                                                    else if(nick_access == "SOP" && (sent_nick_access == "User" || sent_nick_access == "Voice" || sent_nick_access == "HOP" || sent_nick_access == "OP" || sent_nick_access == "SOP"))
-                                                    {
-                                                        allowed = true;
-                                                    }
-                                                    else if(nick_access == "Founder" && (sent_nick_access == "User" || sent_nick_access == "Voice" || sent_nick_access == "HOP" || sent_nick_access == "OP" || sent_nick_access == "SOP" || sent_nick_access == "Founder"))
-                                                    {
-                                                        allowed = true;
-                                                    }
-                                                    else if(nick_owner)
-                                                    {
-                                                        allowed = true;
-                                                    }
-                                                    else
-                                                    {
-                                                        allowed = false;
                                                     }
                                                     if(allowed == true)
                                                     {
@@ -1134,6 +1230,10 @@ namespace IRCBot
                                                             sendData("KICK", line[2] + " " + new_line[0] + " :No Reason");
                                                         }
                                                     }
+                                                    else
+                                                    {
+                                                        sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
+                                                    }
                                                 }
                                             }
                                             else
@@ -1141,11 +1241,15 @@ namespace IRCBot
                                                 sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
                                             }
                                         }
+                                        else
+                                        {
+                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
+                                        }
                                         break;
                                     case "ak":
                                         spam_count++;
                                         nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
-                                        if (nick_access == "OP" || nick_access == "SOP" || nick_access == "Founder" || nick_owner == true)
+                                        if (nick_access >= 7)
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
@@ -1181,27 +1285,11 @@ namespace IRCBot
                                                 }
                                                 else
                                                 {
-                                                    string sent_nick_access = get_user_access(new_line[0].TrimStart(':'), line[2]);
+                                                    int sent_nick_access = get_user_access(new_line[0].TrimStart(':'), line[2]);
                                                     bool allowed = false;
-                                                    if (nick_access == "OP" && (sent_nick_access == "User" || sent_nick_access == "Voice" || sent_nick_access == "HOP" || sent_nick_access == "OP"))
+                                                    if (nick_access >= sent_nick_access)
                                                     {
                                                         allowed = true;
-                                                    }
-                                                    else if (nick_access == "SOP" && (sent_nick_access == "User" || sent_nick_access == "Voice" || sent_nick_access == "HOP" || sent_nick_access == "OP" || sent_nick_access == "SOP"))
-                                                    {
-                                                        allowed = true;
-                                                    }
-                                                    else if (nick_access == "Founder" && (sent_nick_access == "User" || sent_nick_access == "Voice" || sent_nick_access == "HOP" || sent_nick_access == "OP" || sent_nick_access == "SOP" || sent_nick_access == "Founder"))
-                                                    {
-                                                        allowed = true;
-                                                    }
-                                                    else if (nick_owner)
-                                                    {
-                                                        allowed = true;
-                                                    }
-                                                    else
-                                                    {
-                                                        allowed = false;
                                                     }
                                                     if (allowed == true)
                                                     {
@@ -1215,6 +1303,10 @@ namespace IRCBot
                                                             add_auto(new_line[0], line[2], target_host, "k", "No Reason");
                                                         }
                                                     }
+                                                    else
+                                                    {
+                                                        sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
+                                                    }
                                                 }
                                             }
                                             else
@@ -1222,11 +1314,15 @@ namespace IRCBot
                                                 sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
                                             }
                                         }
+                                        else
+                                        {
+                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
+                                        }
                                         break;
                                     case "ab":
                                         spam_count++;
                                         nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
-                                        if (nick_access == "OP" || nick_access == "SOP" || nick_access == "Founder" || nick_owner == true)
+                                        if (nick_access >= 7)
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
@@ -1263,27 +1359,11 @@ namespace IRCBot
                                                 }
                                                 else
                                                 {
-                                                    string sent_nick_access = get_user_access(new_line[0].TrimStart(':'), line[2]);
+                                                    int sent_nick_access = get_user_access(new_line[0].TrimStart(':'), line[2]);
                                                     bool allowed = false;
-                                                    if (nick_access == "OP" && (sent_nick_access == "User" || sent_nick_access == "Voice" || sent_nick_access == "HOP" || sent_nick_access == "OP"))
+                                                    if (nick_access >= sent_nick_access)
                                                     {
                                                         allowed = true;
-                                                    }
-                                                    else if (nick_access == "SOP" && (sent_nick_access == "User" || sent_nick_access == "Voice" || sent_nick_access == "HOP" || sent_nick_access == "OP" || sent_nick_access == "SOP"))
-                                                    {
-                                                        allowed = true;
-                                                    }
-                                                    else if (nick_access == "Founder" && (sent_nick_access == "User" || sent_nick_access == "Voice" || sent_nick_access == "HOP" || sent_nick_access == "OP" || sent_nick_access == "SOP" || sent_nick_access == "Founder"))
-                                                    {
-                                                        allowed = true;
-                                                    }
-                                                    else if (nick_owner)
-                                                    {
-                                                        allowed = true;
-                                                    }
-                                                    else
-                                                    {
-                                                        allowed = false;
                                                     }
                                                     if (allowed == true)
                                                     {
@@ -1296,6 +1376,10 @@ namespace IRCBot
                                                             add_auto(new_line[0], line[2], target_host, "b", "No Reason");
                                                         }
                                                     }
+                                                    else
+                                                    {
+                                                        sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
+                                                    }
                                                 }
                                             }
                                             else
@@ -1303,11 +1387,15 @@ namespace IRCBot
                                                 sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
                                             }
                                         }
+                                        else
+                                        {
+                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
+                                        }
                                         break;
                                     case "akb":
                                         spam_count++;
                                         nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
-                                        if (nick_access == "OP" || nick_access == "SOP" || nick_access == "Founder" || nick_owner == true)
+                                        if (nick_access >= 7)
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
@@ -1344,27 +1432,11 @@ namespace IRCBot
                                                 }
                                                 else
                                                 {
-                                                    string sent_nick_access = get_user_access(new_line[0].TrimStart(':'), line[2]);
+                                                    int sent_nick_access = get_user_access(new_line[0].TrimStart(':'), line[2]);
                                                     bool allowed = false;
-                                                    if (nick_access == "OP" && (sent_nick_access == "User" || sent_nick_access == "Voice" || sent_nick_access == "HOP" || sent_nick_access == "OP"))
+                                                    if (nick_access >= sent_nick_access)
                                                     {
                                                         allowed = true;
-                                                    }
-                                                    else if (nick_access == "SOP" && (sent_nick_access == "User" || sent_nick_access == "Voice" || sent_nick_access == "HOP" || sent_nick_access == "OP" || sent_nick_access == "SOP"))
-                                                    {
-                                                        allowed = true;
-                                                    }
-                                                    else if (nick_access == "Founder" && (sent_nick_access == "User" || sent_nick_access == "Voice" || sent_nick_access == "HOP" || sent_nick_access == "OP" || sent_nick_access == "SOP" || sent_nick_access == "Founder"))
-                                                    {
-                                                        allowed = true;
-                                                    }
-                                                    else if (nick_owner)
-                                                    {
-                                                        allowed = true;
-                                                    }
-                                                    else
-                                                    {
-                                                        allowed = false;
                                                     }
                                                     if (allowed == true)
                                                     {
@@ -1377,6 +1449,10 @@ namespace IRCBot
                                                             add_auto(new_line[0], line[2], target_host, "kb", "No Reason");
                                                         }
                                                     }
+                                                    else
+                                                    {
+                                                        sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
+                                                    }
                                                 }
                                             }
                                             else
@@ -1384,11 +1460,15 @@ namespace IRCBot
                                                 sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
                                             }
                                         }
+                                        else
+                                        {
+                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
+                                        }
                                         break;
                                     case "deak":
                                         spam_count++;
                                         nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
-                                        if (nick_access == "OP" || nick_access == "SOP" || nick_access == "Founder" || nick_owner == true)
+                                        if (nick_access >= 7)
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
@@ -1400,11 +1480,15 @@ namespace IRCBot
                                                 sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
                                             }
                                         }
+                                        else
+                                        {
+                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
+                                        }
                                         break;
                                     case "deab":
                                         spam_count++;
                                         nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
-                                        if (nick_access == "OP" || nick_access == "SOP" || nick_access == "Founder" || nick_owner == true)
+                                        if (nick_access >= 7)
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
@@ -1416,11 +1500,15 @@ namespace IRCBot
                                                 sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
                                             }
                                         }
+                                        else
+                                        {
+                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
+                                        }
                                         break;
                                     case "deakb":
                                         spam_count++;
                                         nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
-                                        if (nick_access == "OP" || nick_access == "SOP" || nick_access == "Founder" || nick_owner == true)
+                                        if (nick_access >= 7)
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
@@ -1432,43 +1520,55 @@ namespace IRCBot
                                                 sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
                                             }
                                         }
+                                        else
+                                        {
+                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
+                                        }
                                         break;
                                     case "hop":
                                         spam_count++;
                                         nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
-                                        if (nick_access == "HOP" || nick_access == "OP" || nick_access == "SOP" || nick_access == "Founder" || nick_owner == true)
+                                        if (nick_access >= 4)
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 sendData("MODE", line[2] + " +h " + line[4]);
-                                                set_access_list(line[4], line[2], "HOP");
+                                                set_access_list(line[4], line[2], "4");
                                             }
                                             else
                                             {
                                                 sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
                                             }
+                                        }
+                                        else
+                                        {
+                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
                                         }
                                         break;
                                     case "dehop":
                                         spam_count++;
                                         nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
-                                        if (nick_access == "HOP" || nick_access == "OP" || nick_access == "SOP" || nick_access == "Founder" || nick_owner == true)
+                                        if (nick_access >= 4)
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 sendData("MODE", line[2] + " -h " + line[4]);
-                                                set_access_list(line[4], line[2], "User");
+                                                del_access_list(line[4], line[2], "4");
                                             }
                                             else
                                             {
                                                 sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
                                             }
                                         }
+                                        else
+                                        {
+                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
+                                        }
                                         break;
                                     case "k":
                                         spam_count++;
                                         nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
-                                        if (nick_access == "HOP" || nick_access == "OP" || nick_access == "SOP" || nick_access == "Founder" || nick_owner == true)
+                                        if (nick_access >= 5)
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
@@ -1504,31 +1604,11 @@ namespace IRCBot
                                                 }
                                                 else
                                                 {
-                                                    string sent_nick_access = get_user_access(new_line[0].TrimStart(':'), line[2]);
+                                                    int sent_nick_access = get_user_access(new_line[0].TrimStart(':'), line[2]);
                                                     bool allowed = false;
-                                                    if (nick_access == "HOP" && (sent_nick_access == "User" || sent_nick_access == "Voice" || sent_nick_access == "HOP"))
+                                                    if (nick_access >= sent_nick_access)
                                                     {
                                                         allowed = true;
-                                                    }
-                                                    else if (nick_access == "OP" && (sent_nick_access == "User" || sent_nick_access == "Voice" || sent_nick_access == "HOP" || sent_nick_access == "OP"))
-                                                    {
-                                                        allowed = true;
-                                                    }
-                                                    else if (nick_access == "SOP" && (sent_nick_access == "User" || sent_nick_access == "Voice" || sent_nick_access == "HOP" || sent_nick_access == "OP" || sent_nick_access == "SOP"))
-                                                    {
-                                                        allowed = true;
-                                                    }
-                                                    else if (nick_access == "Founder" && (sent_nick_access == "User" || sent_nick_access == "Voice" || sent_nick_access == "HOP" || sent_nick_access == "OP" || sent_nick_access == "SOP" || sent_nick_access == "Founder"))
-                                                    {
-                                                        allowed = true;
-                                                    }
-                                                    else if (nick_owner)
-                                                    {
-                                                        allowed = true;
-                                                    }
-                                                    else
-                                                    {
-                                                        allowed = false;
                                                     }
                                                     if (allowed == true)
                                                     {
@@ -1541,6 +1621,10 @@ namespace IRCBot
                                                             sendData("KICK", line[2] + " " + new_line[0] + " :No Reason");
                                                         }
                                                     }
+                                                    else
+                                                    {
+                                                        sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
+                                                    }
                                                 }
                                             }
                                             else
@@ -1548,34 +1632,70 @@ namespace IRCBot
                                                 sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
                                             }
                                         }
+                                        else
+                                        {
+                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
+                                        }
                                         break;
                                     case "voice":
                                         spam_count++;
                                         nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
                                         // Voice Commands
-                                        if (nick_access == "Voice" || nick_access == "HOP" || nick_access == "OP" || nick_access == "SOP" || nick_access == "Founder" || nick_owner == true)
+                                        if (nick_access >= 3)
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 sendData("MODE", line[2] + " +v " + line[4]);
-                                                set_access_list(line[4], line[2], "Voice");
+                                                set_access_list(line[4], line[2], "3");
                                             }
                                             else
                                             {
                                                 sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
                                             }
+                                        }
+                                        else
+                                        {
+                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
                                         }
                                         break;
                                     case "devoice":
                                         spam_count++;
                                         nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
                                         // Voice Commands
-                                        if (nick_access == "Voice" || nick_access == "HOP" || nick_access == "OP" || nick_access == "SOP" || nick_access == "Founder" || nick_owner == true)
+                                        if (nick_access >= 3)
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 sendData("MODE", line[2] + " -v " + line[4]);
-                                                set_access_list(line[4], line[2], "User");
+                                                del_access_list(line[4], line[2], "3");
+                                            }
+                                            else
+                                            {
+                                                sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
+                                        }
+                                        break;
+                                    case "help":
+                                        spam_count++;
+                                        nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
+                                        if (nick_access >= 1)
+                                        {
+                                            help(line, nick[0].TrimStart(':'), line[2], nick_access);
+                                        }
+                                        break;
+                                    case "intro":
+                                        spam_count++;
+                                        nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
+                                        if (nick_access >= 1)
+                                        {
+                                            if (line.GetUpperBound(0) > 3)
+                                            {
+                                                // Add introduction
+                                                add_intro(nick[0].TrimStart(':'), line[2], line);
                                             }
                                             else
                                             {
@@ -1583,30 +1703,14 @@ namespace IRCBot
                                             }
                                         }
                                         break;
-                                    case "help":
-                                        spam_count++;
-                                        if (nick_owner == true)
-                                        {
-                                            nick_access = "Owner";
-                                        }
-                                        help(line, nick[0].TrimStart(':'), line[2], nick_access);
-                                        break;
-                                    case "intro":
-                                        spam_count++;
-                                        if (line.GetUpperBound(0) > 3)
-                                        {
-                                            // Add introduction
-                                            add_intro(nick[0].TrimStart(':'), line[2], line);
-                                        }
-                                        else
-                                        {
-                                            sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
-                                        }
-                                        break;
                                     case "introdelete":
                                         spam_count++;
-                                        // Delete Introduction
-                                        delete_intro(nick[0].TrimStart(':'), line[2]);
+                                        nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
+                                        if (nick_access >= 1)
+                                        {
+                                            // Delete Introduction
+                                            delete_intro(nick[0].TrimStart(':'), line[2]);
+                                        }
                                         break;
                                     case "message":
                                         spam_count++;
@@ -1621,116 +1725,148 @@ namespace IRCBot
                                         break;
                                     case "kme":
                                         spam_count++;
-                                        if (line.GetUpperBound(0) > 3)
+                                        nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
+                                        if (nick_access >= 1)
                                         {
-                                            sendData("KICK", line[2] + " " + nick[0].TrimStart(':') + " :" + line[4]);
-                                        }
-                                        else
-                                        {
-                                            sendData("KICK", line[2] + " " + nick[0].TrimStart(':') + " :No Reason");
+                                            if (line.GetUpperBound(0) > 3)
+                                            {
+                                                sendData("KICK", line[2] + " " + nick[0].TrimStart(':') + " :" + line[4]);
+                                            }
+                                            else
+                                            {
+                                                sendData("KICK", line[2] + " " + nick[0].TrimStart(':') + " :No Reason");
+                                            }
                                         }
                                         break;
                                     case "quote":
                                         spam_count++;
-                                        get_quote(line[2]);
+                                        nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
+                                        if (nick_access >= 1)
+                                        {
+                                            get_quote(line[2]);
+                                        }
                                         break;
                                     case "seen":
                                         spam_count++;
-                                        if (line.GetUpperBound(0) > 3)
+                                        nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
+                                        if (nick_access >= 1)
                                         {
-                                            // Add introduction
-                                            seen(line[4], line[2]);
-                                        }
-                                        else
-                                        {
-                                            sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
+                                            if (line.GetUpperBound(0) > 3)
+                                            {
+                                                // Add introduction
+                                                seen(line[4], line[2]);
+                                            }
+                                            else
+                                            {
+                                                sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
+                                            }
                                         }
                                         break;
                                     case "w":
                                         spam_count++;
-                                        if (line.GetUpperBound(0) > 3)
+                                        nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
+                                        if (nick_access >= 1)
                                         {
-                                            // Add introduction
-                                            get_weather(line[4], line[2]);
-                                        }
-                                        else
-                                        {
-                                            sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
+                                            if (line.GetUpperBound(0) > 3)
+                                            {
+                                                // Add introduction
+                                                get_weather(line[4], line[2]);
+                                            }
+                                            else
+                                            {
+                                                sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
+                                            }
                                         }
                                         break;
                                     case "weather":
                                         spam_count++;
-                                        if (line.GetUpperBound(0) > 3)
+                                        nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
+                                        if (nick_access >= 1)
                                         {
-                                            // Add introduction
-                                            get_weather(line[4], line[2]);
-                                        }
-                                        else
-                                        {
-                                            sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
+                                            if (line.GetUpperBound(0) > 3)
+                                            {
+                                                // Add introduction
+                                                get_weather(line[4], line[2]);
+                                            }
+                                            else
+                                            {
+                                                sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
+                                            }
                                         }
                                         break;
                                     case "f":
                                         spam_count++;
-                                        if (line.GetUpperBound(0) > 3)
+                                        nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
+                                        if (nick_access >= 1)
                                         {
-                                            // Add introduction
-                                            get_forecast(line[4], line[2]);
-                                        }
-                                        else
-                                        {
-                                            sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
+                                            if (line.GetUpperBound(0) > 3)
+                                            {
+                                                // Add introduction
+                                                get_forecast(line[4], line[2]);
+                                            }
+                                            else
+                                            {
+                                                sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
+                                            }
                                         }
                                         break;
                                     case "forecast":
                                         spam_count++;
-                                        if (line.GetUpperBound(0) > 3)
+                                        nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
+                                        if (nick_access >= 1)
                                         {
-                                            // Add introduction
-                                            get_forecast(line[4], line[2]);
-                                        }
-                                        else
-                                        {
-                                            sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
+                                            if (line.GetUpperBound(0) > 3)
+                                            {
+                                                // Add introduction
+                                                get_forecast(line[4], line[2]);
+                                            }
+                                            else
+                                            {
+                                                sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
+                                            }
                                         }
                                         break;
                                     case "google":
                                         spam_count++;
-                                        if (line.GetUpperBound(0) > 3)
+                                        nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
+                                        if (nick_access >= 1)
                                         {
-                                            if (line[4].StartsWith("DCC SEND"))
+                                            if (line.GetUpperBound(0) > 3)
                                             {
-                                                sendData("PRIVMSG", line[2] + " :Invalid Search Term");
-                                            }
-                                            else
-                                            {
-                                                ISearchResult searchClass = new GoogleSearch(line[4]);
-                                                try
+                                                if (line[4].StartsWith("DCC SEND"))
                                                 {
-                                                    var list = searchClass.Search();
-                                                if (list.Count > 0)
-                                                {
-                                                    foreach (var searchType in list)
-                                                    {
-                                                        sendData("PRIVMSG", line[2] + " :" + searchType.title.Replace("<b>", "").Replace("</b>", "").Replace("&quot;", "\"").Replace("&#39", "'") + ": " + searchType.content.Replace("<b>", "").Replace("</b>", "").Replace("&quot;", "\"").Replace("&#39", "'"));
-                                                        sendData("PRIVMSG", line[2] + " :" + searchType.url);
-                                                        break;
-                                                    }
+                                                    sendData("PRIVMSG", line[2] + " :Invalid Search Term");
                                                 }
                                                 else
                                                 {
-                                                    sendData("PRIVMSG", line[2] + " :No Results Found");
-                                                }
-                                                }
-                                                catch (Exception ex)
-                                                {
-                                                    MessageBox.Show(ex.ToString());
+                                                    ISearchResult searchClass = new GoogleSearch(line[4]);
+                                                    try
+                                                    {
+                                                        var list = searchClass.Search();
+                                                        if (list.Count > 0)
+                                                        {
+                                                            foreach (var searchType in list)
+                                                            {
+                                                                sendData("PRIVMSG", line[2] + " :" + searchType.title.Replace("<b>", "").Replace("</b>", "").Replace("&quot;", "\"").Replace("&#39", "'") + ": " + searchType.content.Replace("<b>", "").Replace("</b>", "").Replace("&quot;", "\"").Replace("&#39", "'"));
+                                                                sendData("PRIVMSG", line[2] + " :" + searchType.url);
+                                                                break;
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            sendData("PRIVMSG", line[2] + " :No Results Found");
+                                                        }
+                                                    }
+                                                    catch (Exception ex)
+                                                    {
+                                                        MessageBox.Show(ex.ToString());
+                                                    }
                                                 }
                                             }
-                                        }
-                                        else
-                                        {
-                                            sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
+                                            else
+                                            {
+                                                sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
+                                            }
                                         }
                                         break;
                                 }
@@ -1864,6 +2000,7 @@ namespace IRCBot
                                         if (line[4].Equals(conf.pass))
                                         {
                                             add_owner(nick[0].TrimStart(':'));
+                                            sendData("PRIVMSG", nick[0].TrimStart(':') + " :Identified Successfully!");
                                         }
                                         break;
                                 }
@@ -1915,6 +2052,41 @@ namespace IRCBot
             return shouldRun;
         }
 
+        private void list_access_list(string nick, string channel)
+        {
+            string file_name = "list.txt";
+
+            if (File.Exists(cur_dir + "\\modules\\access\\" + file_name))
+            {
+                string[] log_file = System.IO.File.ReadAllLines(cur_dir + "\\modules\\access\\" + file_name);
+                int number_of_lines = log_file.GetUpperBound(0) + 1;
+                if (number_of_lines > 0)
+                {
+                    foreach (string line in log_file)
+                    {
+                        char[] sep = new char[] { '*' };
+                        string[] new_line = line.Split(sep, 3);
+                        if (new_line.GetUpperBound(0) > 0)
+                        {
+                            if (new_line[1].Equals(channel))
+                            {
+                                sendData("NOTICE", nick + " :" + new_line[0] + ": " + new_line[2]);
+                            }
+                        }
+                    }
+                    sendData("NOTICE", nick + " :End of Access List");
+                }
+                else
+                {
+                    sendData("NOTICE", nick + " :No users in Access List.");
+                }
+            }
+            else
+            {
+                sendData("NOTICE", nick + " :No users in Access List.");
+            }
+        }
+
         private string get_access_list(string nick, string channel)
         {
             string file_name = "list.txt";
@@ -1929,7 +2101,7 @@ namespace IRCBot
                     foreach (string line in log_file)
                     {
                         char[] sep = new char[] { '*' };
-                        string[] new_line = line.Split(sep, 4);
+                        string[] new_line = line.Split(sep, 3);
                         if (new_line.GetUpperBound(0) > 0)
                         {
                             if (new_line[0].Equals(nick) && new_line[1].Equals(channel))
@@ -1965,12 +2137,31 @@ namespace IRCBot
                     foreach (string lines in log_file)
                     {
                         char[] sep = new char[] { '*' };
-                        string[] new_line = lines.Split(sep, 4);
+                        string[] new_line = lines.Split(sep, 3);
                         if (new_line.GetUpperBound(0) > 0)
                         {
                             if (new_line[0].Equals(nick) && new_line[1].Equals(channel))
                             {
-                                new_file[index] = new_line[0] + "*" + new_line[1] + "*" + access;
+                                string[] tmp_line = new_line[2].Split(',');
+                                bool access_found = false;
+                                foreach (string line in tmp_line)
+                                {
+                                    if(line.Equals(access))
+                                    {
+                                        access_found = true;
+                                    }
+                                }
+                                if (access_found == false)
+                                {
+                                    if (new_line[2].Equals(""))
+                                    {
+                                        new_file[index] = new_line[0] + "*" + new_line[1] + "*" + access;
+                                    }
+                                    else
+                                    {
+                                        new_file[index] = new_line[0] + "*" + new_line[1] + "*" + new_line[2] + "," + access;
+                                    }
+                                }
                                 nick_found = true;
                             }
                             else
@@ -2003,6 +2194,65 @@ namespace IRCBot
                 StreamWriter log_file = File.CreateText(cur_dir + "\\modules\\access\\" + file_name);
                 log_file.WriteLine(nick + "*" + channel + "*" + access);
                 log_file.Close();
+            }
+        }
+
+        private void del_access_list(string nick, string channel, string access)
+        {
+            string file_name = "list.txt";
+            DateTime current_date = DateTime.Now;
+
+            if (Directory.Exists(cur_dir + "\\modules\\access\\") == false)
+            {
+                Directory.CreateDirectory(cur_dir + "\\modules\\access");
+            }
+            if (File.Exists(cur_dir + "\\modules\\access\\" + file_name))
+            {
+                string[] log_file = System.IO.File.ReadAllLines(cur_dir + "\\modules\\access\\" + file_name);
+                int number_of_lines = log_file.GetUpperBound(0) + 1;
+                string[] new_file = new string[number_of_lines];
+                int index = 0;
+                if (number_of_lines > 0)
+                {
+                    foreach (string lines in log_file)
+                    {
+                        char[] sep = new char[] { '*' };
+                        string[] new_line = lines.Split(sep, 3);
+                        if (new_line.GetUpperBound(0) > 0)
+                        {
+                            if (new_line[0].Equals(nick) && new_line[1].Equals(channel))
+                            {
+                                string[] tmp_line = new_line[2].Split(',');
+                                bool access_found = false;
+                                string new_access = "";
+                                foreach (string line in tmp_line)
+                                {
+                                    if (line.Equals(access))
+                                    {
+                                    }
+                                    else
+                                    {
+                                        new_access += "," + line;
+                                    }
+                                }
+                                if (access_found == false)
+                                {
+                                    if (new_access.TrimStart(',').TrimEnd(',') != "")
+                                    {
+                                        new_file[index] = new_line[0] + "*" + new_line[1] + "*" + new_access.TrimStart(',').TrimEnd(',');
+                                        index++;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                new_file[index] = lines;
+                                index++;
+                            }
+                        }
+                    }
+                    System.IO.File.WriteAllLines(cur_dir + "\\modules\\access\\" + file_name, new_file);
+                }
             }
         }
 
@@ -2523,53 +2773,19 @@ namespace IRCBot
             }
         }
 
-        private void help(string[] line, string nick, string channel, string access)
+        private void help(string[] line, string nick, string channel, int access)
         {
             string search_term = "";
             string list_file = cur_dir + "\\config\\help.txt";
-            string[] allowed_access;
-            switch (access)
-            {
-                case "Owner":
-                    allowed_access = new string[] {"Owner", "Founder", "SOP", "OP", "HOP", "Voice", "User"};
-                    break;
-                case "Founder":
-                    allowed_access = new string[] { "Founder", "SOP", "OP", "HOP", "Voice", "User" };
-                    break;
-                case "SOP":
-                    allowed_access = new string[] { "SOP", "OP", "HOP", "Voice", "User" };
-                    break;
-                case "OP":
-                    allowed_access = new string[] { "OP", "HOP", "Voice", "User" };
-                    break;
-                case "HOP":
-                    allowed_access = new string[] { "HOP", "Voice", "User" };
-                    break;
-                case "Voice":
-                    allowed_access = new string[] { "Voice", "User" };
-                    break;
-                default:
-                    allowed_access = new string[] { "User" };
-                    break;
-            }
             if (File.Exists(list_file))
             {
-                string current_access = "";
                 string msg = "";
                 string[] file = System.IO.File.ReadAllLines(list_file);
+                int previous_access = 0;
                 foreach (string file_line in file)
                 {
                     string[] split = file_line.Split(':');
-                    bool help_allowed = false;
-                    for (int x = 0; x <= allowed_access.GetUpperBound(0); x++)
-                    {
-                        if (allowed_access[x].Equals(split[1]) == true)
-                        {
-                            help_allowed = true;
-                            break;
-                        }
-                    }
-                    if (help_allowed == true)
+                    if (access >= Convert.ToInt32(split[1]))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -2582,17 +2798,17 @@ namespace IRCBot
                         }
                         else
                         {
-                            if (current_access.Equals(split[1]) == false)
+                            if (Convert.ToInt32(split[1]) != previous_access)
                             {
-                                if (msg != "")
-                                {
-                                    sendData("NOTICE", nick + " :" + msg.TrimEnd(','));
-                                }
+                                previous_access = Convert.ToInt32(split[1]);
+                                sendData("NOTICE", nick + " :" + msg.TrimEnd(','));
                                 msg = "";
-                                sendData("NOTICE", nick + " :----- " + split[1] + " Commands -----");
+                                msg += " " + conf.command + split[2] + ",";
                             }
-                            current_access = split[1];
-                            msg += " " + conf.command + split[2] + ",";
+                            else
+                            {
+                                msg += " " + conf.command + split[2] + ",";
+                            }
                         }
                     }
                 }

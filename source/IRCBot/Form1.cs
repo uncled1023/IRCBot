@@ -313,9 +313,7 @@ namespace IRCBot
             RichTextBox output_box = (RichTextBox)control;
             if (restart == true)
             {
-                Thread.Sleep(1000);
-                output_box.AppendText(Environment.NewLine + "Restart Attempt " + restart_attempts + Environment.NewLine);
-                Thread.Sleep(1000);
+                output_box.AppendText(Environment.NewLine + "Restart Attempt " + restart_attempts + " [" + Math.Pow(2, Convert.ToDouble(restart_attempts)) + " Seconds Delay]" + Environment.NewLine);
                 connect();
             }
             else
@@ -327,11 +325,15 @@ namespace IRCBot
 
         public void IRCBot(BackgroundWorker bw)
         {
-
+            if (restart == true)
+            {
+                Thread.Sleep(Convert.ToInt32(Math.Pow(2, Convert.ToDouble(restart_attempts))) * 1000);
+            }
             this.config = conf;
             try
             {
                 IRCConnection = new TcpClient(config.server, config.port);
+                restart = false;
             }
             catch
             {

@@ -764,16 +764,6 @@ namespace IRCBot
                                             sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
                                         }
                                         break;
-                                    case "listaccess":
-                                        if (nick_owner == true)
-                                        {
-                                            list_access_list(nick[0].TrimStart(':'), line[2]);
-                                        }
-                                        else
-                                        {
-                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
-                                        }
-                                        break;
                                     case "delaccess":
                                         if (nick_owner == true)
                                         {
@@ -974,6 +964,48 @@ namespace IRCBot
                                             sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
                                         }
                                         break;
+                                    case "asop":
+                                        spam_count++;
+                                        nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
+                                        if (nick_access >= 8)
+                                        {
+                                            if (line.GetUpperBound(0) > 3)
+                                            {
+                                                sendData("MODE", line[2] + " +a " + line[4]);
+                                                sendData("PRIVMSG", "chanserv :SOP " + line[2] + " add " + line[4]);
+                                                set_access_list(line[4], line[2], "8");
+                                            }
+                                            else
+                                            {
+                                                sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
+                                        }
+                                        break;
+                                    case "deasop":
+                                        spam_count++;
+                                        nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
+                                        if (nick_access >= 8)
+                                        {
+                                            if (line.GetUpperBound(0) > 3)
+                                            {
+                                                sendData("MODE", line[2] + " -a " + line[4]);
+                                                sendData("PRIVMSG", "chanserv :SOP " + line[2] + " del " + line[4]);
+                                                del_access_list(line[4], line[2], "8");
+                                            }
+                                            else
+                                            {
+                                                sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
+                                        }
+                                        break;
                                     case "desop":
                                         spam_count++;
                                         nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
@@ -1014,6 +1046,48 @@ namespace IRCBot
                                             sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
                                         }
                                         break;
+                                    case "aop":
+                                        spam_count++;
+                                        nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
+                                        if (nick_access >= 7)
+                                        {
+                                            if (line.GetUpperBound(0) > 3)
+                                            {
+                                                sendData("MODE", line[2] + " +o " + line[4]);
+                                                sendData("PRIVMSG", "chanserv :AOP " + line[2] + " add " + line[4]);
+                                                set_access_list(line[4], line[2], "7");
+                                            }
+                                            else
+                                            {
+                                                sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
+                                        }
+                                        break;
+                                    case "deaop":
+                                        spam_count++;
+                                        nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
+                                        if (nick_access >= 7)
+                                        {
+                                            if (line.GetUpperBound(0) > 3)
+                                            {
+                                                sendData("MODE", line[2] + " -o " + line[4]);
+                                                sendData("PRIVMSG", "chanserv :AOP " + line[2] + " del " + line[4]);
+                                                del_access_list(line[4], line[2], "7");
+                                            }
+                                            else
+                                            {
+                                                sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
+                                        }
+                                        break;
                                     case "deop":
                                         spam_count++;
                                         nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
@@ -1028,6 +1102,102 @@ namespace IRCBot
                                             {
                                                 sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
                                             }
+                                        }
+                                        else
+                                        {
+                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
+                                        }
+                                        break;
+                                    case "ahop":
+                                        spam_count++;
+                                        nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
+                                        if (nick_access >= 7)
+                                        {
+                                            if (line.GetUpperBound(0) > 3)
+                                            {
+                                                sendData("MODE", line[2] + " + " + line[4]);
+                                                sendData("PRIVMSG", "chanserv :HOP " + line[2] + " add " + line[4]);
+                                                set_access_list(line[4], line[2], "7");
+                                            }
+                                            else
+                                            {
+                                                sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
+                                        }
+                                        break;
+                                    case "deahop":
+                                        spam_count++;
+                                        nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
+                                        if (nick_access >= 7)
+                                        {
+                                            if (line.GetUpperBound(0) > 3)
+                                            {
+                                                sendData("MODE", line[2] + " -h " + line[4]);
+                                                sendData("PRIVMSG", "chanserv :HOP " + line[2] + " del " + line[4]);
+                                                del_access_list(line[4], line[2], "7");
+                                            }
+                                            else
+                                            {
+                                                sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
+                                        }
+                                        break;
+                                    case "vop":
+                                        spam_count++;
+                                        nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
+                                        if (nick_access >= 7)
+                                        {
+                                            if (line.GetUpperBound(0) > 3)
+                                            {
+                                                sendData("MODE", line[2] + " +v " + line[4]);
+                                                sendData("PRIVMSG", "chanserv :VOP " + line[2] + " add " + line[4]);
+                                                set_access_list(line[4], line[2], "7");
+                                            }
+                                            else
+                                            {
+                                                sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
+                                        }
+                                        break;
+                                    case "deavop":
+                                        spam_count++;
+                                        nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
+                                        if (nick_access >= 7)
+                                        {
+                                            if (line.GetUpperBound(0) > 3)
+                                            {
+                                                sendData("MODE", line[2] + " -v " + line[4]);
+                                                sendData("PRIVMSG", "chanserv :VOP " + line[2] + " del " + line[4]);
+                                                del_access_list(line[4], line[2], "7");
+                                            }
+                                            else
+                                            {
+                                                sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            sendData("NOTICE", nick[0].TrimStart(':') + " :You do not have permission to use that command.");
+                                        }
+                                        break;
+                                    case "listaccess":
+                                        spam_count++;
+                                        nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
+                                        if (nick_access >= 7)
+                                        {
+                                            list_access_list(nick[0].TrimStart(':'), line[2]);
                                         }
                                         else
                                         {

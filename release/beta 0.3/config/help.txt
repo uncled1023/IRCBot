@@ -1,7 +1,6 @@
 Identify as Owner:10:owner <bot password>:Identifies you as the Bot's owner.
 Add Access:10:access <nick> <access_level>:Adds the specified nick to the access list with the specified level.
 Remove Access:10:delaccess <nick> <access_level>:Removes the specified access level from the nick.
-List Access Levels:10:listaccess:Lists all the users with access on the channel and their level.
 Add Owner:10:addowner <nick>:Adds the defined nick as an owner to me.
 Delete Owner:10:delowner <nick>:Removes the defined nick from my owners list.
 Identify Bot:10:id:Makes me identify to the server.
@@ -11,10 +10,19 @@ Say Message:10:say <message>:I will display whatever the message is.
 Quit:10:quit [<reason>]:Tells me to quit the server.
 Set Founder:9:founder <nick>:Sets the nick to Owner of the chan.
 Remove Founder:9:defounder <nick>:Unsets the nick as Owner of the chan.
+Add Auto-SOP:8:asop <nick>:Adds the nick to the Auto Super Op List.
+Remove Auto-SOP:8:deasop <nick>:Removes the nick from the Auto Super Op List.
 Set SOP:8:sop <nick>:Sets the nick as Super Op.
 Remove SOP:8:desop <nick>:Removes the nick as Super Op.
+Add Auto-OP:7:aop <nick>:Adds the nick to the Auto Op List.
+Remove Auto-OP:7:deaop <nick>:Removes the nick from the Auto Op List.
 Set OP:7:op <nick>:Sets the nick as an Op.
 Remove OP:7:deop <nick>:Removes the nick as an Op.
+Add Auto-HOP:7:ahop <nick>:Adds the nick to the Auto HOP List.
+Remove Auto-HOP:7:deahop <nick>:Removes the nick from the Auto HOP List.
+Add Auto-Voice:7:avoice <nick>:Adds the nick to the Auto Voice List.
+Remove Auto-Voice:7:deavoice <nick>:Removes the nick from the Auto Voice List.
+List Access Levels:7:listaccess:Lists all the users with access on the channel and their level.
 Set Channel Mode:7:mode +/-<flag>:Sets or unsets a channel mode.
 Set Channel Topic:7:topic <topic>:Sets the channels topic.
 Invite to Channel:7:invite <nick>:Invites the specified nick into the channel.

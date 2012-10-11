@@ -2244,14 +2244,14 @@ namespace IRCBot
             List<KeyValuePair<string, string>> ret = new List<KeyValuePair<string, string>>();
             try
             {
-                string c = new WebClient().DownloadString(URL + HttpUtility.UrlEncode(search));
+                string c = new WebClient().DownloadString(URL + System.Web.HttpUtility.UrlEncode(search));
                 MatchCollection mc = Regex.Matches(c, "<div class=\"definition\">(.*?)</div>");
                 MatchCollection mc2 = Regex.Matches(c, "<td class='word'>(.*?)</td>", RegexOptions.Singleline);
                 if (mc.Count <= mc2.Count)
                 {
                     for (int i = 0; i < mc.Count; i++)
                     {
-                        ret.Add(new KeyValuePair<string, string>(mc2[i].Groups[1].Value.Trim(), System.Web.HttpUtility.HtmlDecode(mc[i].Groups[1].Value.Trim())));
+                        ret.Add(new KeyValuePair<string, string>(System.Web.HttpUtility.HtmlDecode(mc2[i].Groups[1].Value.Trim()), System.Web.HttpUtility.HtmlDecode(mc[i].Groups[1].Value.Trim())));
                     }
                 }
             }
@@ -2261,28 +2261,38 @@ namespace IRCBot
             }
             if (ret.Count > 0)
             {
-                int index = 0;
-                if (ret.Count > 3)
-                {
-                    sendData("PRIVMSG", channel + " :Showing top 3 results");
-                }
-                else
-                {
-                    sendData("PRIVMSG", channel + " :Showing " + ret.Count + " results");
-                }
                 foreach (KeyValuePair<string, string> pair in ret)
                 {
-                    if (index < 3)
+                    string def = pair.Value;
+                    string term = pair.Key;
+                    while (def.IndexOf("<a href") != -1)
                     {
-                        sendData("PRIVMSG", channel + " :" + pair.Key + ": " + pair.Value);
+                        int start_strip = def.IndexOf("<a href");
+                        string tmp_def = def.Substring(start_strip);
+                        int end_strip = tmp_def.IndexOf(">");
+                        def = def.Remove(start_strip, end_strip + 1);
                     }
-                    else
+                    def = def.Replace("</a>", "").Replace("\n", "").Replace("\r", "").Replace("<strong class=\"highlight\">", "").Replace("</strong>", "");
+                    while (term.IndexOf("<a href") != -1)
                     {
-                        break;
+                        int start_strip = term.IndexOf("<a href");
+                        string tmp_def = term.Substring(start_strip);
+                        int end_strip = tmp_def.IndexOf(">");
+                        term = term.Remove(start_strip, end_strip + 1);
                     }
-                    index++;
+                    term = term.Replace("</a>", "").Replace("\n", "").Replace("\r", "").Replace("<strong class=\"highlight\">", "").Replace("</strong>", "");
+                    string[] strSep = new string[] { "<br/><br/>" };
+                    string[] definition = def.Split(strSep, StringSplitOptions.RemoveEmptyEntries);
+                    string[] strSep2 = new string[] { "<br/>" };
+                    string[] fin_def = definition[0].Split(strSep2, StringSplitOptions.RemoveEmptyEntries);
+                    sendData("PRIVMSG", channel + " :" + term + ": " + fin_def[0]);
+                    for (int x = 1; fin_def.GetUpperBound(0) >= x; x++ )
+                    {
+                        sendData("PRIVMSG", channel + " :" + fin_def[x]);
+                    }
+                    break;
                 }
-                sendData("PRIVMSG", channel + " :" + URL + search);
+                sendData("PRIVMSG", channel + " :" + URL + System.Web.HttpUtility.UrlEncode(search));
             }
             else
             {

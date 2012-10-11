@@ -16,6 +16,6 @@ brb|bbl:Ill be waiting for your return|ORLY?|aw, ill miss you.|Fine, go away|You
 *fuck*you*:Thats not nice!|Yes please.  ;P|:(|NO|Um, how about you?|No one likes you.
 *hate*:I hate you too|Hate is a strong word...|Well... well...  I dislike you a lot.|Oh shut up <nick>.|No one likes you anyways.|Why are you always mean to me?
 *go * hell*:At least it wont be cold.|And your coming with me. MUAHA|no, you are!|Am not!|The devil scares me.|No, you go to hell.
-*shut*up*|*no*u*:Um, no?|Freedom of speech bitch!|NOU|Oh shut up <nick>.|Go eat a nuke.|Why are you always mean to me?
+*shut * up*|*no *u*:Um, no?|Freedom of speech bitch!|NOU|Oh shut up <nick>.|Go eat a nuke.|Why are you always mean to me?
 *love*|*<3*:Really?&<action>blushes|I dnt love you though.|I love you too.|Love is a strong word...|But im married?!|Hehe, thanks.  :-P
 *rawr*:RAWR (I love you too)|<3 sexy.|I love you too.|RAWR!!!&<action>eats <nick>|ORLY now.  ;)|WTF was that?

@@ -2046,8 +2046,26 @@ namespace IRCBot
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                // Add introduction
+                                                // Get Urban Dictionary Info
                                                 get_ud(line[4], line[2]);
+                                            }
+                                            else
+                                            {
+                                                sendData("PRIVMSG", line[2] + " :" + nick[0].TrimStart(':') + ", you need to include more info.");
+                                            }
+                                        }
+                                        break;
+                                    case "8ball":
+                                        spam_count++;
+                                        nick_access = get_user_access(nick[0].TrimStart(':'), line[2]);
+                                        if (nick_access >= 1)
+                                        {
+                                            if (line.GetUpperBound(0) > 3)
+                                            {
+                                                string[] responses = new string[] { "Yes", "No", "Unequivocally", "Try again later", "Yawn... Leave me be", "Absolutely!", "Fat Chance", "Ha Ha Ha Ha...", "In your dreams", "Maybe", "If you *Believe*", "Totally", "Leave me Alone", "Stop asking all these questions!", "Nope" };
+                                                Random ran_num = new Random();
+                                                int index = ran_num.Next(responses.GetUpperBound(0) + 1);
+                                                sendData("PRIVMSG", line[2] + " :" + responses[index]);
                                             }
                                             else
                                             {

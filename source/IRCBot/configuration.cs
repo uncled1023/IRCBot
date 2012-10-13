@@ -16,8 +16,8 @@ namespace IRCBot
     public partial class configuration : Form
     {
         string cur_dir = "";
-        private Form1 m_parent;
-        public configuration(Form1 frmctrl)
+        private Interface m_parent;
+        public configuration(Interface frmctrl)
         {
             InitializeComponent();
 

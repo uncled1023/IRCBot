@@ -82,6 +82,7 @@
       <DependentUpon>configuration.cs</DependentUpon>
     </Compile>
     <Compile Include="google.cs" />
+    <Compile Include="hbomb.cs" />
     <Compile Include="help.cs" />
     <Compile Include="Interface.cs">
       <SubType>Form</SubType>

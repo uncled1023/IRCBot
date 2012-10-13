@@ -63,6 +63,39 @@ namespace IRCBot
 
         private IRCConfig conf = new IRCConfig();
 
+        // Load Modules //
+        
+        // Access Module
+        access access = new access();
+        // Moderation Module
+        moderation mod = new moderation();
+        // Owner Module
+        owner owner = new owner();
+        // Help Module
+        help help = new help();
+        // Rules Module
+        rules rules = new rules();
+        // Intro Message Module
+        intro intro = new intro();
+        // Quote Module
+        quote quote = new quote();
+        // Seen Module
+        seen seen = new seen();
+        // Weather Module
+        weather weather = new weather();
+        // Google Module
+        google google = new google();
+        // Urban Dictionary Module
+        urban_dictionary ud = new urban_dictionary();
+        // 8ball Module
+        _8ball _8ball = new _8ball();
+        // AI Module
+        AI ai = new AI();
+        // Messaging Module
+        messaging message_module = new messaging();
+        // Hbomb Module
+        hbomb hbomb = new hbomb();
+
         delegate void SetTextCallback(string text);
 
         //inner enum used only internally
@@ -484,8 +517,7 @@ namespace IRCBot
                         string channel = ex[2];
                         
                         // Seen Module
-                        seen add_seen = new seen();
-                        add_seen.add_seen(nick, channel, ex, this);
+                        seen.add_seen(nick, channel, ex, this);
 
                         // On Message Events events
                         if (ex[1].ToLower() == "privmsg")
@@ -510,61 +542,50 @@ namespace IRCBot
                                     if (ex[2].StartsWith("#") == true) // From Channel
                                     {
                                         // Access Module
-                                        access access = new access();
                                         access.access_control(ex, command, this, conf, nick_access, nick);
 
                                         // Moderation Module
-                                        moderation mod = new moderation();
                                         mod.moderation_control(ex, command, this, conf, nick_access, nick);
 
                                         // Owner Module
-                                        owner owner = new owner();
                                         owner.owner_control(ex, command, this, conf, nick_access, nick);
 
                                         // Help Module
-                                        help help = new help();
                                         help.help_control(ex, command, this, conf, nick_access, nick);
 
                                         // Rules Module
-                                        rules rules = new rules();
                                         rules.rules_control(ex, command, this, nick_access, nick);
 
                                         // Intro Message Module
-                                        intro intro = new intro();
                                         intro.intro_control(ex, command, this, nick_access, nick);
 
                                         // Quote Module
-                                        quote quote = new quote();
                                         quote.quote_control(ex, command, this, conf, nick_access, nick);
 
                                         // Seen Module
-                                        seen seen = new seen();
                                         seen.seen_control(ex, command, this, nick_access, nick, sr);
 
                                         // Weather Module
-                                        weather weather = new weather();
                                         weather.weather_control(ex, command, this, nick_access, nick);
 
                                         // Google Module
-                                        google google = new google();
                                         google.google_control(ex, command, this, nick_access, nick);
 
                                         // Urban Dictionary Module
-                                        urban_dictionary ud = new urban_dictionary();
                                         ud.ud_control(ex, command, this, nick_access, nick);
 
                                         // 8ball Module
-                                        _8ball _8ball = new _8ball();
                                         _8ball._8ball_control(ex, command, this, nick_access, nick);
+
+                                        // hbomb Module
+                                        hbomb.hbomb_control(ex, command, this, nick_access, nick, channel, conf);
                                     }
                                     else // From Query
                                     {
                                         // Access Module
-                                        access access = new access();
                                         access.access_control(ex, command, this, conf, nick_access, nick);
 
                                         // Owner Module
-                                        owner owner = new owner();
                                         owner.owner_control(ex, command, this, conf, nick_access, nick);
                                     }
                                 }
@@ -573,29 +594,23 @@ namespace IRCBot
                                     if (ex[2].StartsWith("#") == true) // From Channel
                                     {
                                         // ABan/AKick Module
-                                        moderation mod = new moderation();
                                         mod.check_auto(nick, channel, nick_host, this);
 
                                         // Quote Module
-                                        quote add_quote = new quote();
-                                        add_quote.add_quote(nick, channel, ex, this, conf);
+                                        quote.add_quote(nick, channel, ex, this, conf);
 
                                         // AI Module
-                                        AI ai = new AI();
                                         ai.AI_Parse(ex, channel, nick, this, conf);
 
                                         // Messaging Module
-                                        messaging message_module = new messaging();
                                         message_module.find_message(nick, this);
                                     }
                                     else // From Query
                                     {
                                         // Messaging Module
-                                        messaging message_module = new messaging();
                                         message_module.find_message(nick, this);
 
                                         // AI Module
-                                        AI ai = new AI();
                                         ai.AI_Parse(ex, nick, nick, this, conf);
                                     }
 
@@ -609,15 +624,12 @@ namespace IRCBot
                         if (ex[1].ToLower() == "join")
                         {
                             // Intro Message Module
-                            intro intro = new intro();
                             intro.check_intro(nick, channel, this);
 
                             // Messaging Module
-                            messaging message_module = new messaging();
                             message_module.find_message(nick, this);
 
                             // ABan/AKick Module
-                            moderation mod = new moderation();
                             mod.check_auto(nick, channel, nick_host, this);
                         }
                     }

@@ -39,7 +39,7 @@ Set HOP:4:hop <nick>:Sets the nick as Half Op.
 Remove HOP:4:dehop <nick>:Removes the nick as Half Op.
 Set Voice:3:voice <nick>:Sets the nick as Voiced.
 Remove Voice:3:devoice <nick>:Removes the nick as Voiced.
-Send a Message:1:message <message> <user>:Allows you to leave a message for a nick.
+Send a Message:1:message <user> <message>:Allows you to leave a message for a nick.
 Set your Introduction:1:intro <message>:Adds a personal greeting for whenever you enter the channel.  You can add multiple greetings by using | in between each greeting.
 Delete your Introduction:1:introdelete:Deletes all of your introductions.
 Kick Yourself:1:kme [<reason>]:Kicks you from the channel.
@@ -52,3 +52,4 @@ Channel Quote:1:quote:Gets a random quote from the channel.
 Google:1:google <query>:Returns the first result from Google.
 Urban Dictionary:1:ud <query>:Returns the top result from Urban Dictionary.
 Magic 8-Ball:1:8ball <question>:Answers any question you have!
+Channel Rules:0:rules:Sends you the channel rules.

@@ -96,6 +96,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="quote.cs" />
+    <Compile Include="rules.cs" />
     <Compile Include="seen.cs" />
     <Compile Include="urban_dictionary.cs" />
     <Compile Include="weather.cs" />

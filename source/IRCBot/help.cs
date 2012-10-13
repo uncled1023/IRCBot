@@ -11,13 +11,15 @@ namespace IRCBot
     {
         public void help_control(string[] line, string command, Interface ircbot, IRCConfig conf, int nick_access, string nick)
         {
-            if (command.Equals("help"))
+            switch (command)
             {
+                case "help":
                     ircbot.spam_count++;
                     if (nick_access >= 1)
                     {
                         display_help(line, nick, line[2], nick_access, ircbot, conf);
                     }
+                    break;
             }
         }
 

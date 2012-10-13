@@ -134,7 +134,6 @@ namespace IRCBot
             control = tabControl1.Controls.Find("output_box_system", true)[0];
             RichTextBox output_box = (RichTextBox)control;
             output_box.LinkClicked += new LinkClickedEventHandler(link_Click);
-
             connect();
         }
 
@@ -231,6 +230,15 @@ namespace IRCBot
             Spam_Check_Timer.Start();
 
             Spam_Timer.Interval = conf.spam_timout;
+
+            string[] server = conf.server.Split('.');
+            Control control = new Control();
+            control = tabControl1.Controls.Find("output_box_system", true)[0];
+            RichTextBox output_box = (RichTextBox)control;
+            output_box.Name = "output_box_" + server[1] + "_system";
+            control = tabControl1.Controls.Find("tabPage1", true)[0];
+            TabPage tabpage = (TabPage)control;
+            tabpage.Name = "tabPage_" + server[1] + "_system";
 
             this.backgroundWorker1.RunWorkerAsync(2000);
         }
@@ -558,21 +566,37 @@ namespace IRCBot
                                 }
                                 else // All other text
                                 {
-                                    // Messaging Module
-                                    messaging message_module = new messaging();
-                                    message_module.find_message(nick, this);
+                                    if (ex[2].StartsWith("#") == true) // From Channel
+                                    {
+                                        // ABan/AKick Module
+                                        moderation mod = new moderation();
+                                        mod.check_auto(nick, channel, nick_host, this);
 
-                                    // ABan/AKick Module
-                                    moderation mod = new moderation();
-                                    mod.check_auto(nick, channel, nick_host, this);
+                                        // Quote Module
+                                        quote add_quote = new quote();
+                                        add_quote.add_quote(nick, channel, ex, this, conf);
 
-                                    // Quote Module
-                                    quote add_quote = new quote();
-                                    add_quote.add_quote(nick, channel, ex, this, conf);
+                                        // AI Module
+                                        AI ai = new AI();
+                                        ai.AI_Parse(ex, channel, nick, this, conf);
 
-                                    // AI Module
-                                    AI ai = new AI();
-                                    ai.AI_Parse(ex, channel, nick, this, conf);
+                                        // Messaging Module
+                                        messaging message_module = new messaging();
+                                        message_module.find_message(nick, this);
+                                    }
+                                    else // From Query
+                                    {
+                                        // Messaging Module
+                                        messaging message_module = new messaging();
+                                        message_module.find_message(nick, this);
+
+                                        // AI Module
+                                        AI ai = new AI();
+                                        ai.AI_Parse(ex, nick, nick, this, conf);
+                                    }
+
+
+
                                 }
                             }
                         }
@@ -862,12 +886,13 @@ namespace IRCBot
             {
                 try
                 {
+                    string[] server = conf.server.Split('.');
                     string channel = "System";
                     string tab_name = "System";
                     string message = "";
                     string nickname = "";
                     string pattern = "[^a-zA-Z0-9]"; //regex pattern
-                    Control control = tabControl1.Controls.Find("output_box_system", true)[0];
+                    Control control = tabControl1.Controls.Find("output_box_" + server[1] + "_system", true)[0];
                     char[] charSeparator = new char[] { ' ' };
                     string[] tmp_lines = text.Split(charSeparator, 4);
                     string time_stamp = DateTime.Now.ToString("hh:mm tt");
@@ -977,7 +1002,14 @@ namespace IRCBot
                                 tab_name = "System";
                                 channel = "System";
                             }
-                            message = nickname + " has set Mode " + tmp_lines[3];
+                            if (nickname.Equals(conf.nick))
+                            {
+                                message = "";
+                            }
+                            else
+                            {
+                                message = nickname + " has set Mode " + tmp_lines[3];
+                            }
                             nickname = "";
                             font_color = "#000000";
                         }
@@ -1017,14 +1049,24 @@ namespace IRCBot
                         }
                         tab_name = Regex.Replace(tab_name, pattern, "_");
                         string[] nick = tmp_lines[0].Split('!');
-                        if (tabControl1.Controls.Find("output_box_" + tab_name, true).GetUpperBound(0) >= 0)
+                        if (channel != "System")
                         {
-                            control = tabControl1.Controls.Find("output_box_" + tab_name, true)[0];
-                        }
-                        else
-                        {
-                            add_tab(channel);
-                            control = tabControl1.Controls.Find("output_box_" + tab_name, true)[0];
+                            if (channel.StartsWith("#"))
+                            {
+                                if (tabControl1.Controls.Find("output_box_chan_" + server[1] + "_" + tab_name, true).GetUpperBound(0) < 0)
+                                {
+                                    add_tab(channel);
+                                }
+                                control = tabControl1.Controls.Find("output_box_chan_" + server[1] + "_" + tab_name, true)[0];
+                            }
+                            else
+                            {
+                                if (tabControl1.Controls.Find("output_box_user_" + server[1] + "_" + tab_name, true).GetUpperBound(0) < 0)
+                                {
+                                    add_tab(channel);
+                                }
+                                control = tabControl1.Controls.Find("output_box_user_" + server[1] + "_" + tab_name, true)[0];
+                            }
                         }
                     }
                     output_box = (RichTextBox)control;
@@ -1061,7 +1103,6 @@ namespace IRCBot
                     this.Text = conf.name;
                     if (conf.keep_logs.Equals("True"))
                     {
-                        string[] server = conf.server.Split('.');
                         string file_name = "";
                         if (channel.StartsWith("#"))
                         {
@@ -1069,7 +1110,7 @@ namespace IRCBot
                         }
                         else
                         {
-                            file_name = server[1] + "-#" + tab_name + ".log";
+                            file_name = server[1] + "-" + tab_name + ".log";
                         }
                         if (conf.logs_path == "")
                         {
@@ -1140,13 +1181,21 @@ namespace IRCBot
             }
             else
             {
+                string[] server = conf.server.Split('.');
                 string pattern = "[^a-zA-Z0-9]"; //regex pattern
                 string tab_name = channel.TrimStart('#');
                 tab_name = Regex.Replace(tab_name, pattern, "_");
                 RichTextBox box = new RichTextBox();
                 box.Dock = System.Windows.Forms.DockStyle.Fill;
                 box.Location = new System.Drawing.Point(3, 3);
-                box.Name = "output_box_" + tab_name;
+                if (channel.StartsWith("#"))
+                {
+                    box.Name = "output_box_chan_" + server[1] + "_" + tab_name;
+                }
+                else
+                {
+                    box.Name = "output_box_user_" + server[1] + "_" + tab_name;
+                }
                 box.Size = new System.Drawing.Size(826, 347);
                 box.TabIndex = 0;
                 box.ReadOnly = true;
@@ -1154,7 +1203,14 @@ namespace IRCBot
                 TabPage tabpage = new TabPage();
                 tabpage.Controls.Add(box);
                 tabpage.Location = new System.Drawing.Point(4, 22);
-                tabpage.Name = "tabPage_" + tab_name;
+                if (channel.StartsWith("#"))
+                {
+                    tabpage.Name = "tabPage_chan_" + server[1] + "_" + tab_name;
+                }
+                else
+                {
+                    tabpage.Name = "tabPage_user_" + server[1] + "_" + tab_name;
+                }
                 tabpage.Padding = new System.Windows.Forms.Padding(3);
                 tabpage.Size = new System.Drawing.Size(832, 353);
                 tabpage.TabIndex = 0;

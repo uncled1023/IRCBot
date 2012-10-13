@@ -525,6 +525,10 @@ namespace IRCBot
                                         help help = new help();
                                         help.help_control(ex, command, this, conf, nick_access, nick);
 
+                                        // Rules Module
+                                        rules rules = new rules();
+                                        rules.rules_control(ex, command, this, nick_access, nick);
+
                                         // Intro Message Module
                                         intro intro = new intro();
                                         intro.intro_control(ex, command, this, nick_access, nick);

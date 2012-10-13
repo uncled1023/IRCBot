@@ -17,13 +17,13 @@ namespace IRCBot
                     ircbot.spam_count++;
                     if (nick_access >= 1)
                     {
-                        get_rules(line[2], ircbot);
+                        get_rules(nick, line[2], ircbot);
                     }
                     break;
             }
         }
 
-        private void get_rules(string channel, Interface ircbot)
+        private void get_rules(string nick, string channel, Interface ircbot)
         {
             if (File.Exists(ircbot.cur_dir + "\\modules\\rules\\rules.txt"))
             {
@@ -37,23 +37,23 @@ namespace IRCBot
                         string[] split = line.Split('*');
                         if (split.GetUpperBound(0) > 0 && channel.Equals(split[0]))
                         {
-                            ircbot.sendData("NOTICE", channel + " :Rule " + index + ") " + split[1]);
+                            ircbot.sendData("NOTICE", nick + " :Rule " + index + ") " + split[1]);
                             index++;
                         }
                     }
                     if (index == 1)
                     {
-                        ircbot.sendData("NOTICE", channel + " :There are no Rules");
+                        ircbot.sendData("NOTICE", nick + " :There are no Rules");
                     }
                 }
                 else
                 {
-                    ircbot.sendData("NOTICE", channel + " :There are no Rules");
+                    ircbot.sendData("NOTICE", nick + " :There are no Rules");
                 }
             }
             else
             {
-                ircbot.sendData("NOTICE", channel + " :There are no Rules");
+                ircbot.sendData("NOTICE", nick + " :There are no Rules");
             }
         }
     }

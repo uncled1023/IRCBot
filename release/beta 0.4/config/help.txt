@@ -53,4 +53,5 @@ Google:1:google <query>:Returns the first result from Google.
 Urban Dictionary:1:ud <query>:Returns the top result from Urban Dictionary.
 Magic 8-Ball:1:8ball <question>:Answers any question you have!
 H-Bomb:1:hbomb:Initiates a new game of pass the Hbomb.  To pass the bomb, type .pass <nick>, and to defuse the bomb type .defuse <color>.
+Ping Me:1:pingme:Gets the ping time between your client and me.
 Channel Rules:0:rules:Sends you the channel rules.

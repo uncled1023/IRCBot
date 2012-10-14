@@ -95,6 +95,8 @@ namespace IRCBot
         messaging message_module = new messaging();
         // Hbomb Module
         hbomb hbomb = new hbomb();
+        // Ping Me Module
+        pingme pingme = new pingme();
 
         delegate void SetTextCallback(string text);
 
@@ -508,6 +510,9 @@ namespace IRCBot
 
                 if (spam_activated == false)
                 {
+                    // Ping Me Module
+                    pingme.check_ping(ex, this);
+
                     string[] user_info = ex[0].Split('@');
                     string[] name = user_info[0].Split('!');
                     if (name.GetUpperBound(0) > 0)
@@ -579,6 +584,9 @@ namespace IRCBot
 
                                         // hbomb Module
                                         hbomb.hbomb_control(ex, command, this, nick_access, nick, channel, conf);
+
+                                        // Ping Me Module
+                                        pingme.pingme_control(ex, command, this, nick_access, nick, channel);
                                     }
                                     else // From Query
                                     {
@@ -1029,6 +1037,15 @@ namespace IRCBot
                             nickname = "";
                             font_color = "#000000";
                         }
+                        else if (tmp_lines[1].Equals("topic"))
+                        {
+                            channel = tmp_lines[2];
+                            nickname = tmp_lines[0].TrimStart(':').Split('!')[0];
+                            tab_name = channel.TrimStart('#');
+                            message = nickname + " has set Topic " + tmp_lines[3];
+                            nickname = "";
+                            font_color = "#000000";
+                        }
                         else if (tmp_lines[1].Equals("kick"))
                         {
                             channel = tmp_lines[2];
@@ -1048,20 +1065,73 @@ namespace IRCBot
                         }
                         else
                         {
-                            channel = "System";
-                            tab_name = "System";
-                            nickname = tmp_lines[0].TrimStart(':').Split('!')[0] + ": ";
-                            charSeparator = new char[] { ':' };
-                            string[] tmp_msg = text.Split(charSeparator, 2, StringSplitOptions.RemoveEmptyEntries);
-                            if (tmp_msg.GetUpperBound(0) > 0)
+                            if (tmp_lines.GetUpperBound(0) > 2)
                             {
-                                message = tmp_msg[1];
+                                string[] new_lines = tmp_lines[3].Split(charSeparator, 2);
+                                if (tmp_lines[2].Equals(conf.nick) && tmp_lines[3].StartsWith("#") && new_lines.GetUpperBound(0) > 0)
+                                {
+                                    if (new_lines[1] != ":End of /NAMES list.")
+                                    {
+                                        channel = new_lines[0];
+                                        nickname = tmp_lines[0].TrimStart(':').Split('!')[0];
+                                        tab_name = channel.TrimStart('#');
+                                        message = "Topic for " + channel + " is: " + new_lines[1].TrimStart(':');
+                                        nickname = "";
+                                        font_color = "#B037B0";
+                                    }
+                                    else
+                                    {
+                                        channel = "System";
+                                        tab_name = "System";
+                                        nickname = tmp_lines[0].TrimStart(':').Split('!')[0] + ": ";
+                                        charSeparator = new char[] { ':' };
+                                        string[] tmp_msg = text.Split(charSeparator, 2, StringSplitOptions.RemoveEmptyEntries);
+                                        if (tmp_msg.GetUpperBound(0) > 0)
+                                        {
+                                            message = tmp_msg[1];
+                                        }
+                                        else
+                                        {
+                                            message = tmp_msg[0];
+                                        }
+                                        font_color = "000000";
+                                    }
+                                }
+                                else
+                                {
+                                    channel = "System";
+                                    tab_name = "System";
+                                    nickname = tmp_lines[0].TrimStart(':').Split('!')[0] + ": ";
+                                    charSeparator = new char[] { ':' };
+                                    string[] tmp_msg = text.Split(charSeparator, 2, StringSplitOptions.RemoveEmptyEntries);
+                                    if (tmp_msg.GetUpperBound(0) > 0)
+                                    {
+                                        message = tmp_msg[1];
+                                    }
+                                    else
+                                    {
+                                        message = tmp_msg[0];
+                                    }
+                                    font_color = "000000";
+                                }
                             }
                             else
                             {
-                                message = tmp_msg[0];
+                                channel = "System";
+                                tab_name = "System";
+                                nickname = tmp_lines[0].TrimStart(':').Split('!')[0] + ": ";
+                                charSeparator = new char[] { ':' };
+                                string[] tmp_msg = text.Split(charSeparator, 2, StringSplitOptions.RemoveEmptyEntries);
+                                if (tmp_msg.GetUpperBound(0) > 0)
+                                {
+                                    message = tmp_msg[1];
+                                }
+                                else
+                                {
+                                    message = tmp_msg[0];
+                                }
+                                font_color = "000000";
                             }
-                            font_color = "000000";
                         }
                         tab_name = Regex.Replace(tab_name, pattern, "_");
                         string[] nick = tmp_lines[0].Split('!');

@@ -20,6 +20,10 @@ namespace IRCBot
                         get_rules(nick, line[2], ircbot);
                     }
                     break;
+                case "addrule":
+                    break;
+                case "delrule":
+                    break;
             }
         }
 

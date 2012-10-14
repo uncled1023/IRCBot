@@ -75,6 +75,7 @@
     <Compile Include="8ball.cs" />
     <Compile Include="access.cs" />
     <Compile Include="AI.cs" />
+    <Compile Include="chat.cs" />
     <Compile Include="configuration.cs">
       <SubType>Form</SubType>
     </Compile>

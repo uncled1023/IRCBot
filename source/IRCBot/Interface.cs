@@ -268,12 +268,15 @@ namespace IRCBot
 
             string[] server = conf.server.Split('.');
             Control control = new Control();
-            control = tabControl1.Controls.Find("output_box_system", true)[0];
-            RichTextBox output_box = (RichTextBox)control;
-            output_box.Name = "output_box_" + server[1] + "_system";
-            control = tabControl1.Controls.Find("tabPage1", true)[0];
-            TabPage tabpage = (TabPage)control;
-            tabpage.Name = "tabPage_" + server[1] + "_system";
+            if (tabControl1.Controls.Find("output_box_system", true).GetUpperBound(0) >= 0)
+            {
+                control = tabControl1.Controls.Find("output_box_system", true)[0];
+                RichTextBox output_box = (RichTextBox)control;
+                output_box.Name = "output_box_" + server[1] + "_system";
+                control = tabControl1.Controls.Find("tabPage1", true)[0];
+                TabPage tabpage = (TabPage)control;
+                tabpage.Name = "tabPage_" + server[1] + "_system";
+            }
 
             this.backgroundWorker1.RunWorkerAsync(2000);
         }
@@ -342,8 +345,9 @@ namespace IRCBot
 
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            string[] server = conf.server.Split('.');
             Control control = new Control();
-            control = tabControl1.Controls.Find("output_box_system", true)[0];
+            control = tabControl1.Controls.Find("output_box_" + server[1] + "_system", true)[0];
             RichTextBox output_box = (RichTextBox)control;
             if (restart == true)
             {
@@ -632,7 +636,7 @@ namespace IRCBot
                         if (ex[1].ToLower() == "join")
                         {
                             // Intro Message Module
-                            intro.check_intro(nick, channel, this);
+                            intro.check_intro(nick, channel.TrimStart(':'), this);
 
                             // Messaging Module
                             message_module.find_message(nick, this);
@@ -807,69 +811,73 @@ namespace IRCBot
 
         public int get_user_access(string nick, string channel)
         {
+            bool nick_found = false;
             string access = "";
             string user_access = "";
             access acc = new access();
             access = acc.get_access_list(nick, channel, this);
-            if (access == "")
-            {
-                sendData("NAMES", channel);
 
-                string line = sr.ReadLine();
-                char[] charSeparator = new char[] { ' ' };
-                string[] name_line = line.Split(charSeparator, 5);
-                string[] names_list = name_line[4].Split(':');
-                string[] names = names_list[1].Split(' ');
-                for (int x = 0; x <= names.GetUpperBound(0); x++)
+            sendData("NAMES", channel);
+
+            string line = sr.ReadLine();
+            char[] charSeparator = new char[] { ' ' };
+            string[] name_line = line.Split(charSeparator, 5);
+            string[] names_list = name_line[4].Split(':');
+            string[] names = names_list[1].Split(' ');
+            for (int x = 0; x <= names.GetUpperBound(0); x++)
+            {
+                if (nick == names[x].Remove(0, 1))
                 {
-                    if (nick == names[x].Remove(0, 1))
-                    {
-                        user_access = names[x].Remove(1);
-                    }
+                    nick_found = true;
+                    user_access = names[x].Remove(1);
+                    break;
                 }
-                while (name_line[4] != ":End of /NAMES list.")
-                {
-                    line = sr.ReadLine();
-                    name_line = line.Split(charSeparator, 5);
-                }
+            }
+            while (name_line[4] != ":End of /NAMES list.")
+            {
+                line = sr.ReadLine();
+                name_line = line.Split(charSeparator, 5);
+            }
+            if (nick_found == true)
+            {
                 if (user_access.Contains('~'))
                 {
-                    access = "9";
+                    access += ",9";
                 }
                 else if (user_access.Contains('&'))
                 {
-                    access = "8";
+                    access += ",8";
                 }
                 else if (user_access.Contains('@'))
                 {
-                    access = "7";
+                    access += ",7";
                 }
                 else if (user_access.Contains('%'))
                 {
-                    access = "4";
+                    access += ",6";
                 }
                 else if (user_access.Contains('+'))
                 {
-                    access = "3";
-                }
-                else if (user_access != "")
-                {
-                    access = "1";
+                    access += ",3";
                 }
                 else
                 {
-                    access = "0";
+                    access += ",1";
                 }
+            }
+            else
+            {
+                access += ",0";
             }
             string[] owners = conf.owner.Split(','); // Get list of owners
             for (int x = 0; x <= owners.GetUpperBound(0); x++)
             {
                 if (nick.Equals(owners[x]))
                 {
-                    access += "," + "10";
+                    access += ",10";
                 }
             }
-            string[] tmp_access = access.Split(',');
+            string[] tmp_access = access.TrimStart(',').TrimEnd(',').Split(',');
             int access_num = 0;
             foreach (string access_line in tmp_access)
             {

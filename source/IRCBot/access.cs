@@ -14,18 +14,32 @@ namespace IRCBot
             switch (command)
             {
                 case "access":
-                    if (access_level >= 10)
+                    if (access_level >= 7)
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
                             string[] parse = line[4].Split(' ');
                             if (parse.GetUpperBound(0) > 1)
                             {
-                                set_access_list(parse[0], parse[1], parse[2], ircbot);
+                                if (Convert.ToInt32(parse[2]) <= access_level)
+                                {
+                                    set_access_list(parse[0], parse[1], parse[2], ircbot);
+                                }
+                                else
+                                {
+                                    ircbot.sendData("NOTICE", nick + " :You do not have permission to change their access.");
+                                }
                             }
                             else if (parse.GetUpperBound(0) > 0)
                             {
-                                set_access_list(parse[0], line[2], parse[1], ircbot);
+                                if (Convert.ToInt32(parse[1]) <= access_level)
+                                {
+                                    set_access_list(parse[0], line[2], parse[1], ircbot);
+                                }
+                                else
+                                {
+                                    ircbot.sendData("NOTICE", nick + " :You do not have permission to change their access.");
+                                }
                             }
                             else
                             {
@@ -43,7 +57,7 @@ namespace IRCBot
                     }
                     break;
                 case "delaccess":
-                    if (access_level >= 10)
+                    if (access_level >= 7)
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -72,7 +86,6 @@ namespace IRCBot
                     }
                     break;
                 case "listaccess":
-                    ircbot.spam_count++;
                     if (access_level >= 7)
                     {
                         if (line.GetUpperBound(0) > 3)
@@ -102,6 +115,7 @@ namespace IRCBot
                 int number_of_lines = log_file.GetUpperBound(0) + 1;
                 if (number_of_lines > 0)
                 {
+                    string access_msg = "";
                     foreach (string line in log_file)
                     {
                         char[] sep = new char[] { '*' };
@@ -110,11 +124,19 @@ namespace IRCBot
                         {
                             if (new_line[1].Equals(channel))
                             {
-                                ircbot.sendData("NOTICE", nick + " :" + new_line[0] + ": " + new_line[2]);
+                                access_msg += " | " + new_line[0] + ": " + new_line[2];
                             }
                         }
                     }
-                    ircbot.sendData("NOTICE", nick + " :End of Access List");
+                    if (access_msg != "")
+                    {
+                        ircbot.sendData("NOTICE", nick + " :" + access_msg.Trim().TrimStart('|').Trim());
+                        ircbot.sendData("NOTICE", nick + " :End of Access List");
+                    }
+                    else
+                    {
+                        ircbot.sendData("NOTICE", nick + " :No users in Access List.");
+                    }
                 }
                 else
                 {

@@ -17,7 +17,6 @@ namespace IRCBot
             switch (command)
             {
                 case "founder":
-                    ircbot.spam_count++;
                     if (nick_access >= 9)
                     {
                         if (line.GetUpperBound(0) > 3)
@@ -36,7 +35,6 @@ namespace IRCBot
                     }
                     break;
                 case "defounder":
-                    ircbot.spam_count++;
                     if (nick_access >= 9)
                     {
                         if (line.GetUpperBound(0) > 3)
@@ -55,7 +53,6 @@ namespace IRCBot
                     }
                     break;
                 case "sop":
-                    ircbot.spam_count++;
                     if (nick_access >= 8)
                     {
                         if (line.GetUpperBound(0) > 3)
@@ -74,7 +71,6 @@ namespace IRCBot
                     }
                     break;
                 case "asop":
-                    ircbot.spam_count++;
                     if (nick_access >= 8)
                     {
                         if (line.GetUpperBound(0) > 3)
@@ -94,7 +90,6 @@ namespace IRCBot
                     }
                     break;
                 case "deasop":
-                    ircbot.spam_count++;
                     if (nick_access >= 8)
                     {
                         if (line.GetUpperBound(0) > 3)
@@ -114,7 +109,6 @@ namespace IRCBot
                     }
                     break;
                 case "desop":
-                    ircbot.spam_count++;
                     if (nick_access >= 8)
                     {
                         if (line.GetUpperBound(0) > 3)
@@ -133,7 +127,6 @@ namespace IRCBot
                     }
                     break;
                 case "op":
-                    ircbot.spam_count++;
                     if (nick_access >= 7)
                     {
                         if (line.GetUpperBound(0) > 3)
@@ -152,7 +145,6 @@ namespace IRCBot
                     }
                     break;
                 case "aop":
-                    ircbot.spam_count++;
                     if (nick_access >= 7)
                     {
                         if (line.GetUpperBound(0) > 3)
@@ -172,7 +164,6 @@ namespace IRCBot
                     }
                     break;
                 case "deaop":
-                    ircbot.spam_count++;
                     if (nick_access >= 7)
                     {
                         if (line.GetUpperBound(0) > 3)
@@ -192,7 +183,6 @@ namespace IRCBot
                     }
                     break;
                 case "deop":
-                    ircbot.spam_count++;
                     if (nick_access >= 7)
                     {
                         if (line.GetUpperBound(0) > 3)
@@ -211,7 +201,6 @@ namespace IRCBot
                     }
                     break;
                 case "ahop":
-                    ircbot.spam_count++;
                     if (nick_access >= 7)
                     {
                         if (line.GetUpperBound(0) > 3)
@@ -231,7 +220,6 @@ namespace IRCBot
                     }
                     break;
                 case "deahop":
-                    ircbot.spam_count++;
                     if (nick_access >= 7)
                     {
                         if (line.GetUpperBound(0) > 3)
@@ -251,8 +239,7 @@ namespace IRCBot
                     }
                     break;
                 case "hop":
-                    ircbot.spam_count++;
-                    if (nick_access >= 4)
+                    if (nick_access >= 6)
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -270,8 +257,7 @@ namespace IRCBot
                     }
                     break;
                 case "dehop":
-                    ircbot.spam_count++;
-                    if (nick_access >= 4)
+                    if (nick_access >= 6)
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -289,7 +275,6 @@ namespace IRCBot
                     }
                     break;
                 case "avoice":
-                    ircbot.spam_count++;
                     if (nick_access >= 7)
                     {
                         if (line.GetUpperBound(0) > 3)
@@ -309,7 +294,6 @@ namespace IRCBot
                     }
                     break;
                 case "deavoice":
-                    ircbot.spam_count++;
                     if (nick_access >= 7)
                     {
                         if (line.GetUpperBound(0) > 3)
@@ -329,7 +313,6 @@ namespace IRCBot
                     }
                     break;
                 case "voice":
-                    ircbot.spam_count++;
                     if (nick_access >= 3)
                     {
                         if (line.GetUpperBound(0) > 3)
@@ -348,7 +331,6 @@ namespace IRCBot
                     }
                     break;
                 case "devoice":
-                    ircbot.spam_count++;
                     if (nick_access >= 3)
                     {
                         if (line.GetUpperBound(0) > 3)
@@ -367,7 +349,6 @@ namespace IRCBot
                     }
                     break;
                 case "mode":
-                    ircbot.spam_count++;
                     if (nick_access >= 7)
                     {
                         if (line.GetUpperBound(0) > 3)
@@ -393,7 +374,6 @@ namespace IRCBot
                     }
                     break;
                 case "topic":
-                    ircbot.spam_count++;
                     if (nick_access >= 7)
                     {
                         if (line.GetUpperBound(0) > 3)
@@ -419,7 +399,6 @@ namespace IRCBot
                     }
                     break;
                 case "invite":
-                    ircbot.spam_count++;
                     if (nick_access >= 7)
                     {
                         if (line.GetUpperBound(0) > 3)
@@ -438,8 +417,7 @@ namespace IRCBot
                     }
                     break;
                 case "b":
-                    ircbot.spam_count++;
-                    if (nick_access >= 6)
+                    if (nick_access >= 5)
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -494,8 +472,7 @@ namespace IRCBot
                     }
                     break;
                 case "kb":
-                    ircbot.spam_count++;
-                    if (nick_access >= 6)
+                    if (nick_access >= 5)
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -552,7 +529,6 @@ namespace IRCBot
                     }
                     break;
                 case "ak":
-                    ircbot.spam_count++;
                     if (nick_access >= 7)
                     {
                         if (line.GetUpperBound(0) > 3)
@@ -608,7 +584,6 @@ namespace IRCBot
                     }
                     break;
                 case "ab":
-                    ircbot.spam_count++;
                     if (nick_access >= 7)
                     {
                         if (line.GetUpperBound(0) > 3)
@@ -664,7 +639,6 @@ namespace IRCBot
                     }
                     break;
                 case "akb":
-                    ircbot.spam_count++;
                     if (nick_access >= 7)
                     {
                         if (line.GetUpperBound(0) > 3)
@@ -720,7 +694,6 @@ namespace IRCBot
                     }
                     break;
                 case "deak":
-                    ircbot.spam_count++;
                     if (nick_access >= 7)
                     {
                         if (line.GetUpperBound(0) > 3)
@@ -739,7 +712,6 @@ namespace IRCBot
                     }
                     break;
                 case "deab":
-                    ircbot.spam_count++;
                     if (nick_access >= 7)
                     {
                         if (line.GetUpperBound(0) > 3)
@@ -758,7 +730,6 @@ namespace IRCBot
                     }
                     break;
                 case "deakb":
-                    ircbot.spam_count++;
                     if (nick_access >= 7)
                     {
                         if (line.GetUpperBound(0) > 3)
@@ -777,8 +748,7 @@ namespace IRCBot
                     }
                     break;
                 case "k":
-                    ircbot.spam_count++;
-                    if (nick_access >= 5)
+                    if (nick_access >= 4)
                     {
                         if (line.GetUpperBound(0) > 3)
                         {

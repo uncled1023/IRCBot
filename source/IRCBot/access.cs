@@ -228,6 +228,28 @@ namespace IRCBot
                 log_file.WriteLine(nick + "*" + channel + "*" + access);
                 log_file.Close();
             }
+
+            for (int x = 0; x < ircbot.nick_list.Count(); x++)
+            {
+                if (ircbot.nick_list[x][0].Equals(channel))
+                {
+                    for (int i = 1; i < ircbot.nick_list[x].Count(); i++)
+                    {
+                        string[] split = ircbot.nick_list[x][i].Split(':');
+                        if (split[1].Equals(nick))
+                        {
+                            int old_access = Convert.ToInt32(split[0]);
+                            int new_access = Convert.ToInt32(access);
+                            if (old_access > new_access)
+                            {
+                                new_access = old_access;
+                            }
+                            ircbot.nick_list[x][i] = new_access.ToString() + ":" + nick;
+                            break;
+                        }
+                    }
+                }
+            }
         }
 
         public string get_access_list(string nick, string channel, Interface ircbot)
@@ -314,6 +336,23 @@ namespace IRCBot
                         }
                     }
                     System.IO.File.WriteAllLines(ircbot.cur_dir + "\\modules\\access\\" + file_name, new_file);
+                }
+            }
+
+            for (int x = 0; x < ircbot.nick_list.Count(); x++)
+            {
+                if (ircbot.nick_list[x][0].Equals(channel))
+                {
+                    for (int i = 1; i < ircbot.nick_list[x].Count(); i++)
+                    {
+                        string[] split = ircbot.nick_list[x][i].Split(':');
+                        if (split[1].Equals(nick))
+                        {
+                            int new_access = ircbot.get_user_access(nick, channel);
+                            ircbot.nick_list[x][i] = new_access.ToString() + ":" + nick;
+                            break;
+                        }
+                    }
                 }
             }
         }

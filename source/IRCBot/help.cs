@@ -31,7 +31,6 @@ namespace IRCBot
             {
                 string msg = "";
                 string[] file = System.IO.File.ReadAllLines(list_file);
-                int previous_access = 0;
                 foreach (string file_line in file)
                 {
                     string[] split = file_line.Split(':');
@@ -48,17 +47,7 @@ namespace IRCBot
                         }
                         else
                         {
-                            if (Convert.ToInt32(split[1]) != previous_access)
-                            {
-                                previous_access = Convert.ToInt32(split[1]);
-                                ircbot.sendData("NOTICE", nick + " :" + msg.TrimEnd(','));
-                                msg = "";
-                                msg += " " + conf.command + split[2] + ",";
-                            }
-                            else
-                            {
-                                msg += " " + conf.command + split[2] + ",";
-                            }
+                            msg += " " + conf.command + split[2] + ",";
                         }
                     }
                 }

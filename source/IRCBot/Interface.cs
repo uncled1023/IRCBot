@@ -799,6 +799,7 @@ namespace IRCBot
                                                 nick_found = true;
                                                 int user_access = get_access_num(names[i].Remove(1));
                                                 nick_list[x].Add(user_access + ":" + names[i].TrimStart('~').TrimStart('&').TrimStart('@').TrimStart('%').TrimStart('+'));
+                                                break;
                                             }
                                         }
                                         line = sr.ReadLine();

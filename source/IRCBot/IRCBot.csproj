@@ -82,6 +82,7 @@
     <Compile Include="configuration.Designer.cs">
       <DependentUpon>configuration.cs</DependentUpon>
     </Compile>
+    <Compile Include="fun.cs" />
     <Compile Include="google.cs" />
     <Compile Include="hbomb.cs" />
     <Compile Include="help.cs" />

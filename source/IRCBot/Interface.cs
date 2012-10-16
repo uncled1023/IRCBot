@@ -218,7 +218,7 @@ namespace IRCBot
                 nodePort.InnerText = "6667";
                 node.AppendChild(nodePort);
                 XmlNode nodeServer = xmlDoc.CreateElement("server");
-                nodeServer.InnerText = "";
+                nodeServer.InnerText = "irc";
                 node.AppendChild(nodeServer);
                 XmlNode nodeChan = xmlDoc.CreateElement("chan_list");
                 nodeChan.InnerText = "";
@@ -270,17 +270,55 @@ namespace IRCBot
             Spam_Check_Timer.Start();
 
             Spam_Timer.Interval = conf.spam_timout;
-
-            string[] server = conf.server.Split('.');
-            Control control = new Control();
-            if (tabControl1.Controls.Find("output_box_system", true).GetUpperBound(0) >= 0)
+            string[] server_list = conf.server.Split(',');
+            foreach (string server_name in server_list)
             {
-                control = tabControl1.Controls.Find("output_box_system", true)[0];
-                RichTextBox output_box = (RichTextBox)control;
-                output_box.Name = "output_box_" + server[1] + "_system";
-                control = tabControl1.Controls.Find("tabPage1", true)[0];
-                TabPage tabpage = (TabPage)control;
-                tabpage.Name = "tabPage_" + server[1] + "_system";
+                Control control = new Control();
+                if (tabControl1.Controls.Find("output_box_system", true).GetUpperBound(0) >= 0)
+                {
+                    string[] server = conf.server.Split('.');
+                    string tmp_server_name = "No Server Specified";
+                    if (server.GetUpperBound(0) > 0)
+                    {
+                        tmp_server_name = server[1];
+                    }
+                    control = tabControl1.Controls.Find("output_box_system", true)[0];
+                    RichTextBox output_box = (RichTextBox)control;
+                    output_box.Name = "output_box_" + tmp_server_name + "_system";
+                    control = tabControl1.Controls.Find("tabPage1", true)[0];
+                    TabPage tabpage = (TabPage)control;
+                    tabpage.Name = "tabPage_" + tmp_server_name + "_system";
+                    tabpage.Text = tmp_server_name;
+                }
+                else
+                {
+                    string[] server = conf.server.Split('.');
+                    string tmp_server_name = "No Server Specified";
+                    if (server.GetUpperBound(0) > 0)
+                    {
+                        tmp_server_name = server[1];
+                    }
+                    RichTextBox box = new RichTextBox();
+                    box.Dock = System.Windows.Forms.DockStyle.Fill;
+                    box.Location = new System.Drawing.Point(3, 3);
+                    box.Name = "output_box_" + tmp_server_name + "_system";
+                    box.Size = new System.Drawing.Size(826, 347);
+                    box.TabIndex = 0;
+                    box.ReadOnly = true;
+                    box.Text = "";
+                    TabPage tabpage = new TabPage();
+                    tabpage.Controls.Add(box);
+                    tabpage.Location = new System.Drawing.Point(4, 22);
+                    tabpage.Name = "tabPage_user_" + tmp_server_name + "_system";
+                    tabpage.Padding = new System.Windows.Forms.Padding(3);
+                    tabpage.Size = new System.Drawing.Size(832, 353);
+                    tabpage.TabIndex = 0;
+                    tabpage.Text = tmp_server_name;
+                    tabpage.UseVisualStyleBackColor = true;
+                    tabControl1.Controls.Add(tabpage);
+                    tabControl1.Update();
+                    box.LinkClicked += new LinkClickedEventHandler(link_Click);
+                }
             }
 
             nick_list.Clear();
@@ -353,8 +391,17 @@ namespace IRCBot
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             string[] server = conf.server.Split('.');
+            string tmp_server_name = "No Server Specified";
+            if (server.GetUpperBound(0) > 0)
+            {
+                tmp_server_name = server[1];
+            }
+            else
+            {
+                restart = false;
+            }
             Control control = new Control();
-            control = tabControl1.Controls.Find("output_box_" + server[1] + "_system", true)[0];
+            control = tabControl1.Controls.Find("output_box_" + tmp_server_name + "_system", true)[0];
             RichTextBox output_box = (RichTextBox)control;
             if (restart == true)
             {
@@ -363,8 +410,13 @@ namespace IRCBot
             }
             else
             {
+                if (tmp_server_name == "No Server Specified")
+                {
+                    output_box.AppendText(Environment.NewLine + "Please add a server to connect to." + Environment.NewLine);
+                }
                 restart_attempts = 0;
                 output_box.AppendText(Environment.NewLine + "Exited" + Environment.NewLine);
+                connectToolStripMenuItem.Text = "Connect";
             }
         }
 
@@ -581,7 +633,7 @@ namespace IRCBot
                 }
 
                 char[] charSeparator = new char[] { ' ' };
-                ex = data.Split(charSeparator, 5);
+                ex = data.Split(charSeparator, 5, StringSplitOptions.RemoveEmptyEntries);
                 
                 if (ex[0] == "PING")
                 {
@@ -1525,12 +1577,17 @@ namespace IRCBot
                 try
                 {
                     string[] server = conf.server.Split('.');
+                    string tmp_server_name = "No Server Specified";
+                    if (server.GetUpperBound(0) > 0)
+                    {
+                        tmp_server_name = server[1];
+                    }
                     string channel = "System";
                     string tab_name = "System";
                     string message = "";
                     string nickname = "";
                     string pattern = "[^a-zA-Z0-9]"; //regex pattern
-                    Control control = tabControl1.Controls.Find("output_box_" + server[1] + "_system", true)[0];
+                    Control control = tabControl1.Controls.Find("output_box_" + tmp_server_name + "_system", true)[0];
                     char[] charSeparator = new char[] { ' ' };
                     string[] tmp_lines = text.Split(charSeparator, 4);
                     string time_stamp = DateTime.Now.ToString("hh:mm tt");
@@ -1753,19 +1810,19 @@ namespace IRCBot
                         {
                             if (channel.StartsWith("#"))
                             {
-                                if (tabControl1.Controls.Find("output_box_chan_" + server[1] + "_" + tab_name, true).GetUpperBound(0) < 0)
+                                if (tabControl1.Controls.Find("output_box_chan_" + tmp_server_name + "_" + tab_name, true).GetUpperBound(0) < 0)
                                 {
                                     add_tab(channel);
                                 }
-                                control = tabControl1.Controls.Find("output_box_chan_" + server[1] + "_" + tab_name, true)[0];
+                                control = tabControl1.Controls.Find("output_box_chan_" + tmp_server_name + "_" + tab_name, true)[0];
                             }
                             else
                             {
-                                if (tabControl1.Controls.Find("output_box_user_" + server[1] + "_" + tab_name, true).GetUpperBound(0) < 0)
+                                if (tabControl1.Controls.Find("output_box_user_" + tmp_server_name + "_" + tab_name, true).GetUpperBound(0) < 0)
                                 {
                                     add_tab(channel);
                                 }
-                                control = tabControl1.Controls.Find("output_box_user_" + server[1] + "_" + tab_name, true)[0];
+                                control = tabControl1.Controls.Find("output_box_user_" + tmp_server_name + "_" + tab_name, true)[0];
                             }
                         }
                     }
@@ -1806,11 +1863,11 @@ namespace IRCBot
                         string file_name = "";
                         if (channel.StartsWith("#"))
                         {
-                            file_name = server[1] + "-#" + tab_name + ".log";
+                            file_name = tmp_server_name + "-#" + tab_name + ".log";
                         }
                         else
                         {
-                            file_name = server[1] + "-" + tab_name + ".log";
+                            file_name = tmp_server_name + "-" + tab_name + ".log";
                         }
                         if (conf.logs_path == "")
                         {
@@ -1882,6 +1939,11 @@ namespace IRCBot
             else
             {
                 string[] server = conf.server.Split('.');
+                string tmp_server_name = "No Server Specified";
+                if (server.GetUpperBound(0) > 0)
+                {
+                    tmp_server_name = server[1];
+                }
                 string pattern = "[^a-zA-Z0-9]"; //regex pattern
                 string tab_name = channel.TrimStart('#');
                 tab_name = Regex.Replace(tab_name, pattern, "_");
@@ -1890,11 +1952,11 @@ namespace IRCBot
                 box.Location = new System.Drawing.Point(3, 3);
                 if (channel.StartsWith("#"))
                 {
-                    box.Name = "output_box_chan_" + server[1] + "_" + tab_name;
+                    box.Name = "output_box_chan_" + tmp_server_name + "_" + tab_name;
                 }
                 else
                 {
-                    box.Name = "output_box_user_" + server[1] + "_" + tab_name;
+                    box.Name = "output_box_user_" + tmp_server_name + "_" + tab_name;
                 }
                 box.Size = new System.Drawing.Size(826, 347);
                 box.TabIndex = 0;
@@ -1905,11 +1967,11 @@ namespace IRCBot
                 tabpage.Location = new System.Drawing.Point(4, 22);
                 if (channel.StartsWith("#"))
                 {
-                    tabpage.Name = "tabPage_chan_" + server[1] + "_" + tab_name;
+                    tabpage.Name = "tabPage_chan_" + tmp_server_name + "_" + tab_name;
                 }
                 else
                 {
-                    tabpage.Name = "tabPage_user_" + server[1] + "_" + tab_name;
+                    tabpage.Name = "tabPage_user_" + tmp_server_name + "_" + tab_name;
                 }
                 tabpage.Padding = new System.Windows.Forms.Padding(3);
                 tabpage.Size = new System.Drawing.Size(832, 353);

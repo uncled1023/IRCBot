@@ -694,6 +694,9 @@ namespace IRCBot
                                         // Rules Module
                                         rules.rules_control(ex, command, this, nick_access, nick);
 
+                                        // Messaging Module
+                                        message_module.message_control(ex, command, this, nick_access, nick);
+
                                         // Intro Message Module
                                         intro.intro_control(ex, command, this, nick_access, nick);
 
@@ -735,6 +738,9 @@ namespace IRCBot
 
                                         // Owner Module
                                         owner.owner_control(ex, command, this, ref conf, nick_access, nick);
+
+                                        // Messaging Module
+                                        message_module.message_control(ex, command, this, nick_access, nick);
                                     }
                                 }
                                 else // All other text

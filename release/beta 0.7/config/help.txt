@@ -56,4 +56,7 @@ Urban Dictionary:1:ud <query>:Returns the top result from Urban Dictionary.
 Magic 8-Ball:1:8ball <question>:Answers any question you have!
 H-Bomb:1:hbomb:Initiates a new game of pass the Hbomb.  To pass the bomb, type .pass <nick>, and to defuse the bomb type .defuse <color>.
 Ping Me:1:pingme:Gets the ping time between your client and me.
+Send Love:1:love [<nick>]:Sends some love to the nick or yourself.
+Hug:1:hug [<nick>]:Sends a hug to the nick or yourself.
+Slap Someone:1:slap [<nick>]:Slaps a nick or yourself.
 Channel Rules:0:rules:Sends you the channel rules.

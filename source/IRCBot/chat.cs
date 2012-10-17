@@ -21,7 +21,7 @@ namespace IRCBot
 
         public chat()
         {
-            chat_time.Interval = 30000;
+            chat_time.Interval = 20000;
             chat_time.AutoReset = false;
             chat_time.Elapsed += stop_chat;
             chat_time.Enabled = false;

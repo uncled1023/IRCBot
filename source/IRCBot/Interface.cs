@@ -71,8 +71,6 @@ namespace IRCBot
         
         // Access Module
         access access = new access();
-        // Moderation Module
-        moderation mod = new moderation();
         // Owner Module
         owner owner = new owner();
         // Help Module
@@ -684,6 +682,7 @@ namespace IRCBot
                                         access.access_control(ex, command, this, conf, nick_access, nick);
 
                                         // Moderation Module
+                                        moderation mod = new moderation();
                                         mod.moderation_control(ex, command, this, conf, nick_access, nick);
 
                                         // Owner Module
@@ -743,6 +742,7 @@ namespace IRCBot
                                     if (ex[2].StartsWith("#") == true) // From Channel
                                     {
                                         // ABan/AKick Module
+                                        moderation mod = new moderation();
                                         mod.check_auto(nick, channel, nick_host, this);
 
                                         // Quote Module
@@ -997,6 +997,7 @@ namespace IRCBot
                         message_module.find_message(nick, this);
 
                         // ABan/AKick Module
+                        moderation mod = new moderation();
                         mod.check_auto(nick, channel.TrimStart(':'), nick_host, this);
                     }
 
@@ -1068,43 +1069,46 @@ namespace IRCBot
                     {
                         if (ex.GetUpperBound(0) > 3)
                         {
-                            for (int x = 0; x < nick_list.Count(); x++)
+                            if (ex[3].TrimStart('-').TrimStart('+').ToLower() == "o" || ex[3].TrimStart('-').TrimStart('+').ToLower() == "v" || ex[3].TrimStart('-').TrimStart('+').ToLower() == "h" || ex[3].TrimStart('-').TrimStart('+').ToLower() == "q" || ex[3].TrimStart('-').TrimStart('+').ToLower() == "a")
                             {
-                                if (nick_list[x][0].Equals(ex[2]))
+                                for (int x = 0; x < nick_list.Count(); x++)
                                 {
-                                    bool nick_found = false;
-                                    string[] new_nick = ex[4].Split(charSeparator,2);
-                                    for (int y = 0; y <= new_nick.GetUpperBound(0); y++)
+                                    if (nick_list[x][0].Equals(ex[2]))
                                     {
-                                        int new_access = get_user_access(new_nick[y], ex[2]);
-                                        bool identified = get_user_ident(new_nick[y]);
-                                        for (int i = 1; i < nick_list[x].Count(); i++)
+                                        bool nick_found = false;
+                                        string[] new_nick = ex[4].Split(charSeparator, 2);
+                                        for (int y = 0; y <= new_nick.GetUpperBound(0); y++)
                                         {
-                                            string[] split = nick_list[x][i].Split(':');
-                                            if (split.GetUpperBound(0) > 0)
+                                            int new_access = get_user_access(new_nick[y], ex[2]);
+                                            bool identified = get_user_ident(new_nick[y]);
+                                            for (int i = 1; i < nick_list[x].Count(); i++)
                                             {
-                                                if (split[1].Equals(new_nick[y]))
+                                                string[] split = nick_list[x][i].Split(':');
+                                                if (split.GetUpperBound(0) > 0)
                                                 {
-                                                    nick_found = true;
-                                                    if (split[0] != "")
+                                                    if (split[1].Equals(new_nick[y]))
                                                     {
-                                                        int old_access = Convert.ToInt32(split[0]);
-                                                        if (identified == true)
+                                                        nick_found = true;
+                                                        if (split[0] != "")
                                                         {
-                                                            if (old_access > new_access)
+                                                            int old_access = Convert.ToInt32(split[0]);
+                                                            if (identified == true)
                                                             {
-                                                                new_access = old_access;
+                                                                if (old_access > new_access)
+                                                                {
+                                                                    new_access = old_access;
+                                                                }
                                                             }
                                                         }
+                                                        nick_list[x][i] = new_access.ToString() + ":" + new_nick[y];
+                                                        break;
                                                     }
-                                                    nick_list[x][i] = new_access.ToString() + ":" + new_nick[y];
-                                                    break;
                                                 }
                                             }
-                                        }
-                                        if (nick_found == false)
-                                        {
-                                            nick_list[x].Add(new_access.ToString() + ":" + new_nick[y]);
+                                            if (nick_found == false)
+                                            {
+                                                nick_list[x].Add(new_access.ToString() + ":" + new_nick[y]);
+                                            }
                                         }
                                     }
                                 }

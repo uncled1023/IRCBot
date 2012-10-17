@@ -148,6 +148,54 @@ namespace IRCBot
                                             ircbot.sendData("KICK", channel + " " + nick + " :No Reason");
                                         }
                                     }
+                                    else if (events[y].StartsWith("<ban>") == true)
+                                    {
+                                        string target_host = ircbot.get_user_host(nick);
+                                        string ban = "*!*@" + target_host;
+                                        if (target_host.Equals("was"))
+                                        {
+                                            ban = nick + "!*@*";
+                                        }
+                                        if (events[y].Length > 6)
+                                        {
+                                            ircbot.sendData("MODE", channel + " +b " + ban + " :" + events[y].Remove(0, 6));
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("MODE", channel + " +b " + ban + " :No Reason");
+                                        }
+                                    }
+                                    else if (events[y].StartsWith("<kickban>") == true)
+                                    {
+                                        string target_host = ircbot.get_user_host(nick);
+                                        string ban = "*!*@" + target_host;
+                                        if (target_host.Equals("was"))
+                                        {
+                                            ban = nick + "!*@*";
+                                        }
+                                        if (events[y].Length > 6)
+                                        {
+                                            ircbot.sendData("MODE", channel + " +b " + ban + " :" + events[y].Remove(0, 6));
+                                            ircbot.sendData("KICK", channel + " " + nick + " :" + events[y].Remove(0, 6));
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("MODE", channel + " +b " + ban + " :No Reason");
+                                            ircbot.sendData("KICK", channel + " " + nick + " :No Reason");
+                                        }
+                                    }
+                                    else if (events[y].StartsWith("<timeban>") == true)
+                                    {
+                                        string[] mod_tmp_line = new string[] { conf.nick, "0", channel, ":tb", events[y].Remove(0, 9) };
+                                        moderation mod = new moderation();
+                                        mod.moderation_control(mod_tmp_line, "tb", ircbot, conf, 10, conf.nick);
+                                    }
+                                    else if (events[y].StartsWith("<timekickban>") == true)
+                                    {
+                                        string[] mod_tmp_line = new string[] { conf.nick, "0", channel, ":tkb", events[y].Remove(0, 13) };
+                                        moderation mod = new moderation();
+                                        mod.moderation_control(mod_tmp_line, "tkb", ircbot, conf, 10, conf.nick);
+                                    }
                                     else
                                     {
                                         ircbot.sendData("PRIVMSG", channel + " :" + events[y]);

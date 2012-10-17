@@ -46,10 +46,10 @@ Set your Introduction:1:intro <message>:Adds a personal greeting for whenever yo
 Delete your Introduction:1:introdelete:Deletes all of your introductions.
 Kick Yourself:1:kme [<reason>]:Kicks you from the channel.
 Check Nick Whereabouts:1:seen <nick>:Displays the last time the nick has been seen in the channel.
-Get Current Weather:1:weather <zip code|city name>:Displays the current weather conditions for the city you search for.
-Get Current Weather:1:w <zip code|city name>:Displays the current weather conditions for the city you search for.
-Get 5 Day Forecast:1:forecast <zip code|city name>:Displays the 5 day forecast for the city you search for.
-Get 5 Day Forecast:1:f <zip code|city name>:Displays the 5 day forecast for the city you search for.
+Get Current Weather:1:weather <zip_code|city_name>:Displays the current weather conditions for the city you search for.
+Get Current Weather:1:w <zip_code|city_name>:Displays the current weather conditions for the city you search for.
+Get 5 Day Forecast:1:forecast <zip_code|city_name>:Displays the 5 day forecast for the city you search for.
+Get 5 Day Forecast:1:f <zip_code|city_name>:Displays the 5 day forecast for the city you search for.
 Channel Quote:1:quote:Gets a random quote from the channel.
 Google:1:google <query>:Returns the first result from Google.
 Urban Dictionary:1:ud <query>:Returns the top result from Urban Dictionary.

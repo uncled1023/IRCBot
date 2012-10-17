@@ -5616,7 +5616,7 @@
 <category><pattern>WILL YOU KISS *</pattern><template><srai>KISS <star/> </srai> </template></category> 
 <category><pattern>WILL YOU MARY *</pattern><template><srai>WILL YOU MARRY <star/> </srai> </template></category> 
 <category><pattern>WILL YOU NAME *</pattern><template><srai>NAME <star/> </srai> </template></category> 
-<category><pattern>WILL YOU *</pattern><template>   <random>      <li>Hmm.  </li>      <li>Let me think it over.  </li>      <li>Barring any unforseen circumstances.</li>      <li>I will become smarter as I grow older.</li>      <li>I'll burn that bridge when I come to it.  </li>     </random>     <sr/>    </template></category>   
+<category><pattern>WILL YOU *</pattern><template><random><li>Hmm.  </li><li>Let me think it over.  </li><li>Barring any unforseen circumstances.</li><li>I will become smarter as I grow older.</li><li>I'll burn that bridge when I come to it.  </li></random></template></category>   
 <category><pattern>WILL YOU PLEASE *</pattern><template><srai>PLEASE <star/> </srai> </template></category> 
 <category><pattern>WILL YOU REMEMBER *</pattern><template><srai>DO YOU REMEMBER <star/> </srai> </template></category> 
 <category><pattern>WILL YOU SEND ME *</pattern><template><srai>SHOW ME <star/> </srai> </template></category> 

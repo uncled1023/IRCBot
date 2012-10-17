@@ -267,7 +267,7 @@ namespace IRCBot
                     {
                         char[] sep = new char[] { '*' };
                         string[] new_line = line.Split(sep, 3);
-                        if (new_line.GetUpperBound(0) > 0)
+                        if (new_line.GetUpperBound(0) > 1)
                         {
                             if (new_line[0].Equals(nick) && new_line[1].Equals(channel))
                             {

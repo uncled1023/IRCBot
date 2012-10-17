@@ -10,9 +10,9 @@ namespace IRCBot
 {
     class AI
     {
-        public void AI_Parse(string[] total_line, string channel, string nick, Interface ircbot, IRCConfig conf)
+        public void AI_Parse(string[] total_line, string channel, string nick, Interface ircbot, IRCConfig conf, chat chat)
         {
-            if (nick != conf.nick)
+            if (nick != conf.nick && chat.still_chatting == false)
             {
                 try
                 {

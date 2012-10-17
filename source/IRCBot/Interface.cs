@@ -101,6 +101,10 @@ namespace IRCBot
         hbomb hbomb = new hbomb();
         // Ping Me Module
         pingme pingme = new pingme();
+        // Fun Commands Module
+        fun fun = new fun();
+        // ChatBot Module
+        chat chat = new chat();
 
         delegate void SetTextCallback(string text);
 
@@ -639,6 +643,7 @@ namespace IRCBot
                 {
                     sendData("PONG", ex[1]);
                 }
+
                 // Ping Me Module
                 pingme.check_ping(ex, this);
 
@@ -719,6 +724,9 @@ namespace IRCBot
 
                                         // Ping Me Module
                                         pingme.pingme_control(ex, command, this, nick_access, nick, channel);
+
+                                        // Fun Module
+                                        fun.fun_control(ex, command, this, nick_access, nick, channel);
                                     }
                                     else // From Query
                                     {
@@ -744,10 +752,13 @@ namespace IRCBot
                                         quote.add_quote(nick, channel, ex, this, conf);
 
                                         // AI Module
-                                        ai.AI_Parse(ex, channel, nick, this, conf);
+                                        ai.AI_Parse(ex, channel, nick, this, conf, chat);
 
                                         // Messaging Module
                                         message_module.find_message(nick, this);
+
+                                        // Chat Module
+                                        chat.chat_control(ex, this, conf, nick, channel);
                                     }
                                     else // From Query
                                     {
@@ -755,7 +766,7 @@ namespace IRCBot
                                         message_module.find_message(nick, this);
 
                                         // AI Module
-                                        ai.AI_Parse(ex, nick, nick, this, conf);
+                                        ai.AI_Parse(ex, nick, nick, this, conf, chat);
                                     }
                                 }
                             }
@@ -796,7 +807,7 @@ namespace IRCBot
                                     string line = sr.ReadLine();
                                     char[] Separator = new char[] { ' ' };
                                     string[] name_line = line.Split(Separator, 5);
-                                    while (name_line.GetUpperBound(0) < 3)
+                                    while (name_line.GetUpperBound(0) <= 3)
                                     {
                                         output = Environment.NewLine + line;
                                         lock (listLock)
@@ -823,7 +834,7 @@ namespace IRCBot
                                         }
                                         line = sr.ReadLine();
                                         name_line = line.Split(charSeparator, 5);
-                                        while (name_line.GetUpperBound(0) < 3)
+                                        while (name_line.GetUpperBound(0) <= 3)
                                         {
                                             output = Environment.NewLine + line;
                                             lock (listLock)
@@ -856,14 +867,19 @@ namespace IRCBot
                                         }
                                         line = sr.ReadLine();
                                         name_line = line.Split(charSeparator, 5);
-                                        output = Environment.NewLine + line;
-                                        lock (listLock)
+                                        while (name_line.GetUpperBound(0) <= 3)
                                         {
-                                            if (queue_text.Count >= 1000)
+                                            output = Environment.NewLine + line;
+                                            lock (listLock)
                                             {
-                                                queue_text.RemoveAt(0);
+                                                if (queue_text.Count >= 1000)
+                                                {
+                                                    queue_text.RemoveAt(0);
+                                                }
+                                                queue_text.Add(output);
                                             }
-                                            queue_text.Add(output);
+                                            line = sr.ReadLine();
+                                            name_line = line.Split(charSeparator, 5);
                                         }
                                     }
                                 }
@@ -934,14 +950,19 @@ namespace IRCBot
                                 }
                                 line = sr.ReadLine();
                                 name_line = line.Split(charSeparator, 5);
-                                output = Environment.NewLine + line;
-                                lock (listLock)
+                                while (name_line.GetUpperBound(0) <= 3)
                                 {
-                                    if (queue_text.Count >= 1000)
+                                    output = Environment.NewLine + line;
+                                    lock (listLock)
                                     {
-                                        queue_text.RemoveAt(0);
+                                        if (queue_text.Count >= 1000)
+                                        {
+                                            queue_text.RemoveAt(0);
+                                        }
+                                        queue_text.Add(output);
                                     }
-                                    queue_text.Add(output);
+                                    line = sr.ReadLine();
+                                    name_line = line.Split(charSeparator, 5);
                                 }
                             }
                             if (channel_found == true)

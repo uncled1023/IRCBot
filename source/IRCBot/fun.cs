@@ -78,6 +78,13 @@ namespace IRCBot
                         }
                     }
                     break;
+                case "bots":
+                    ircbot.spam_count++;
+                    if (nick_access >= 1)
+                    {
+                        ircbot.sendData("PRIVMSG", channel + " :Reporting in!");
+                    }
+                    break;
             }
         }
     }

@@ -9,22 +9,25 @@ namespace IRCBot
 {
     class messaging
     {
-        public void message_control(string[] line, string command, Interface ircbot, int nick_access, string nick)
+        public void message_control(string[] line, string command, Interface ircbot, string nick)
         {
             switch (command)
             {
                 case "message":
-                    ircbot.spam_count++;
-                    if (nick_access >= 1)
+                    if (line.GetUpperBound(0) > 3)
                     {
-                        if (line.GetUpperBound(0) > 3)
+                        if (line[2].StartsWith("#"))
                         {
                             add_message(nick, line, line[2], ircbot);
                         }
                         else
                         {
-                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                            add_message(nick, line, null, ircbot);
                         }
+                    }
+                    else
+                    {
+                        ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
                     }
                     break;
             }
@@ -49,7 +52,7 @@ namespace IRCBot
                     {
                         char[] charSeparator = new char[] { '*' };
                         string[] intro_nick = file_line.Split(charSeparator, 4);
-                        if (nick.Equals(intro_nick[0]))
+                        if (nick.Equals(intro_nick[0]) && to_nick.Equals(intro_nick[1]))
                         {
                             new_file[counter] = add_line;
                             found_nick = true;

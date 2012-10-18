@@ -34,11 +34,13 @@ Remove a User from Auto Ban:7:deab <nick>:Removes the specified nick to the auto
 Remove a User from Auto Kick-Ban:7:deakb <nick>:Removes the specified nick to the auto kick-ban list.
 Add Channel Rule:7:addrule <rule>:Adds the specified rule to the end of the channel rules list.
 Remove Channel Rule:7:delrule <rule_number>:Removes the specified rule number from the rules list.
-Ban a User:6:b <nick> [<reason>]:Bans the specified nick.
-Kick+Ban a User:6:kb <nick> [<reason>]:Bans and then Kicks the specified nick.
-Kick a User:5:k <nick> [<reason>]:Kicks the user from the channel.
-Set HOP:4:hop <nick>:Sets the nick as Half Op.
-Remove HOP:4:dehop <nick>:Removes the nick as Half Op.
+Set HOP:6:hop <nick>:Sets the nick as Half Op.
+Remove HOP:6:dehop <nick>:Removes the nick as Half Op.
+Ban a User:5:b <nick> [<reason>]:Bans the specified nick.
+Kick+Ban a User:5:kb <nick> [<reason>]:Bans and then Kicks the specified nick.
+Timed Ban:5:tb <ban_time_sec> <nick> [<reason>]:Bans the specified nick for the ammount of time specified.
+Timed Kick+Ban:5:tkb <ban_time_sec> <nick> [<reason>]:Bans and then Kicks the specified nick for the ammount of time specified.
+Kick a User:4:k <nick> [<reason>]:Kicks the user from the channel.
 Set Voice:3:voice <nick>:Sets the nick as Voiced.
 Remove Voice:3:devoice <nick>:Removes the nick as Voiced.
 Send a Message:1:message <user> <message>:Allows you to leave a message for a nick.
@@ -59,4 +61,5 @@ Ping Me:1:pingme:Gets the ping time between your client and me.
 Send Love:1:love [<nick>]:Sends some love to the nick or yourself.
 Hug:1:hug [<nick>]:Sends a hug to the nick or yourself.
 Slap Someone:1:slap [<nick>]:Slaps a nick or yourself.
+Check In:1:bots:Checks in to the channel!
 Channel Rules:0:rules:Sends you the channel rules.

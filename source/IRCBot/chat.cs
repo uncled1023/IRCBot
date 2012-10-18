@@ -57,7 +57,7 @@ namespace IRCBot
                     // Start Chatting
                     still_chatting = false;
                     chat_time.Stop();
-                    Request r = new Request(msg.Replace("!", "").Replace(".", "").Replace(";", "").Replace("?", ""), myUser, myBot);
+                    Request r = new Request(msg, myUser, myBot);
                     Result res = myBot.Chat(r);
                     ircbot.sendData("PRIVMSG", channel + " :" + res.Output.Replace("[nick]", nick).Replace("[me]", conf.nick).Replace("[owner]", conf.owner));
                     chat_time.Start();

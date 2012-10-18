@@ -129,12 +129,15 @@ namespace IRCBot
                                 ircbot.spam_count++;
                                 if (line.GetUpperBound(0) > 3)
                                 {
-                                    if (line[4].Equals(wire_color))
+                                    if (line[4].ToLower().Equals(wire_color.ToLower()))
                                     {
                                         bomb_trigger.Enabled = false;
                                         hbomb_active = false;
                                         ircbot.sendData("PRIVMSG", channel + " :You have successfully defused the bomb!");
                                         if (previous_bomb_holder.Equals(bomb_holder))
+                                        {
+                                        }
+                                        else
                                         {
                                             ircbot.sendData("KICK", bomb_channel + " " + previous_bomb_holder + " :BOOM!!!");
                                         }

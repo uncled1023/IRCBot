@@ -15,7 +15,6 @@ namespace IRCBot
 {
     public partial class configuration : Form
     {
-        string cur_dir = "";
         private Interface m_parent;
         public configuration(Interface frmctrl)
         {
@@ -23,11 +22,10 @@ namespace IRCBot
 
             m_parent = frmctrl;
 
-            cur_dir = Directory.GetCurrentDirectory();
             XmlDocument xmlDoc = new XmlDocument();
-            if (File.Exists(cur_dir + "\\config\\config.xml"))
+            if (File.Exists(m_parent.cur_dir + "\\config\\config.xml"))
             {
-                xmlDoc.Load(cur_dir + "\\config\\config.xml");
+                xmlDoc.Load(m_parent.cur_dir + "\\config\\config.xml");
             }
             else
             {
@@ -63,7 +61,7 @@ namespace IRCBot
                 nodeKeep.InnerText = "True";
                 node.AppendChild(nodeKeep);
                 XmlNode nodeLogs = xmlDoc.CreateElement("logs_path");
-                nodeLogs.InnerText = cur_dir + "\\logs\\";
+                nodeLogs.InnerText = m_parent.cur_dir + "\\logs\\";
                 node.AppendChild(nodeLogs);
                 XmlNode nodeStart = xmlDoc.CreateElement("start_with_windows");
                 nodeStart.InnerText = "True";
@@ -77,9 +75,12 @@ namespace IRCBot
                 XmlNode nodeSpamTime = xmlDoc.CreateElement("spam_timeout");
                 nodeSpamTime.InnerText = "10000";
                 node.AppendChild(nodeSpamTime);
+                XmlNode nodeSpamMaxMsgLength = xmlDoc.CreateElement("max_message_length");
+                nodeSpamMaxMsgLength.InnerText = "450";
+                node.AppendChild(nodeSpamMaxMsgLength);
                 xmlDoc.AppendChild(node);
-                xmlDoc.Save(cur_dir + "\\config\\config.xml");
-                xmlDoc.Load(cur_dir + "\\config\\config.xml");
+                xmlDoc.Save(m_parent.cur_dir + "\\config\\config.xml");
+                xmlDoc.Load(m_parent.cur_dir + "\\config\\config.xml");
             }
             XmlNode list = xmlDoc.SelectSingleNode("connection_settings");
 
@@ -95,6 +96,7 @@ namespace IRCBot
             spam_count_box.Text = list["spam_count"].InnerText;
             spam_threshold_box.Text = list["spam_threshold"].InnerText;
             spam_timeout_box.Text = list["spam_timeout"].InnerText;
+            max_message_length_box.Text = list["max_message_length"].InnerText;
             if (list["keep_logs"].InnerText == "True")
             {
                 keep_logs_box.Checked = true;
@@ -113,6 +115,35 @@ namespace IRCBot
                 windows_start_box.Checked = false;
             }
 
+            XmlNodeList xnList = xmlDoc.SelectNodes("/modules/module");
+            foreach (XmlNode xn in xnList)
+            {
+                String module_name = xn["name"].InnerText;
+                module_list.Items.Add(module_name);
+            }
+            module_list.SelectedValueChanged += new EventHandler(this.module_changed);
+        }
+
+        private void module_changed(object sender, EventArgs e)
+        {
+            ComboBox selected_control = (ComboBox)sender;
+            string value = selected_control.Text.ToString();
+            XmlDocument xmlDoc = new XmlDocument();
+            if (File.Exists(m_parent.cur_dir + "\\config\\config.xml"))
+            {
+                xmlDoc.Load(m_parent.cur_dir + "\\config\\config.xml");
+                XmlNodeList xnList = xmlDoc.SelectNodes("/modules/module");
+                foreach (XmlNode xn in xnList)
+                {
+                    String module_name = xn["name"].InnerText;
+                    if (value.Equals(module_name))
+                    {
+                    }
+                }
+            }
+            else
+            {
+            }
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -132,16 +163,16 @@ namespace IRCBot
             else
             {
                 XmlDocument xmlDoc2 = new XmlDocument();
-                xmlDoc2.Load(cur_dir + "\\config\\config.xml");
+                xmlDoc2.Load(m_parent.cur_dir + "\\config\\config.xml");
                 XmlNodeList xnList = xmlDoc2.SelectNodes("connection_settings");
                 foreach (XmlNode xn in xnList)
                 {
                     xn.RemoveAll();
                 }
-                xmlDoc2.Save(cur_dir + "\\config\\config.xml");
+                xmlDoc2.Save(m_parent.cur_dir + "\\config\\config.xml");
 
                 XmlDocument xmlDoc = new XmlDocument();
-                xmlDoc.Load(cur_dir + "\\config\\config.xml");
+                xmlDoc.Load(m_parent.cur_dir + "\\config\\config.xml");
                 XmlNode node = xmlDoc.SelectSingleNode("connection_settings");
                 XmlNode nodeName = xmlDoc.CreateElement("name");
                 nodeName.InnerText = bot_name_box.Text;
@@ -188,8 +219,11 @@ namespace IRCBot
                 XmlNode nodeSpamTime = xmlDoc.CreateElement("spam_timeout");
                 nodeSpamTime.InnerText = spam_timeout_box.Text;
                 node.AppendChild(nodeSpamTime);
+                XmlNode nodeSpamMaxMsgLength = xmlDoc.CreateElement("max_message_length");
+                nodeSpamMaxMsgLength.InnerText = max_message_length_box.Text;
+                node.AppendChild(nodeSpamMaxMsgLength);
                 xmlDoc.AppendChild(node);
-                xmlDoc.Save(cur_dir + "\\config\\config.xml");
+                xmlDoc.Save(m_parent.cur_dir + "\\config\\config.xml");
 
                 RegistryKey rkApp = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
                 if (windows_start_box.Checked.ToString() == "True")

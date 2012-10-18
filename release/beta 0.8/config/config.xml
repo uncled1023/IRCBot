@@ -1,0 +1,18 @@
+<connection_settings>
+  <name>IRCBot</name>
+  <nick>IRCBot</nick>
+  <password></password>
+  <email></email>
+  <owner></owner>
+  <port>6667</port>
+  <server></server>
+  <chan_list></chan_list>
+  <command_prefix>.</command_prefix>
+  <keep_logs>True</keep_logs>
+  <logs_path></logs_path>
+  <start_with_windows>False</start_with_windows>
+  <spam_count>5</spam_count>
+  <spam_threshold>1000</spam_threshold>
+  <spam_timeout>10000</spam_timeout>
+  <max_message_length>450</max_message_length>
+</connection_settings>

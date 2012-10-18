@@ -35,6 +35,7 @@ struct IRCConfig
     public int spam_threshold;
     public int spam_timout;
     public int max_message_length;
+    public List<List<string>> module_config;
 }
 
 namespace IRCBot
@@ -246,6 +247,9 @@ namespace IRCBot
                 XmlNode nodeSpamTime = xmlDoc.CreateElement("spam_timeout");
                 nodeSpamTime.InnerText = "10000";
                 node.AppendChild(nodeSpamTime);
+                XmlNode nodeSpamMaxMsgLength = xmlDoc.CreateElement("max_message_length");
+                nodeSpamMaxMsgLength.InnerText = "450";
+                node.AppendChild(nodeSpamMaxMsgLength);
                 xmlDoc.AppendChild(node);
                 xmlDoc.Save(cur_dir + "\\config\\config.xml");
                 xmlDoc.Load(cur_dir + "\\config\\config.xml");
@@ -266,7 +270,7 @@ namespace IRCBot
             conf.spam_count_max = Convert.ToInt32(list["spam_count"].InnerText);
             conf.spam_threshold = Convert.ToInt32(list["spam_threshold"].InnerText);
             conf.spam_timout = Convert.ToInt32(list["spam_timeout"].InnerText);
-            conf.max_message_length = 450;
+            conf.max_message_length = Convert.ToInt32(list["max_message_length"].InnerText);
 
             Spam_Check_Timer.Interval = conf.spam_threshold;
             Spam_Check_Timer.Start();

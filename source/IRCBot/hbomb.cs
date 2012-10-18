@@ -61,7 +61,7 @@ namespace IRCBot
                             {
                                 colors += wire + ",";
                             }
-                            ircbot.sendData("NOTICE", nick + " :You need to hurry and pass the bomb before it blows up!  Or you can try to defuse it yourself.  The colors are: " + colors);
+                            ircbot.sendData("NOTICE", nick + " :You need to hurry and pass the bomb before it blows up!  Or you can try to defuse it yourself.  The colors are: " + colors.TrimEnd(','));
                         }
                         else
                         {
@@ -164,7 +164,6 @@ namespace IRCBot
                         }
                     }
                     break;
-
             }
         }
 
@@ -186,7 +185,6 @@ namespace IRCBot
 
         private void pass_hbomb(string pass_nick, string channel, string nick, Interface ircbot)
         {
-
             string tab_name = channel.TrimStart('#');
             string pattern = "[^a-zA-Z0-9]"; //regex pattern
             tab_name = Regex.Replace(tab_name, pattern, "_");

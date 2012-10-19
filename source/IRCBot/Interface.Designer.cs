@@ -34,6 +34,7 @@
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.connectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.configurationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -43,7 +44,6 @@
             this.output_box_system = new System.Windows.Forms.RichTextBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.button1 = new System.Windows.Forms.Button();
-            this.connectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -98,10 +98,17 @@
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "File";
             // 
+            // connectToolStripMenuItem
+            // 
+            this.connectToolStripMenuItem.Name = "connectToolStripMenuItem";
+            this.connectToolStripMenuItem.Size = new System.Drawing.Size(119, 22);
+            this.connectToolStripMenuItem.Text = "Connect";
+            this.connectToolStripMenuItem.Click += new System.EventHandler(this.connectToolStripMenuItem_Click);
+            // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(119, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -179,14 +186,7 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
-            // connectToolStripMenuItem
-            // 
-            this.connectToolStripMenuItem.Name = "connectToolStripMenuItem";
-            this.connectToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.connectToolStripMenuItem.Text = "Connect";
-            this.connectToolStripMenuItem.Click += new System.EventHandler(this.connectToolStripMenuItem_Click);
-            // 
-            // Form1
+            // Interface
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -198,8 +198,8 @@
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
             this.MinimumSize = new System.Drawing.Size(600, 300);
-            this.Name = "Form1";
-            this.Text = "Form1";
+            this.Name = "Interface";
+            this.Text = "IRCBot";
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.tabPage1.ResumeLayout(false);

@@ -168,6 +168,8 @@ namespace IRCBot
         {
             InitializeComponent();
 
+            conf.module_config = new List<List<string>>();
+
             updateOutput.Tick += new EventHandler(UpdateOutput);
             Spam_Check_Timer.Tick += new EventHandler(spam_tick);
             checkRegisterationTimer.Tick += new EventHandler(checkRegistration);
@@ -254,7 +256,7 @@ namespace IRCBot
                 xmlDoc.Save(cur_dir + "\\config\\config.xml");
                 xmlDoc.Load(cur_dir + "\\config\\config.xml");
             }
-            XmlNode list = xmlDoc.SelectSingleNode("connection_settings");
+            XmlNode list = xmlDoc.SelectSingleNode("/bot_settings/connection_settings");
 
             conf.name = list["name"].InnerText;
             conf.nick = list["nick"].InnerText;
@@ -271,6 +273,38 @@ namespace IRCBot
             conf.spam_threshold = Convert.ToInt32(list["spam_threshold"].InnerText);
             conf.spam_timout = Convert.ToInt32(list["spam_timeout"].InnerText);
             conf.max_message_length = Convert.ToInt32(list["max_message_length"].InnerText);
+
+            conf.module_config.Clear();
+            XmlNodeList xnList = xmlDoc.SelectNodes("/bot_settings/modules/module");
+            foreach (XmlNode xn in xnList)
+            {
+                List<string> tmp_list = new List<string>();
+                String module_name = xn["name"].InnerText;
+                tmp_list.Add(module_name);
+                tmp_list.Add(xn["enabled"].InnerText);
+
+                XmlNodeList optionList = xn.ChildNodes;
+                foreach (XmlNode option in optionList)
+                {
+                    if (option.Name.Equals("options"))
+                    {
+                        XmlNodeList Options = option.ChildNodes;
+                        foreach (XmlNode options in Options)
+                        {
+                            switch (options["type"].InnerText)
+                            {
+                                case "textbox":
+                                        tmp_list.Add(options["value"].InnerText);
+                                    break;
+                                case "checkbox":
+                                        tmp_list.Add(options["checked"].InnerText);
+                                    break;
+                            }
+                        }
+                    }
+                }
+                conf.module_config.Add(tmp_list);
+            }
 
             Spam_Check_Timer.Interval = conf.spam_threshold;
             Spam_Check_Timer.Start();
@@ -644,7 +678,17 @@ namespace IRCBot
                 }
 
                 // Ping Me Module
-                pingme.check_ping(ex, this);
+                for (int x = 0; x < conf.module_config.Count(); x++)
+                {
+                    if (conf.module_config[x][0].Equals("Ping Me"))
+                    {
+                        if (conf.module_config[x][1].Equals("True"))
+                        {
+                            pingme.check_ping(ex, this);
+                        }
+                        break;
+                    }
+                }
 
                 string[] user_info = ex[0].Split('@');
                 string[] name = user_info[0].Split('!');
@@ -653,9 +697,19 @@ namespace IRCBot
                     string nick = name[0].TrimStart(':');
                     string nick_host = user_info[1];
                     string channel = ex[2];
-                        
+
                     // Seen Module
-                    seen.add_seen(nick, channel, ex, this);
+                    for (int x = 0; x < conf.module_config.Count(); x++)
+                    {
+                        if (conf.module_config[x][0].Equals("Seen"))
+                        {
+                            if (conf.module_config[x][1].Equals("True"))
+                            {
+                                seen.add_seen(nick, channel, ex, this);
+                            }
+                            break;
+                        }
+                    }
 
                     if (spam_activated == false)
                     {
@@ -683,53 +737,212 @@ namespace IRCBot
                                         int nick_access = get_user_access(nick, channel);
 
                                         // Access Module
-                                        access.access_control(ex, command, this, conf, nick_access, nick);
+                                        for (int x = 0; x < conf.module_config.Count(); x++)
+                                        {
+                                            if (conf.module_config[x][0].Equals("Access"))
+                                            {
+                                                if (conf.module_config[x][1].Equals("True"))
+                                                {
+                                                    access.access_control(ex, command, this, conf, nick_access, nick);
+                                                }
+                                                break;
+                                            }
+                                        }
 
                                         // Moderation Module
-                                        moderation mod = new moderation();
-                                        mod.moderation_control(ex, command, this, conf, nick_access, nick);
+                                        for (int x = 0; x < conf.module_config.Count(); x++)
+                                        {
+                                            if (conf.module_config[x][0].Equals("Moderation"))
+                                            {
+                                                if (conf.module_config[x][1].Equals("True"))
+                                                {
+                                                    moderation mod = new moderation();
+                                                    mod.moderation_control(ex, command, this, conf, nick_access, nick);
+                                                }
+                                                break;
+                                            }
+                                        }
 
                                         // Owner Module
-                                        owner.owner_control(ex, command, this, ref conf, nick_access, nick);
+                                        for (int x = 0; x < conf.module_config.Count(); x++)
+                                        {
+                                            if (conf.module_config[x][0].Equals("Owner"))
+                                            {
+                                                if (conf.module_config[x][1].Equals("True"))
+                                                {
+                                                    owner.owner_control(ex, command, this, ref conf, nick_access, nick);
+                                                }
+                                                break;
+                                            }
+                                        }
 
                                         // Help Module
-                                        help.help_control(ex, command, this, conf, nick_access, nick);
+                                        for (int x = 0; x < conf.module_config.Count(); x++)
+                                        {
+                                            if (conf.module_config[x][0].Equals("Help"))
+                                            {
+                                                if (conf.module_config[x][1].Equals("True"))
+                                                {
+                                                    help.help_control(ex, command, this, conf, nick_access, nick);
+                                                } 
+                                                break;
+                                            }
+                                        }
 
                                         // Rules Module
-                                        rules.rules_control(ex, command, this, nick_access, nick);
+                                        for (int x = 0; x < conf.module_config.Count(); x++)
+                                        {
+                                            if (conf.module_config[x][0].Equals("Rules"))
+                                            {
+                                                if (conf.module_config[x][1].Equals("True"))
+                                                {
+                                                    rules.rules_control(ex, command, this, nick_access, nick);
+                                                }
+                                                break;
+                                            }
+                                        }
 
                                         // Messaging Module
-                                        message_module.message_control(ex, command, this, nick);
+                                        for (int x = 0; x < conf.module_config.Count(); x++)
+                                        {
+                                            if (conf.module_config[x][0].Equals("Messaging"))
+                                            {
+                                                if (conf.module_config[x][1].Equals("True"))
+                                                {
+                                                    message_module.message_control(ex, command, this, nick);
+                                                }
+                                                break;
+                                            }
+                                        }
 
                                         // Intro Message Module
-                                        intro.intro_control(ex, command, this, nick_access, nick);
+                                        for (int x = 0; x < conf.module_config.Count(); x++)
+                                        {
+                                            if (conf.module_config[x][0].Equals("Intro"))
+                                            {
+                                                if (conf.module_config[x][1].Equals("True"))
+                                                {
+                                                    intro.intro_control(ex, command, this, nick_access, nick);
+                                                }
+                                                break;
+                                            }
+                                        }
 
                                         // Quote Module
-                                        quote.quote_control(ex, command, this, conf, nick_access, nick);
+                                        for (int x = 0; x < conf.module_config.Count(); x++)
+                                        {
+                                            if (conf.module_config[x][0].Equals("Quote"))
+                                            {
+                                                if (conf.module_config[x][1].Equals("True"))
+                                                {
+                                                    quote.quote_control(ex, command, this, conf, x, nick_access, nick);
+                                                }
+                                                break;
+                                            }
+                                        }
 
                                         // Seen Module
-                                        seen.seen_control(ex, command, this, nick_access, nick, sr);
+                                        for (int x = 0; x < conf.module_config.Count(); x++)
+                                        {
+                                            if (conf.module_config[x][0].Equals("Seen"))
+                                            {
+                                                if (conf.module_config[x][1].Equals("True"))
+                                                {
+                                                    seen.seen_control(ex, command, this, nick_access, nick, sr);
+                                                }
+                                                break;
+                                            }
+                                        }
 
                                         // Weather Module
-                                        weather.weather_control(ex, command, this, nick_access, nick);
+                                        for (int x = 0; x < conf.module_config.Count(); x++)
+                                        {
+                                            if (conf.module_config[x][0].Equals("Weather"))
+                                            {
+                                                if (conf.module_config[x][1].Equals("True"))
+                                                {
+                                                    weather.weather_control(ex, command, this, conf, x, nick_access, nick);
+                                                }
+                                                break;
+                                            }
+                                        }
 
                                         // Google Module
-                                        google.google_control(ex, command, this, nick_access, nick);
+                                        for (int x = 0; x < conf.module_config.Count(); x++)
+                                        {
+                                            if (conf.module_config[x][0].Equals("Google"))
+                                            {
+                                                if (conf.module_config[x][1].Equals("True"))
+                                                {
+                                                    google.google_control(ex, command, this, conf, x, nick_access, nick);
+                                                }
+                                                break;
+                                            }
+                                        }
 
                                         // Urban Dictionary Module
-                                        ud.ud_control(ex, command, this, nick_access, nick);
+                                        for (int x = 0; x < conf.module_config.Count(); x++)
+                                        {
+                                            if (conf.module_config[x][0].Equals("Urban Dictionary"))
+                                            {
+                                                if (conf.module_config[x][1].Equals("True"))
+                                                {
+                                                    ud.ud_control(ex, command, this, conf, x, nick_access, nick);
+                                                }
+                                                break;
+                                            }
+                                        }
 
                                         // 8ball Module
-                                        _8ball._8ball_control(ex, command, this, nick_access, nick);
+                                        for (int x = 0; x < conf.module_config.Count(); x++)
+                                        {
+                                            if (conf.module_config[x][0].Equals("8ball"))
+                                            {
+                                                if (conf.module_config[x][1].Equals("True"))
+                                                {
+                                                    _8ball._8ball_control(ex, command, this, nick_access, nick);
+                                                }
+                                                break;
+                                            }
+                                        }
 
                                         // hbomb Module
-                                        hbomb.hbomb_control(ex, command, this, nick_access, nick, channel, conf);
+                                        for (int x = 0; x < conf.module_config.Count(); x++)
+                                        {
+                                            if (conf.module_config[x][0].Equals("HBomb"))
+                                            {
+                                                if (conf.module_config[x][1].Equals("True"))
+                                                {
+                                                    hbomb.hbomb_control(ex, command, this, nick_access, nick, channel, conf);
+                                                } break;
+                                            }
+                                        }
 
                                         // Ping Me Module
-                                        pingme.pingme_control(ex, command, this, nick_access, nick, channel);
+                                        for (int x = 0; x < conf.module_config.Count(); x++)
+                                        {
+                                            if (conf.module_config[x][0].Equals("Ping Me"))
+                                            {
+                                                if (conf.module_config[x][1].Equals("True"))
+                                                {
+                                                    pingme.pingme_control(ex, command, this, nick_access, nick, channel);
+                                                }
+                                                break;
+                                            }
+                                        }
 
                                         // Fun Module
-                                        fun.fun_control(ex, command, this, nick_access, nick, channel);
+                                        for (int x = 0; x < conf.module_config.Count(); x++)
+                                        {
+                                            if (conf.module_config[x][0].Equals("Fun"))
+                                            {
+                                                if (conf.module_config[x][1].Equals("True"))
+                                                {
+                                                    fun.fun_control(ex, command, this, nick_access, nick, channel);
+                                                }
+                                                break;
+                                            }
+                                        }
                                     }
                                     else // From Query
                                     {
@@ -738,13 +951,43 @@ namespace IRCBot
                                         int nick_access = get_user_access(nick, channel);
 
                                         // Access Module
-                                        access.access_control(ex, command, this, conf, nick_access, nick);
+                                        for (int x = 0; x < conf.module_config.Count(); x++)
+                                        {
+                                            if (conf.module_config[x][0].Equals("Access"))
+                                            {
+                                                if (conf.module_config[x][1].Equals("True"))
+                                                {
+                                                    access.access_control(ex, command, this, conf, nick_access, nick);
+                                                }
+                                                break;
+                                            }
+                                        }
 
                                         // Owner Module
-                                        owner.owner_control(ex, command, this, ref conf, nick_access, nick);
+                                        for (int x = 0; x < conf.module_config.Count(); x++)
+                                        {
+                                            if (conf.module_config[x][0].Equals("Owner"))
+                                            {
+                                                if (conf.module_config[x][1].Equals("True"))
+                                                {
+                                                    owner.owner_control(ex, command, this, ref conf, nick_access, nick);
+                                                }
+                                                break;
+                                            }
+                                        }
 
                                         // Messaging Module
-                                        message_module.message_control(ex, command, this, nick);
+                                        for (int x = 0; x < conf.module_config.Count(); x++)
+                                        {
+                                            if (conf.module_config[x][0].Equals("Messaging"))
+                                            {
+                                                if (conf.module_config[x][1].Equals("True"))
+                                                {
+                                                    message_module.message_control(ex, command, this, nick);
+                                                }
+                                                break;
+                                            }
+                                        }
                                     }
                                 }
                                 else // All other text
@@ -752,28 +995,98 @@ namespace IRCBot
                                     if (ex[2].StartsWith("#") == true) // From Channel
                                     {
                                         // ABan/AKick Module
-                                        moderation mod = new moderation();
-                                        mod.check_auto(nick, channel, nick_host, this);
+                                        for (int x = 0; x < conf.module_config.Count(); x++)
+                                        {
+                                            if (conf.module_config[x][0].Equals("Moderation"))
+                                            {
+                                                if (conf.module_config[x][1].Equals("True"))
+                                                {
+                                                    moderation mod = new moderation();
+                                                    mod.check_auto(nick, channel, nick_host, this);
+                                                }
+                                                break;
+                                            }
+                                        }
 
                                         // Quote Module
-                                        quote.add_quote(nick, channel, ex, this, conf);
+                                        for (int x = 0; x < conf.module_config.Count(); x++)
+                                        {
+                                            if (conf.module_config[x][0].Equals("Quote"))
+                                            {
+                                                if (conf.module_config[x][1].Equals("True"))
+                                                {
+                                                    quote.add_quote(nick, channel, ex, this, conf);
+                                                }
+                                                break;
+                                            }
+                                        }
 
-                                        // AI Module
-                                        ai.AI_Parse(ex, channel, nick, this, conf, chat);
+                                        // Response Module
+                                        for (int x = 0; x < conf.module_config.Count(); x++)
+                                        {
+                                            if (conf.module_config[x][0].Equals("Response"))
+                                            {
+                                                if (conf.module_config[x][1].Equals("True"))
+                                                {
+                                                    ai.AI_Parse(ex, channel, nick, this, conf, chat);
+                                                }
+                                                break;
+                                            }
+                                        }
 
                                         // Messaging Module
-                                        message_module.find_message(nick, this);
+                                        for (int x = 0; x < conf.module_config.Count(); x++)
+                                        {
+                                            if (conf.module_config[x][0].Equals("Messaging"))
+                                            {
+                                                if (conf.module_config[x][1].Equals("True"))
+                                                {
+                                                    message_module.find_message(nick, this);
+                                                }
+                                                break;
+                                            }
+                                        }
 
                                         // Chat Module
-                                        chat.chat_control(ex, this, conf, nick, channel);
+                                        for (int x = 0; x < conf.module_config.Count(); x++)
+                                        {
+                                            if (conf.module_config[x][0].Equals("Chat"))
+                                            {
+                                                if (conf.module_config[x][1].Equals("True"))
+                                                {
+                                                    chat.chat_control(ex, this, conf, nick, channel);
+                                                }
+                                                break;
+                                            }
+                                        }
                                     }
                                     else // From Query
                                     {
                                         // Messaging Module
-                                        message_module.find_message(nick, this);
+                                        for (int x = 0; x < conf.module_config.Count(); x++)
+                                        {
+                                            if (conf.module_config[x][0].Equals("Messaging"))
+                                            {
+                                                if (conf.module_config[x][1].Equals("True"))
+                                                {
+                                                    message_module.find_message(nick, this);
+                                                }
+                                                break;
+                                            }
+                                        }
 
-                                        // AI Module
-                                        ai.AI_Parse(ex, nick, nick, this, conf, chat);
+                                        // Response Module
+                                        for (int x = 0; x < conf.module_config.Count(); x++)
+                                        {
+                                            if (conf.module_config[x][0].Equals("Response"))
+                                            {
+                                                if (conf.module_config[x][1].Equals("True"))
+                                                {
+                                                    ai.AI_Parse(ex, nick, nick, this, conf, chat);
+                                                }
+                                                break;
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -1001,14 +1314,44 @@ namespace IRCBot
                         }
                         
                         // Intro Message Module
-                        intro.check_intro(nick, channel.TrimStart(':'), this);
+                        for (int x = 0; x < conf.module_config.Count(); x++)
+                        {
+                            if (conf.module_config[x][0].Equals("Intro"))
+                            {
+                                if (conf.module_config[x][1].Equals("True"))
+                                {
+                                    intro.check_intro(nick, channel.TrimStart(':'), this);
+                                }
+                                break;
+                            }
+                        }
 
                         // Messaging Module
-                        message_module.find_message(nick, this);
+                        for (int x = 0; x < conf.module_config.Count(); x++)
+                        {
+                            if (conf.module_config[x][0].Equals("Messaging"))
+                            {
+                                if (conf.module_config[x][1].Equals("True"))
+                                {
+                                    message_module.find_message(nick, this);
+                                }
+                                break;
+                            }
+                        }
 
                         // ABan/AKick Module
-                        moderation mod = new moderation();
-                        mod.check_auto(nick, channel.TrimStart(':'), nick_host, this);
+                        for (int x = 0; x < conf.module_config.Count(); x++)
+                        {
+                            if (conf.module_config[x][0].Equals("Moderation"))
+                            {
+                                if (conf.module_config[x][1].Equals("True"))
+                                {
+                                    moderation mod = new moderation();
+                                    mod.check_auto(nick, channel.TrimStart(':'), nick_host, this);
+                                }
+                                break;
+                            }
+                        }
                     }
 
                     // On user QUIT events
@@ -1560,13 +1903,23 @@ namespace IRCBot
                 string access = "0";
                 string tmp_custom_access = "";
                 bool user_identified = get_user_ident(nick);
-                if (channel != null)
+                for (int x = 0; x < conf.module_config.Count(); x++)
                 {
-                    access acc = new access();
-                    tmp_custom_access = acc.get_access_list(nick, channel, this);
-                    if (user_identified == true)
+                    if (conf.module_config[x][0].Equals("Moderation"))
                     {
-                        access = tmp_custom_access;
+                        if (conf.module_config[x][1].Equals("True"))
+                        {
+                            if (channel != null)
+                            {
+                                access acc = new access();
+                                tmp_custom_access = acc.get_access_list(nick, channel, this);
+                                if (user_identified == true)
+                                {
+                                    access = tmp_custom_access;
+                                }
+                            }
+                        }
+                        break;
                     }
                 }
                 for (int x = 0; x < nick_list.Count(); x++)
@@ -2125,7 +2478,7 @@ namespace IRCBot
         {
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.Load(cur_dir + "\\config\\config.xml");
-            XmlNode list = xmlDoc.SelectSingleNode("connection_settings");
+            XmlNode list = xmlDoc.SelectSingleNode("/bot_settings/connection_settings");
 
             conf.name = list["name"].InnerText;
             conf.nick = list["nick"].InnerText;
@@ -2138,6 +2491,39 @@ namespace IRCBot
             conf.command = list["command_prefix"].InnerText;
             conf.keep_logs = list["keep_logs"].InnerText;
             conf.logs_path = list["logs_path"].InnerText;
+            conf.max_message_length = Convert.ToInt32(list["max_message_length"].InnerText);
+
+            conf.module_config.Clear();
+            XmlNodeList xnList = xmlDoc.SelectNodes("/bot_settings/modules/module");
+            foreach (XmlNode xn in xnList)
+            {
+                List<string> tmp_list = new List<string>();
+                String module_name = xn["name"].InnerText;
+                tmp_list.Add(module_name);
+                tmp_list.Add(xn["enabled"].InnerText);
+
+                XmlNodeList optionList = xn.ChildNodes;
+                foreach (XmlNode option in optionList)
+                {
+                    if (option.Name.Equals("options"))
+                    {
+                        XmlNodeList Options = option.ChildNodes;
+                        foreach (XmlNode options in Options)
+                        {
+                            switch (options["type"].InnerText)
+                            {
+                                case "textbox":
+                                    tmp_list.Add(options["value"].InnerText);
+                                    break;
+                                case "checkbox":
+                                    tmp_list.Add(options["checked"].InnerText);
+                                    break;
+                            }
+                        }
+                    }
+                }
+                conf.module_config.Add(tmp_list);
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)

@@ -14,7 +14,7 @@ namespace IRCBot
 {
     class google
     {
-        public void google_control(string[] line, string command, Interface ircbot, int nick_access, string nick)
+        public void google_control(string[] line, string command, Interface ircbot, IRCConfig conf, int conf_id, int nick_access, string nick)
         {
             switch (command)
             {
@@ -39,7 +39,11 @@ namespace IRCBot
                                         foreach (var searchType in list)
                                         {
                                             ircbot.sendData("PRIVMSG", line[2] + " :" + searchType.title.Replace("<b>", "").Replace("</b>", "").Replace("&quot;", "\"").Replace("&#39", "'").Replace("&amp;", "&") + ": " + searchType.content.Replace("<b>", "").Replace("</b>", "").Replace("&quot;", "\"").Replace("&#39", "'").Replace("&amp;", "&"));
-                                            ircbot.sendData("PRIVMSG", line[2] + " :" + searchType.url);
+
+                                            if (conf.module_config[conf_id][2].Equals("True"))
+                                            {
+                                                ircbot.sendData("PRIVMSG", line[2] + " :" + searchType.url);
+                                            }
                                             break;
                                         }
                                     }

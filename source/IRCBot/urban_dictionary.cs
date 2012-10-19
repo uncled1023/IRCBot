@@ -10,7 +10,7 @@ namespace IRCBot
 {
     class urban_dictionary
     {
-        public void ud_control(string[] line, string command, Interface ircbot, int nick_access, string nick)
+        public void ud_control(string[] line, string command, Interface ircbot, IRCConfig conf, int conf_id, int nick_access, string nick)
         {
             switch (command)
             {
@@ -21,7 +21,7 @@ namespace IRCBot
                         if (line.GetUpperBound(0) > 3)
                         {
                             // Get Urban Dictionary Info
-                            get_ud(line[4], line[2], ircbot);
+                            get_ud(line[4], line[2], ircbot, conf, conf_id);
                         }
                         else
                         {
@@ -32,7 +32,7 @@ namespace IRCBot
             }
         }
 
-        private void get_ud(string search, string channel, Interface ircbot)
+        private void get_ud(string search, string channel, Interface ircbot, IRCConfig conf, int conf_id)
         {
             string URL = "http://www.urbandictionary.com/define.php?term=";
             List<KeyValuePair<string, string>> ret = new List<KeyValuePair<string, string>>();
@@ -86,7 +86,10 @@ namespace IRCBot
                     }
                     break;
                 }
-                ircbot.sendData("PRIVMSG", channel + " :" + URL + System.Web.HttpUtility.UrlEncode(search));
+                if (conf.module_config[conf_id][2].Equals("True"))
+                {
+                    ircbot.sendData("PRIVMSG", channel + " :" + URL + System.Web.HttpUtility.UrlEncode(search));
+                }
             }
             else
             {

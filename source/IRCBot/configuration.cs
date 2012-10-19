@@ -19,7 +19,7 @@ namespace IRCBot
         public configuration(Interface frmctrl)
         {
             InitializeComponent();
-
+            tabControl2.DrawItem += new DrawItemEventHandler(tabControl2_DrawItem);
             m_parent = frmctrl;
 
             XmlDocument xmlDoc = new XmlDocument();
@@ -82,7 +82,7 @@ namespace IRCBot
                 xmlDoc.Save(m_parent.cur_dir + "\\config\\config.xml");
                 xmlDoc.Load(m_parent.cur_dir + "\\config\\config.xml");
             }
-            XmlNode list = xmlDoc.SelectSingleNode("connection_settings");
+            XmlNode list = xmlDoc.SelectSingleNode("/bot_settings/connection_settings");
 
             bot_name_box.Text = list["name"].InnerText;
             bot_nick_box.Text = list["nick"].InnerText;
@@ -115,35 +115,145 @@ namespace IRCBot
                 windows_start_box.Checked = false;
             }
 
-            XmlNodeList xnList = xmlDoc.SelectNodes("/modules/module");
+            XmlNodeList xnList = xmlDoc.SelectNodes("/bot_settings/modules/module");
             foreach (XmlNode xn in xnList)
             {
+                int element_num = 0;
                 String module_name = xn["name"].InnerText;
-                module_list.Items.Add(module_name);
-            }
-            module_list.SelectedValueChanged += new EventHandler(this.module_changed);
-        }
+                System.Windows.Forms.TabPage tabPage = new System.Windows.Forms.TabPage();
 
-        private void module_changed(object sender, EventArgs e)
-        {
-            ComboBox selected_control = (ComboBox)sender;
-            string value = selected_control.Text.ToString();
-            XmlDocument xmlDoc = new XmlDocument();
-            if (File.Exists(m_parent.cur_dir + "\\config\\config.xml"))
-            {
-                xmlDoc.Load(m_parent.cur_dir + "\\config\\config.xml");
-                XmlNodeList xnList = xmlDoc.SelectNodes("/modules/module");
-                foreach (XmlNode xn in xnList)
+                tabPage.Location = new System.Drawing.Point(4, 22);
+                tabPage.Name = module_name;
+                tabPage.Padding = new System.Windows.Forms.Padding(3);
+                tabPage.Size = new System.Drawing.Size(378, 293);
+                tabPage.TabIndex = 0;
+                tabPage.Text = module_name;
+                tabPage.UseVisualStyleBackColor = true;
+                tabControl2.Controls.Add(tabPage);
+
+                bool checkbox_checked = false;
+                if (xn["enabled"].InnerText == "True")
                 {
-                    String module_name = xn["name"].InnerText;
-                    if (value.Equals(module_name))
+                    checkbox_checked = true;
+                }
+                CheckBox myCheckboxEnabled = new CheckBox();
+                myCheckboxEnabled.Name = "checkBox_" + module_name + "_enabled";
+                myCheckboxEnabled.Checked = checkbox_checked;
+                myCheckboxEnabled.Left = 200;
+                myCheckboxEnabled.Top = 10 + (element_num * 25);
+                myCheckboxEnabled.TabIndex = element_num + 1;
+                myCheckboxEnabled.TabStop = true;
+                tabPage.Controls.Add(myCheckboxEnabled);
+
+                Label myLabelEnabled = new Label();
+                myLabelEnabled.Name = "label_" + module_name + "_enabled";
+                myLabelEnabled.Text = "Enabled";
+                myLabelEnabled.Width = 180;
+                myLabelEnabled.Height = 13;
+                myLabelEnabled.Left = 8;
+                myLabelEnabled.Top = 13 + (element_num * 25);
+                tabPage.Controls.Add(myLabelEnabled);
+
+                element_num++;
+                XmlNodeList optionList = xn.ChildNodes;
+                foreach (XmlNode option in optionList)
+                {
+                    if (option.Name.Equals("options"))
                     {
+                        XmlNodeList Options = option.ChildNodes;
+                        foreach (XmlNode options in Options)
+                        {
+                            switch (options["type"].InnerText)
+                            {
+                                case "textbox":
+                                    TextBox myTextBox = new TextBox();
+                                    myTextBox.Name = "textBox_" + module_name + "_" + options.Name + "_" + element_num.ToString();
+                                    myTextBox.Text = options["value"].InnerText;
+                                    myTextBox.TextAlign = HorizontalAlignment.Left;
+                                    myTextBox.Width = 170;
+                                    myTextBox.Height = 20;
+                                    myTextBox.Left = 200;
+                                    myTextBox.Top = 10 + (element_num * 25);
+                                    myTextBox.TabIndex = element_num + 1;
+                                    myTextBox.TabStop = true;
+                                    tabPage.Controls.Add(myTextBox);
+
+                                    Label myLabelText = new Label();
+                                    myLabelText.Name = "label_" + module_name + "_" + options.Name + "_" + element_num.ToString();
+                                    myLabelText.Text = options["label"].InnerText;
+                                    myLabelText.Width = 180;
+                                    myLabelText.Height = 13;
+                                    myLabelText.Left = 8;
+                                    myLabelText.Top = 13 + (element_num * 25);
+                                    tabPage.Controls.Add(myLabelText);
+
+                                    element_num++;
+                                    break;
+                                case "checkbox":
+                                    checkbox_checked = false;
+                                    if (options["checked"].InnerText == "True")
+                                    {
+                                        checkbox_checked = true;
+                                    }
+                                    CheckBox myCheckbox = new CheckBox();
+                                    myCheckbox.Name = "checkBox_" + module_name + "_" + options.Name + "_" + element_num.ToString();
+                                    myCheckbox.Checked = checkbox_checked;
+                                    myCheckbox.Left = 200;
+                                    myCheckbox.Top = 10 + (element_num * 25);
+                                    myCheckbox.TabIndex = element_num + 1;
+                                    myCheckbox.TabStop = true;
+                                    tabPage.Controls.Add(myCheckbox);
+
+                                    Label myLabelCheck = new Label();
+                                    myLabelCheck.Name = "label_" + module_name + "_" + options.Name + "_" + element_num.ToString();
+                                    myLabelCheck.Text = options["label"].InnerText;
+                                    myLabelCheck.Width = 180;
+                                    myLabelCheck.Height = 13;
+                                    myLabelCheck.Left = 8;
+                                    myLabelCheck.Top = 13 + (element_num * 25);
+                                    tabPage.Controls.Add(myLabelCheck);
+
+                                    element_num++;
+                                    break;
+                            }
+                        }
                     }
                 }
             }
+        }
+
+        private void tabControl2_DrawItem(Object sender, System.Windows.Forms.DrawItemEventArgs e)
+        {
+            Graphics g = e.Graphics;
+            Brush _textBrush;
+
+            // Get the item from the collection.
+            TabPage _tabPage = tabControl2.TabPages[e.Index];
+
+            // Get the real bounds for the tab rectangle.
+            Rectangle _tabBounds = tabControl2.GetTabRect(e.Index);
+
+            if (e.State == DrawItemState.Selected)
+            {
+
+                // Draw a different background color, and don't paint a focus rectangle.
+                _textBrush = new SolidBrush(Color.Black);
+                g.FillRectangle(Brushes.Gray, e.Bounds);
+            }
             else
             {
+                _textBrush = new System.Drawing.SolidBrush(e.ForeColor);
+                e.DrawBackground();
             }
+
+            // Use our own font.
+            Font _tabFont = new Font("Arial", (float)10.0, FontStyle.Bold, GraphicsUnit.Pixel);
+
+            // Draw string. Center the text.
+            StringFormat _stringFlags = new StringFormat();
+            _stringFlags.Alignment = StringAlignment.Center;
+            _stringFlags.LineAlignment = StringAlignment.Center;
+            g.DrawString(_tabPage.Text, _tabFont, _textBrush, _tabBounds, new StringFormat(_stringFlags));
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -162,67 +272,68 @@ namespace IRCBot
             }
             else
             {
-                XmlDocument xmlDoc2 = new XmlDocument();
-                xmlDoc2.Load(m_parent.cur_dir + "\\config\\config.xml");
-                XmlNodeList xnList = xmlDoc2.SelectNodes("connection_settings");
-                foreach (XmlNode xn in xnList)
-                {
-                    xn.RemoveAll();
-                }
-                xmlDoc2.Save(m_parent.cur_dir + "\\config\\config.xml");
-
                 XmlDocument xmlDoc = new XmlDocument();
                 xmlDoc.Load(m_parent.cur_dir + "\\config\\config.xml");
-                XmlNode node = xmlDoc.SelectSingleNode("connection_settings");
-                XmlNode nodeName = xmlDoc.CreateElement("name");
-                nodeName.InnerText = bot_name_box.Text;
-                node.AppendChild(nodeName);
-                XmlNode nodeNick = xmlDoc.CreateElement("nick");
-                nodeNick.InnerText = bot_nick_box.Text;
-                node.AppendChild(nodeNick);
-                XmlNode nodePass = xmlDoc.CreateElement("password");
-                nodePass.InnerText = password_box.Text;
-                node.AppendChild(nodePass);
-                XmlNode nodeEmail = xmlDoc.CreateElement("email");
-                nodeEmail.InnerText = email_box.Text;
-                node.AppendChild(nodeEmail);
-                XmlNode nodeOwner = xmlDoc.CreateElement("owner");
-                nodeOwner.InnerText = owner_nicks_box.Text;
-                node.AppendChild(nodeOwner);
-                XmlNode nodePort = xmlDoc.CreateElement("port");
-                nodePort.InnerText = port_box.Text;
-                node.AppendChild(nodePort);
-                XmlNode nodeServer = xmlDoc.CreateElement("server");
-                nodeServer.InnerText = server_name_box.Text;
-                node.AppendChild(nodeServer);
-                XmlNode nodeChan = xmlDoc.CreateElement("chan_list");
-                nodeChan.InnerText = channels_box.Text;
-                node.AppendChild(nodeChan);
-                XmlNode nodeCommand = xmlDoc.CreateElement("command_prefix");
-                nodeCommand.InnerText = command_prefix_box.Text;
-                node.AppendChild(nodeCommand);
-                XmlNode nodeKeep = xmlDoc.CreateElement("keep_logs");
-                nodeKeep.InnerText = keep_logs_box.Checked.ToString();
-                node.AppendChild(nodeKeep);
-                XmlNode nodeLogs = xmlDoc.CreateElement("logs_path");
-                nodeLogs.InnerText = log_folder_box.Text;
-                node.AppendChild(nodeLogs);
-                XmlNode nodeStart = xmlDoc.CreateElement("start_with_windows");
-                nodeStart.InnerText = windows_start_box.Checked.ToString();
-                node.AppendChild(nodeStart);
-                XmlNode nodeSpamCount = xmlDoc.CreateElement("spam_count");
-                nodeSpamCount.InnerText = spam_count_box.Text;
-                node.AppendChild(nodeSpamCount);
-                XmlNode nodeSpamThreshold = xmlDoc.CreateElement("spam_threshold");
-                nodeSpamThreshold.InnerText = spam_threshold_box.Text;
-                node.AppendChild(nodeSpamThreshold);
-                XmlNode nodeSpamTime = xmlDoc.CreateElement("spam_timeout");
-                nodeSpamTime.InnerText = spam_timeout_box.Text;
-                node.AppendChild(nodeSpamTime);
-                XmlNode nodeSpamMaxMsgLength = xmlDoc.CreateElement("max_message_length");
-                nodeSpamMaxMsgLength.InnerText = max_message_length_box.Text;
-                node.AppendChild(nodeSpamMaxMsgLength);
-                xmlDoc.AppendChild(node);
+                XmlNode node = xmlDoc.SelectSingleNode("/bot_settings/connection_settings");
+                node["name"].InnerText = bot_name_box.Text;
+                node["nick"].InnerText = bot_nick_box.Text;
+                node["password"].InnerText = password_box.Text;
+                node["email"].InnerText = email_box.Text;
+                node["owner"].InnerText = owner_nicks_box.Text;
+                node["port"].InnerText = port_box.Text;
+                node["server"].InnerText = server_name_box.Text;
+                node["chan_list"].InnerText = channels_box.Text;
+                node["command_prefix"].InnerText = command_prefix_box.Text;
+                node["keep_logs"].InnerText = keep_logs_box.Checked.ToString();
+                node["logs_path"].InnerText = log_folder_box.Text;
+                node["start_with_windows"].InnerText = windows_start_box.Checked.ToString();
+                node["spam_count"].InnerText = spam_count_box.Text;
+                node["spam_threshold"].InnerText = spam_threshold_box.Text;
+                node["spam_timeout"].InnerText = spam_timeout_box.Text;
+                node["max_message_length"].InnerText = max_message_length_box.Text;
+
+                XmlNodeList xnList = xmlDoc.SelectNodes("/bot_settings/modules/module");
+                foreach (XmlNode xn in xnList)
+                {
+                    int element_num = 1;
+                    String module_name = xn["name"].InnerText;
+                    
+                    CheckBox enabled = (CheckBox)tabControl2.Controls.Find("checkBox_" + module_name + "_enabled", true)[0];
+                    xn["enabled"].InnerText = enabled.Checked.ToString();
+
+                    XmlNodeList optionList = xn.ChildNodes;
+                    foreach (XmlNode option in optionList)
+                    {
+                        if (option.Name.Equals("options"))
+                        {
+                            XmlNodeList Options = option.ChildNodes;
+                            foreach (XmlNode options in Options)
+                            {
+                                switch (options["type"].InnerText)
+                                {
+                                    case "textbox":
+                                        if (tabControl2.Controls.Find("textBox_" + options.Name + "_" + element_num.ToString(), true) != null)
+                                        {
+                                            TextBox textBox = (TextBox)tabControl2.Controls.Find("textBox_" + module_name + "_" + options.Name + "_" + element_num.ToString(), true)[0];
+                                            options["value"].InnerText = textBox.Text;
+
+                                            element_num++;
+                                        }
+                                        break;
+                                    case "checkbox":
+                                        if (tabControl2.Controls.Find("checkBox_" + options.Name + "_" + element_num.ToString(), true) != null)
+                                        {
+                                            CheckBox checkBox = (CheckBox)tabControl2.Controls.Find("checkBox_" + module_name + "_" + options.Name + "_" + element_num.ToString(), true)[0];
+                                            options["checked"].InnerText = checkBox.Checked.ToString();
+
+                                            element_num++;
+                                        }
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                }
                 xmlDoc.Save(m_parent.cur_dir + "\\config\\config.xml");
 
                 RegistryKey rkApp = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
@@ -234,6 +345,7 @@ namespace IRCBot
                 {
                     rkApp.DeleteValue("IRCBot", false);
                 }
+
                 m_parent.update_conf();
                 this.Close();
             }

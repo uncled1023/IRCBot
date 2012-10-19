@@ -10,75 +10,95 @@ namespace IRCBot
 {
     class weather
     {
-        public void weather_control(string[] line, string command, Interface ircbot, int nick_access, string nick)
+        public void weather_control(string[] line, string command, Interface ircbot, IRCConfig conf, int conf_id, int nick_access, string nick)
         {
             switch (command)
             {
                 case "w":
-                    ircbot.spam_count++;
-                    if (nick_access >= 1)
+                    if (conf.module_config[conf_id][2].Equals("True"))
                     {
-                        if (line.GetUpperBound(0) > 3)
+                        ircbot.spam_count++;
+                        if (nick_access >= 1)
                         {
-                            // Add introduction
-                            get_weather(line[4], line[2], ircbot);
-                        }
-                        else
-                        {
-                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                            if (line.GetUpperBound(0) > 3)
+                            {
+                                // Add introduction
+                                get_weather(line[4], line[2], ircbot);
+                            }
+                            else
+                            {
+                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                            }
                         }
                     }
                     break;
                 case "weather":
-                    ircbot.spam_count++;
-                    if (nick_access >= 1)
+                    if (conf.module_config[conf_id][2].Equals("True"))
                     {
-                        if (line.GetUpperBound(0) > 3)
+                        ircbot.spam_count++;
+                        if (nick_access >= 1)
                         {
-                            // Add introduction
-                            get_weather(line[4], line[2], ircbot);
-                        }
-                        else
-                        {
-                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                            if (line.GetUpperBound(0) > 3)
+                            {
+                                // Add introduction
+                                get_weather(line[4], line[2], ircbot);
+                            }
+                            else
+                            {
+                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                            }
                         }
                     }
                     break;
                 case "f":
-                    ircbot.spam_count++;
-                    if (nick_access >= 1)
+                    if (conf.module_config[conf_id][3].Equals("True"))
                     {
-                        if (line.GetUpperBound(0) > 3)
+                        ircbot.spam_count++;
+                        if (nick_access >= 1)
                         {
-                            // Add introduction
-                            get_forecast(line[4], line[2], ircbot);
-                        }
-                        else
-                        {
-                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                            if (line.GetUpperBound(0) > 3)
+                            {
+                                // Add introduction
+                                get_forecast(line[4], line[2], ircbot, Convert.ToInt32(conf.module_config[conf_id][4]));
+                            }
+                            else
+                            {
+                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                            }
                         }
                     }
                     break;
                 case "forecast":
-                    ircbot.spam_count++;
-                    if (nick_access >= 1)
+                    if (conf.module_config[conf_id][3].Equals("True"))
                     {
-                        if (line.GetUpperBound(0) > 3)
+                        ircbot.spam_count++;
+                        if (nick_access >= 1)
                         {
-                            // Add introduction
-                            get_forecast(line[4], line[2], ircbot);
-                        }
-                        else
-                        {
-                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                            if (line.GetUpperBound(0) > 3)
+                            {
+                                // Add introduction
+                                get_forecast(line[4], line[2], ircbot, Convert.ToInt32(conf.module_config[conf_id][4]));
+                            }
+                            else
+                            {
+                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                            }
                         }
                     }
                     break;
             }
         }
 
-        private void get_forecast(string term, string channel, Interface ircbot)
+        private void get_forecast(string term, string channel, Interface ircbot, int days)
         {
+            if (days > 5)
+            {
+                days = 5;
+            }
+            if (days < 1)
+            {
+                days = 1;
+            }
             XmlDocument doc2 = new XmlDocument();
 
             // Load data  
@@ -118,18 +138,23 @@ namespace IRCBot
             {
                 if (nodes.Count > 0)
                 {
-                    ircbot.sendData("PRIVMSG", channel + " :Five day forecast for " + location);
+                    ircbot.sendData("PRIVMSG", channel + " :" + days + " day forecast for " + location);
+                    int index = 0;
                     foreach (XmlNode node in nodes)
                     {
                         foreach (XmlNode sub_node in node)
                         {
-                            weekday = sub_node["date"].SelectSingleNode("weekday").InnerText;
-                            highf = sub_node["high"].SelectSingleNode("fahrenheit").InnerText;
-                            highc = sub_node["high"].SelectSingleNode("celsius").InnerText;
-                            lowf = sub_node["low"].SelectSingleNode("fahrenheit").InnerText;
-                            lowc = sub_node["low"].SelectSingleNode("celsius").InnerText;
-                            conditions = sub_node["conditions"].InnerText;
-                            ircbot.sendData("PRIVMSG", channel + " :" + weekday + ": " + conditions + " with a high of " + highf + " F (" + highc + " C) and a low of " + lowf + " F (" + lowc + " C).");
+                            if (index <= days)
+                            {
+                                weekday = sub_node["date"].SelectSingleNode("weekday").InnerText;
+                                highf = sub_node["high"].SelectSingleNode("fahrenheit").InnerText;
+                                highc = sub_node["high"].SelectSingleNode("celsius").InnerText;
+                                lowf = sub_node["low"].SelectSingleNode("fahrenheit").InnerText;
+                                lowc = sub_node["low"].SelectSingleNode("celsius").InnerText;
+                                conditions = sub_node["conditions"].InnerText;
+                                ircbot.sendData("PRIVMSG", channel + " :" + weekday + ": " + conditions + " with a high of " + highf + " F (" + highc + " C) and a low of " + lowf + " F (" + lowc + " C).");
+                            }
+                            index++;
                         }
                     }
                 }

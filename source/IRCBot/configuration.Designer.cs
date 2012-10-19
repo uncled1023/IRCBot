@@ -37,6 +37,8 @@
             this.server_name_box = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.max_message_length_box = new System.Windows.Forms.TextBox();
+            this.label16 = new System.Windows.Forms.Label();
             this.spam_threshold_box = new System.Windows.Forms.TextBox();
             this.label15 = new System.Windows.Forms.Label();
             this.spam_timeout_box = new System.Windows.Forms.TextBox();
@@ -63,15 +65,11 @@
             this.log_folder_box = new System.Windows.Forms.TextBox();
             this.label10 = new System.Windows.Forms.Label();
             this.keep_logs_box = new System.Windows.Forms.CheckBox();
+            this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.tabControl2 = new System.Windows.Forms.TabControl();
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
-            this.tabPage4 = new System.Windows.Forms.TabPage();
-            this.max_message_length_box = new System.Windows.Forms.TextBox();
-            this.label16 = new System.Windows.Forms.Label();
-            this.module_list = new System.Windows.Forms.ComboBox();
-            this.label17 = new System.Windows.Forms.Label();
-            this.panel1 = new System.Windows.Forms.Panel();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -184,6 +182,22 @@
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Bot Configuration";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // max_message_length_box
+            // 
+            this.max_message_length_box.Location = new System.Drawing.Point(201, 247);
+            this.max_message_length_box.Name = "max_message_length_box";
+            this.max_message_length_box.Size = new System.Drawing.Size(185, 20);
+            this.max_message_length_box.TabIndex = 20;
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(8, 250);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(109, 13);
+            this.label16.TabIndex = 19;
+            this.label16.Text = "Max Message Length";
             // 
             // spam_threshold_box
             // 
@@ -408,6 +422,27 @@
             this.keep_logs_box.TabIndex = 0;
             this.keep_logs_box.UseVisualStyleBackColor = true;
             // 
+            // tabPage4
+            // 
+            this.tabPage4.Controls.Add(this.tabControl2);
+            this.tabPage4.Location = new System.Drawing.Point(4, 22);
+            this.tabPage4.Name = "tabPage4";
+            this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage4.Size = new System.Drawing.Size(392, 325);
+            this.tabPage4.TabIndex = 3;
+            this.tabPage4.Text = "Module Configuration";
+            this.tabPage4.UseVisualStyleBackColor = true;
+            // 
+            // tabControl2
+            // 
+            this.tabControl2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabControl2.HotTrack = true;
+            this.tabControl2.Location = new System.Drawing.Point(3, 3);
+            this.tabControl2.Name = "tabControl2";
+            this.tabControl2.SelectedIndex = 0;
+            this.tabControl2.Size = new System.Drawing.Size(386, 319);
+            this.tabControl2.TabIndex = 0;
+            // 
             // button1
             // 
             this.button1.Location = new System.Drawing.Point(337, 357);
@@ -427,60 +462,6 @@
             this.button2.Text = "Save";
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
-            // 
-            // tabPage4
-            // 
-            this.tabPage4.Controls.Add(this.panel1);
-            this.tabPage4.Controls.Add(this.label17);
-            this.tabPage4.Controls.Add(this.module_list);
-            this.tabPage4.Location = new System.Drawing.Point(4, 22);
-            this.tabPage4.Name = "tabPage4";
-            this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(392, 325);
-            this.tabPage4.TabIndex = 3;
-            this.tabPage4.Text = "Module Configuration";
-            this.tabPage4.UseVisualStyleBackColor = true;
-            // 
-            // max_message_length_box
-            // 
-            this.max_message_length_box.Location = new System.Drawing.Point(201, 247);
-            this.max_message_length_box.Name = "max_message_length_box";
-            this.max_message_length_box.Size = new System.Drawing.Size(185, 20);
-            this.max_message_length_box.TabIndex = 20;
-            // 
-            // label16
-            // 
-            this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(8, 250);
-            this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(109, 13);
-            this.label16.TabIndex = 19;
-            this.label16.Text = "Max Message Length";
-            // 
-            // module_list
-            // 
-            this.module_list.FormattingEnabled = true;
-            this.module_list.Location = new System.Drawing.Point(163, 11);
-            this.module_list.Name = "module_list";
-            this.module_list.Size = new System.Drawing.Size(223, 21);
-            this.module_list.TabIndex = 0;
-            // 
-            // label17
-            // 
-            this.label17.AutoSize = true;
-            this.label17.Location = new System.Drawing.Point(6, 11);
-            this.label17.Name = "label17";
-            this.label17.Size = new System.Drawing.Size(42, 13);
-            this.label17.TabIndex = 1;
-            this.label17.Text = "Module";
-            // 
-            // panel1
-            // 
-            this.panel1.AutoScroll = true;
-            this.panel1.Location = new System.Drawing.Point(6, 38);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(380, 281);
-            this.panel1.TabIndex = 2;
             // 
             // configuration
             // 
@@ -505,7 +486,6 @@
             this.tabPage3.ResumeLayout(false);
             this.tabPage3.PerformLayout();
             this.tabPage4.ResumeLayout(false);
-            this.tabPage4.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -553,8 +533,6 @@
         private System.Windows.Forms.TabPage tabPage4;
         private System.Windows.Forms.TextBox max_message_length_box;
         private System.Windows.Forms.Label label16;
-        private System.Windows.Forms.Label label17;
-        private System.Windows.Forms.ComboBox module_list;
-        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.TabControl tabControl2;
     }
 }

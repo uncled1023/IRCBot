@@ -10,7 +10,7 @@ namespace IRCBot
 {
     class quote
     {
-        public void quote_control(string[] line, string command, Interface ircbot, IRCConfig conf, int nick_access, string nick)
+        public void quote_control(string[] line, string command, Interface ircbot, IRCConfig conf, int conf_id, int nick_access, string nick)
         {
             switch (command)
             {
@@ -18,9 +18,16 @@ namespace IRCBot
                     ircbot.spam_count++;
                     if (nick_access >= 1)
                     {
-                        if (line.GetUpperBound(0) > 3)
+                        if (conf.module_config[conf_id][2].Equals("True"))
                         {
-                            get_specific_quote(line[2], line[4], ircbot, conf);
+                            if (line.GetUpperBound(0) > 3)
+                            {
+                                get_specific_quote(line[2], line[4], ircbot, conf);
+                            }
+                            else
+                            {
+                                get_quote(line[2], ircbot, conf);
+                            }
                         }
                         else
                         {

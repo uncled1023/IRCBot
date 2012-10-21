@@ -31,7 +31,7 @@ namespace IRCBot
             switch (command)
             {
                 case "hbomb":
-                    if (nick_access >= 1)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (hbomb_active == false)
                         {
@@ -76,7 +76,7 @@ namespace IRCBot
                     }
                     break;
                 case "pass":
-                    if (nick_access >= 1)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (hbomb_active == true)
                         {
@@ -118,7 +118,7 @@ namespace IRCBot
                     }
                     break;
                 case "defuse":
-                    if (nick_access >= 1)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (hbomb_active == true)
                         {

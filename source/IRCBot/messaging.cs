@@ -30,6 +30,23 @@ namespace IRCBot
                         ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
                     }
                     break;
+                case "msg":
+                    if (line.GetUpperBound(0) > 3)
+                    {
+                        if (line[2].StartsWith("#"))
+                        {
+                            add_message(nick, line, line[2], ircbot);
+                        }
+                        else
+                        {
+                            add_message(nick, line, null, ircbot);
+                        }
+                    }
+                    else
+                    {
+                        ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                    }
+                    break;
             }
         }
         private void add_message(string nick, string[] line, string channel, Interface ircbot)

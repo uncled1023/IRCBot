@@ -29,7 +29,7 @@ namespace IRCBot
             switch (command)
             {
                 case "founder":
-                    if (nick_access >= 9)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -47,7 +47,7 @@ namespace IRCBot
                     }
                     break;
                 case "defounder":
-                    if (nick_access >= 9)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -65,7 +65,7 @@ namespace IRCBot
                     }
                     break;
                 case "sop":
-                    if (nick_access >= 8)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -83,7 +83,7 @@ namespace IRCBot
                     }
                     break;
                 case "asop":
-                    if (nick_access >= 8)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -102,7 +102,7 @@ namespace IRCBot
                     }
                     break;
                 case "deasop":
-                    if (nick_access >= 8)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -121,7 +121,7 @@ namespace IRCBot
                     }
                     break;
                 case "desop":
-                    if (nick_access >= 8)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -139,7 +139,7 @@ namespace IRCBot
                     }
                     break;
                 case "op":
-                    if (nick_access >= 7)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -157,7 +157,7 @@ namespace IRCBot
                     }
                     break;
                 case "aop":
-                    if (nick_access >= 7)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -176,7 +176,7 @@ namespace IRCBot
                     }
                     break;
                 case "deaop":
-                    if (nick_access >= 7)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -195,7 +195,7 @@ namespace IRCBot
                     }
                     break;
                 case "deop":
-                    if (nick_access >= 7)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -213,7 +213,7 @@ namespace IRCBot
                     }
                     break;
                 case "ahop":
-                    if (nick_access >= 7)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -232,7 +232,7 @@ namespace IRCBot
                     }
                     break;
                 case "deahop":
-                    if (nick_access >= 7)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -251,7 +251,7 @@ namespace IRCBot
                     }
                     break;
                 case "hop":
-                    if (nick_access >= 6)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -269,7 +269,7 @@ namespace IRCBot
                     }
                     break;
                 case "dehop":
-                    if (nick_access >= 6)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -287,7 +287,7 @@ namespace IRCBot
                     }
                     break;
                 case "avoice":
-                    if (nick_access >= 7)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -306,7 +306,7 @@ namespace IRCBot
                     }
                     break;
                 case "deavoice":
-                    if (nick_access >= 7)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -325,7 +325,7 @@ namespace IRCBot
                     }
                     break;
                 case "voice":
-                    if (nick_access >= 3)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -343,7 +343,7 @@ namespace IRCBot
                     }
                     break;
                 case "devoice":
-                    if (nick_access >= 3)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -361,7 +361,7 @@ namespace IRCBot
                     }
                     break;
                 case "mode":
-                    if (nick_access >= 7)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -386,7 +386,7 @@ namespace IRCBot
                     }
                     break;
                 case "topic":
-                    if (nick_access >= 7)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -411,7 +411,7 @@ namespace IRCBot
                     }
                     break;
                 case "invite":
-                    if (nick_access >= 7)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -429,7 +429,7 @@ namespace IRCBot
                     }
                     break;
                 case "b":
-                    if (nick_access >= 5)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -490,7 +490,7 @@ namespace IRCBot
                     }
                     break;
                 case "ub":
-                    if (nick_access >= 5)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -530,7 +530,7 @@ namespace IRCBot
                     }
                     break;
                 case "kb":
-                    if (nick_access >= 5)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -593,7 +593,7 @@ namespace IRCBot
                     }
                     break;
                 case "tb":
-                    if (nick_access >= 5)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -670,7 +670,7 @@ namespace IRCBot
                     }
                     break;
                 case "tkb":
-                    if (nick_access >= 5)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -749,7 +749,7 @@ namespace IRCBot
                     }
                     break;
                 case "ak":
-                    if (nick_access >= 7)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -804,7 +804,7 @@ namespace IRCBot
                     }
                     break;
                 case "ab":
-                    if (nick_access >= 7)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -859,7 +859,7 @@ namespace IRCBot
                     }
                     break;
                 case "akb":
-                    if (nick_access >= 7)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -914,7 +914,7 @@ namespace IRCBot
                     }
                     break;
                 case "deak":
-                    if (nick_access >= 7)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -932,7 +932,7 @@ namespace IRCBot
                     }
                     break;
                 case "deab":
-                    if (nick_access >= 7)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -950,7 +950,7 @@ namespace IRCBot
                     }
                     break;
                 case "deakb":
-                    if (nick_access >= 7)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -968,7 +968,7 @@ namespace IRCBot
                     }
                     break;
                 case "k":
-                    if (nick_access >= 4)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -1023,7 +1023,7 @@ namespace IRCBot
                     break;
                 case "kme":
                     ircbot.spam_count++;
-                    if (nick_access >= 1)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {

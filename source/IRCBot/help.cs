@@ -15,7 +15,7 @@ namespace IRCBot
             {
                 case "help":
                     ircbot.spam_count++;
-                    if (nick_access >= 1)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         display_help(line, nick, line[2], nick_access, ircbot, conf);
                     }
@@ -39,10 +39,9 @@ namespace IRCBot
                         if (line.GetUpperBound(0) > 3)
                         {
                             search_term = line[4];
-                            string[] new_line = split[2].Split(' ');
-                            if (search_term.Contains(new_line[0]))
+                            if (search_term.ToLower().Equals(split[2].ToLower()))
                             {
-                                ircbot.sendData("NOTICE", nick + " :" + split[0] + " | Usage: " + conf.command + split[2] + " | Description: " + split[3]);
+                                ircbot.sendData("NOTICE", nick + " :" + split[0] + " | Usage: " + conf.command + split[2] + " " + split[3] + " | Description: " + split[4]);
                             }
                         }
                         else

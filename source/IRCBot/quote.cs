@@ -16,7 +16,7 @@ namespace IRCBot
             {
                 case "quote":
                     ircbot.spam_count++;
-                    if (nick_access >= 1)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (conf.module_config[conf_id][2].Equals("True"))
                         {

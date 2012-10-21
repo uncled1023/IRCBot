@@ -15,7 +15,7 @@ namespace IRCBot
             {
                 case "pingme":
                     ircbot.spam_count++;
-                    if (nick_access >= 1)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         ircbot.sendData("PING", nick);
                         ping_list.Add(new List<string>());

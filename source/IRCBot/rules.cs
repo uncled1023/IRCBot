@@ -15,13 +15,13 @@ namespace IRCBot
             {
                 case "rules":
                     ircbot.spam_count++;
-                    if (nick_access >= 1)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         get_rules(nick, line[2], ircbot);
                     }
                     break;
                 case "addrule":
-                    if (nick_access >= 7)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -34,7 +34,7 @@ namespace IRCBot
                     }
                     break;
                 case "delrule":
-                    if (nick_access >= 7)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {

@@ -18,7 +18,7 @@ namespace IRCBot
                     if (conf.module_config[conf_id][2].Equals("True"))
                     {
                         ircbot.spam_count++;
-                        if (nick_access >= 1)
+                        if (nick_access >= ircbot.get_command_access(command))
                         {
                             if (line.GetUpperBound(0) > 3)
                             {
@@ -36,7 +36,7 @@ namespace IRCBot
                     if (conf.module_config[conf_id][2].Equals("True"))
                     {
                         ircbot.spam_count++;
-                        if (nick_access >= 1)
+                        if (nick_access >= ircbot.get_command_access(command))
                         {
                             if (line.GetUpperBound(0) > 3)
                             {
@@ -54,7 +54,7 @@ namespace IRCBot
                     if (conf.module_config[conf_id][3].Equals("True"))
                     {
                         ircbot.spam_count++;
-                        if (nick_access >= 1)
+                        if (nick_access >= ircbot.get_command_access(command))
                         {
                             if (line.GetUpperBound(0) > 3)
                             {
@@ -72,7 +72,7 @@ namespace IRCBot
                     if (conf.module_config[conf_id][3].Equals("True"))
                     {
                         ircbot.spam_count++;
-                        if (nick_access >= 1)
+                        if (nick_access >= ircbot.get_command_access(command))
                         {
                             if (line.GetUpperBound(0) > 3)
                             {

@@ -16,7 +16,7 @@ namespace IRCBot
             {
                 case "seen":
                     ircbot.spam_count++;
-                    if (nick_access >= 1)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         display_seen(line[4], line[2], ircbot, sr);
                     }

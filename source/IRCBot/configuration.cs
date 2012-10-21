@@ -220,6 +220,43 @@ namespace IRCBot
                     }
                 }
             }
+
+            string list_file = m_parent.cur_dir + "\\config\\help.txt";
+            if (File.Exists(list_file))
+            {
+                string[] file = System.IO.File.ReadAllLines(list_file);
+                foreach (string file_line in file)
+                {
+                    string[] split = file_line.Split(':');
+                    command_list.Items.Add(split[2]);
+                }
+            }
+            command_list.SelectedIndexChanged += new EventHandler(command_list_change);
+            command_list.Sorted = true;
+        }
+
+        private void command_list_change(Object sender, EventArgs e)
+        {
+            string list_file = m_parent.cur_dir + "\\config\\help.txt";
+            if (File.Exists(list_file))
+            {
+                string[] file = System.IO.File.ReadAllLines(list_file);
+                foreach (string file_line in file)
+                {
+                    string[] split = file_line.Split(':');
+                    if (split.GetUpperBound(0) > 3)
+                    {
+                        if (split[2].Equals(command_list.SelectedItem))
+                        {
+                            command_name.Text = split[0];
+                            command_arguments.Text = split[3];
+                            command_description.Text = split[4];
+                            command_access_level.Text = split[1];
+                            break;
+                        }
+                    }
+                }
+            }
         }
 
         private void tabControl2_DrawItem(Object sender, System.Windows.Forms.DrawItemEventArgs e)
@@ -374,6 +411,32 @@ namespace IRCBot
                     }
                 }
             }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            string list_file = m_parent.cur_dir + "\\config\\help.txt";
+            List<string> new_file = new List<string>();
+            if (File.Exists(list_file))
+            {
+                string msg = "";
+                string[] file = System.IO.File.ReadAllLines(list_file);
+                foreach (string file_line in file)
+                {
+                    string[] split = file_line.Split(':');
+                    if (split[2].Equals(command_list.SelectedItem))
+                    {
+                        msg = command_name.Text + ":" + command_access_level.Text + ":" + command_list.SelectedItem + ":" + command_arguments.Text + ":" + command_description.Text;
+                    }
+                    else
+                    {
+                        msg = file_line;
+                    }
+                    new_file.Add(msg);
+                    msg = "";
+                }
+            }
+            System.IO.File.WriteAllLines(list_file, new_file);
         }
     }
 }

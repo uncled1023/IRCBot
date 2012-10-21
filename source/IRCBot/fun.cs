@@ -20,7 +20,7 @@ namespace IRCBot
             {
                 case "love":
                     ircbot.spam_count++;
-                    if (nick_access >= 1)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -52,7 +52,7 @@ namespace IRCBot
                     break;
                 case "hug":
                     ircbot.spam_count++;
-                    if (nick_access >= 1)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -66,7 +66,7 @@ namespace IRCBot
                     break;
                 case "slap":
                     ircbot.spam_count++;
-                    if (nick_access >= 1)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -80,7 +80,7 @@ namespace IRCBot
                     break;
                 case "bots":
                     ircbot.spam_count++;
-                    if (nick_access >= 1)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         ircbot.sendData("PRIVMSG", channel + " :Reporting in!");
                     }

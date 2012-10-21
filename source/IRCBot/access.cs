@@ -14,7 +14,7 @@ namespace IRCBot
             switch (command)
             {
                 case "access":
-                    if (access_level >= 7)
+                    if (access_level >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -57,7 +57,7 @@ namespace IRCBot
                     }
                     break;
                 case "delaccess":
-                    if (access_level >= 7)
+                    if (access_level >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -86,7 +86,7 @@ namespace IRCBot
                     }
                     break;
                 case "listaccess":
-                    if (access_level >= 7)
+                    if (access_level >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {

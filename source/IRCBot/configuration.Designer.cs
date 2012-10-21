@@ -67,15 +67,27 @@
             this.keep_logs_box = new System.Windows.Forms.CheckBox();
             this.tabPage4 = new System.Windows.Forms.TabPage();
             this.tabControl2 = new System.Windows.Forms.TabControl();
+            this.tabPage5 = new System.Windows.Forms.TabPage();
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
-            this.tabPage5 = new System.Windows.Forms.TabPage();
+            this.command_list = new System.Windows.Forms.ListBox();
+            this.label17 = new System.Windows.Forms.Label();
+            this.command_name = new System.Windows.Forms.TextBox();
+            this.label18 = new System.Windows.Forms.Label();
+            this.label19 = new System.Windows.Forms.Label();
+            this.command_arguments = new System.Windows.Forms.TextBox();
+            this.label20 = new System.Windows.Forms.Label();
+            this.command_description = new System.Windows.Forms.TextBox();
+            this.label21 = new System.Windows.Forms.Label();
+            this.command_access_level = new System.Windows.Forms.TextBox();
+            this.button3 = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.tabPage3.SuspendLayout();
             this.tabPage4.SuspendLayout();
+            this.tabPage5.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -445,6 +457,27 @@
             this.tabControl2.Size = new System.Drawing.Size(386, 319);
             this.tabControl2.TabIndex = 0;
             // 
+            // tabPage5
+            // 
+            this.tabPage5.Controls.Add(this.button3);
+            this.tabPage5.Controls.Add(this.label21);
+            this.tabPage5.Controls.Add(this.command_access_level);
+            this.tabPage5.Controls.Add(this.label20);
+            this.tabPage5.Controls.Add(this.command_description);
+            this.tabPage5.Controls.Add(this.label19);
+            this.tabPage5.Controls.Add(this.command_arguments);
+            this.tabPage5.Controls.Add(this.label18);
+            this.tabPage5.Controls.Add(this.command_name);
+            this.tabPage5.Controls.Add(this.label17);
+            this.tabPage5.Controls.Add(this.command_list);
+            this.tabPage5.Location = new System.Drawing.Point(4, 22);
+            this.tabPage5.Name = "tabPage5";
+            this.tabPage5.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage5.Size = new System.Drawing.Size(392, 325);
+            this.tabPage5.TabIndex = 4;
+            this.tabPage5.Text = "Access Levels";
+            this.tabPage5.UseVisualStyleBackColor = true;
+            // 
             // button1
             // 
             this.button1.Location = new System.Drawing.Point(337, 357);
@@ -465,15 +498,96 @@
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
-            // tabPage5
+            // command_list
             // 
-            this.tabPage5.Location = new System.Drawing.Point(4, 22);
-            this.tabPage5.Name = "tabPage5";
-            this.tabPage5.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage5.Size = new System.Drawing.Size(392, 325);
-            this.tabPage5.TabIndex = 4;
-            this.tabPage5.Text = "Access Levels";
-            this.tabPage5.UseVisualStyleBackColor = true;
+            this.command_list.FormattingEnabled = true;
+            this.command_list.Location = new System.Drawing.Point(6, 32);
+            this.command_list.Name = "command_list";
+            this.command_list.Size = new System.Drawing.Size(120, 290);
+            this.command_list.TabIndex = 0;
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Location = new System.Drawing.Point(6, 16);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(73, 13);
+            this.label17.TabIndex = 1;
+            this.label17.Text = "Command List";
+            // 
+            // command_name
+            // 
+            this.command_name.Location = new System.Drawing.Point(132, 32);
+            this.command_name.Name = "command_name";
+            this.command_name.Size = new System.Drawing.Size(254, 20);
+            this.command_name.TabIndex = 2;
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(129, 16);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(35, 13);
+            this.label18.TabIndex = 3;
+            this.label18.Text = "Name";
+            // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
+            this.label19.Location = new System.Drawing.Point(129, 58);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(57, 13);
+            this.label19.TabIndex = 5;
+            this.label19.Text = "Arguments";
+            // 
+            // command_arguments
+            // 
+            this.command_arguments.Location = new System.Drawing.Point(132, 74);
+            this.command_arguments.Name = "command_arguments";
+            this.command_arguments.Size = new System.Drawing.Size(254, 20);
+            this.command_arguments.TabIndex = 4;
+            // 
+            // label20
+            // 
+            this.label20.AutoSize = true;
+            this.label20.Location = new System.Drawing.Point(129, 100);
+            this.label20.Name = "label20";
+            this.label20.Size = new System.Drawing.Size(60, 13);
+            this.label20.TabIndex = 7;
+            this.label20.Text = "Description";
+            // 
+            // command_description
+            // 
+            this.command_description.Location = new System.Drawing.Point(132, 116);
+            this.command_description.Name = "command_description";
+            this.command_description.Size = new System.Drawing.Size(254, 20);
+            this.command_description.TabIndex = 6;
+            // 
+            // label21
+            // 
+            this.label21.AutoSize = true;
+            this.label21.Location = new System.Drawing.Point(129, 142);
+            this.label21.Name = "label21";
+            this.label21.Size = new System.Drawing.Size(71, 13);
+            this.label21.TabIndex = 9;
+            this.label21.Text = "Access Level";
+            // 
+            // command_access_level
+            // 
+            this.command_access_level.Location = new System.Drawing.Point(132, 158);
+            this.command_access_level.Name = "command_access_level";
+            this.command_access_level.Size = new System.Drawing.Size(254, 20);
+            this.command_access_level.TabIndex = 8;
+            // 
+            // button3
+            // 
+            this.button3.Location = new System.Drawing.Point(132, 184);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(75, 23);
+            this.button3.TabIndex = 10;
+            this.button3.Text = "Save";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
             // configuration
             // 
@@ -498,6 +612,8 @@
             this.tabPage3.ResumeLayout(false);
             this.tabPage3.PerformLayout();
             this.tabPage4.ResumeLayout(false);
+            this.tabPage5.ResumeLayout(false);
+            this.tabPage5.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -547,5 +663,16 @@
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.TabControl tabControl2;
         private System.Windows.Forms.TabPage tabPage5;
+        private System.Windows.Forms.Label label21;
+        private System.Windows.Forms.TextBox command_access_level;
+        private System.Windows.Forms.Label label20;
+        private System.Windows.Forms.TextBox command_description;
+        private System.Windows.Forms.Label label19;
+        private System.Windows.Forms.TextBox command_arguments;
+        private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.TextBox command_name;
+        private System.Windows.Forms.Label label17;
+        private System.Windows.Forms.ListBox command_list;
+        private System.Windows.Forms.Button button3;
     }
 }

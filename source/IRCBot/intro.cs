@@ -15,7 +15,7 @@ namespace IRCBot
             {
                 case "intro":
                     ircbot.spam_count++;
-                    if (nick_access >= 1)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -30,7 +30,7 @@ namespace IRCBot
                     break;
                 case "introdelete":
                     ircbot.spam_count++;
-                    if (nick_access >= 1)
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         // Delete Introduction
                         delete_intro(nick, line[2], ircbot);

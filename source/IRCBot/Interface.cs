@@ -170,6 +170,23 @@ namespace IRCBot
             InitializeComponent();
 
             conf.module_config = new List<List<string>>();
+            conf.command_access = new List<List<string>>();
+
+            List<string> tmp_list = new List<string>();
+            string list_file = cur_dir + "\\config\\help.txt";
+            if (File.Exists(list_file))
+            {
+                string[] file = System.IO.File.ReadAllLines(list_file);
+                foreach (string file_line in file)
+                {
+                    string[] split = file_line.Split(':');
+                    string command_access = split[1];
+                    string command = split[2];
+                    tmp_list.Add(command);
+                    tmp_list.Add(command_access);
+                }
+                conf.command_access.Add(tmp_list);
+            }
 
             updateOutput.Tick += new EventHandler(UpdateOutput);
             Spam_Check_Timer.Tick += new EventHandler(spam_tick);
@@ -1679,6 +1696,20 @@ namespace IRCBot
             }
         }
 
+        public int get_command_access(string command)
+        {
+            int access = 0;
+            for (int x = 0; x < conf.command_access.Count(); x++)
+            {
+                if (conf.command_access[x][0].Equals(command))
+                {
+                    access = Convert.ToInt32(conf.command_access[x][1]);
+                    break;
+                }
+            }
+            return access;
+        }
+
         public string get_user_host(string nick)
         {
             string access = "";
@@ -2524,6 +2555,23 @@ namespace IRCBot
                     }
                 }
                 conf.module_config.Add(tmp_list);
+            }
+
+            conf.command_access.Clear();
+            List<string> tmp_list2 = new List<string>();
+            string list_file = cur_dir + "\\config\\help.txt";
+            if (File.Exists(list_file))
+            {
+                string[] file = System.IO.File.ReadAllLines(list_file);
+                foreach (string file_line in file)
+                {
+                    string[] split = file_line.Split(':');
+                    string command_access = split[1];
+                    string command = split[2];
+                    tmp_list2.Add(command);
+                    tmp_list2.Add(command_access);
+                }
+                conf.command_access.Add(tmp_list2);
             }
         }
 

@@ -37,7 +37,7 @@ namespace IRCBot
                     }
                     break;
                 case "addowner":
-                    if (nick_access == ircbot.get_command_access(command))
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -54,7 +54,7 @@ namespace IRCBot
                     }
                     break;
                 case "delowner":
-                    if (nick_access == ircbot.get_command_access(command))
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -71,7 +71,7 @@ namespace IRCBot
                     }
                     break;
                 case "id":
-                    if (nick_access == ircbot.get_command_access(command))
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         ircbot.identify();
                     }
@@ -81,7 +81,7 @@ namespace IRCBot
                     }
                     break;
                 case "join":
-                    if (nick_access == ircbot.get_command_access(command))
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -99,7 +99,7 @@ namespace IRCBot
                     }
                     break;
                 case "part":
-                    if (nick_access == ircbot.get_command_access(command))
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -117,7 +117,7 @@ namespace IRCBot
                     }
                     break;
                 case "say":
-                    if (nick_access == ircbot.get_command_access(command))
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
@@ -143,7 +143,7 @@ namespace IRCBot
                     }
                     break;
                 case "quit":
-                    if (nick_access == ircbot.get_command_access(command))
+                    if (nick_access >= ircbot.get_command_access(command))
                     {
                         if (line.GetUpperBound(0) <= 3)
                         {

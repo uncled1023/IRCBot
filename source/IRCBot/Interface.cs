@@ -171,21 +171,23 @@ namespace IRCBot
 
             conf.module_config = new List<List<string>>();
             conf.command_access = new List<List<string>>();
+            
+            cur_dir = Directory.GetCurrentDirectory();
 
-            List<string> tmp_list = new List<string>();
             string list_file = cur_dir + "\\config\\help.txt";
             if (File.Exists(list_file))
             {
                 string[] file = System.IO.File.ReadAllLines(list_file);
                 foreach (string file_line in file)
                 {
+                    List<string> tmp_list = new List<string>();
                     string[] split = file_line.Split(':');
                     string command_access = split[1];
                     string command = split[2];
                     tmp_list.Add(command);
                     tmp_list.Add(command_access);
+                    conf.command_access.Add(tmp_list);
                 }
-                conf.command_access.Add(tmp_list);
             }
 
             updateOutput.Tick += new EventHandler(UpdateOutput);
@@ -2558,20 +2560,20 @@ namespace IRCBot
             }
 
             conf.command_access.Clear();
-            List<string> tmp_list2 = new List<string>();
             string list_file = cur_dir + "\\config\\help.txt";
             if (File.Exists(list_file))
             {
                 string[] file = System.IO.File.ReadAllLines(list_file);
                 foreach (string file_line in file)
                 {
+                    List<string> tmp_list2 = new List<string>();
                     string[] split = file_line.Split(':');
                     string command_access = split[1];
                     string command = split[2];
                     tmp_list2.Add(command);
                     tmp_list2.Add(command_access);
+                    conf.command_access.Add(tmp_list2);
                 }
-                conf.command_access.Add(tmp_list2);
             }
         }
 

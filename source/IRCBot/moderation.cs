@@ -489,6 +489,46 @@ namespace IRCBot
                         ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
                     }
                     break;
+                case "ub":
+                    if (nick_access >= 5)
+                    {
+                        if (line.GetUpperBound(0) > 3)
+                        {
+                            string[] new_line = line[4].Split(charS, 2);
+                            int sent_nick_access = ircbot.get_user_access(new_line[0].TrimStart(':'), line[2]);
+
+                            if (nick_access >= sent_nick_access)
+                            {
+                                string target_host = ircbot.get_user_host(new_line[0]);
+                                string ban = "*!*@" + target_host;
+                                if (target_host.Equals("was"))
+                                {
+                                    ban = nick + "!*@*";
+                                }
+                                if (new_line.GetUpperBound(0) > 0)
+                                {
+                                    ircbot.sendData("MODE", line[2] + " -b " + ban + " :" + new_line[1]);
+                                }
+                                else
+                                {
+                                    ircbot.sendData("MODE", line[2] + " -b " + ban + " :No Reason");
+                                }
+                            }
+                            else
+                            {
+                                ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                            }
+                        }
+                        else
+                        {
+                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                        }
+                    }
+                    else
+                    {
+                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                    }
+                    break;
                 case "kb":
                     if (nick_access >= 5)
                     {

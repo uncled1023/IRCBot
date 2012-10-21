@@ -36,6 +36,7 @@ struct IRCConfig
     public int spam_timout;
     public int max_message_length;
     public List<List<string>> module_config;
+    public List<List<string>> command_access;
 }
 
 namespace IRCBot

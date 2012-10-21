@@ -35,7 +35,6 @@ namespace IRCBot
                     {
                         if (hbomb_active == false)
                         {
-                            ircbot.spam_count++;
                             hbomb_active = true;
                             bomb_channel = channel;
 
@@ -83,7 +82,6 @@ namespace IRCBot
                         {
                             if (bomb_holder.Equals(nick))
                             {
-                                ircbot.spam_count++;
                                 if (line.GetUpperBound(0) > 3)
                                 {
                                     if (line[4].TrimEnd(' ').Equals(conf.nick))
@@ -126,7 +124,6 @@ namespace IRCBot
                         {
                             if (bomb_holder.Equals(nick))
                             {
-                                ircbot.spam_count++;
                                 if (line.GetUpperBound(0) > 3)
                                 {
                                     if (line[4].ToLower().Equals(wire_color.ToLower()))

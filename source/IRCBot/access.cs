@@ -23,7 +23,7 @@ namespace IRCBot
                             {
                                 if (Convert.ToInt32(parse[2]) <= access_level)
                                 {
-                                    set_access_list(parse[0], parse[1], parse[2], ircbot);
+                                    set_access_list(parse[0].Trim(), parse[1], parse[2], ircbot);
                                 }
                                 else
                                 {
@@ -34,7 +34,7 @@ namespace IRCBot
                             {
                                 if (Convert.ToInt32(parse[1]) <= access_level)
                                 {
-                                    set_access_list(parse[0], line[2], parse[1], ircbot);
+                                    set_access_list(parse[0].Trim(), line[2], parse[1], ircbot);
                                 }
                                 else
                                 {
@@ -64,11 +64,11 @@ namespace IRCBot
                             string[] parse = line[4].Split(' ');
                             if (parse.GetUpperBound(0) > 1)
                             {
-                                del_access_list(parse[0], parse[1], parse[2], ircbot);
+                                del_access_list(parse[0].Trim(), parse[1], parse[2], ircbot);
                             }
                             else if (parse.GetUpperBound(0) > 0)
                             {
-                                del_access_list(parse[0], line[2], parse[1], ircbot);
+                                del_access_list(parse[0].Trim(), line[2], parse[1], ircbot);
                             }
                             else
                             {
@@ -162,7 +162,7 @@ namespace IRCBot
             {
                 string[] log_file = System.IO.File.ReadAllLines(ircbot.cur_dir + "\\modules\\access\\" + file_name);
                 int number_of_lines = log_file.GetUpperBound(0) + 1;
-                string[] new_file = new string[number_of_lines];
+                List<string> new_file = new List<string>();
                 int index = 0;
                 bool nick_found = false;
                 if (number_of_lines > 0)
@@ -173,9 +173,9 @@ namespace IRCBot
                         string[] new_line = lines.Split(sep, 3);
                         if (new_line.GetUpperBound(0) > 0)
                         {
-                            if (new_line[0].Equals(nick) && new_line[1].Equals(channel))
+                            if (new_line[0].Trim().Equals(nick) && new_line[1].Trim().Equals(channel))
                             {
-                                string[] tmp_line = new_line[2].Split(',');
+                                string[] tmp_line = new_line[2].Trim().Split(',');
                                 bool access_found = false;
                                 foreach (string line in tmp_line)
                                 {
@@ -186,20 +186,20 @@ namespace IRCBot
                                 }
                                 if (access_found == false)
                                 {
-                                    if (new_line[2].Equals(""))
+                                    if (new_line[2].Trim().Equals(""))
                                     {
-                                        new_file[index] = new_line[0] + "*" + new_line[1] + "*" + access;
+                                        new_file.Add(new_line[0].Trim() + "*" + new_line[1].Trim() + "*" + access);
                                     }
                                     else
                                     {
-                                        new_file[index] = new_line[0] + "*" + new_line[1] + "*" + new_line[2] + "," + access;
+                                        new_file.Add(new_line[0].Trim() + "*" + new_line[1].Trim() + "*" + new_line[2].Trim() + "," + access);
                                     }
                                 }
                                 nick_found = true;
                             }
                             else
                             {
-                                new_file[index] = lines;
+                                new_file.Add(lines);
                             }
                             index++;
                         }
@@ -269,7 +269,7 @@ namespace IRCBot
                         string[] new_line = line.Split(sep, 3);
                         if (new_line.GetUpperBound(0) > 1)
                         {
-                            if (new_line[0].Equals(nick) && new_line[1].Equals(channel))
+                            if (new_line[0].Trim().Equals(nick.Trim()) && new_line[1].Trim().Equals(channel))
                             {
                                 access = new_line[2];
                                 break;
@@ -294,8 +294,7 @@ namespace IRCBot
             {
                 string[] log_file = System.IO.File.ReadAllLines(ircbot.cur_dir + "\\modules\\access\\" + file_name);
                 int number_of_lines = log_file.GetUpperBound(0) + 1;
-                string[] new_file = new string[number_of_lines];
-                int index = 0;
+                List<string> new_file = new List<string>();
                 if (number_of_lines > 0)
                 {
                     foreach (string lines in log_file)
@@ -304,10 +303,9 @@ namespace IRCBot
                         string[] new_line = lines.Split(sep, 3);
                         if (new_line.GetUpperBound(0) > 0)
                         {
-                            if (new_line[0].Equals(nick) && new_line[1].Equals(channel))
+                            if (new_line[0].Trim().Equals(nick) && new_line[1].Trim().Equals(channel))
                             {
-                                string[] tmp_line = new_line[2].Split(',');
-                                bool access_found = false;
+                                string[] tmp_line = new_line[2].Trim().Split(',');
                                 string new_access = "";
                                 foreach (string line in tmp_line)
                                 {
@@ -319,19 +317,14 @@ namespace IRCBot
                                         new_access += "," + line;
                                     }
                                 }
-                                if (access_found == false)
+                                if (new_access.TrimStart(',').TrimEnd(',') != "")
                                 {
-                                    if (new_access.TrimStart(',').TrimEnd(',') != "")
-                                    {
-                                        new_file[index] = new_line[0] + "*" + new_line[1] + "*" + new_access.TrimStart(',').TrimEnd(',');
-                                        index++;
-                                    }
+                                    new_file.Add(new_line[0].Trim() + "*" + new_line[1].Trim() + "*" + new_access.TrimStart(',').TrimEnd(','));
                                 }
                             }
                             else
                             {
-                                new_file[index] = lines;
-                                index++;
+                                new_file.Add(lines);
                             }
                         }
                     }

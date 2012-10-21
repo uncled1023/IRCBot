@@ -18,6 +18,7 @@ namespace IRCBot
         public bool still_chatting;
         private Bot myBot;
         private User myUser;
+        private List<string> chatting_nick;
 
         public chat()
         {
@@ -27,6 +28,7 @@ namespace IRCBot
             chat_time.Enabled = false;
 
             still_chatting = false;
+            chatting_nick = new List<string>();
             myBot = new Bot();
             myBot.loadSettings();
             myUser = new User("chat_nick", myBot);
@@ -54,14 +56,30 @@ namespace IRCBot
                 }
                 if (me_in == true || still_chatting == true)
                 {
-                    // Start Chatting
-                    still_chatting = false;
-                    chat_time.Stop();
-                    Request r = new Request(msg, myUser, myBot);
-                    Result res = myBot.Chat(r);
-                    ircbot.sendData("PRIVMSG", channel + " :" + res.Output.Replace("[nick]", nick).Replace("[me]", conf.nick).Replace("[owner]", conf.owner));
-                    chat_time.Start();
-                    still_chatting = true;
+                    bool nick_found = false;
+                    for (int x = 0; x < chatting_nick.Count(); x++)
+                    {
+                        if (chatting_nick[x].Equals(nick))
+                        {
+                            nick_found = true;
+                        }
+                    }
+                    if (me_in == true && nick_found == false)
+                    {
+                        chatting_nick.Add(nick);
+                        nick_found = true;
+                    }
+                    if (nick_found == true)
+                    {
+                        // Start Chatting
+                        still_chatting = false;
+                        chat_time.Stop();
+                        Request r = new Request(msg, myUser, myBot);
+                        Result res = myBot.Chat(r);
+                        ircbot.sendData("PRIVMSG", channel + " :" + res.Output.Replace("[nick]", nick).Replace("[me]", conf.nick).Replace("[owner]", conf.owner));
+                        chat_time.Start();
+                        still_chatting = true;
+                    }
                 }
             }
         }
@@ -69,6 +87,7 @@ namespace IRCBot
         private void stop_chat(object sender, EventArgs e)
         {
             still_chatting = false;
+            chatting_nick.Clear();
             chat_time.Enabled = false;
             chat_time.Stop();
         }

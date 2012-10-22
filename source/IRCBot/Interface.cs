@@ -105,6 +105,8 @@ namespace IRCBot
         fun fun = new fun();
         // ChatBot Module
         chat chat = new chat();
+        // Poll Module
+        poll poll = new poll();
 
         delegate void SetTextCallback(string text);
 
@@ -959,6 +961,19 @@ namespace IRCBot
                                                 if (conf.module_config[x][1].Equals("True"))
                                                 {
                                                     fun.fun_control(ex, command, this, nick_access, nick, channel);
+                                                }
+                                                break;
+                                            }
+                                        }
+
+                                        // Poll Module
+                                        for (int x = 0; x < conf.module_config.Count(); x++)
+                                        {
+                                            if (conf.module_config[x][0].Equals("Poll"))
+                                            {
+                                                if (conf.module_config[x][1].Equals("True"))
+                                                {
+                                                    poll.poll_control(ex, command, this, nick_access, nick, channel);
                                                 }
                                                 break;
                                             }

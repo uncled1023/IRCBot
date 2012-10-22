@@ -137,5 +137,9 @@
         </chat_timeout>
       </options>
     </module>
+    <module>
+      <name>Poll</name>
+      <enabled>True</enabled>
+    </module>
   </modules>
 </bot_settings>

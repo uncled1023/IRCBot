@@ -58,7 +58,15 @@ Channel Quote:1:quote:[<nick>]:Gets a random quote from the channel.  If a nickn
 Google:1:google:<query>:Returns the first result from Google.
 Urban Dictionary:1:ud:<query>:Returns the top result from Urban Dictionary.
 Magic 8-Ball:1:8ball:<question>:Answers any question you have!
-H-Bomb:1:hbomb::Initiates a new game of pass the Hbomb.  To pass the bomb, type .pass <nick>, and to defuse the bomb type .defuse <color>.
+H-Bomb:1:hbomb::Initiates a new game of pass the Hbomb.
+Pass the H-Bomb:0:pass:<nick>:Passes the H-Bomb to the specified nick.
+Defuse the H-Bomb:0:defuse:<color>:Cuts a wire of the H-Bomb.  If you get it correct, the person who passed it to you gets bombed, otherwise you do.
+Create Poll:1:poll:<question>|<answer1>|<answer2>:Creates a poll in the channel.
+Add Answer:1:addanswer:<answer>:Adds an answer to the active poll.
+Delete Answer:1:delanswer:<answer_number>:Deletes the specified answer.
+Stop Poll:1:stoppoll::Stops the active poll.
+Display Results:1:results::Displays the results of the current poll.
+Vote:1:vote:<answer_number>:Votes for the specified poll.
 Ping Me:1:pingme::Gets the ping time between your client and me.
 Send Love:1:love:[<nick>]:Sends some love to the nick or yourself.
 Hug:1:hug:[<nick>]:Sends a hug to the nick or yourself.

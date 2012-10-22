@@ -2636,5 +2636,19 @@ namespace IRCBot
                 connect();
             }
         }
+
+        private void Interface_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            updateOutput.Stop();
+            this.backgroundWorker1.CancelAsync();
+            if (sr != null)
+                sr.Close();
+            if (sw != null)
+                sw.Close();
+            if (ns != null)
+                ns.Close();
+            if (IRCConnection != null)
+                IRCConnection.Close();
+        }
     }
 }

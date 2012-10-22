@@ -120,9 +120,9 @@ namespace IRCBot
                 case "stoppoll":
                     if (nick_access >= ircbot.get_command_access(command))
                     {
-                        if (poll_owner.Equals(nick) || nick_access > Convert.ToInt32(ircbot.get_user_access(poll_owner, channel)))
+                        if (poll_active == true)
                         {
-                            if (poll_active == true)
+                            if (poll_owner.Equals(nick) || nick_access > Convert.ToInt32(ircbot.get_user_access(poll_owner, channel)))
                             {
                                 poll_active = false;
 
@@ -131,15 +131,17 @@ namespace IRCBot
                                 {
                                     ircbot.sendData("PRIVMSG", channel + " :" + (x + 1).ToString() + ") " + poll_answers[x][0] + " | " + poll_answers[x][1] + " votes");
                                 }
+                                poll_answers.Clear();
+                                poll_nick_responses.Clear();
                             }
                             else
                             {
-                                ircbot.sendData("PRIVMSG", channel + " :There is currently no poll active right now");
+                                ircbot.sendData("PRIVMSG", channel + " :You are not the poll owner.");
                             }
                         }
                         else
                         {
-                            ircbot.sendData("PRIVMSG", channel + " :You are not the poll owner.");
+                            ircbot.sendData("PRIVMSG", channel + " :There is currently no poll active right now");
                         }
                     }
                     break;

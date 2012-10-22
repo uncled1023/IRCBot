@@ -200,6 +200,7 @@
             this.MinimumSize = new System.Drawing.Size(600, 300);
             this.Name = "Interface";
             this.Text = "IRCBot";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Interface_FormClosing);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.tabPage1.ResumeLayout(false);

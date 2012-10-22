@@ -107,6 +107,8 @@ namespace IRCBot
         chat chat = new chat();
         // Poll Module
         poll poll = new poll();
+        // Roll Call Module
+        roll_call roll_call = new roll_call();
 
         delegate void SetTextCallback(string text);
 
@@ -192,6 +194,9 @@ namespace IRCBot
                 }
             }
 
+            button1.Enabled = false;
+            button1.Visible = false;
+
             updateOutput.Tick += new EventHandler(UpdateOutput);
             Spam_Check_Timer.Tick += new EventHandler(spam_tick);
             checkRegisterationTimer.Tick += new EventHandler(checkRegistration);
@@ -200,6 +205,8 @@ namespace IRCBot
             control = tabControl1.Controls.Find("output_box_system", true)[0];
             RichTextBox output_box = (RichTextBox)control;
             output_box.LinkClicked += new LinkClickedEventHandler(link_Click);
+
+            tabControl1.SelectedIndexChanged += new EventHandler(tab_changed);
             connect();
         }
 
@@ -378,11 +385,35 @@ namespace IRCBot
                 else
                 {
                 }
-            }
 
-            nick_list.Clear();
-            first_run = true;
-            this.backgroundWorker1.RunWorkerAsync(2000);
+                nick_list.Clear();
+                first_run = true;
+                this.backgroundWorker1.RunWorkerAsync(2000);
+            }
+        }
+
+        private void tab_changed(object sender, EventArgs e)
+        {
+            string[] server_list = conf.server.Split(',');
+            foreach (string server_name in server_list)
+            {
+                string[] server = conf.server.Split('.');
+                string tmp_server_name = "No Server Specified";
+                if (server.GetUpperBound(0) > 0)
+                {
+                    tmp_server_name = server[1];
+                }
+                if (tabControl1.SelectedTab.Text.Equals(tmp_server_name))
+                {
+                    button1.Enabled = false;
+                    button1.Visible = false;
+                }
+                else
+                {
+                    button1.Enabled = true;
+                    button1.Visible = true;
+                }
+            }
         }
 
         protected void link_Click(object sender, LinkClickedEventArgs e)
@@ -460,22 +491,25 @@ namespace IRCBot
                 restart = false;
             }
             Control control = new Control();
-            control = tabControl1.Controls.Find("output_box_" + tmp_server_name + "_system", true)[0];
-            RichTextBox output_box = (RichTextBox)control;
-            if (restart == true)
+            if (tabControl1.Controls.Find("output_box_" + tmp_server_name + "_system", true).GetUpperBound(0) >= 0)
             {
-                output_box.AppendText(Environment.NewLine + "Restart Attempt " + restart_attempts + " [" + Math.Pow(2, Convert.ToDouble(restart_attempts)) + " Seconds Delay]" + Environment.NewLine);
-                connect();
-            }
-            else
-            {
-                if (tmp_server_name == "No Server Specified")
+                control = tabControl1.Controls.Find("output_box_" + tmp_server_name + "_system", true)[0];
+                RichTextBox output_box = (RichTextBox)control;
+                if (restart == true)
                 {
-                    output_box.AppendText(Environment.NewLine + "Please add a server to connect to." + Environment.NewLine);
+                    output_box.AppendText(Environment.NewLine + "Restart Attempt " + restart_attempts + " [" + Math.Pow(2, Convert.ToDouble(restart_attempts)) + " Seconds Delay]" + Environment.NewLine);
+                    connect();
                 }
-                restart_attempts = 0;
-                output_box.AppendText(Environment.NewLine + "Exited" + Environment.NewLine);
-                connectToolStripMenuItem.Text = "Connect";
+                else
+                {
+                    if (tmp_server_name == "No Server Specified")
+                    {
+                        output_box.AppendText(Environment.NewLine + "Please add a server to connect to." + Environment.NewLine);
+                    }
+                    restart_attempts = 0;
+                    output_box.AppendText(Environment.NewLine + "Exited" + Environment.NewLine);
+                    connectToolStripMenuItem.Text = "Connect";
+                }
             }
         }
 
@@ -978,6 +1012,19 @@ namespace IRCBot
                                                 break;
                                             }
                                         }
+
+                                        // Roll Call Module
+                                        for (int x = 0; x < conf.module_config.Count(); x++)
+                                        {
+                                            if (conf.module_config[x][0].Equals("Roll Call"))
+                                            {
+                                                if (conf.module_config[x][1].Equals("True"))
+                                                {
+                                                    roll_call.roll_call_control(ex, command, this, conf, x, nick_access, channel, nick);
+                                                }
+                                                break;
+                                            }
+                                        }
                                     }
                                     else // From Query
                                     {
@@ -1019,6 +1066,19 @@ namespace IRCBot
                                                 if (conf.module_config[x][1].Equals("True"))
                                                 {
                                                     message_module.message_control(ex, command, this, nick);
+                                                }
+                                                break;
+                                            }
+                                        }
+
+                                        // Roll Call Module
+                                        for (int x = 0; x < conf.module_config.Count(); x++)
+                                        {
+                                            if (conf.module_config[x][0].Equals("Roll Call"))
+                                            {
+                                                if (conf.module_config[x][1].Equals("True"))
+                                                {
+                                                    roll_call.roll_call_control(ex, command, this, conf, x, nick_access, channel, nick);
                                                 }
                                                 break;
                                             }
@@ -2088,7 +2148,6 @@ namespace IRCBot
                             }
                             else
                             {
-                                tab_name = "System";
                                 channel = "System";
                                 if (tmp_msg.GetUpperBound(0) > 0)
                                 {
@@ -2106,18 +2165,9 @@ namespace IRCBot
                         {
                             channel = tmp_lines[2].TrimStart(':');
                             nickname = tmp_lines[0].TrimStart(':').Split('!')[0];
-                            if (channel.StartsWith("#"))
+                            if (channel.Equals(conf.nick))
                             {
-                                tab_name = channel.TrimStart('#');
-                            }
-                            else if (channel.Equals(conf.nick))
-                            {
-                                tab_name = nickname;
                                 channel = nickname;
-                            }
-                            else if (nickname.Equals(conf.nick))
-                            {
-                                tab_name = channel;
                             }
                             message = tmp_lines[3].Remove(0, 1);
                             nickname = "<" + nickname + ">  ";
@@ -2129,11 +2179,9 @@ namespace IRCBot
                             nickname = tmp_lines[0].TrimStart(':').Split('!')[0];
                             if (channel.StartsWith("#"))
                             {
-                                tab_name = channel.TrimStart('#');
                             }
                             else
                             {
-                                tab_name = "System";
                                 channel = "System";
                             }
                             message = nickname + " has joined " + channel;
@@ -2146,14 +2194,51 @@ namespace IRCBot
                             nickname = tmp_lines[0].TrimStart(':').Split('!')[0];
                             if (channel.StartsWith("#"))
                             {
-                                tab_name = channel.TrimStart('#');
+                                if (nickname.Equals(conf.nick))
+                                {
+                                    channel = "System";
+                                }
                             }
                             else
                             {
-                                tab_name = "System";
                                 channel = "System";
                             }
-                            message = nickname + " has left " + channel;
+                            message = nickname + " has left " + tmp_lines[2];
+                            nickname = "";
+                            font_color = "#66361F";
+                        }
+                        else if (tmp_lines[1].Equals("quit"))
+                        {
+                            nickname = tmp_lines[0].TrimStart(':').Split('!')[0];
+                            bool channel_found = false;
+                            for (int x = 0; x < nick_list.Count(); x++)
+                            {
+                                for (int i = 1; i < nick_list[x].Count(); i++)
+                                {
+                                    string[] split = nick_list[x][i].Split(':');
+                                    if (split.GetUpperBound(0) > 0)
+                                    {
+                                        if (split[1].Equals(nickname))
+                                        {
+                                            channel_found = true;
+                                            channel = nick_list[x][0] + ",";
+                                        }
+                                    }
+                                }
+                            }
+                            if (channel_found == false)
+                            {
+                                channel = "System";
+                            }                            
+                            
+                            if (tmp_lines.GetUpperBound(0) > 3)
+                            {
+                                message = nickname + " has quit (" + tmp_lines[2].TrimStart(':') + " " + tmp_lines[3] + ")";
+                            }
+                            else
+                            {
+                                message = nickname + " has quit (" + tmp_lines[2].TrimStart(':') + ")";
+                            }
                             nickname = "";
                             font_color = "#66361F";
                         }
@@ -2163,11 +2248,9 @@ namespace IRCBot
                             nickname = tmp_lines[0].TrimStart(':').Split('!')[0];
                             if (channel.StartsWith("#"))
                             {
-                                tab_name = channel.TrimStart('#');
                             }
                             else if (channel.Equals(conf.nick))
                             {
-                                tab_name = "System";
                                 channel = "System";
                             }
                             if (nickname.Equals(conf.nick))
@@ -2196,11 +2279,9 @@ namespace IRCBot
                             nickname = tmp_lines[0].TrimStart(':').Split('!')[0];
                             if (channel.StartsWith("#"))
                             {
-                                tab_name = channel.TrimStart('#');
                             }
                             else if (channel.Equals(conf.nick))
                             {
-                                tab_name = "System";
                                 channel = "System";
                             }
                             message = nickname + " has kicked " + tmp_lines[3].Replace(':', '(') + ")";
@@ -2218,7 +2299,6 @@ namespace IRCBot
                                     {
                                         channel = new_lines[0];
                                         nickname = tmp_lines[0].TrimStart(':').Split('!')[0];
-                                        tab_name = channel.TrimStart('#');
                                         message = "Topic for " + channel + " is: " + new_lines[1].TrimStart(':');
                                         nickname = "";
                                         font_color = "#B037B0";
@@ -2226,7 +2306,6 @@ namespace IRCBot
                                     else
                                     {
                                         channel = "System";
-                                        tab_name = "System";
                                         nickname = tmp_lines[0].TrimStart(':').Split('!')[0] + ": ";
                                         charSeparator = new char[] { ':' };
                                         string[] tmp_msg = text.Split(charSeparator, 2, StringSplitOptions.RemoveEmptyEntries);
@@ -2244,7 +2323,6 @@ namespace IRCBot
                                 else
                                 {
                                     channel = "System";
-                                    tab_name = "System";
                                     nickname = tmp_lines[0].TrimStart(':').Split('!')[0] + ": ";
                                     charSeparator = new char[] { ':' };
                                     string[] tmp_msg = text.Split(charSeparator, 2, StringSplitOptions.RemoveEmptyEntries);
@@ -2262,7 +2340,6 @@ namespace IRCBot
                             else
                             {
                                 channel = "System";
-                                tab_name = "System";
                                 nickname = tmp_lines[0].TrimStart(':').Split('!')[0] + ": ";
                                 charSeparator = new char[] { ':' };
                                 string[] tmp_msg = text.Split(charSeparator, 2, StringSplitOptions.RemoveEmptyEntries);
@@ -2277,11 +2354,16 @@ namespace IRCBot
                                 font_color = "000000";
                             }
                         }
+                    }
+                    string[] channels = channel.Split(',');
+                    foreach (string channel_line in channels)
+                    {
+                        tab_name = channel_line.TrimStart('#');
                         tab_name = Regex.Replace(tab_name, pattern, "_");
                         string[] nick = tmp_lines[0].Split('!');
                         if (channel != "System")
                         {
-                            if (channel.StartsWith("#"))
+                            if (channel_line.StartsWith("#"))
                             {
                                 if (tabControl1.Controls.Find("output_box_chan_" + tmp_server_name + "_" + tab_name, true).GetUpperBound(0) < 0)
                                 {
@@ -2298,66 +2380,67 @@ namespace IRCBot
                                 control = tabControl1.Controls.Find("output_box_user_" + tmp_server_name + "_" + tab_name, true)[0];
                             }
                         }
-                    }
-                    output_box = (RichTextBox)control;
-                    if (nickname != "" || message != "")
-                    {
-                        int before_length = output_box.Text.Length + 1;
-                        int nickname_length = nickname.Length;
-                        int message_length = message.Length;
-                        int timestamp_length = time_stamp.Length;
-                        string line = "[" + time_stamp + "] " + nickname + message;
-                        int line_length = line.Length;
-                        Color actColor;
-                        actColor = System.Drawing.ColorTranslator.FromHtml(font_color);
-                        output_box.AppendText(line + Environment.NewLine);
-                        //timstamp coloring
-                        output_box.SelectionStart = before_length;
-                        output_box.SelectionLength = timestamp_length + 2;
-                        output_box.SelectionColor = Color.Black;
-                        if (nickname_length > 0)
-                        {
-                            //nick coloring
-                            output_box.SelectionStart = before_length + timestamp_length + 2;
-                            output_box.SelectionLength = nickname_length - 1;
-                            output_box.SelectionColor = System.Drawing.ColorTranslator.FromHtml("#C73232");
-                        }
-                        //message coloring
-                        output_box.SelectionStart = before_length + timestamp_length + 2 + nickname_length;
-                        output_box.SelectionLength = message_length;
-                        output_box.SelectionColor = actColor;
 
-                        output_box.SelectionStart = output_box.Text.Length;
-                        output_box.ScrollToCaret();
-                    }
-                    this.Text = conf.name;
-                    if (conf.keep_logs.Equals("True"))
-                    {
-                        string file_name = "";
-                        if (channel.StartsWith("#"))
+                        output_box = (RichTextBox)control;
+                        if (nickname != "" || message != "")
                         {
-                            file_name = tmp_server_name + "-#" + tab_name + ".log";
+                            int before_length = output_box.Text.Length + 1;
+                            int nickname_length = nickname.Length;
+                            int message_length = message.Length;
+                            int timestamp_length = time_stamp.Length;
+                            string line = "[" + time_stamp + "] " + nickname + message;
+                            int line_length = line.Length;
+                            Color actColor;
+                            actColor = System.Drawing.ColorTranslator.FromHtml(font_color);
+                            output_box.AppendText(line + Environment.NewLine);
+                            //timstamp coloring
+                            output_box.SelectionStart = before_length;
+                            output_box.SelectionLength = timestamp_length + 2;
+                            output_box.SelectionColor = Color.Black;
+                            if (nickname_length > 0)
+                            {
+                                //nick coloring
+                                output_box.SelectionStart = before_length + timestamp_length + 2;
+                                output_box.SelectionLength = nickname_length - 1;
+                                output_box.SelectionColor = System.Drawing.ColorTranslator.FromHtml("#C73232");
+                            }
+                            //message coloring
+                            output_box.SelectionStart = before_length + timestamp_length + 2 + nickname_length;
+                            output_box.SelectionLength = message_length;
+                            output_box.SelectionColor = actColor;
+
+                            output_box.SelectionStart = output_box.Text.Length;
+                            output_box.ScrollToCaret();
                         }
-                        else
+                        this.Text = conf.name;
+                        if (conf.keep_logs.Equals("True"))
                         {
-                            file_name = tmp_server_name + "-" + tab_name + ".log";
-                        }
-                        if (conf.logs_path == "")
-                        {
-                            conf.logs_path = cur_dir + "\\logs";
-                        }
-                        if (Directory.Exists(conf.logs_path))
-                        {
-                            StreamWriter log_file = File.AppendText(conf.logs_path + "\\" + file_name);
-                            log_file.WriteLine("[" + date_stamp + " " + time_stamp + "] " + text);
-                            log_file.Close();
-                        }
-                        else
-                        {
-                            Directory.CreateDirectory(conf.logs_path);
-                            StreamWriter log_file = File.AppendText(conf.logs_path + "\\" + file_name);
-                            log_file.WriteLine("[" + date_stamp + " " + time_stamp + "] " + text);
-                            log_file.Close();
+                            string file_name = "";
+                            if (channel_line.StartsWith("#"))
+                            {
+                                file_name = tmp_server_name + "-#" + tab_name + ".log";
+                            }
+                            else
+                            {
+                                file_name = tmp_server_name + "-" + tab_name + ".log";
+                            }
+                            if (conf.logs_path == "")
+                            {
+                                conf.logs_path = cur_dir + "\\logs";
+                            }
+                            if (Directory.Exists(conf.logs_path))
+                            {
+                                StreamWriter log_file = File.AppendText(conf.logs_path + "\\" + file_name);
+                                log_file.WriteLine("[" + date_stamp + " " + time_stamp + "] " + text);
+                                log_file.Close();
+                            }
+                            else
+                            {
+                                Directory.CreateDirectory(conf.logs_path);
+                                StreamWriter log_file = File.AppendText(conf.logs_path + "\\" + file_name);
+                                log_file.WriteLine("[" + date_stamp + " " + time_stamp + "] " + text);
+                                log_file.Close();
+                            }
                         }
                     }
                 }
@@ -2459,7 +2542,16 @@ namespace IRCBot
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            sendData("QUIT", "Leaving");
+            updateOutput.Stop();
+            this.backgroundWorker1.CancelAsync();
+            if (sr != null)
+                sr.Close();
+            if (sw != null)
+                sw.Close();
+            if (ns != null)
+                ns.Close();
+            if (IRCConnection != null)
+                IRCConnection.Close();
             this.Close();
         }
 
@@ -2471,7 +2563,8 @@ namespace IRCBot
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            AboutBox1 about = new AboutBox1();
+            about.ShowDialog();
         }
 
         private void input_box_KeyPress(object sender, KeyPressEventArgs e)

@@ -74,6 +74,10 @@ namespace IRCBot
                             }
                         }
                     }
+                    else
+                    {
+                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                    }
                     break;
                 case "pass":
                     if (nick_access >= ircbot.get_command_access(command))
@@ -115,6 +119,10 @@ namespace IRCBot
                         {
                             ircbot.sendData("PRIVMSG", channel + " :There isn't a bomb to pass!");
                         }
+                    }
+                    else
+                    {
+                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
                     }
                     break;
                 case "defuse":
@@ -159,6 +167,10 @@ namespace IRCBot
                         {
                             ircbot.sendData("PRIVMSG", channel + " :There isn't a bomb to pass!");
                         }
+                    }
+                    else
+                    {
+                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
                     }
                     break;
             }

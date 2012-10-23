@@ -109,6 +109,8 @@ namespace IRCBot
         poll poll = new poll();
         // Roll Call Module
         roll_call roll_call = new roll_call();
+        // Version Response Module
+        version version = new version();
 
         delegate void SetTextCallback(string text);
 
@@ -1178,6 +1180,19 @@ namespace IRCBot
                                                 if (conf.module_config[x][1].Equals("True"))
                                                 {
                                                     ai.AI_Parse(ex, nick, nick, this, conf, chat);
+                                                }
+                                                break;
+                                            }
+                                        }
+
+                                        // Version Response Module
+                                        for (int x = 0; x < conf.module_config.Count(); x++)
+                                        {
+                                            if (conf.module_config[x][0].Equals("Version Response"))
+                                            {
+                                                if (conf.module_config[x][1].Equals("True"))
+                                                {
+                                                    version.version_control(ex, this, conf, x, nick);
                                                 }
                                                 break;
                                             }

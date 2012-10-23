@@ -25,6 +25,10 @@ namespace IRCBot
                         ping_list[index].Add(channel);
                         ping_list[index].Add(current_time);
                     }
+                    else
+                    {
+                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                    }
                     break;
             }
         }

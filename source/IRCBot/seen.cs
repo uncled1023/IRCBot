@@ -20,6 +20,10 @@ namespace IRCBot
                     {
                         display_seen(line[4], line[2], ircbot, sr);
                     }
+                    else
+                    {
+                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                    }
                     break;
             }
         }

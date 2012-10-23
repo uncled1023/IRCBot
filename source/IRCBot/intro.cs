@@ -27,6 +27,10 @@ namespace IRCBot
                             ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
                         }
                     }
+                    else
+                    {
+                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                    }
                     break;
                 case "introdelete":
                     ircbot.spam_count++;
@@ -34,6 +38,10 @@ namespace IRCBot
                     {
                         // Delete Introduction
                         delete_intro(nick, line[2], ircbot);
+                    }
+                    else
+                    {
+                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
                     }
                     break;
             }

@@ -152,5 +152,16 @@
         </roll_call_message>
       </options>
     </module>
+    <module>
+      <name>Version Response</name>
+      <enabled>True</enabled>
+      <options>
+        <bot_machine>
+          <type>textbox</type>
+          <value>the Moon</value>
+          <label>Machine bot is ran on</label>
+        </bot_machine>
+      </options>
+    </module>
   </modules>
 </bot_settings>

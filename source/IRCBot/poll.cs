@@ -52,6 +52,10 @@ namespace IRCBot
                             ircbot.sendData("PRIVMSG", channel + " :There is currently a poll active right now");
                         }
                     }
+                    else
+                    {
+                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                    }
                     break;
                 case "addanswer":
                     if (nick_access >= ircbot.get_command_access(command))
@@ -81,6 +85,10 @@ namespace IRCBot
                         {
                             ircbot.sendData("PRIVMSG", channel + " :You are not the poll owner.");
                         }
+                    }
+                    else
+                    {
+                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
                     }
                     break;
                 case "delanswer":
@@ -116,6 +124,10 @@ namespace IRCBot
                             ircbot.sendData("PRIVMSG", channel + " :You are not the poll owner.");
                         }
                     }
+                    else
+                    {
+                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                    }
                     break;
                 case "stoppoll":
                     if (nick_access >= ircbot.get_command_access(command))
@@ -144,6 +156,10 @@ namespace IRCBot
                             ircbot.sendData("PRIVMSG", channel + " :There is currently no poll active right now");
                         }
                     }
+                    else
+                    {
+                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                    }
                     break;
                 case "results":
                     if (nick_access >= ircbot.get_command_access(command))
@@ -161,6 +177,10 @@ namespace IRCBot
                         {
                             ircbot.sendData("NOTICE", nick + " :There is currently no poll active right now");
                         }
+                    }
+                    else
+                    {
+                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
                     }
                     break;
                 case "vote":
@@ -222,6 +242,10 @@ namespace IRCBot
                         {
                             ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
                         }
+                    }
+                    else
+                    {
+                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
                     }
                     break;
             }

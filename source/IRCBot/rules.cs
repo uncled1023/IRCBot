@@ -19,6 +19,10 @@ namespace IRCBot
                     {
                         get_rules(nick, line[2], ircbot);
                     }
+                    else
+                    {
+                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                    }
                     break;
                 case "addrule":
                     if (nick_access >= ircbot.get_command_access(command))
@@ -32,6 +36,10 @@ namespace IRCBot
                             ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
                         }
                     }
+                    else
+                    {
+                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                    }
                     break;
                 case "delrule":
                     if (nick_access >= ircbot.get_command_access(command))
@@ -44,6 +52,10 @@ namespace IRCBot
                         {
                             ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
                         }
+                    }
+                    else
+                    {
+                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
                     }
                     break;
             }

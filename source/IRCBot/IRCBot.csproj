@@ -114,6 +114,7 @@
     <Compile Include="rules.cs" />
     <Compile Include="seen.cs" />
     <Compile Include="urban_dictionary.cs" />
+    <Compile Include="version.cs" />
     <Compile Include="weather.cs" />
     <EmbeddedResource Include="AboutBox1.resx">
       <DependentUpon>AboutBox1.cs</DependentUpon>

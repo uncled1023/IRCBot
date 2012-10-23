@@ -19,6 +19,10 @@ namespace IRCBot
                     {
                         display_help(line, nick, line[2], nick_access, ircbot, conf);
                     }
+                    else
+                    {
+                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                    }
                     break;
             }
         }
@@ -31,6 +35,7 @@ namespace IRCBot
             {
                 string msg = "";
                 string[] file = System.IO.File.ReadAllLines(list_file);
+                bool more_info = false;
                 foreach (string file_line in file)
                 {
                     string[] split = file_line.Split(':');
@@ -38,6 +43,7 @@ namespace IRCBot
                     {
                         if (line.GetUpperBound(0) > 3)
                         {
+                            more_info = true;
                             search_term = line[4];
                             if (search_term.ToLower().Equals(split[2].ToLower()))
                             {
@@ -55,7 +61,11 @@ namespace IRCBot
                     ircbot.sendData("NOTICE", nick + " :" + msg.TrimEnd(','));
                     msg = "";
                 }
-                if (line.GetUpperBound(0) <= 3)
+                else
+                {
+                    ircbot.sendData("NOTICE", nick + " :No help information available.");
+                }
+                if (more_info == false)
                 {
                     ircbot.sendData("NOTICE", nick + " :For more information about a specific command, type .help <command name>");
                 }

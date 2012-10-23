@@ -34,6 +34,10 @@ namespace IRCBot
                             get_quote(line[2], ircbot, conf);
                         }
                     }
+                    else
+                    {
+                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                    }
                     break;
             }
         }

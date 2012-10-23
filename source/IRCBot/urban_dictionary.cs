@@ -28,6 +28,10 @@ namespace IRCBot
                             ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
                         }
                     }
+                    else
+                    {
+                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                    }
                     break;
             }
         }

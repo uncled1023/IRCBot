@@ -49,6 +49,10 @@ namespace IRCBot
                             ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
                         }
                     }
+                    else
+                    {
+                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                    }
                     break;
                 case "hug":
                     ircbot.spam_count++;
@@ -62,6 +66,10 @@ namespace IRCBot
                         {
                             ircbot.sendData("PRIVMSG", channel + " :\u0001ACTION hugs " + nick + "\u0001");
                         }
+                    }
+                    else
+                    {
+                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
                     }
                     break;
                 case "slap":
@@ -77,12 +85,20 @@ namespace IRCBot
                             ircbot.sendData("PRIVMSG", channel + " :\u0001ACTION slaps " + nick + " with a large trout\u0001");
                         }
                     }
+                    else
+                    {
+                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                    }
                     break;
                 case "bots":
                     ircbot.spam_count++;
                     if (nick_access >= ircbot.get_command_access(command))
                     {
                         ircbot.sendData("PRIVMSG", channel + " :Reporting in!");
+                    }
+                    else
+                    {
+                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
                     }
                     break;
             }

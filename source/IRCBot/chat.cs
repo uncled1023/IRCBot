@@ -41,9 +41,17 @@ namespace IRCBot
 
         public void chat_control(string[] line, Interface ircbot, IRCConfig conf, string nick, string channel)
         {
-            if (line.GetUpperBound(0) > 3)
+            if (line.GetUpperBound(0) >= 3)
             {
-                string msg = line[3].TrimStart(':') + " " + line[4];
+                string msg = "";
+                if (line.GetUpperBound(0) > 3)
+                {
+                    msg = line[3].TrimStart(':') + " " + line[4];
+                }
+                else
+                {
+                    msg = line[3].TrimStart(':');
+                }
                 string[] words = msg.Split(' ');
                 bool me_in = false;
                 foreach (string word in words)

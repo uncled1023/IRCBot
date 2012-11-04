@@ -57,11 +57,11 @@ namespace IRCBot
                 StreamWriter log_file = File.AppendText(ircbot.cur_dir + "\\modules\\quotes\\logs\\" + file_name);
                 if (line.GetUpperBound(0) > 3)
                 {
-                    log_file.WriteLine(line[3].Remove(0, 1) + " " + line[4] + " [" + nick + "]");
+                    log_file.WriteLine(nick + "*" + line[3].Remove(0, 1) + " " + line[4]);
                 }
                 else
                 {
-                    log_file.WriteLine(line[3].Remove(0, 1) + " [" + nick + "]");
+                    log_file.WriteLine(nick + "*" + line[3].Remove(0, 1));
                 }
                 log_file.Close();
             }
@@ -86,7 +86,9 @@ namespace IRCBot
                         int index = random.Next(0, number_of_lines);
                         line = log_file[index];
                     }
-                    ircbot.sendData("PRIVMSG", channel + " :" + line);
+                    char[] charSep = new char[] { '*' };
+                    string[] lines = line.Split(charSep, 2);
+                    ircbot.sendData("PRIVMSG", channel + " :" + lines[1] + " [" + lines[0] + "]");
                 }
                 else
                 {
@@ -114,60 +116,33 @@ namespace IRCBot
                     string line = "";
                     string line_nick = "";
                     bool nick_found = false;
-                    List<List<string>> quote_list = new List<List<string>>();
+                    List<string> quote_list = new List<string>();
                     foreach (string file_line in log_file)
                     {
                         nick_found = false;
-                        string[] tmp_line = file_line.Split('[');
-                        line_nick = tmp_line[tmp_line.GetUpperBound(0)].TrimEnd(']');
-                        for (int x = 0; x < quote_list.Count(); x++)
+                        char[] charSep = new char[] { '*' };
+                        string[] tmp_line = file_line.Split(charSep, 2);
+                        line_nick = tmp_line[0];
+                        if (nick.Trim().ToLower().Equals(line_nick.ToLower()))
                         {
-                            if(quote_list[x][0].Equals(line_nick.ToLower()))
-                            {
-                                nick_found = true;
-                                quote_list[x].Add(file_line);
-                                break;
-                            }
-                        }
-                        if (nick_found == false)
-                        {
-                            List<string> tmp_list = new List<string>();
-                            tmp_list.Add(line_nick.ToLower());
-                            tmp_list.Add(file_line);
-                            quote_list.Add(tmp_list);
+                            nick_found = true;
+                            quote_list.Add(file_line);
                         }
                     }
                     line_nick = "";
                     line = "";
-                    while (line == "")
-                    {
-                        nick_found = false;
-                        int quote_index = 0;
-                        for (int x = 0; x < quote_list.Count(); x++)
-                        {
-                            if (quote_list[x][0].Equals(nick.Trim().ToLower()))
-                            {
-                                nick_found = true;
-                                quote_index = x;
-                                break;
-                            }
-                        }
-                        if (nick_found == true)
-                        {
-                            Random random = new Random();
-                            number_of_lines = quote_list[quote_index].Count();
-                            int index = random.Next(1, number_of_lines);
-                            line = quote_list[quote_index][index];
-                            line_nick = quote_list[quote_index][0];
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
                     if (nick_found == true)
                     {
-                        ircbot.sendData("PRIVMSG", channel + " :" + line);
+                        while (line == "")
+                        {
+                            Random random = new Random();
+                            number_of_lines = quote_list.Count();
+                            int index = random.Next(1, number_of_lines + 1);
+                            line = quote_list[index - 1];
+                        }
+                        char[] charSep = new char[] { '*' };
+                        string[] lines = line.Split(charSep, 2);
+                        ircbot.sendData("PRIVMSG", channel + " :" + lines[1] + " [" + lines[0] + "]");
                     }
                     else
                     {

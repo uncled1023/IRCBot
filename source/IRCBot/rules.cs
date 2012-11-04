@@ -9,7 +9,7 @@ namespace IRCBot
 {
     class rules
     {
-        public void rules_control(string[] line, string command, Interface ircbot, int nick_access, string nick)
+        public void rules_control(string[] line, string command, bot ircbot, int nick_access, string nick)
         {
             switch (command)
             {
@@ -61,27 +61,27 @@ namespace IRCBot
             }
         }
 
-        private void add_rule(string rule, string nick, string channel, Interface ircbot)
+        private void add_rule(string rule, string nick, string channel, bot ircbot)
         {
-            if (File.Exists(ircbot.cur_dir + "\\modules\\rules\\rules.txt"))
+            if (File.Exists(ircbot.cur_dir + "\\modules\\rules\\" + ircbot.server_name + "_rules.txt"))
             {
-                List<string> rules_file = System.IO.File.ReadAllLines(ircbot.cur_dir + "\\modules\\rules\\rules.txt").ToList();
+                List<string> rules_file = System.IO.File.ReadAllLines(ircbot.cur_dir + "\\modules\\rules\\" + ircbot.server_name + "_rules.txt").ToList();
                 rules_file.Add(channel + "*" + rule);
-                System.IO.File.WriteAllLines(ircbot.cur_dir + "\\modules\\rules\\rules.txt", rules_file);
+                System.IO.File.WriteAllLines(ircbot.cur_dir + "\\modules\\rules\\" + ircbot.server_name + "_rules.txt", rules_file);
             }
             else
             {
                 List<string> rules_file = new List<string>();
                 rules_file.Add(channel + "*" + rule);
-                System.IO.File.WriteAllLines(ircbot.cur_dir + "\\modules\\rules\\rules.txt", rules_file);
+                System.IO.File.WriteAllLines(ircbot.cur_dir + "\\modules\\rules\\" + ircbot.server_name + "_rules.txt", rules_file);
             }
         }
 
-        private void del_rule(string rule_num, string nick, string channel, Interface ircbot)
+        private void del_rule(string rule_num, string nick, string channel, bot ircbot)
         {
-            if (File.Exists(ircbot.cur_dir + "\\modules\\rules\\rules.txt"))
+            if (File.Exists(ircbot.cur_dir + "\\modules\\rules\\" + ircbot.server_name + "_rules.txt"))
             {
-                List<string> rules_file = System.IO.File.ReadAllLines(ircbot.cur_dir + "\\modules\\rules\\rules.txt").ToList();
+                List<string> rules_file = System.IO.File.ReadAllLines(ircbot.cur_dir + "\\modules\\rules\\" + ircbot.server_name + "_rules.txt").ToList();
                 int number_of_lines = rules_file.Count + 1;
                 if (number_of_lines > 0)
                 {
@@ -104,7 +104,7 @@ namespace IRCBot
                     }
                     else
                     {
-                        System.IO.File.WriteAllLines(ircbot.cur_dir + "\\modules\\rules\\rules.txt", rules_file);
+                        System.IO.File.WriteAllLines(ircbot.cur_dir + "\\modules\\rules\\" + ircbot.server_name + "_rules.txt", rules_file);
                     }
                 }
                 else
@@ -118,11 +118,11 @@ namespace IRCBot
             }
         }
 
-        private void get_rules(string nick, string channel, Interface ircbot)
+        private void get_rules(string nick, string channel, bot ircbot)
         {
-            if (File.Exists(ircbot.cur_dir + "\\modules\\rules\\rules.txt"))
+            if (File.Exists(ircbot.cur_dir + "\\modules\\rules\\" + ircbot.server_name + "_rules.txt"))
             {
-                string[] answer_file = System.IO.File.ReadAllLines(ircbot.cur_dir + "\\modules\\rules\\rules.txt");
+                string[] answer_file = System.IO.File.ReadAllLines(ircbot.cur_dir + "\\modules\\rules\\" + ircbot.server_name + "_rules.txt");
                 int number_of_lines = answer_file.GetUpperBound(0) + 1;
                 if (number_of_lines > 0)
                 {

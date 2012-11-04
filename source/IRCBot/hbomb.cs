@@ -19,14 +19,14 @@ namespace IRCBot
         private string bomb_channel = "";
         private string wire_color = "";
         private string[] wire_colors = new string[] { "Black", "Blue", "Yellow", "Red", "Green", "White" };
-        private Interface main;
+        private bot main;
 
         public hbomb()
         {
             bomb_trigger.Elapsed += activate_bomb;
         }
 
-        public void hbomb_control(string[] line, string command, Interface ircbot, int nick_access, string nick, string channel, IRCConfig conf)
+        public void hbomb_control(string[] line, string command, bot ircbot, int nick_access, string nick, string channel, IRCConfig conf)
         {
             switch (command)
             {
@@ -165,7 +165,7 @@ namespace IRCBot
                         }
                         else
                         {
-                            ircbot.sendData("PRIVMSG", channel + " :There isn't a bomb to pass!");
+                            ircbot.sendData("PRIVMSG", channel + " :There isn't a bomb to defuse!");
                         }
                     }
                     else
@@ -192,12 +192,12 @@ namespace IRCBot
             }
         }
 
-        private void pass_hbomb(string pass_nick, string channel, string nick, Interface ircbot)
+        private void pass_hbomb(string pass_nick, string channel, string nick, bot ircbot)
         {
             string tab_name = channel.TrimStart('#');
             string pattern = "[^a-zA-Z0-9]"; //regex pattern
             tab_name = Regex.Replace(tab_name, pattern, "_");
-            string file_name = "#" + tab_name + ".log";
+            string file_name = ircbot.server_name + "_#" + tab_name + ".log";
             bool nick_idle = true;
 
             if (File.Exists(ircbot.cur_dir + "\\modules\\seen\\" + file_name))

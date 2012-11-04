@@ -9,7 +9,7 @@ namespace IRCBot
 {
     class _8ball
     {
-        public void _8ball_control(string[] line, string command, Interface ircbot, int nick_access, string nick)
+        public void _8ball_control(string[] line, string command, bot ircbot, int nick_access, string nick)
         {
             switch (command)
             {
@@ -34,7 +34,7 @@ namespace IRCBot
             }
         }
 
-        private void get_answer(string channel, Interface ircbot)
+        private void get_answer(string channel, bot ircbot)
         {
             if (File.Exists(ircbot.cur_dir + "\\modules\\8ball\\answers.txt"))
             {

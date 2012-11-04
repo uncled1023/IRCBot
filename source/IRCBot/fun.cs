@@ -14,7 +14,7 @@ namespace IRCBot
         {
         }
 
-        public void fun_control(string[] line, string command, Interface ircbot, int nick_access, string nick, string channel)
+        public void fun_control(string[] line, string command, bot ircbot, int nick_access, string nick, string channel)
         {
             switch (command)
             {

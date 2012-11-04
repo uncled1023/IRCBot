@@ -10,7 +10,7 @@ namespace IRCBot
 {
     class weather
     {
-        public void weather_control(string[] line, string command, Interface ircbot, IRCConfig conf, int conf_id, int nick_access, string nick)
+        public void weather_control(string[] line, string command, bot ircbot, IRCConfig conf, int conf_id, int nick_access, string nick)
         {
             switch (command)
             {
@@ -105,7 +105,7 @@ namespace IRCBot
             }
         }
 
-        private void get_forecast(string term, string channel, Interface ircbot, int days)
+        private void get_forecast(string term, string channel, bot ircbot, int days)
         {
             if (days > 5)
             {
@@ -185,7 +185,7 @@ namespace IRCBot
             }
         }
 
-        private void get_weather(string term, string channel, Interface ircbot)
+        private void get_weather(string term, string channel, bot ircbot)
         {
             XmlDocument doc = new XmlDocument();
 

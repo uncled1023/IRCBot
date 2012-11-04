@@ -8,7 +8,7 @@ namespace IRCBot
 {
     class version
     {
-        public void version_control(string[] line, Interface ircbot, IRCConfig conf, int conf_id, string nick)
+        public void version_control(string[] line, bot ircbot, IRCConfig conf, int conf_id, string nick)
         {
             string version = ":\u0001VERSION\u0001";
             if (line[3] == version)

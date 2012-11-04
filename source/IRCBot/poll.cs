@@ -13,7 +13,8 @@ namespace IRCBot
         private string poll_question = "";
         private List<List<string>> poll_answers = new List<List<string>>();
         private List<List<string>> poll_nick_responses = new List<List<string>>();
-        public void poll_control(string[] line, string command, Interface ircbot, int nick_access, string nick, string channel)
+
+        public void poll_control(string[] line, string command, bot ircbot, int nick_access, string nick, string channel)
         {
             switch (command)
             {
@@ -230,7 +231,7 @@ namespace IRCBot
                                 }
                                 catch (Exception ex)
                                 {
-                                    ircbot.sendData("PRIVMSG", channel + " :Exception: " + ex.ToString());
+                                    ircbot.sendData("PRIVMSG", channel + " :You need to vote for a valid answer.");
                                 }
                             }
                             else

@@ -9,7 +9,7 @@ namespace IRCBot
 {
     class intro
     {
-        public void intro_control(string[] line, string command, Interface ircbot, int nick_access, string nick)
+        public void intro_control(string[] line, string command, bot ircbot, int nick_access, string nick)
         {
             switch (command)
             {
@@ -47,9 +47,9 @@ namespace IRCBot
             }
         }
 
-        public void check_intro(string nick, string channel, Interface ircbot)
+        public void check_intro(string nick, string channel, bot ircbot)
         {
-            string list_file = ircbot.cur_dir + "\\modules\\intro\\list.txt";
+            string list_file = ircbot.cur_dir + "\\modules\\intro\\" + ircbot.server_name + "_list.txt";
             if (File.Exists(list_file))
             {
                 string line;
@@ -73,9 +73,9 @@ namespace IRCBot
             }
         }
 
-        private void add_intro(string nick, string channel, string[] line, Interface ircbot)
+        private void add_intro(string nick, string channel, string[] line, bot ircbot)
         {
-            string list_file = ircbot.cur_dir + "\\modules\\intro\\list.txt";
+            string list_file = ircbot.cur_dir + "\\modules\\intro\\" + ircbot.server_name + "_list.txt";
             string add_line = nick + ":" + channel + ":";
             bool found_nick = false;
             if (line.GetUpperBound(0) > 3)
@@ -118,9 +118,9 @@ namespace IRCBot
             }
         }
 
-        private void delete_intro(string nick, string channel, Interface ircbot)
+        private void delete_intro(string nick, string channel, bot ircbot)
         {
-            string list_file = ircbot.cur_dir + "\\modules\\intro\\list.txt";
+            string list_file = ircbot.cur_dir + "\\modules\\intro\\" + ircbot.server_name + "_list.txt";
             if (File.Exists(list_file))
             {
                 int counter = 0;

@@ -83,13 +83,26 @@
       <DependentUpon>AboutBox1.cs</DependentUpon>
     </Compile>
     <Compile Include="access.cs" />
+    <Compile Include="add_server.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="add_server.Designer.cs">
+      <DependentUpon>add_server.cs</DependentUpon>
+    </Compile>
     <Compile Include="AI.cs" />
+    <Compile Include="bot.cs" />
     <Compile Include="chat.cs" />
     <Compile Include="configuration.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="configuration.Designer.cs">
       <DependentUpon>configuration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="edit_server.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="edit_server.Designer.cs">
+      <DependentUpon>edit_server.cs</DependentUpon>
     </Compile>
     <Compile Include="fun.cs" />
     <Compile Include="google.cs" />
@@ -119,8 +132,14 @@
     <EmbeddedResource Include="AboutBox1.resx">
       <DependentUpon>AboutBox1.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="add_server.resx">
+      <DependentUpon>add_server.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="configuration.resx">
       <DependentUpon>configuration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="edit_server.resx">
+      <DependentUpon>edit_server.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Interface.resx">
       <DependentUpon>Interface.cs</DependentUpon>

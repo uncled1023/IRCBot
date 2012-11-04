@@ -9,7 +9,7 @@ namespace IRCBot
 {
     class help
     {
-        public void help_control(string[] line, string command, Interface ircbot, IRCConfig conf, int nick_access, string nick)
+        public void help_control(string[] line, string command, bot ircbot, IRCConfig conf, int nick_access, string nick)
         {
             switch (command)
             {
@@ -27,7 +27,7 @@ namespace IRCBot
             }
         }
 
-        private void display_help(string[] line, string nick, string channel, int access, Interface ircbot, IRCConfig conf)
+        private void display_help(string[] line, string nick, string channel, int access, bot ircbot, IRCConfig conf)
         {
             string search_term = "";
             string list_file = ircbot.cur_dir + "\\config\\help.txt";

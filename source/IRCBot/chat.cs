@@ -39,7 +39,7 @@ namespace IRCBot
             myBot.isAcceptingUserInput = true;
         }
 
-        public void chat_control(string[] line, Interface ircbot, IRCConfig conf, string nick, string channel)
+        public void chat_control(string[] line, bot ircbot, IRCConfig conf, string nick, string channel)
         {
             if (line.GetUpperBound(0) >= 3)
             {

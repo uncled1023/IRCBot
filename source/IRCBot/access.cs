@@ -9,7 +9,7 @@ namespace IRCBot
 {
     class access
     {
-        public void access_control(string[] line, string command, Interface ircbot, IRCConfig conf, int access_level, string nick)
+        public void access_control(string[] line, string command, bot ircbot, IRCConfig conf, int access_level, string nick)
         {
             switch (command)
             {
@@ -105,9 +105,9 @@ namespace IRCBot
             }
         }
 
-        public void list_access_list(string nick, string channel, Interface ircbot)
+        public void list_access_list(string nick, string channel, bot ircbot)
         {
-            string file_name = "list.txt";
+            string file_name = ircbot.server_name + "_list.txt";
 
             if (File.Exists(ircbot.cur_dir + "\\modules\\access\\" + file_name))
             {
@@ -149,9 +149,9 @@ namespace IRCBot
             }
         }
 
-        public void set_access_list(string nick, string channel, string access, Interface ircbot)
+        public void set_access_list(string nick, string channel, string access, bot ircbot)
         {
-            string file_name = "list.txt";
+            string file_name = ircbot.server_name + "_list.txt";
             DateTime current_date = DateTime.Now;
 
             if (Directory.Exists(ircbot.cur_dir + "\\modules\\access\\") == false)
@@ -252,9 +252,9 @@ namespace IRCBot
             }
         }
 
-        public string get_access_list(string nick, string channel, Interface ircbot)
+        public string get_access_list(string nick, string channel, bot ircbot)
         {
-            string file_name = "list.txt";
+            string file_name = ircbot.server_name + "_list.txt";
             string access = "";
 
             if (File.Exists(ircbot.cur_dir + "\\modules\\access\\" + file_name))
@@ -281,9 +281,9 @@ namespace IRCBot
             return access;
         }
 
-        public void del_access_list(string nick, string channel, string access, Interface ircbot)
+        public void del_access_list(string nick, string channel, string access, bot ircbot)
         {
-            string file_name = "list.txt";
+            string file_name = ircbot.server_name + "_list.txt";
             DateTime current_date = DateTime.Now;
 
             if (Directory.Exists(ircbot.cur_dir + "\\modules\\access\\") == false)

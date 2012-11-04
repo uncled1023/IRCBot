@@ -10,7 +10,7 @@ namespace IRCBot
 {
     class urban_dictionary
     {
-        public void ud_control(string[] line, string command, Interface ircbot, IRCConfig conf, int conf_id, int nick_access, string nick)
+        public void ud_control(string[] line, string command, bot ircbot, IRCConfig conf, int conf_id, int nick_access, string nick)
         {
             switch (command)
             {
@@ -36,7 +36,7 @@ namespace IRCBot
             }
         }
 
-        private void get_ud(string search, string channel, Interface ircbot, IRCConfig conf, int conf_id)
+        private void get_ud(string search, string channel, bot ircbot, IRCConfig conf, int conf_id)
         {
             string URL = "http://www.urbandictionary.com/define.php?term=";
             List<KeyValuePair<string, string>> ret = new List<KeyValuePair<string, string>>();

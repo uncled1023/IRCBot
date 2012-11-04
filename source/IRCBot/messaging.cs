@@ -9,7 +9,7 @@ namespace IRCBot
 {
     class messaging
     {
-        public void message_control(string[] line, string command, Interface ircbot, string nick)
+        public void message_control(string[] line, string command, bot ircbot, string nick)
         {
             switch (command)
             {
@@ -49,9 +49,9 @@ namespace IRCBot
                     break;
             }
         }
-        private void add_message(string nick, string[] line, string channel, Interface ircbot)
+        private void add_message(string nick, string[] line, string channel, bot ircbot)
         {
-            string list_file = ircbot.cur_dir + "\\modules\\messaging\\messages.txt";
+            string list_file = ircbot.cur_dir + "\\modules\\messaging\\" + ircbot.server_name + "_messages.txt";
             char[] charS = new char[] { ' ' };
             string[] tmp = line[4].Split(charS, 2);
             string to_nick = tmp[0];
@@ -101,9 +101,9 @@ namespace IRCBot
             }
         }
 
-        public void find_message(string nick, Interface ircbot)
+        public void find_message(string nick, bot ircbot)
         {
-            string list_file = ircbot.cur_dir + "\\modules\\messaging\\messages.txt";
+            string list_file = ircbot.cur_dir + "\\modules\\messaging\\" + ircbot.server_name + "_messages.txt";
             if (File.Exists(list_file))
             {
                 int counter = 0;

@@ -11,7 +11,7 @@ namespace IRCBot
 {
     class owner
     {
-        public void owner_control(string[] line, string command, Interface ircbot, ref IRCConfig conf, int nick_access, string nick)
+        public void owner_control(string[] line, string command, bot ircbot, ref IRCConfig conf, int nick_access, string nick)
         {
             switch (command)
             {
@@ -163,7 +163,7 @@ namespace IRCBot
             }
         }
 
-        private void add_owner(string nick, Interface ircbot, ref IRCConfig conf)
+        private void add_owner(string nick, bot ircbot, ref IRCConfig conf)
         {
             XmlDocument xmlDoc = new XmlDocument();
             if (File.Exists(ircbot.cur_dir + "\\config\\config.xml"))
@@ -183,7 +183,7 @@ namespace IRCBot
             }
         }
 
-        private void del_owner(string nick, Interface ircbot, ref IRCConfig conf)
+        private void del_owner(string nick, bot ircbot, ref IRCConfig conf)
         {
             XmlDocument xmlDoc = new XmlDocument();
             string new_owner = "";

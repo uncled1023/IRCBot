@@ -14,7 +14,7 @@ namespace IRCBot
 {
     class google
     {
-        public void google_control(string[] line, string command, Interface ircbot, IRCConfig conf, int conf_id, int nick_access, string nick)
+        public void google_control(string[] line, string command, bot ircbot, IRCConfig conf, int conf_id, int nick_access, string nick)
         {
             switch (command)
             {

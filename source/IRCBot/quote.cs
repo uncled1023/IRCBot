@@ -10,7 +10,7 @@ namespace IRCBot
 {
     class quote
     {
-        public void quote_control(string[] line, string command, Interface ircbot, IRCConfig conf, int conf_id, int nick_access, string nick)
+        public void quote_control(string[] line, string command, bot ircbot, IRCConfig conf, int conf_id, int nick_access, string nick)
         {
             switch (command)
             {
@@ -42,20 +42,14 @@ namespace IRCBot
             }
         }
 
-        public void add_quote(string nick, string channel, string[] line, Interface ircbot, IRCConfig conf)
+        public void add_quote(string nick, string channel, string[] line, bot ircbot, IRCConfig conf)
         {
             if (!nick.Equals(conf.nick) && !line[3].Remove(0, 1).StartsWith(conf.command))
             {
                 string tab_name = channel.TrimStart('#');
                 string pattern = "[^a-zA-Z0-9]"; //regex pattern
                 string new_tab_name = Regex.Replace(tab_name, pattern, "_");
-                string[] server = conf.server.Split('.');
-                string tmp_server_name = "No Server Specified";
-                if (server.GetUpperBound(0) > 0)
-                {
-                    tmp_server_name = server[1];
-                }
-                string file_name = tmp_server_name + "-#" + new_tab_name + ".log";
+                string file_name = ircbot.server_name + "_#" + new_tab_name + ".log";
                 if (Directory.Exists(ircbot.cur_dir + "\\modules\\quotes\\logs") == false)
                 {
                     Directory.CreateDirectory(ircbot.cur_dir + "\\modules\\quotes\\logs");
@@ -73,18 +67,12 @@ namespace IRCBot
             }
         }
 
-        private void get_quote(string channel, Interface ircbot, IRCConfig conf)
+        private void get_quote(string channel, bot ircbot, IRCConfig conf)
         {
-            string[] server = conf.server.Split('.');
-            string tmp_server_name = "No Server Specified";
-            if (server.GetUpperBound(0) > 0)
-            {
-                tmp_server_name = server[1];
-            }
             string tab_name = channel.TrimStart('#');
             string pattern = "[^a-zA-Z0-9]"; //regex pattern
             tab_name = Regex.Replace(tab_name, pattern, "_");
-            string file_name = tmp_server_name + "-#" + tab_name + ".log";
+            string file_name = ircbot.server_name + "_#" + tab_name + ".log";
             if (File.Exists(ircbot.cur_dir + "\\modules\\quotes\\logs\\" + file_name))
             {
                 string[] log_file = System.IO.File.ReadAllLines(ircbot.cur_dir + "\\modules\\quotes\\logs\\" + file_name);
@@ -111,18 +99,12 @@ namespace IRCBot
             }
         }
 
-        private void get_specific_quote(string channel, string nick, Interface ircbot, IRCConfig conf)
+        private void get_specific_quote(string channel, string nick, bot ircbot, IRCConfig conf)
         {
-            string[] server = conf.server.Split('.');
-                string tmp_server_name = "No Server Specified";
-                if (server.GetUpperBound(0) > 0)
-                {
-                    tmp_server_name = server[1];
-                }
             string tab_name = channel.TrimStart('#');
             string pattern = "[^a-zA-Z0-9]"; //regex pattern
             tab_name = Regex.Replace(tab_name, pattern, "_");
-            string file_name = tmp_server_name + "-#" + tab_name + ".log";
+            string file_name = ircbot.server_name + "_#" + tab_name + ".log";
             if (File.Exists(ircbot.cur_dir + "\\modules\\quotes\\logs\\" + file_name))
             {
                 string[] log_file = System.IO.File.ReadAllLines(ircbot.cur_dir + "\\modules\\quotes\\logs\\" + file_name);

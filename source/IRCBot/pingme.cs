@@ -9,7 +9,7 @@ namespace IRCBot
     class pingme
     {
         private List<List<string>> ping_list = new List<List<string>>();
-        public void pingme_control(string[] line, string command, Interface ircbot, int nick_access, string nick, string channel)
+        public void pingme_control(string[] line, string command, bot ircbot, int nick_access, string nick, string channel)
         {
             switch (command)
             {
@@ -33,7 +33,7 @@ namespace IRCBot
             }
         }
 
-        public void check_ping(string[] line, Interface ircbot)
+        public void check_ping(string[] line, bot ircbot)
         {
             if (line.GetUpperBound(0) > 2)
             {

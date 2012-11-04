@@ -30,30 +30,6 @@ namespace IRCBot
             else
             {
                 XmlNode node = xmlDoc.CreateNode(XmlNodeType.Element, "connection_settings", null);
-                XmlNode nodeName = xmlDoc.CreateElement("name");
-                nodeName.InnerText = "IRCBot";
-                node.AppendChild(nodeName);
-                XmlNode nodeNick = xmlDoc.CreateElement("nick");
-                nodeNick.InnerText = "IRCBot";
-                node.AppendChild(nodeNick);
-                XmlNode nodePass = xmlDoc.CreateElement("password");
-                nodePass.InnerText = "";
-                node.AppendChild(nodePass);
-                XmlNode nodeEmail = xmlDoc.CreateElement("email");
-                nodeEmail.InnerText = "";
-                node.AppendChild(nodeEmail);
-                XmlNode nodeOwner = xmlDoc.CreateElement("owner");
-                nodeOwner.InnerText = "";
-                node.AppendChild(nodeOwner);
-                XmlNode nodePort = xmlDoc.CreateElement("port");
-                nodePort.InnerText = "6667";
-                node.AppendChild(nodePort);
-                XmlNode nodeServer = xmlDoc.CreateElement("server");
-                nodeServer.InnerText = "";
-                node.AppendChild(nodeServer);
-                XmlNode nodeChan = xmlDoc.CreateElement("chan_list");
-                nodeChan.InnerText = "";
-                node.AppendChild(nodeChan);
                 XmlNode nodeCommand = xmlDoc.CreateElement("command_prefix");
                 nodeCommand.InnerText = ".";
                 node.AppendChild(nodeCommand);
@@ -84,14 +60,6 @@ namespace IRCBot
             }
             XmlNode list = xmlDoc.SelectSingleNode("/bot_settings/connection_settings");
 
-            bot_name_box.Text = list["name"].InnerText;
-            bot_nick_box.Text = list["nick"].InnerText;
-            password_box.Text = list["password"].InnerText;
-            email_box.Text = list["email"].InnerText;
-            owner_nicks_box.Text = list["owner"].InnerText;
-            port_box.Text = list["port"].InnerText;
-            server_name_box.Text = list["server"].InnerText;
-            channels_box.Text = list["chan_list"].InnerText;
             command_prefix_box.Text = list["command_prefix"].InnerText;
             spam_count_box.Text = list["spam_count"].InnerText;
             spam_threshold_box.Text = list["spam_threshold"].InnerText;
@@ -115,7 +83,16 @@ namespace IRCBot
                 windows_start_box.Checked = false;
             }
 
-            XmlNodeList xnList = xmlDoc.SelectNodes("/bot_settings/modules/module");
+            XmlNodeList xnList = xmlDoc.SelectNodes("/bot_settings/connection_settings/server_list/server");
+            foreach (XmlNode xn in xnList)
+            {
+                string server_name = xn["server_name"].InnerText;
+                server_list.Items.Add(server_name);
+            }
+
+            server_list.SelectedIndexChanged += server_changed;
+
+            xnList = xmlDoc.SelectNodes("/bot_settings/modules/module");
             foreach (XmlNode xn in xnList)
             {
                 int element_num = 0;
@@ -231,8 +208,21 @@ namespace IRCBot
                     command_list.Items.Add(split[2]);
                 }
             }
-            command_list.SelectedIndexChanged += new EventHandler(command_list_change);
+            command_list.SelectedIndexChanged += command_list_change;
             command_list.Sorted = true;
+        }
+
+        private void server_changed(Object sender, EventArgs e)
+        {
+            bool connected = m_parent.bot_connected(server_list.SelectedItem.ToString());
+            if (connected == true)
+            {
+                connect_button.Text = "Disconnect";
+            }
+            else
+            {
+                connect_button.Text = "Connect";
+            }
         }
 
         private void command_list_change(Object sender, EventArgs e)
@@ -295,97 +285,74 @@ namespace IRCBot
 
         private void button2_Click(object sender, EventArgs e)
         {
-            if (bot_nick_box.Equals(""))
-            {
-                MessageBox.Show("Your Bot must have a nickname");
-            }
-            else if (server_name_box.Equals(""))
-            {
-                MessageBox.Show("You must specify a Server Address");
-            }
-            else if (port_box.Equals(""))
-            {
-                MessageBox.Show("You must specify a port number");
-            }
-            else
-            {
-                XmlDocument xmlDoc = new XmlDocument();
-                xmlDoc.Load(m_parent.cur_dir + "\\config\\config.xml");
-                XmlNode node = xmlDoc.SelectSingleNode("/bot_settings/connection_settings");
-                node["name"].InnerText = bot_name_box.Text;
-                node["nick"].InnerText = bot_nick_box.Text;
-                node["password"].InnerText = password_box.Text;
-                node["email"].InnerText = email_box.Text;
-                node["owner"].InnerText = owner_nicks_box.Text;
-                node["port"].InnerText = port_box.Text;
-                node["server"].InnerText = server_name_box.Text;
-                node["chan_list"].InnerText = channels_box.Text;
-                node["command_prefix"].InnerText = command_prefix_box.Text;
-                node["keep_logs"].InnerText = keep_logs_box.Checked.ToString();
-                node["logs_path"].InnerText = log_folder_box.Text;
-                node["start_with_windows"].InnerText = windows_start_box.Checked.ToString();
-                node["spam_count"].InnerText = spam_count_box.Text;
-                node["spam_threshold"].InnerText = spam_threshold_box.Text;
-                node["spam_timeout"].InnerText = spam_timeout_box.Text;
-                node["max_message_length"].InnerText = max_message_length_box.Text;
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.Load(m_parent.cur_dir + "\\config\\config.xml");
+            XmlNode node = xmlDoc.SelectSingleNode("/bot_settings/connection_settings");
+            node["command_prefix"].InnerText = command_prefix_box.Text;
+            node["keep_logs"].InnerText = keep_logs_box.Checked.ToString();
+            node["logs_path"].InnerText = log_folder_box.Text;
+            node["start_with_windows"].InnerText = windows_start_box.Checked.ToString();
+            node["spam_count"].InnerText = spam_count_box.Text;
+            node["spam_threshold"].InnerText = spam_threshold_box.Text;
+            node["spam_timeout"].InnerText = spam_timeout_box.Text;
+            node["max_message_length"].InnerText = max_message_length_box.Text;
 
-                XmlNodeList xnList = xmlDoc.SelectNodes("/bot_settings/modules/module");
-                foreach (XmlNode xn in xnList)
+            XmlNodeList xnList = xmlDoc.SelectNodes("/bot_settings/modules/module");
+            foreach (XmlNode xn in xnList)
+            {
+                int element_num = 1;
+                String module_name = xn["name"].InnerText;
+
+                CheckBox enabled = (CheckBox)tabControl2.Controls.Find("checkBox_" + module_name + "_enabled", true)[0];
+                xn["enabled"].InnerText = enabled.Checked.ToString();
+
+                XmlNodeList optionList = xn.ChildNodes;
+                foreach (XmlNode option in optionList)
                 {
-                    int element_num = 1;
-                    String module_name = xn["name"].InnerText;
-                    
-                    CheckBox enabled = (CheckBox)tabControl2.Controls.Find("checkBox_" + module_name + "_enabled", true)[0];
-                    xn["enabled"].InnerText = enabled.Checked.ToString();
-
-                    XmlNodeList optionList = xn.ChildNodes;
-                    foreach (XmlNode option in optionList)
+                    if (option.Name.Equals("options"))
                     {
-                        if (option.Name.Equals("options"))
+                        XmlNodeList Options = option.ChildNodes;
+                        foreach (XmlNode options in Options)
                         {
-                            XmlNodeList Options = option.ChildNodes;
-                            foreach (XmlNode options in Options)
+                            switch (options["type"].InnerText)
                             {
-                                switch (options["type"].InnerText)
-                                {
-                                    case "textbox":
-                                        if (tabControl2.Controls.Find("textBox_" + options.Name + "_" + element_num.ToString(), true) != null)
-                                        {
-                                            TextBox textBox = (TextBox)tabControl2.Controls.Find("textBox_" + module_name + "_" + options.Name + "_" + element_num.ToString(), true)[0];
-                                            options["value"].InnerText = textBox.Text;
+                                case "textbox":
+                                    if (tabControl2.Controls.Find("textBox_" + options.Name + "_" + element_num.ToString(), true) != null)
+                                    {
+                                        TextBox textBox = (TextBox)tabControl2.Controls.Find("textBox_" + module_name + "_" + options.Name + "_" + element_num.ToString(), true)[0];
+                                        options["value"].InnerText = textBox.Text;
 
-                                            element_num++;
-                                        }
-                                        break;
-                                    case "checkbox":
-                                        if (tabControl2.Controls.Find("checkBox_" + options.Name + "_" + element_num.ToString(), true) != null)
-                                        {
-                                            CheckBox checkBox = (CheckBox)tabControl2.Controls.Find("checkBox_" + module_name + "_" + options.Name + "_" + element_num.ToString(), true)[0];
-                                            options["checked"].InnerText = checkBox.Checked.ToString();
+                                        element_num++;
+                                    }
+                                    break;
+                                case "checkbox":
+                                    if (tabControl2.Controls.Find("checkBox_" + options.Name + "_" + element_num.ToString(), true) != null)
+                                    {
+                                        CheckBox checkBox = (CheckBox)tabControl2.Controls.Find("checkBox_" + module_name + "_" + options.Name + "_" + element_num.ToString(), true)[0];
+                                        options["checked"].InnerText = checkBox.Checked.ToString();
 
-                                            element_num++;
-                                        }
-                                        break;
-                                }
+                                        element_num++;
+                                    }
+                                    break;
                             }
                         }
                     }
                 }
-                xmlDoc.Save(m_parent.cur_dir + "\\config\\config.xml");
-
-                RegistryKey rkApp = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
-                if (windows_start_box.Checked.ToString() == "True")
-                {
-                    rkApp.SetValue("IRCBot", Application.ExecutablePath.ToString());
-                }
-                else
-                {
-                    rkApp.DeleteValue("IRCBot", false);
-                }
-
-                m_parent.update_conf();
-                this.Close();
             }
+            xmlDoc.Save(m_parent.cur_dir + "\\config\\config.xml");
+
+            RegistryKey rkApp = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+            if (windows_start_box.Checked.ToString() == "True")
+            {
+                rkApp.SetValue("IRCBot", Application.ExecutablePath.ToString());
+            }
+            else
+            {
+                rkApp.DeleteValue("IRCBot", false);
+            }
+
+            m_parent.update_conf();
+            this.Close();
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -437,6 +404,93 @@ namespace IRCBot
                 }
             }
             System.IO.File.WriteAllLines(list_file, new_file);
+        }
+
+        private void add_server_button_Click(object sender, EventArgs e)
+        {
+            server_list.SelectedIndexChanged -= server_changed;
+            add_server add_server = new add_server(m_parent, this);
+            add_server.ShowDialog();
+            server_list.SelectedIndexChanged += server_changed;
+        }
+
+        private void edit_server_button_Click(object sender, EventArgs e)
+        {
+            server_list.SelectedIndexChanged -= server_changed;
+            edit_server edit_server = new edit_server(m_parent, server_list.SelectedItem.ToString());
+            edit_server.ShowDialog();
+            server_list.SelectedIndexChanged += server_changed;
+        }
+
+        private void delete_server_button_Click(object sender, EventArgs e)
+        {
+            server_list.SelectedIndexChanged -= server_changed;
+            string server_name = server_list.SelectedItem.ToString();
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.Load(m_parent.cur_dir + "\\config\\config.xml");
+            XmlNodeList ServerxnList = xmlDoc.SelectNodes("/bot_settings/connection_settings/server_list/server");
+            foreach (XmlNode xn in ServerxnList)
+            {
+                string tmp_server = xn["server_name"].InnerText;
+                if (tmp_server.Equals(server_name))
+                {
+                    xn.ParentNode.RemoveChild(xn);
+                    break;
+                }
+            }
+            xmlDoc.Save(m_parent.cur_dir + "\\config\\config.xml");
+            server_list.Items.RemoveAt(server_list.SelectedIndex);
+            m_parent.update_conf();
+            server_list.SelectedIndexChanged += server_changed;
+            bool connected = m_parent.bot_connected(server_name);
+            if (connected == true)
+            {
+                bool disconnected = m_parent.end_connection(server_name);
+            }
+        }
+
+        private void connect_button_Click(object sender, EventArgs e)
+        {
+            if (connect_button.Text.Equals("Connect"))
+            {
+                connect_button.Text = "Connecting...";
+                bool connected = m_parent.start_connection(server_list.SelectedItem.ToString());
+                if (connected == true)
+                {
+                    connect_button.Text = "Disconnect";
+                }
+                else
+                {
+                    MessageBox.Show("Could not connect");
+                    connect_button.Text = "Connect";
+                }
+            }
+            else
+            {
+                connect_button.Text = "Disconnecting...";
+                bool disconnected = m_parent.end_connection(server_list.SelectedItem.ToString());
+                if (disconnected == true)
+                {
+                    connect_button.Text = "Connect";
+                }
+                else
+                {
+                    MessageBox.Show("Could not disconnect");
+                    connect_button.Text = "Disconnect";
+                }
+            }
+        }
+
+        private void server_list_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            edit_server_button.Enabled = true;
+            delete_server_button.Enabled = true;
+            connect_button.Enabled = true;
+        }
+
+        public void add_to_list(string server_name)
+        {
+            server_list.Items.Add(server_name);
         }
     }
 }

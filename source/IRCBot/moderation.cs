@@ -13,7 +13,7 @@ namespace IRCBot
         private string unban_nick_string;
         private string unban_host_string;
         private string unban_channel_string;
-        private Interface main;
+        private bot main;
 
         public moderation()
         {
@@ -21,7 +21,7 @@ namespace IRCBot
             unban_trigger.Elapsed += unban_nick;
         }
 
-        public void moderation_control(string[] line, string command, Interface ircbot, IRCConfig conf, int nick_access, string nick)
+        public void moderation_control(string[] line, string command, bot ircbot, IRCConfig conf, int nick_access, string nick)
         {
             access access = new access();
 
@@ -1038,9 +1038,9 @@ namespace IRCBot
             }
         }
 
-        public void check_auto(string nick, string channel, string hostname, Interface ircbot)
+        public void check_auto(string nick, string channel, string hostname, bot ircbot)
         {
-            string list_file = ircbot.cur_dir + "\\modules\\auto_kb\\list.txt";
+            string list_file = ircbot.cur_dir + "\\modules\\auto_kb\\" + ircbot.server_name + "_list.txt";
             if (File.Exists(list_file))
             {
                 int counter = 0;
@@ -1101,9 +1101,9 @@ namespace IRCBot
             main.sendData("MODE", unban_channel_string + " -b " + ban);
         }
 
-        private void add_auto(string nick, string channel, string hostname, string type, string reason, Interface ircbot)
+        private void add_auto(string nick, string channel, string hostname, string type, string reason, bot ircbot)
         {
-            string list_file = ircbot.cur_dir + "\\modules\\auto_kb\\list.txt";
+            string list_file = ircbot.cur_dir + "\\modules\\auto_kb\\" + ircbot.server_name + "_list.txt";
             string add_line = nick + "*" + hostname + "*" + channel + "*" + type + "*" + reason + "*" + DateTime.Now.ToString("MMMM d, yyyy h:mm:ss tt");
             bool found_nick = false;
             if (File.Exists(list_file))
@@ -1160,9 +1160,9 @@ namespace IRCBot
             ircbot.sendData("PRIVMSG", channel + " :" + nick + " has been added to the a" + type + " list.");
         }
 
-        private void del_auto(string nick, string channel, string hostname, string type, Interface ircbot)
+        private void del_auto(string nick, string channel, string hostname, string type, bot ircbot)
         {
-            string list_file = ircbot.cur_dir + "\\modules\\auto_kb\\list.txt";
+            string list_file = ircbot.cur_dir + "\\modules\\auto_kb\\" + ircbot.server_name + "_list.txt";
             bool found_nick = false;
             if (File.Exists(list_file))
             {

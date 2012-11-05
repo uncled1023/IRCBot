@@ -214,14 +214,17 @@ namespace IRCBot
 
         private void server_changed(Object sender, EventArgs e)
         {
-            bool connected = m_parent.bot_connected(server_list.SelectedItem.ToString());
-            if (connected == true)
+            if (server_list.SelectedItem != null)
             {
-                connect_button.Text = "Disconnect";
-            }
-            else
-            {
-                connect_button.Text = "Connect";
+                bool connected = m_parent.bot_connected(server_list.SelectedItem.ToString());
+                if (connected == true)
+                {
+                    connect_button.Text = "Disconnect";
+                }
+                else
+                {
+                    connect_button.Text = "Connect";
+                }
             }
         }
 

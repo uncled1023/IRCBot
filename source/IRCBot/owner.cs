@@ -25,6 +25,10 @@ namespace IRCBot
                                 add_owner(nick, ircbot, ref conf);
                                 ircbot.sendData("NOTICE", nick + " :You are now identified as an owner!");
                             }
+                            else
+                            {
+                                ircbot.sendData("NOTICE", nick + " :Invalid Password");
+                            }
                         }
                         else
                         {
@@ -169,13 +173,15 @@ namespace IRCBot
             if (File.Exists(ircbot.cur_dir + "\\config\\config.xml"))
             {
                 xmlDoc.Load(ircbot.cur_dir + "\\config\\config.xml");
-                XmlNode list = xmlDoc.SelectSingleNode("connection_settings");
-                foreach (XmlNode node in list)
+                XmlNodeList ServerxnList = xmlDoc.SelectNodes("/bot_settings/connection_settings/server_list/server");
+                foreach (XmlNode xn in ServerxnList)
                 {
-                    if (node.Name == "owner")
+                    string tmp_server = xn["server_name"].InnerText;
+                    if (tmp_server.Equals(conf.server))
                     {
-                        string new_owner = node.InnerText + "," + nick;
-                        node.InnerText = new_owner;
+                        string new_owner = xn["owner"].InnerText + "," + nick;
+                        xn["owner"].InnerText = new_owner;
+                        break;
                     }
                 }
                 xmlDoc.Save(ircbot.cur_dir + "\\config\\config.xml");
@@ -190,12 +196,13 @@ namespace IRCBot
             if (File.Exists(ircbot.cur_dir + "\\config\\config.xml"))
             {
                 xmlDoc.Load(ircbot.cur_dir + "\\config\\config.xml");
-                XmlNode list = xmlDoc.SelectSingleNode("connection_settings");
-                foreach (XmlNode node in list)
+                XmlNodeList ServerxnList = xmlDoc.SelectNodes("/bot_settings/connection_settings/server_list/server");
+                foreach (XmlNode xn in ServerxnList)
                 {
-                    if (node.Name == "owner")
+                    string tmp_server = xn["server_name"].InnerText;
+                    if (tmp_server.Equals(conf.server))
                     {
-                        string[] new_owner_tmp = node.InnerText.Split(',');
+                        string[] new_owner_tmp = xn["owner"].InnerText.Split(',');
                         for (int x = 0; x <= new_owner_tmp.GetUpperBound(0); x++)
                         {
                             if (new_owner_tmp[x].Equals(nick))
@@ -206,7 +213,8 @@ namespace IRCBot
                                 new_owner += new_owner_tmp[x] + ",";
                             }
                         }
-                        node.InnerText = new_owner.TrimEnd(',');
+                        xn["owner"].InnerText = new_owner.TrimEnd(',');
+                        break;
                     }
                 }
                 xmlDoc.Save(ircbot.cur_dir + "\\config\\config.xml");

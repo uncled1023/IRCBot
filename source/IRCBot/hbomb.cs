@@ -209,7 +209,7 @@ namespace IRCBot
             main.sendData("PRIVMSG", bomb_channel + " :" + msg);
             msg = "15,1<,.14,1;'`\".,;`..,;`*.,';`.15,1;'>)1,1.";
             main.sendData("PRIVMSG", bomb_channel + " :" + msg);
-            msg = "15,1I.:;14,1.,`;~,`.;'`,.;'`,..15,1';`I1,1..";
+            msg = "15,1I.:;14,1.,`;~,`.;'`,.;'`,..15,1';`I1,1..";
             main.sendData("PRIVMSG", bomb_channel + " :" + msg);
             msg = "1,1.15,1._.14,1`'`..`';.,`';,`';,15,1._./1,1..";
             main.sendData("PRIVMSG", bomb_channel + " :" + msg);

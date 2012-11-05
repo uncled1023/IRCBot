@@ -108,6 +108,7 @@
     <Compile Include="google.cs" />
     <Compile Include="hbomb.cs" />
     <Compile Include="help.cs" />
+    <Compile Include="idle.cs" />
     <Compile Include="Interface.cs">
       <SubType>Form</SubType>
     </Compile>

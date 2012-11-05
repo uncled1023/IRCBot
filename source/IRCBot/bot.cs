@@ -64,6 +64,8 @@ namespace IRCBot
         roll_call roll_call;
         // Version Response Module
         version version;
+        // Idle Module
+        idle idle;
 
         TcpClient IRCConnection;
         IRCConfig config;
@@ -136,6 +138,8 @@ namespace IRCBot
             roll_call = new roll_call();
             // Version Response Module
             version = new version();
+            // Idle Module
+            idle = new idle();
 
             IRCConnection = null;
             ns = null;
@@ -721,7 +725,7 @@ namespace IRCBot
                                             {
                                                 if (conf.module_config[x][1].Equals("True"))
                                                 {
-                                                    hbomb.hbomb_control(ex, command, this, nick_access, nick, channel, conf);
+                                                    hbomb.hbomb_control(ex, command, this, nick_access, nick, channel, conf, idle);
                                                 } break;
                                             }
                                         }
@@ -773,6 +777,19 @@ namespace IRCBot
                                                 if (conf.module_config[x][1].Equals("True"))
                                                 {
                                                     roll_call.roll_call_control(ex, command, this, conf, x, nick_access, channel, nick);
+                                                }
+                                                break;
+                                            }
+                                        }
+
+                                        // Idle Module
+                                        for (int x = 0; x < conf.module_config.Count(); x++)
+                                        {
+                                            if (conf.module_config[x][0].Equals("Idle"))
+                                            {
+                                                if (conf.module_config[x][1].Equals("True"))
+                                                {
+                                                    idle.idle_control(ex, command, this, conf, nick_access, nick);
                                                 }
                                                 break;
                                             }
@@ -831,6 +848,19 @@ namespace IRCBot
                                                 if (conf.module_config[x][1].Equals("True"))
                                                 {
                                                     roll_call.roll_call_control(ex, command, this, conf, x, nick_access, channel, nick);
+                                                }
+                                                break;
+                                            }
+                                        }
+
+                                        // Idle Module
+                                        for (int x = 0; x < conf.module_config.Count(); x++)
+                                        {
+                                            if (conf.module_config[x][0].Equals("Idle"))
+                                            {
+                                                if (conf.module_config[x][1].Equals("True"))
+                                                {
+                                                    idle.idle_control(ex, command, this, conf, nick_access, nick);
                                                 }
                                                 break;
                                             }

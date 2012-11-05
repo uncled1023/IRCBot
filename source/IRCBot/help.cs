@@ -56,17 +56,17 @@ namespace IRCBot
                         }
                     }
                 }
-                if (msg != "")
-                {
-                    ircbot.sendData("NOTICE", nick + " :" + msg.TrimEnd(','));
-                    msg = "";
-                }
-                else
-                {
-                    ircbot.sendData("NOTICE", nick + " :No help information available.");
-                }
                 if (more_info == false)
                 {
+                    if (msg != "")
+                    {
+                        ircbot.sendData("NOTICE", nick + " :" + msg.TrimEnd(','));
+                        msg = "";
+                    }
+                    else
+                    {
+                        ircbot.sendData("NOTICE", nick + " :No help information available.");
+                    }
                     ircbot.sendData("NOTICE", nick + " :For more information about a specific command, type .help <command name>");
                 }
             }

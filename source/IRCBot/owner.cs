@@ -157,7 +157,7 @@ namespace IRCBot
                         {
                             ircbot.sendData("QUIT", ":" + line[4]); //if the command is quit, send the QUIT command to the server with a quit message
                         }
-                        ircbot.shouldRun = false; //turn shouldRun to false - the server will stop sending us data so trying to read it will not work and result in an error. This stops the loop from running and we will close off the connections properly
+                        ircbot.worker.CancelAsync();
                     }
                     else
                     {

@@ -188,11 +188,11 @@ namespace IRCBot
                                 {
                                     if (new_line[2].Trim().Equals(""))
                                     {
-                                        new_file.Add(new_line[0].Trim() + "*" + new_line[1].Trim() + "*" + access);
+                                        new_file.Add(new_line[0].Trim() + "*" + new_line[1].Trim() + "*" + access.Trim());
                                     }
                                     else
                                     {
-                                        new_file.Add(new_line[0].Trim() + "*" + new_line[1].Trim() + "*" + new_line[2].Trim() + "," + access);
+                                        new_file.Add(new_line[0].Trim() + "*" + new_line[1].Trim() + "*" + new_line[2].Trim() + "," + access.Trim());
                                     }
                                 }
                                 nick_found = true;
@@ -207,7 +207,7 @@ namespace IRCBot
                     if (nick_found == false)
                     {
                         StreamWriter log = File.AppendText(ircbot.cur_dir + "\\modules\\access\\" + file_name);
-                        log.WriteLine(nick + "*" + channel + "*" + access);
+                        log.WriteLine(nick.Trim() + "*" + channel + "*" + access.Trim());
                         log.Close();
                     }
                     else
@@ -218,14 +218,14 @@ namespace IRCBot
                 else
                 {
                     StreamWriter log = File.AppendText(ircbot.cur_dir + "\\modules\\access\\" + file_name);
-                    log.WriteLine(nick + "*" + channel + "*" + access);
+                    log.WriteLine(nick.Trim() + "*" + channel + "*" + access.Trim());
                     log.Close();
                 }
             }
             else
             {
                 StreamWriter log_file = File.CreateText(ircbot.cur_dir + "\\modules\\access\\" + file_name);
-                log_file.WriteLine(nick + "*" + channel + "*" + access);
+                log_file.WriteLine(nick.Trim() + "*" + channel + "*" + access.Trim());
                 log_file.Close();
             }
 

@@ -11,6 +11,7 @@ namespace IRCBot
 {
     class owner
     {
+        System.Timers.Timer invalid_pass_timeout = new System.Timers.Timer();
         public void owner_control(string[] line, string command, bot ircbot, ref IRCConfig conf, int nick_access, string nick)
         {
             switch (command)

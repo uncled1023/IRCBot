@@ -54,7 +54,7 @@
             this.port_box.Location = new System.Drawing.Point(209, 38);
             this.port_box.Name = "port_box";
             this.port_box.Size = new System.Drawing.Size(185, 20);
-            this.port_box.TabIndex = 11;
+            this.port_box.TabIndex = 9;
             this.port_box.Text = "6667";
             // 
             // label7
@@ -71,7 +71,7 @@
             this.channels_box.Location = new System.Drawing.Point(209, 64);
             this.channels_box.Name = "channels_box";
             this.channels_box.Size = new System.Drawing.Size(185, 20);
-            this.channels_box.TabIndex = 9;
+            this.channels_box.TabIndex = 11;
             // 
             // label2
             // 
@@ -103,7 +103,7 @@
             this.email_box.Location = new System.Drawing.Point(209, 191);
             this.email_box.Name = "email_box";
             this.email_box.Size = new System.Drawing.Size(185, 20);
-            this.email_box.TabIndex = 21;
+            this.email_box.TabIndex = 19;
             // 
             // label8
             // 
@@ -119,7 +119,7 @@
             this.password_box.Location = new System.Drawing.Point(209, 165);
             this.password_box.Name = "password_box";
             this.password_box.Size = new System.Drawing.Size(185, 20);
-            this.password_box.TabIndex = 19;
+            this.password_box.TabIndex = 17;
             // 
             // label6
             // 
@@ -135,7 +135,7 @@
             this.owner_nicks_box.Location = new System.Drawing.Point(209, 217);
             this.owner_nicks_box.Name = "owner_nicks_box";
             this.owner_nicks_box.Size = new System.Drawing.Size(185, 20);
-            this.owner_nicks_box.TabIndex = 17;
+            this.owner_nicks_box.TabIndex = 21;
             // 
             // label5
             // 

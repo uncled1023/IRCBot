@@ -154,7 +154,6 @@ namespace IRCBot
 
         private void connect()
         {
-            connectToolStripMenuItem.Text = "Disconnect";
             cur_dir = Directory.GetCurrentDirectory();
 
             updateOutput.Interval = 100;
@@ -252,72 +251,85 @@ namespace IRCBot
             string[] tmp_server_list = full_server_list.Split(',');
             bot_instances = new List<bot>();
             int index = 0;
-            foreach (string server_name in tmp_server_list)
+            connectToolStripMenuItem.Enabled = false;
+            if (full_server_list != "")
             {
-                XmlNodeList ServerxnList = xmlDoc.SelectNodes("/bot_settings/connection_settings/server_list/server");
-                foreach (XmlNode xn in ServerxnList)
+                connectToolStripMenuItem.Text = "Disconnect";
+                connectToolStripMenuItem.Enabled = true;
+                foreach (string server_name in tmp_server_list)
                 {
-                    string tmp_server = xn["server_name"].InnerText;
-                    if (tmp_server.Equals(server_name))
+                    XmlNodeList ServerxnList = xmlDoc.SelectNodes("/bot_settings/connection_settings/server_list/server");
+                    foreach (XmlNode xn in ServerxnList)
                     {
-                        conf.name = xn["name"].InnerText;
-                        conf.nick = xn["nick"].InnerText;
-                        conf.pass = xn["password"].InnerText;
-                        conf.email = xn["email"].InnerText;
-                        conf.owner = xn["owner"].InnerText;
-                        conf.port = Convert.ToInt32(xn["port"].InnerText);
-                        conf.server = xn["server_name"].InnerText;
-                        conf.chans = xn["chan_list"].InnerText;
-                        break;
+                        string tmp_server = xn["server_name"].InnerText;
+                        if (tmp_server.Equals(server_name))
+                        {
+                            conf.name = xn["name"].InnerText;
+                            conf.nick = xn["nick"].InnerText;
+                            conf.pass = xn["password"].InnerText;
+                            conf.email = xn["email"].InnerText;
+                            conf.owner = xn["owner"].InnerText;
+                            conf.port = Convert.ToInt32(xn["port"].InnerText);
+                            conf.server = xn["server_name"].InnerText;
+                            conf.chans = xn["chan_list"].InnerText;
+                            break;
+                        }
                     }
-                }
-                Control control = new Control();
-                string[] server = server_name.Split('.');
-                string tmp_server_name = "No_Server_Specified";
-                if (server.GetUpperBound(0) > 0)
-                {
-                    tmp_server_name = server[1];
-                }
-                if (tabControl1.Controls.Find("output_box_system", true).GetUpperBound(0) >= 0)
-                {
-                    control = tabControl1.Controls.Find("output_box_system", true)[0];
-                    RichTextBox output_box = (RichTextBox)control;
-                    output_box.Name = "output_box_" + tmp_server_name + ":system";
-                    control = tabControl1.Controls.Find("tabPage1", true)[0];
-                    TabPage tabpage = (TabPage)control;
-                    tabpage.Name = "tabPage_:" + tmp_server_name + ":system";
-                    tabpage.Text = tmp_server_name;
-                }
-                else if (tabControl1.Controls.Find("output_box_" + tmp_server_name + "_system", true).GetUpperBound(0) < 0)
-                {
-                    RichTextBox box = new RichTextBox();
-                    box.Dock = System.Windows.Forms.DockStyle.Fill;
-                    box.Location = new System.Drawing.Point(3, 3);
-                    box.Name = "output_box_" + tmp_server_name + ":system";
-                    box.Size = new System.Drawing.Size(826, 347);
-                    box.ReadOnly = true;
-                    box.Text = "";
-                    TabPage tabpage = new TabPage();
-                    tabpage.Controls.Add(box);
-                    tabpage.Location = new System.Drawing.Point(4, 22);
-                    tabpage.Name = "tabPage_:" + tmp_server_name + ":system";
-                    tabpage.Padding = new System.Windows.Forms.Padding(3);
-                    tabpage.Size = new System.Drawing.Size(832, 353);
-                    tabpage.Text = tmp_server_name;
-                    tabpage.UseVisualStyleBackColor = true;
-                    tabControl1.Controls.Add(tabpage);
-                    tabControl1.GetControl(index).TabIndex = index;
-                    tabControl1.Update();
-                    box.LinkClicked += new LinkClickedEventHandler(link_Click);
-                }
-                else
-                {
-                }
+                    Control control = new Control();
+                    string[] server = server_name.Split('.');
+                    string tmp_server_name = "No_Server_Specified";
+                    if (server.GetUpperBound(0) > 0)
+                    {
+                        tmp_server_name = server[1];
+                    }
+                    if (tabControl1.Controls.Find("output_box_system", true).GetUpperBound(0) >= 0)
+                    {
+                        control = tabControl1.Controls.Find("output_box_system", true)[0];
+                        RichTextBox output_box = (RichTextBox)control;
+                        output_box.Name = "output_box_" + tmp_server_name + ":system";
+                        control = tabControl1.Controls.Find("tabPage1", true)[0];
+                        TabPage tabpage = (TabPage)control;
+                        tabpage.Name = "tabPage_:" + tmp_server_name + ":system";
+                        tabpage.Text = tmp_server_name;
+                    }
+                    else if (tabControl1.Controls.Find("output_box_" + tmp_server_name + ":system", true).GetUpperBound(0) < 0)
+                    {
+                        RichTextBox box = new RichTextBox();
+                        box.Dock = System.Windows.Forms.DockStyle.Fill;
+                        box.Location = new System.Drawing.Point(3, 3);
+                        box.Name = "output_box_" + tmp_server_name + ":system";
+                        box.Size = new System.Drawing.Size(826, 347);
+                        box.ReadOnly = true;
+                        box.Text = "";
+                        TabPage tabpage = new TabPage();
+                        tabpage.Controls.Add(box);
+                        tabpage.Location = new System.Drawing.Point(4, 22);
+                        tabpage.Name = "tabPage_:" + tmp_server_name + ":system";
+                        tabpage.Padding = new System.Windows.Forms.Padding(3);
+                        tabpage.Size = new System.Drawing.Size(832, 353);
+                        tabpage.Text = tmp_server_name;
+                        tabpage.UseVisualStyleBackColor = true;
+                        tabControl1.Controls.Add(tabpage);
+                        tabControl1.GetControl(index).TabIndex = index;
+                        tabControl1.Update();
+                        box.LinkClicked += new LinkClickedEventHandler(link_Click);
+                    }
+                    else
+                    {
+                    }
 
-                bot bot_instance = new bot();
-                bot_instances.Add(bot_instance);
-                bot_instances[index].start_bot(this, conf);
-                index++;
+                    bot bot_instance = new bot();
+                    bot_instances.Add(bot_instance);
+                    bot_instances[index].start_bot(this, conf);
+                    index++;
+                }
+            }
+            else
+            {
+                Control control = new Control();
+                control = tabControl1.Controls.Find("output_box_system", true)[0];
+                RichTextBox output_box = (RichTextBox)control;
+                output_box.AppendText("No Servers Specified");
             }
         }
 
@@ -1026,12 +1038,11 @@ namespace IRCBot
 
         public void update_conf()
         {
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.Load(cur_dir + "\\config\\config.xml");
             foreach (bot bot_instance in bot_instances)
             {
-                XmlDocument xmlDoc = new XmlDocument();
-                xmlDoc.Load(cur_dir + "\\config\\config.xml");
                 XmlNode list = xmlDoc.SelectSingleNode("/bot_settings/connection_settings");
-
                 bot_instance.conf.command = list["command_prefix"].InnerText;
                 bot_instance.conf.keep_logs = list["keep_logs"].InnerText;
                 bot_instance.conf.logs_path = list["logs_path"].InnerText;
@@ -1102,15 +1113,15 @@ namespace IRCBot
                         bot_instance.conf.command_access.Add(tmp_list2);
                     }
                 }
-
-                xnList = xmlDoc.SelectNodes("/bot_settings/connection_settings/server_list/server");
-                full_server_list = "";
-                foreach (XmlNode xn in xnList)
-                {
-                    full_server_list += xn["server_name"].InnerText + ",";
-                }
-                full_server_list = full_server_list.TrimEnd(',');
             }
+
+            XmlNodeList xnList2 = xmlDoc.SelectNodes("/bot_settings/connection_settings/server_list/server");
+            full_server_list = "";
+            foreach (XmlNode xn in xnList2)
+            {
+                full_server_list += xn["server_name"].InnerText + ",";
+            }
+            full_server_list = full_server_list.TrimEnd(',');
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -1225,7 +1236,7 @@ namespace IRCBot
                     index++;
                 }
             }
-            if (server_found == true)
+            if (server_found == true && bot_instances.Count > index)
             {
                 if (bot_instances[index].connected == false)
                 {
@@ -1271,6 +1282,48 @@ namespace IRCBot
                     xmlDoc.Save(cur_dir + "\\config\\config.xml");
                     xmlDoc.Load(cur_dir + "\\config\\config.xml");
                 }
+                Control control = new Control();
+                string[] server = start_server_name.Split('.');
+                string tmp_server_name = "No_Server_Specified";
+                if (server.GetUpperBound(0) > 0)
+                {
+                    tmp_server_name = server[1];
+                }
+                if (tabControl1.Controls.Find("output_box_system", true).GetUpperBound(0) >= 0)
+                {
+                    control = tabControl1.Controls.Find("output_box_system", true)[0];
+                    RichTextBox output_box = (RichTextBox)control;
+                    output_box.Name = "output_box_" + tmp_server_name + ":system";
+                    control = tabControl1.Controls.Find("tabPage1", true)[0];
+                    TabPage tabpage = (TabPage)control;
+                    tabpage.Name = "tabPage_:" + tmp_server_name + ":system";
+                    tabpage.Text = tmp_server_name;
+                }
+                else if (tabControl1.Controls.Find("output_box_" + tmp_server_name + ":system", true).GetUpperBound(0) < 0)
+                {
+                    RichTextBox box = new RichTextBox();
+                    box.Dock = System.Windows.Forms.DockStyle.Fill;
+                    box.Location = new System.Drawing.Point(3, 3);
+                    box.Name = "output_box_" + tmp_server_name + ":system";
+                    box.Size = new System.Drawing.Size(826, 347);
+                    box.ReadOnly = true;
+                    box.Text = "";
+                    TabPage tabpage = new TabPage();
+                    tabpage.Controls.Add(box);
+                    tabpage.Location = new System.Drawing.Point(4, 22);
+                    tabpage.Name = "tabPage_:" + tmp_server_name + ":system";
+                    tabpage.Padding = new System.Windows.Forms.Padding(3);
+                    tabpage.Size = new System.Drawing.Size(832, 353);
+                    tabpage.Text = tmp_server_name;
+                    tabpage.UseVisualStyleBackColor = true;
+                    tabControl1.Controls.Add(tabpage);
+                    tabControl1.GetControl(index).TabIndex = index;
+                    tabControl1.Update();
+                    box.LinkClicked += new LinkClickedEventHandler(link_Click);
+                }
+                else
+                {
+                }
                 XmlNodeList ServerxnList = xmlDoc.SelectNodes("/bot_settings/connection_settings/server_list/server");
                 foreach (XmlNode xn in ServerxnList)
                 {
@@ -1292,6 +1345,9 @@ namespace IRCBot
                 bot_instances.Add(bot_instance);
                 bot_instances[index].start_bot(this, conf);
                 server_initiated = true;
+                connectToolStripMenuItem.Enabled = true;
+                connectToolStripMenuItem.Text = "Disconnect";
+                tabControl1.SelectedIndex = tabControl1.TabPages.IndexOfKey("tabPage_:" + tmp_server_name + ":system");
             }
             return server_initiated;
         }
@@ -1343,7 +1399,7 @@ namespace IRCBot
                     index++;
                 }
             }
-            if (bot_found == true)
+            if (bot_found == true && bot_instances.Count > index)
             {
                 return bot_instances[index].connected;
             }

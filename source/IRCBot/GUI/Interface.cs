@@ -975,6 +975,8 @@ namespace IRCBot
                 }
                 tabControl1.Update();
                 box.LinkClicked += new LinkClickedEventHandler(link_Click);
+
+                tabControl1.SelectedIndex = tabControl1.Controls.Find(tabpage.Name, true)[0].TabIndex;
             }
         }
 
@@ -1446,6 +1448,11 @@ namespace IRCBot
         }
 
         private void tabControl1_MouseClick(object sender, MouseEventArgs e)
+        {
+            input_box.Focus();
+        }
+
+        private void tabControl1_MouseClick(object sender, EventArgs e)
         {
             input_box.Focus();
         }

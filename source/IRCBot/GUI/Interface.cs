@@ -35,6 +35,13 @@ struct IRCConfig
     public int spam_threshold;
     public int spam_timout;
     public int max_message_length;
+    public int user_level;
+    public int voice_level;
+    public int hop_level;
+    public int op_level;
+    public int sop_level;
+    public int founder_level;
+    public int owner_level;
     public List<List<string>> module_config;
     public List<List<string>> command_access;
 }
@@ -195,6 +202,28 @@ namespace IRCBot
                 XmlNode nodeSpamMaxMsgLength = xmlDoc.CreateElement("max_message_length");
                 nodeSpamMaxMsgLength.InnerText = "450";
                 node.AppendChild(nodeSpamMaxMsgLength);
+                XmlNode nodeLevels;
+                nodeLevels = xmlDoc.CreateElement("user_level");
+                nodeLevels.InnerText = "1";
+                node.AppendChild(nodeLevels);
+                nodeLevels = xmlDoc.CreateElement("voice_level");
+                nodeLevels.InnerText = "3";
+                node.AppendChild(nodeLevels);
+                nodeLevels = xmlDoc.CreateElement("hop_level");
+                nodeLevels.InnerText = "6";
+                node.AppendChild(nodeLevels);
+                nodeLevels = xmlDoc.CreateElement("op_level");
+                nodeLevels.InnerText = "7";
+                node.AppendChild(nodeLevels);
+                nodeLevels = xmlDoc.CreateElement("sop_level");
+                nodeLevels.InnerText = "8";
+                node.AppendChild(nodeLevels);
+                nodeLevels = xmlDoc.CreateElement("founder_level");
+                nodeLevels.InnerText = "9";
+                node.AppendChild(nodeLevels);
+                nodeLevels = xmlDoc.CreateElement("owner_level");
+                nodeLevels.InnerText = "10";
+                node.AppendChild(nodeLevels);
                 xmlDoc.AppendChild(node);
                 xmlDoc.Save(cur_dir + "\\config\\config.xml");
                 xmlDoc.Load(cur_dir + "\\config\\config.xml");
@@ -208,6 +237,13 @@ namespace IRCBot
             conf.spam_threshold = Convert.ToInt32(list["spam_threshold"].InnerText);
             conf.spam_timout = Convert.ToInt32(list["spam_timeout"].InnerText);
             conf.max_message_length = Convert.ToInt32(list["max_message_length"].InnerText);
+            conf.user_level = Convert.ToInt32(list["user_level"].InnerText);
+            conf.voice_level = Convert.ToInt32(list["voice_level"].InnerText);
+            conf.hop_level = Convert.ToInt32(list["hop_level"].InnerText);
+            conf.op_level = Convert.ToInt32(list["op_level"].InnerText);
+            conf.sop_level = Convert.ToInt32(list["sop_level"].InnerText);
+            conf.founder_level = Convert.ToInt32(list["founder_level"].InnerText);
+            conf.owner_level = Convert.ToInt32(list["owner_level"].InnerText);
 
             conf.module_config.Clear();
             XmlNodeList xnList = xmlDoc.SelectNodes("/bot_settings/connection_settings/server_list/server");

@@ -350,6 +350,10 @@ namespace IRCBot
         {
             if (sw != null)
             {
+                if (cmd.ToLower().Equals("msg"))
+                {
+                    cmd = "PRIVMSG";
+                }
                 if (param == null)
                 {
                     sw.WriteLine(cmd);
@@ -1845,27 +1849,27 @@ namespace IRCBot
             int access = 0;
             if (type.Equals("~"))
             {
-                access = 9;
+                access = conf.founder_level;
             }
             else if (type.Equals("&"))
             {
-                access = 8;
+                access = conf.sop_level;
             }
             else if (type.Equals("@"))
             {
-                access = 7;
+                access = conf.op_level;
             }
             else if (type.Equals("%"))
             {
-                access = 6;
+                access = conf.hop_level;
             }
             else if (type.Equals("+"))
             {
-                access = 3;
+                access = conf.voice_level;
             }
             else
             {
-                access = 1;
+                access = conf.user_level;
             }
             return access;
         }
@@ -1988,7 +1992,7 @@ namespace IRCBot
                     {
                         if (nick.Equals(owners[x]))
                         {
-                            access += ",10";
+                            access += "," + conf.owner_level.ToString();
                         }
                     }
                 }

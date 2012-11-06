@@ -54,6 +54,28 @@ namespace IRCBot
                 XmlNode nodeSpamMaxMsgLength = xmlDoc.CreateElement("max_message_length");
                 nodeSpamMaxMsgLength.InnerText = "450";
                 node.AppendChild(nodeSpamMaxMsgLength);
+                XmlNode nodeLevels;
+                nodeLevels = xmlDoc.CreateElement("user_level");
+                nodeLevels.InnerText = "1";
+                node.AppendChild(nodeLevels);
+                nodeLevels = xmlDoc.CreateElement("voice_level");
+                nodeLevels.InnerText = "3";
+                node.AppendChild(nodeLevels);
+                nodeLevels = xmlDoc.CreateElement("hop_level");
+                nodeLevels.InnerText = "6";
+                node.AppendChild(nodeLevels);
+                nodeLevels = xmlDoc.CreateElement("op_level");
+                nodeLevels.InnerText = "7";
+                node.AppendChild(nodeLevels);
+                nodeLevels = xmlDoc.CreateElement("sop_level");
+                nodeLevels.InnerText = "8";
+                node.AppendChild(nodeLevels);
+                nodeLevels = xmlDoc.CreateElement("founder_level");
+                nodeLevels.InnerText = "9";
+                node.AppendChild(nodeLevels);
+                nodeLevels = xmlDoc.CreateElement("owner_level");
+                nodeLevels.InnerText = "10";
+                node.AppendChild(nodeLevels);
                 xmlDoc.AppendChild(node);
                 xmlDoc.Save(m_parent.cur_dir + "\\config\\config.xml");
                 xmlDoc.Load(m_parent.cur_dir + "\\config\\config.xml");
@@ -65,6 +87,13 @@ namespace IRCBot
             spam_threshold_box.Text = list["spam_threshold"].InnerText;
             spam_timeout_box.Text = list["spam_timeout"].InnerText;
             max_message_length_box.Text = list["max_message_length"].InnerText;
+            user_level_box.Text = list["user_level"].InnerText;
+            voice_level_box.Text = list["voice_level"].InnerText;
+            hop_level_box.Text = list["hop_level"].InnerText;
+            op_level_box.Text = list["op_level"].InnerText;
+            sop_level_box.Text = list["sop_level"].InnerText;
+            founder_level_box.Text = list["founder_level"].InnerText;
+            owner_level_box.Text = list["owner_level"].InnerText;
             if (list["keep_logs"].InnerText == "True")
             {
                 keep_logs_box.Checked = true;
@@ -299,6 +328,13 @@ namespace IRCBot
             node["spam_threshold"].InnerText = spam_threshold_box.Text;
             node["spam_timeout"].InnerText = spam_timeout_box.Text;
             node["max_message_length"].InnerText = max_message_length_box.Text;
+            node["user_level"].InnerText = user_level_box.Text;
+            node["voice_level"].InnerText = voice_level_box.Text;
+            node["hop_level"].InnerText = hop_level_box.Text;
+            node["op_level"].InnerText = op_level_box.Text;
+            node["sop_level"].InnerText = sop_level_box.Text;
+            node["founder_level"].InnerText = founder_level_box.Text;
+            node["owner_level"].InnerText = owner_level_box.Text;
 
             XmlNodeList xnList = xmlDoc.SelectNodes("/bot_settings/modules/module");
             foreach (XmlNode xn in xnList)

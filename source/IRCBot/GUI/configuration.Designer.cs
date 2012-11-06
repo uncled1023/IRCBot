@@ -30,7 +30,20 @@
         {
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.connect_button = new System.Windows.Forms.Button();
+            this.edit_server_button = new System.Windows.Forms.Button();
+            this.delete_server_button = new System.Windows.Forms.Button();
+            this.add_server_button = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
+            this.server_list = new System.Windows.Forms.ListBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.label12 = new System.Windows.Forms.Label();
+            this.label11 = new System.Windows.Forms.Label();
+            this.windows_start_box = new System.Windows.Forms.CheckBox();
+            this.browse_button = new System.Windows.Forms.Button();
+            this.log_folder_box = new System.Windows.Forms.TextBox();
+            this.label10 = new System.Windows.Forms.Label();
+            this.keep_logs_box = new System.Windows.Forms.CheckBox();
             this.max_message_length_box = new System.Windows.Forms.TextBox();
             this.label16 = new System.Windows.Forms.Label();
             this.spam_threshold_box = new System.Windows.Forms.TextBox();
@@ -58,24 +71,27 @@
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
-            this.server_list = new System.Windows.Forms.ListBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.add_server_button = new System.Windows.Forms.Button();
-            this.delete_server_button = new System.Windows.Forms.Button();
-            this.edit_server_button = new System.Windows.Forms.Button();
-            this.label12 = new System.Windows.Forms.Label();
-            this.label11 = new System.Windows.Forms.Label();
-            this.windows_start_box = new System.Windows.Forms.CheckBox();
-            this.browse_button = new System.Windows.Forms.Button();
-            this.log_folder_box = new System.Windows.Forms.TextBox();
-            this.label10 = new System.Windows.Forms.Label();
-            this.keep_logs_box = new System.Windows.Forms.CheckBox();
-            this.connect_button = new System.Windows.Forms.Button();
+            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.user_level_box = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.voice_level_box = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.hop_level_box = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.op_level_box = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.sop_level_box = new System.Windows.Forms.TextBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.founder_level_box = new System.Windows.Forms.TextBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.owner_level_box = new System.Windows.Forms.TextBox();
+            this.label8 = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.tabPage4.SuspendLayout();
             this.tabPage5.SuspendLayout();
+            this.tabPage3.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -84,6 +100,7 @@
             this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Controls.Add(this.tabPage4);
             this.tabControl1.Controls.Add(this.tabPage5);
+            this.tabControl1.Controls.Add(this.tabPage3);
             this.tabControl1.Location = new System.Drawing.Point(12, 0);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
@@ -105,6 +122,68 @@
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Server";
             this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // connect_button
+            // 
+            this.connect_button.Enabled = false;
+            this.connect_button.Location = new System.Drawing.Point(240, 119);
+            this.connect_button.Name = "connect_button";
+            this.connect_button.Size = new System.Drawing.Size(102, 23);
+            this.connect_button.TabIndex = 11;
+            this.connect_button.Text = "Connect";
+            this.connect_button.UseVisualStyleBackColor = true;
+            this.connect_button.Click += new System.EventHandler(this.connect_button_Click);
+            // 
+            // edit_server_button
+            // 
+            this.edit_server_button.Enabled = false;
+            this.edit_server_button.Location = new System.Drawing.Point(240, 61);
+            this.edit_server_button.Name = "edit_server_button";
+            this.edit_server_button.Size = new System.Drawing.Size(102, 23);
+            this.edit_server_button.TabIndex = 9;
+            this.edit_server_button.Text = "Edit Server";
+            this.edit_server_button.UseVisualStyleBackColor = true;
+            this.edit_server_button.Click += new System.EventHandler(this.edit_server_button_Click);
+            // 
+            // delete_server_button
+            // 
+            this.delete_server_button.Enabled = false;
+            this.delete_server_button.Location = new System.Drawing.Point(240, 90);
+            this.delete_server_button.Name = "delete_server_button";
+            this.delete_server_button.Size = new System.Drawing.Size(102, 23);
+            this.delete_server_button.TabIndex = 10;
+            this.delete_server_button.Text = "Delete Server";
+            this.delete_server_button.UseVisualStyleBackColor = true;
+            this.delete_server_button.Click += new System.EventHandler(this.delete_server_button_Click);
+            // 
+            // add_server_button
+            // 
+            this.add_server_button.Location = new System.Drawing.Point(240, 32);
+            this.add_server_button.Name = "add_server_button";
+            this.add_server_button.Size = new System.Drawing.Size(102, 23);
+            this.add_server_button.TabIndex = 8;
+            this.add_server_button.Text = "Add Server";
+            this.add_server_button.UseVisualStyleBackColor = true;
+            this.add_server_button.Click += new System.EventHandler(this.add_server_button_Click);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(6, 12);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(68, 13);
+            this.label1.TabIndex = 7;
+            this.label1.Text = "Server List";
+            // 
+            // server_list
+            // 
+            this.server_list.FormattingEnabled = true;
+            this.server_list.Location = new System.Drawing.Point(9, 32);
+            this.server_list.Name = "server_list";
+            this.server_list.Size = new System.Drawing.Size(183, 173);
+            this.server_list.TabIndex = 6;
+            this.server_list.SelectedIndexChanged += new System.EventHandler(this.server_list_SelectedIndexChanged);
             // 
             // tabPage2
             // 
@@ -132,6 +211,67 @@
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Bot Configuration";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(8, 191);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(135, 13);
+            this.label12.TabIndex = 27;
+            this.label12.Text = "Start when Windows Starts";
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(8, 142);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(95, 13);
+            this.label11.TabIndex = 26;
+            this.label11.Text = "Keep logs of chats";
+            // 
+            // windows_start_box
+            // 
+            this.windows_start_box.AutoSize = true;
+            this.windows_start_box.Location = new System.Drawing.Point(201, 190);
+            this.windows_start_box.Name = "windows_start_box";
+            this.windows_start_box.Size = new System.Drawing.Size(15, 14);
+            this.windows_start_box.TabIndex = 9;
+            this.windows_start_box.UseVisualStyleBackColor = true;
+            // 
+            // browse_button
+            // 
+            this.browse_button.Location = new System.Drawing.Point(321, 162);
+            this.browse_button.Name = "browse_button";
+            this.browse_button.Size = new System.Drawing.Size(65, 23);
+            this.browse_button.TabIndex = 8;
+            this.browse_button.Text = "Browse";
+            this.browse_button.UseVisualStyleBackColor = true;
+            // 
+            // log_folder_box
+            // 
+            this.log_folder_box.Location = new System.Drawing.Point(201, 164);
+            this.log_folder_box.Name = "log_folder_box";
+            this.log_folder_box.Size = new System.Drawing.Size(114, 20);
+            this.log_folder_box.TabIndex = 7;
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(8, 167);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(85, 13);
+            this.label10.TabIndex = 22;
+            this.label10.Text = "Log Save Folder";
+            // 
+            // keep_logs_box
+            // 
+            this.keep_logs_box.AutoSize = true;
+            this.keep_logs_box.Location = new System.Drawing.Point(201, 141);
+            this.keep_logs_box.Name = "keep_logs_box";
+            this.keep_logs_box.Size = new System.Drawing.Size(15, 14);
+            this.keep_logs_box.TabIndex = 6;
+            this.keep_logs_box.UseVisualStyleBackColor = true;
             // 
             // max_message_length_box
             // 
@@ -366,128 +506,141 @@
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
-            // server_list
+            // tabPage3
             // 
-            this.server_list.FormattingEnabled = true;
-            this.server_list.Location = new System.Drawing.Point(9, 32);
-            this.server_list.Name = "server_list";
-            this.server_list.Size = new System.Drawing.Size(183, 173);
-            this.server_list.TabIndex = 6;
-            this.server_list.SelectedIndexChanged += new System.EventHandler(this.server_list_SelectedIndexChanged);
+            this.tabPage3.Controls.Add(this.owner_level_box);
+            this.tabPage3.Controls.Add(this.label8);
+            this.tabPage3.Controls.Add(this.founder_level_box);
+            this.tabPage3.Controls.Add(this.label7);
+            this.tabPage3.Controls.Add(this.sop_level_box);
+            this.tabPage3.Controls.Add(this.label6);
+            this.tabPage3.Controls.Add(this.op_level_box);
+            this.tabPage3.Controls.Add(this.label5);
+            this.tabPage3.Controls.Add(this.hop_level_box);
+            this.tabPage3.Controls.Add(this.label4);
+            this.tabPage3.Controls.Add(this.voice_level_box);
+            this.tabPage3.Controls.Add(this.label2);
+            this.tabPage3.Controls.Add(this.user_level_box);
+            this.tabPage3.Controls.Add(this.label3);
+            this.tabPage3.Location = new System.Drawing.Point(4, 22);
+            this.tabPage3.Name = "tabPage3";
+            this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage3.Size = new System.Drawing.Size(392, 222);
+            this.tabPage3.TabIndex = 5;
+            this.tabPage3.Text = "OP Levels";
+            this.tabPage3.UseVisualStyleBackColor = true;
             // 
-            // label1
+            // user_level_box
             // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(6, 12);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(68, 13);
-            this.label1.TabIndex = 7;
-            this.label1.Text = "Server List";
+            this.user_level_box.Location = new System.Drawing.Point(201, 15);
+            this.user_level_box.Name = "user_level_box";
+            this.user_level_box.Size = new System.Drawing.Size(185, 20);
+            this.user_level_box.TabIndex = 12;
             // 
-            // add_server_button
+            // label3
             // 
-            this.add_server_button.Location = new System.Drawing.Point(240, 32);
-            this.add_server_button.Name = "add_server_button";
-            this.add_server_button.Size = new System.Drawing.Size(102, 23);
-            this.add_server_button.TabIndex = 8;
-            this.add_server_button.Text = "Add Server";
-            this.add_server_button.UseVisualStyleBackColor = true;
-            this.add_server_button.Click += new System.EventHandler(this.add_server_button_Click);
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(8, 18);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(96, 13);
+            this.label3.TabIndex = 13;
+            this.label3.Text = "User Access Level";
             // 
-            // delete_server_button
+            // voice_level_box
             // 
-            this.delete_server_button.Enabled = false;
-            this.delete_server_button.Location = new System.Drawing.Point(240, 90);
-            this.delete_server_button.Name = "delete_server_button";
-            this.delete_server_button.Size = new System.Drawing.Size(102, 23);
-            this.delete_server_button.TabIndex = 10;
-            this.delete_server_button.Text = "Delete Server";
-            this.delete_server_button.UseVisualStyleBackColor = true;
-            this.delete_server_button.Click += new System.EventHandler(this.delete_server_button_Click);
+            this.voice_level_box.Location = new System.Drawing.Point(201, 41);
+            this.voice_level_box.Name = "voice_level_box";
+            this.voice_level_box.Size = new System.Drawing.Size(185, 20);
+            this.voice_level_box.TabIndex = 14;
             // 
-            // edit_server_button
+            // label2
             // 
-            this.edit_server_button.Enabled = false;
-            this.edit_server_button.Location = new System.Drawing.Point(240, 61);
-            this.edit_server_button.Name = "edit_server_button";
-            this.edit_server_button.Size = new System.Drawing.Size(102, 23);
-            this.edit_server_button.TabIndex = 9;
-            this.edit_server_button.Text = "Edit Server";
-            this.edit_server_button.UseVisualStyleBackColor = true;
-            this.edit_server_button.Click += new System.EventHandler(this.edit_server_button_Click);
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(8, 44);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(101, 13);
+            this.label2.TabIndex = 15;
+            this.label2.Text = "Voice Access Level";
             // 
-            // label12
+            // hop_level_box
             // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(8, 191);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(135, 13);
-            this.label12.TabIndex = 27;
-            this.label12.Text = "Start when Windows Starts";
+            this.hop_level_box.Location = new System.Drawing.Point(201, 67);
+            this.hop_level_box.Name = "hop_level_box";
+            this.hop_level_box.Size = new System.Drawing.Size(185, 20);
+            this.hop_level_box.TabIndex = 16;
             // 
-            // label11
+            // label4
             // 
-            this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(8, 142);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(95, 13);
-            this.label11.TabIndex = 26;
-            this.label11.Text = "Keep logs of chats";
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(8, 70);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(111, 13);
+            this.label4.TabIndex = 17;
+            this.label4.Text = "Half-OP Access Level";
             // 
-            // windows_start_box
+            // op_level_box
             // 
-            this.windows_start_box.AutoSize = true;
-            this.windows_start_box.Location = new System.Drawing.Point(201, 190);
-            this.windows_start_box.Name = "windows_start_box";
-            this.windows_start_box.Size = new System.Drawing.Size(15, 14);
-            this.windows_start_box.TabIndex = 9;
-            this.windows_start_box.UseVisualStyleBackColor = true;
+            this.op_level_box.Location = new System.Drawing.Point(201, 93);
+            this.op_level_box.Name = "op_level_box";
+            this.op_level_box.Size = new System.Drawing.Size(185, 20);
+            this.op_level_box.TabIndex = 18;
             // 
-            // browse_button
+            // label5
             // 
-            this.browse_button.Location = new System.Drawing.Point(321, 162);
-            this.browse_button.Name = "browse_button";
-            this.browse_button.Size = new System.Drawing.Size(65, 23);
-            this.browse_button.TabIndex = 8;
-            this.browse_button.Text = "Browse";
-            this.browse_button.UseVisualStyleBackColor = true;
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(8, 96);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(89, 13);
+            this.label5.TabIndex = 19;
+            this.label5.Text = "OP Access Level";
             // 
-            // log_folder_box
+            // sop_level_box
             // 
-            this.log_folder_box.Location = new System.Drawing.Point(201, 164);
-            this.log_folder_box.Name = "log_folder_box";
-            this.log_folder_box.Size = new System.Drawing.Size(114, 20);
-            this.log_folder_box.TabIndex = 7;
+            this.sop_level_box.Location = new System.Drawing.Point(201, 119);
+            this.sop_level_box.Name = "sop_level_box";
+            this.sop_level_box.Size = new System.Drawing.Size(185, 20);
+            this.sop_level_box.TabIndex = 20;
             // 
-            // label10
+            // label6
             // 
-            this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(8, 167);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(85, 13);
-            this.label10.TabIndex = 22;
-            this.label10.Text = "Log Save Folder";
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(8, 122);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(120, 13);
+            this.label6.TabIndex = 21;
+            this.label6.Text = "Super-OP Access Level";
             // 
-            // keep_logs_box
+            // founder_level_box
             // 
-            this.keep_logs_box.AutoSize = true;
-            this.keep_logs_box.Location = new System.Drawing.Point(201, 141);
-            this.keep_logs_box.Name = "keep_logs_box";
-            this.keep_logs_box.Size = new System.Drawing.Size(15, 14);
-            this.keep_logs_box.TabIndex = 6;
-            this.keep_logs_box.UseVisualStyleBackColor = true;
+            this.founder_level_box.Location = new System.Drawing.Point(201, 145);
+            this.founder_level_box.Name = "founder_level_box";
+            this.founder_level_box.Size = new System.Drawing.Size(185, 20);
+            this.founder_level_box.TabIndex = 22;
             // 
-            // connect_button
+            // label7
             // 
-            this.connect_button.Enabled = false;
-            this.connect_button.Location = new System.Drawing.Point(240, 119);
-            this.connect_button.Name = "connect_button";
-            this.connect_button.Size = new System.Drawing.Size(102, 23);
-            this.connect_button.TabIndex = 11;
-            this.connect_button.Text = "Connect";
-            this.connect_button.UseVisualStyleBackColor = true;
-            this.connect_button.Click += new System.EventHandler(this.connect_button_Click);
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(8, 148);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(113, 13);
+            this.label7.TabIndex = 23;
+            this.label7.Text = "Founder Access Level";
+            // 
+            // owner_level_box
+            // 
+            this.owner_level_box.Location = new System.Drawing.Point(201, 171);
+            this.owner_level_box.Name = "owner_level_box";
+            this.owner_level_box.Size = new System.Drawing.Size(185, 20);
+            this.owner_level_box.TabIndex = 24;
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(8, 174);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(105, 13);
+            this.label8.TabIndex = 25;
+            this.label8.Text = "Owner Access Level";
             // 
             // configuration
             // 
@@ -512,6 +665,8 @@
             this.tabPage4.ResumeLayout(false);
             this.tabPage5.ResumeLayout(false);
             this.tabPage5.PerformLayout();
+            this.tabPage3.ResumeLayout(false);
+            this.tabPage3.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -561,5 +716,20 @@
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.CheckBox keep_logs_box;
         private System.Windows.Forms.Button connect_button;
+        private System.Windows.Forms.TabPage tabPage3;
+        private System.Windows.Forms.TextBox owner_level_box;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.TextBox founder_level_box;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.TextBox sop_level_box;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.TextBox op_level_box;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.TextBox hop_level_box;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.TextBox voice_level_box;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TextBox user_level_box;
+        private System.Windows.Forms.Label label3;
     }
 }

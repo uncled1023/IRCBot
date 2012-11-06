@@ -34,7 +34,7 @@ namespace IRCBot
                         if (line.GetUpperBound(0) > 3)
                         {
                             ircbot.sendData("MODE", line[2] + " +q " + line[4]);
-                            access.set_access_list(line[4], line[2], "9", ircbot);
+                            access.set_access_list(line[4], line[2], conf.founder_level.ToString(), ircbot);
                         }
                         else
                         {
@@ -52,7 +52,7 @@ namespace IRCBot
                         if (line.GetUpperBound(0) > 3)
                         {
                             ircbot.sendData("MODE", line[2] + " -q " + line[4]);
-                            access.del_access_list(line[4], line[2], "9", ircbot);
+                            access.del_access_list(line[4], line[2], conf.founder_level.ToString(), ircbot);
                         }
                         else
                         {
@@ -70,7 +70,7 @@ namespace IRCBot
                         if (line.GetUpperBound(0) > 3)
                         {
                             ircbot.sendData("MODE", line[2] + " +a " + line[4]);
-                            access.set_access_list(line[4], line[2], "8", ircbot);
+                            access.set_access_list(line[4], line[2], conf.sop_level.ToString(), ircbot);
                         }
                         else
                         {
@@ -89,7 +89,7 @@ namespace IRCBot
                         {
                             ircbot.sendData("MODE", line[2] + " +a " + line[4]);
                             ircbot.sendData("PRIVMSG", "chanserv :SOP " + line[2] + " add " + line[4]);
-                            access.set_access_list(line[4], line[2], "8", ircbot);
+                            access.set_access_list(line[4], line[2], conf.sop_level.ToString(), ircbot);
                         }
                         else
                         {
@@ -108,7 +108,7 @@ namespace IRCBot
                         {
                             ircbot.sendData("MODE", line[2] + " -a " + line[4]);
                             ircbot.sendData("PRIVMSG", "chanserv :SOP " + line[2] + " del " + line[4]);
-                            access.del_access_list(line[4], line[2], "8", ircbot);
+                            access.del_access_list(line[4], line[2], conf.sop_level.ToString(), ircbot);
                         }
                         else
                         {
@@ -126,7 +126,7 @@ namespace IRCBot
                         if (line.GetUpperBound(0) > 3)
                         {
                             ircbot.sendData("MODE", line[2] + " -a " + line[4]);
-                            access.del_access_list(line[4], line[2], "8", ircbot);
+                            access.del_access_list(line[4], line[2], conf.sop_level.ToString(), ircbot);
                         }
                         else
                         {
@@ -144,7 +144,7 @@ namespace IRCBot
                         if (line.GetUpperBound(0) > 3)
                         {
                             ircbot.sendData("MODE", line[2] + " +o " + line[4]);
-                            access.set_access_list(line[4], line[2], "7", ircbot);
+                            access.set_access_list(line[4], line[2], conf.op_level.ToString(), ircbot);
                         }
                         else
                         {
@@ -163,7 +163,7 @@ namespace IRCBot
                         {
                             ircbot.sendData("MODE", line[2] + " +o " + line[4]);
                             ircbot.sendData("PRIVMSG", "chanserv :AOP " + line[2] + " add " + line[4]);
-                            access.set_access_list(line[4], line[2], "7", ircbot);
+                            access.set_access_list(line[4], line[2], conf.op_level.ToString(), ircbot);
                         }
                         else
                         {
@@ -182,7 +182,7 @@ namespace IRCBot
                         {
                             ircbot.sendData("MODE", line[2] + " -o " + line[4]);
                             ircbot.sendData("PRIVMSG", "chanserv :AOP " + line[2] + " del " + line[4]);
-                            access.del_access_list(line[4], line[2], "7", ircbot);
+                            access.del_access_list(line[4], line[2], conf.op_level.ToString(), ircbot);
                         }
                         else
                         {
@@ -200,7 +200,7 @@ namespace IRCBot
                         if (line.GetUpperBound(0) > 3)
                         {
                             ircbot.sendData("MODE", line[2] + " -o " + line[4]);
-                            access.del_access_list(line[4], line[2], "7", ircbot);
+                            access.del_access_list(line[4], line[2], conf.op_level.ToString(), ircbot);
                         }
                         else
                         {
@@ -219,7 +219,7 @@ namespace IRCBot
                         {
                             ircbot.sendData("MODE", line[2] + " + " + line[4]);
                             ircbot.sendData("PRIVMSG", "chanserv :HOP " + line[2] + " add " + line[4]);
-                            access.set_access_list(line[4], line[2], "6", ircbot);
+                            access.set_access_list(line[4], line[2], conf.hop_level.ToString(), ircbot);
                         }
                         else
                         {
@@ -238,7 +238,7 @@ namespace IRCBot
                         {
                             ircbot.sendData("MODE", line[2] + " -h " + line[4]);
                             ircbot.sendData("PRIVMSG", "chanserv :HOP " + line[2] + " del " + line[4]);
-                            access.del_access_list(line[4], line[2], "6", ircbot);
+                            access.del_access_list(line[4], line[2], conf.hop_level.ToString(), ircbot);
                         }
                         else
                         {
@@ -256,7 +256,7 @@ namespace IRCBot
                         if (line.GetUpperBound(0) > 3)
                         {
                             ircbot.sendData("MODE", line[2] + " +h " + line[4]);
-                            access.set_access_list(line[4], line[2], "6", ircbot);
+                            access.set_access_list(line[4], line[2], conf.hop_level.ToString(), ircbot);
                         }
                         else
                         {
@@ -274,7 +274,7 @@ namespace IRCBot
                         if (line.GetUpperBound(0) > 3)
                         {
                             ircbot.sendData("MODE", line[2] + " -h " + line[4]);
-                            access.del_access_list(line[4], line[2], "6", ircbot);
+                            access.del_access_list(line[4], line[2], conf.hop_level.ToString(), ircbot);
                         }
                         else
                         {
@@ -293,7 +293,7 @@ namespace IRCBot
                         {
                             ircbot.sendData("MODE", line[2] + " +v " + line[4]);
                             ircbot.sendData("PRIVMSG", "chanserv :VOP " + line[2] + " add " + line[4]);
-                            access.set_access_list(line[4], line[2], "3", ircbot);
+                            access.set_access_list(line[4], line[2], conf.voice_level.ToString(), ircbot);
                         }
                         else
                         {
@@ -312,7 +312,7 @@ namespace IRCBot
                         {
                             ircbot.sendData("MODE", line[2] + " -v " + line[4]);
                             ircbot.sendData("PRIVMSG", "chanserv :VOP " + line[2] + " del " + line[4]);
-                            access.del_access_list(line[4], line[2], "3", ircbot);
+                            access.del_access_list(line[4], line[2], conf.voice_level.ToString(), ircbot);
                         }
                         else
                         {
@@ -330,7 +330,7 @@ namespace IRCBot
                         if (line.GetUpperBound(0) > 3)
                         {
                             ircbot.sendData("MODE", line[2] + " +v " + line[4]);
-                            access.set_access_list(line[4], line[2], "3", ircbot);
+                            access.set_access_list(line[4], line[2], conf.voice_level.ToString(), ircbot);
                         }
                         else
                         {
@@ -348,7 +348,7 @@ namespace IRCBot
                         if (line.GetUpperBound(0) > 3)
                         {
                             ircbot.sendData("MODE", line[2] + " -v " + line[4]);
-                            access.del_access_list(line[4], line[2], "3", ircbot);
+                            access.del_access_list(line[4], line[2], conf.voice_level.ToString(), ircbot);
                         }
                         else
                         {
@@ -446,7 +446,7 @@ namespace IRCBot
                                     tmp_me = true;
                                 }
                             }
-                            if (sent_nick_access == 10)
+                            if (sent_nick_access == conf.owner_level)
                             {
                                 ircbot.sendData("PRIVMSG", line[2] + " :You can't ban my owner!");
                             }
@@ -547,7 +547,7 @@ namespace IRCBot
                                     tmp_me = true;
                                 }
                             }
-                            if (sent_nick_access == 10)
+                            if (sent_nick_access == conf.owner_level)
                             {
                                 ircbot.sendData("PRIVMSG", line[2] + " :You can't kick-ban my owner!");
                             }
@@ -614,7 +614,7 @@ namespace IRCBot
                                         tmp_me = true;
                                     }
                                 }
-                                if (sent_nick_access == 10)
+                                if (sent_nick_access == conf.owner_level)
                                 {
                                     ircbot.sendData("PRIVMSG", line[2] + " :You can't ban my owner!");
                                 }
@@ -691,7 +691,7 @@ namespace IRCBot
                                         tmp_me = true;
                                     }
                                 }
-                                if (sent_nick_access == 10)
+                                if (sent_nick_access == conf.owner_level)
                                 {
                                     ircbot.sendData("PRIVMSG", line[2] + " :You can't kick-ban my owner!");
                                 }
@@ -765,7 +765,7 @@ namespace IRCBot
                                     tmp_me = true;
                                 }
                             }
-                            if (sent_nick_access == 10)
+                            if (sent_nick_access == conf.owner_level)
                             {
                                 ircbot.sendData("PRIVMSG", line[2] + " :You can't kick my owner!");
                             }
@@ -821,7 +821,7 @@ namespace IRCBot
                                     tmp_me = true;
                                 }
                             }
-                            if (sent_nick_access == 10)
+                            if (sent_nick_access == conf.owner_level)
                             {
                                 ircbot.sendData("PRIVMSG", line[2] + " :You can't ban my owner!");
                             }
@@ -876,7 +876,7 @@ namespace IRCBot
                                     tmp_me = true;
                                 }
                             }
-                            if (sent_nick_access == 10)
+                            if (sent_nick_access == conf.owner_level)
                             {
                                 ircbot.sendData("PRIVMSG", line[2] + " :You can't kick-ban my owner!");
                             }
@@ -984,7 +984,7 @@ namespace IRCBot
                                     tmp_me = true;
                                 }
                             }
-                            if (sent_nick_access == 10)
+                            if (sent_nick_access == conf.owner_level)
                             {
                                 ircbot.sendData("PRIVMSG", line[2] + " :You can't kick my owner!");
                             }

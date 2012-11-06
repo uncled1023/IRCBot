@@ -75,6 +75,23 @@ namespace IRCBot
                         ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
                     }
                     break;
+                case "nick":
+                    if (nick_access >= ircbot.get_command_access(command))
+                    {
+                        if (line.GetUpperBound(0) > 3)
+                        {
+                            ircbot.sendData("NICK", line[4]);
+                        }
+                        else
+                        {
+                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                        }
+                    }
+                    else
+                    {
+                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                    }
+                    break;
                 case "id":
                     if (nick_access >= ircbot.get_command_access(command))
                     {

@@ -1,6 +1,7 @@
 Identify as Owner:1:owner:<bot password>:Identifies you as the Bot's owner.
 Add Owner:10:addowner:<nick>:Adds the defined nick as an owner to me.
 Delete Owner:10:delowner:<nick>:Removes the defined nick from my owners list.
+Change Nickname:10:nick:<new_nick>:Changes my nickname to the one specified.
 Identify Bot:10:id::Makes me identify to the server.
 Join Channel:10:join:<channel>:Tells me to join the defined channel.
 Part Channel:10:part:<channel>:Tells me to leave the defined channel.

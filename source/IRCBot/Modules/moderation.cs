@@ -219,7 +219,7 @@ namespace IRCBot
                         {
                             ircbot.sendData("MODE", line[2] + " + " + line[4]);
                             ircbot.sendData("PRIVMSG", "chanserv :HOP " + line[2] + " add " + line[4]);
-                            access.set_access_list(line[4], line[2], "7", ircbot);
+                            access.set_access_list(line[4], line[2], "6", ircbot);
                         }
                         else
                         {
@@ -238,7 +238,7 @@ namespace IRCBot
                         {
                             ircbot.sendData("MODE", line[2] + " -h " + line[4]);
                             ircbot.sendData("PRIVMSG", "chanserv :HOP " + line[2] + " del " + line[4]);
-                            access.del_access_list(line[4], line[2], "7", ircbot);
+                            access.del_access_list(line[4], line[2], "6", ircbot);
                         }
                         else
                         {
@@ -256,7 +256,7 @@ namespace IRCBot
                         if (line.GetUpperBound(0) > 3)
                         {
                             ircbot.sendData("MODE", line[2] + " +h " + line[4]);
-                            access.set_access_list(line[4], line[2], "4", ircbot);
+                            access.set_access_list(line[4], line[2], "6", ircbot);
                         }
                         else
                         {
@@ -274,7 +274,7 @@ namespace IRCBot
                         if (line.GetUpperBound(0) > 3)
                         {
                             ircbot.sendData("MODE", line[2] + " -h " + line[4]);
-                            access.del_access_list(line[4], line[2], "4", ircbot);
+                            access.del_access_list(line[4], line[2], "6", ircbot);
                         }
                         else
                         {
@@ -293,7 +293,7 @@ namespace IRCBot
                         {
                             ircbot.sendData("MODE", line[2] + " +v " + line[4]);
                             ircbot.sendData("PRIVMSG", "chanserv :VOP " + line[2] + " add " + line[4]);
-                            access.set_access_list(line[4], line[2], "7", ircbot);
+                            access.set_access_list(line[4], line[2], "3", ircbot);
                         }
                         else
                         {
@@ -312,7 +312,7 @@ namespace IRCBot
                         {
                             ircbot.sendData("MODE", line[2] + " -v " + line[4]);
                             ircbot.sendData("PRIVMSG", "chanserv :VOP " + line[2] + " del " + line[4]);
-                            access.del_access_list(line[4], line[2], "7", ircbot);
+                            access.del_access_list(line[4], line[2], "3", ircbot);
                         }
                         else
                         {

@@ -50,6 +50,10 @@ namespace IRCBot
                                 {
                                     num_dice = Convert.ToInt32(conf.module_config[conf_id][2]);
                                 }
+                                if (num_sides > Convert.ToInt32(conf.module_config[conf_id][3]))
+                                {
+                                    num_sides = Convert.ToInt32(conf.module_config[conf_id][3]);
+                                }
                                 for (int x = 0; x < num_dice; x++)
                                 {
                                     System.Threading.Thread.Sleep(100);

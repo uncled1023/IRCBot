@@ -168,8 +168,13 @@
 			<max_dice>
 				<type>textbox</type>
 				<value>100</value>
-				<label>Maximum number of Dice allowed</label>
+				<label>Maximum number of dice allowed</label>
 			</max_dice>
+			<max_sides>
+				<type>textbox</type>
+				<value>999</value>
+				<label>Maximum number of sides allowed</label>
+			</max_sides>
 		</options>
     </module>
   </modules>

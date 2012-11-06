@@ -124,6 +124,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="quote.cs" />
+    <Compile Include="roll.cs" />
     <Compile Include="roll_call.cs" />
     <Compile Include="rules.cs" />
     <Compile Include="seen.cs" />

@@ -66,6 +66,8 @@ namespace IRCBot
         version version;
         // Idle Module
         idle idle;
+        // ROll Dice Module
+        roll roll;
 
         TcpClient IRCConnection;
         IRCConfig config;
@@ -140,6 +142,8 @@ namespace IRCBot
             version = new version();
             // Idle Module
             idle = new idle();
+            // Roll Dice Module
+            roll = new roll();
 
             IRCConnection = null;
             ns = null;
@@ -790,6 +794,19 @@ namespace IRCBot
                                                 if (conf.module_config[x][1].Equals("True"))
                                                 {
                                                     idle.idle_control(ex, command, this, conf, nick_access, nick);
+                                                }
+                                                break;
+                                            }
+                                        }
+
+                                        // Roll Dice Module
+                                        for (int x = 0; x < conf.module_config.Count(); x++)
+                                        {
+                                            if (conf.module_config[x][0].Equals("Roll Dice"))
+                                            {
+                                                if (conf.module_config[x][1].Equals("True"))
+                                                {
+                                                    roll.roll_control(ex, command, this, conf, x, nick_access, nick, channel);
                                                 }
                                                 break;
                                             }

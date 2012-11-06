@@ -1408,5 +1408,10 @@ namespace IRCBot
                 return false;
             }
         }
+
+        private void tabControl1_MouseClick(object sender, MouseEventArgs e)
+        {
+            input_box.Focus();
+        }
     }
 }

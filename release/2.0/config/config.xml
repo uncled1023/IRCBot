@@ -685,7 +685,7 @@
         <command>
           <name>Delete your Introduction</name>
           <description>Deletes all of your introductions.</description>
-          <triggers>intro</triggers>
+          <triggers>introdelete</triggers>
           <syntax>
           </syntax>
           <access_level>1</access_level>

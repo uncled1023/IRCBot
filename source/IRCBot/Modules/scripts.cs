@@ -8,9 +8,9 @@ using IronPython.Runtime;
 using Microsoft.Scripting;
 using Microsoft.Scripting.Hosting;
 
-namespace IRCBot
+namespace IRCBot.Modules
 {
-    class scripts
+    class scripts : Module
     {
         // Work in progress
         private ScriptEngine pyEngine = null;

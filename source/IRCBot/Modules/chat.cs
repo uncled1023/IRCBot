@@ -10,9 +10,9 @@ using System.Windows.Forms;
 using System.IO;
 using AIMLbot;
 
-namespace IRCBot
+namespace IRCBot.Modules
 {
-    class chat
+    class chat : Module
     {
         private System.Timers.Timer chat_time = new System.Timers.Timer();
         public bool still_chatting;
@@ -22,7 +22,6 @@ namespace IRCBot
 
         public chat()
         {
-            chat_time.Interval = 20000;
             chat_time.AutoReset = false;
             chat_time.Elapsed += stop_chat;
             chat_time.Enabled = false;
@@ -39,54 +38,58 @@ namespace IRCBot
             myBot.isAcceptingUserInput = true;
         }
 
-        public void chat_control(string[] line, bot ircbot, IRCConfig conf, string nick, string channel)
+        public override void control(bot ircbot, ref IRCConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
-            if (line.GetUpperBound(0) >= 3)
+            if (type.Equals("channel") && bot_command == false)
             {
-                string msg = "";
-                if (line.GetUpperBound(0) > 3)
+                chat_time.Interval = Convert.ToInt32(conf.module_config[module_id][3]) * 1000;
+                if (line.GetUpperBound(0) >= 3)
                 {
-                    msg = line[3].TrimStart(':') + " " + line[4];
-                }
-                else
-                {
-                    msg = line[3].TrimStart(':');
-                }
-                string[] words = msg.Split(' ');
-                bool me_in = false;
-                foreach (string word in words)
-                {
-                    if (word.ToLower().Contains(conf.nick.ToLower()))
+                    string msg = "";
+                    if (line.GetUpperBound(0) > 3)
                     {
-                        me_in = true;
-                        break;
+                        msg = line[3].TrimStart(':') + " " + line[4];
                     }
-                }
-                if (me_in == true || still_chatting == true)
-                {
-                    bool nick_found = false;
-                    for (int x = 0; x < chatting_nick.Count(); x++)
+                    else
                     {
-                        if (chatting_nick[x].Equals(nick))
+                        msg = line[3].TrimStart(':');
+                    }
+                    string[] words = msg.Split(' ');
+                    bool me_in = false;
+                    foreach (string word in words)
+                    {
+                        if (word.ToLower().Contains(conf.nick.ToLower()))
                         {
-                            nick_found = true;
+                            me_in = true;
+                            break;
                         }
                     }
-                    if (me_in == true && nick_found == false)
+                    if (me_in == true || still_chatting == true)
                     {
-                        chatting_nick.Add(nick);
-                        nick_found = true;
-                    }
-                    if (nick_found == true)
-                    {
-                        // Start Chatting
-                        still_chatting = false;
-                        chat_time.Stop();
-                        Request r = new Request(msg, myUser, myBot);
-                        Result res = myBot.Chat(r);
-                        ircbot.sendData("PRIVMSG", channel + " :" + res.Output.Replace("[nick]", nick).Replace("[me]", conf.nick).Replace("[owner]", conf.owner));
-                        chat_time.Start();
-                        still_chatting = true;
+                        bool nick_found = false;
+                        for (int x = 0; x < chatting_nick.Count(); x++)
+                        {
+                            if (chatting_nick[x].Equals(nick))
+                            {
+                                nick_found = true;
+                            }
+                        }
+                        if (me_in == true && nick_found == false)
+                        {
+                            chatting_nick.Add(nick);
+                            nick_found = true;
+                        }
+                        if (nick_found == true)
+                        {
+                            // Start Chatting
+                            still_chatting = false;
+                            chat_time.Stop();
+                            Request r = new Request(msg, myUser, myBot);
+                            Result res = myBot.Chat(r);
+                            ircbot.sendData("PRIVMSG", channel + " :" + res.Output.Replace("[nick]", nick).Replace("[me]", conf.nick).Replace("[owner]", conf.owner));
+                            chat_time.Start();
+                            still_chatting = true;
+                        }
                     }
                 }
             }

@@ -17,58 +17,12 @@ using System.Text.RegularExpressions;
 using Microsoft.Win32;
 using System.Runtime.InteropServices;
 using System.Management;
+using System.Reflection;
 
 namespace IRCBot
 {
     class bot
     {
-        // Load Modules //
-
-        // Access Module
-        access access;
-        // Owner Module
-        owner owner;
-        // Help Module
-        help help;
-        // Rules Module
-        rules rules;
-        // Intro Message Module
-        intro intro;
-        // Quote Module
-        quote quote;
-        // Seen Module
-        seen seen;
-        // Weather Module
-        weather weather;
-        // Google Module
-        google google;
-        // Urban Dictionary Module
-        urban_dictionary ud;
-        // 8ball Module
-        _8ball _8ball;
-        // AI Module
-        AI ai;
-        // Messaging Module
-        messaging message_module;
-        // Hbomb Module
-        hbomb hbomb;
-        // Ping Me Module
-        pingme pingme;
-        // Fun Commands Module
-        fun fun;
-        // ChatBot Module
-        chat chat;
-        // Poll Module
-        poll poll;
-        // Roll Call Module
-        roll_call roll_call;
-        // Version Response Module
-        version version;
-        // Idle Module
-        idle idle;
-        // ROll Dice Module
-        roll roll;
-
         TcpClient IRCConnection;
         IRCConfig config;
         NetworkStream ns;
@@ -79,7 +33,6 @@ namespace IRCBot
         private System.Windows.Forms.Timer Spam_Check_Timer;
         private System.Windows.Forms.Timer Spam_Timer;
         private System.Windows.Forms.Timer check_cancel;
-        private bool spam_activated;
         private bool restart;
         private int restart_attempts;
 
@@ -88,63 +41,18 @@ namespace IRCBot
         public bool shouldRun;
         public bool first_run;
         public int spam_count;
+        public bool spam_activated;
         public List<List<string>> nick_list;
         public List<string> channel_list;
         public string cur_dir;
         public BackgroundWorker worker;
+        public List<Modules.Module> module_list = new List<Modules.Module>();
 
         Interface ircbot;
         public IRCConfig conf;
 
         public bot()
         {
-            // Load Modules //
-
-            // Access Module
-            access = new access();
-            // Owner Module
-            owner = new owner();
-            // Help Module
-            help = new help();
-            // Rules Module
-            rules = new rules();
-            // Intro Message Module
-            intro = new intro();
-            // Quote Module
-            quote = new quote();
-            // Seen Module
-            seen = new seen();
-            // Weather Module
-            weather = new weather();
-            // Google Module
-            google = new google();
-            // Urban Dictionary Module
-            ud = new urban_dictionary();
-            // 8ball Module
-            _8ball = new _8ball();
-            // AI Module
-            ai = new AI();
-            // Messaging Module
-            message_module = new messaging();
-            // Hbomb Module
-            hbomb = new hbomb();
-            // Ping Me Module
-            pingme = new pingme();
-            // Fun Commands Module
-            fun = new fun();
-            // ChatBot Module
-            chat = new chat();
-            // Poll Module
-            poll = new poll();
-            // Roll Call Module
-            roll_call = new roll_call();
-            // Version Response Module
-            version = new version();
-            // Idle Module
-            idle = new idle();
-            // Roll Dice Module
-            roll = new roll();
-
             IRCConnection = null;
             ns = null;
             sr = null;
@@ -179,6 +87,8 @@ namespace IRCBot
             }
             cur_dir = ircbot.cur_dir;
 
+            load_modules();
+
             Spam_Check_Timer.Tick += new EventHandler(spam_tick);
             Spam_Check_Timer.Interval = conf.spam_threshold;
             Spam_Check_Timer.Start();
@@ -199,6 +109,58 @@ namespace IRCBot
 
             worker = work;
             worker.RunWorkerAsync(2000);
+        }
+       
+        public void load_modules()
+        {
+            module_list.Clear();
+            string modules_loaded = "";
+            string modules_error = "";
+            foreach (List<string> module in conf.module_config)
+            {
+                string module_name = module[0];
+                string class_name = module[1];
+                //create the class base on string
+                //note : include the namespace and class name (namespace=IRCBot.Modules, class name=<class_name>)
+                Assembly a = Assembly.Load("IRCBot");
+                Type t = a.GetType("IRCBot.Modules." + class_name);
+
+                //check to see if the class is instantiated or not
+                if (t != null)
+                {
+                    Modules.Module new_module = (Modules.Module)Activator.CreateInstance(t);
+                    module_list.Add(new_module);
+                    modules_loaded += ", " + module_name;
+                }
+                else
+                {
+                    modules_error += ", " + module_name;
+                }
+            }
+            if (modules_loaded != "")
+            {
+                string output = Environment.NewLine + server_name + ":Loaded Modules: " + modules_loaded.TrimStart(',').Trim();
+                lock (ircbot.listLock)
+                {
+                    if (ircbot.queue_text.Count >= 1000)
+                    {
+                        ircbot.queue_text.RemoveAt(0);
+                    }
+                    ircbot.queue_text.Add(output);
+                }
+            }
+            if (modules_error != "")
+            {
+                string output = Environment.NewLine + server_name + ":Error Loading Modules: " + modules_error.TrimStart(',').Trim();
+                lock (ircbot.listLock)
+                {
+                    if (ircbot.queue_text.Count >= 1000)
+                    {
+                        ircbot.queue_text.RemoveAt(0);
+                    }
+                    ircbot.queue_text.Add(output);
+                }
+            }
         }
 
         private void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
@@ -465,6 +427,13 @@ namespace IRCBot
             first_run = false;
             while (shouldRun)
             {
+                string type = "base";
+                int nick_access = conf.user_level;
+                string nick = "";
+                string channel = "";
+                string nick_host = "";
+                bool bot_command = false;
+                string command = "";
                 restart = false;
                 restart_attempts = 0;
                 Thread.Sleep(30);
@@ -497,515 +466,45 @@ namespace IRCBot
                     }
                 }
 
-                // Ping Me Module
-                for (int x = 0; x < conf.module_config.Count(); x++)
-                {
-                    if (conf.module_config[x][0].Equals("Ping Me"))
-                    {
-                        if (conf.module_config[x][1].Equals("True"))
-                        {
-                            pingme.check_ping(ex, this);
-                        }
-                        break;
-                    }
-                }
-
                 string[] user_info = ex[0].Split('@');
                 string[] name = user_info[0].Split('!');
                 if (name.GetUpperBound(0) > 0)
                 {
-                    string nick = name[0].TrimStart(':');
-                    string nick_host = user_info[1];
-                    string channel = ex[2];
+                    nick = name[0].TrimStart(':');
+                    nick_host = user_info[1];
+                    channel = ex[2];
 
-                    // Seen Module
-                    for (int x = 0; x < conf.module_config.Count(); x++)
-                    {
-                        if (conf.module_config[x][0].Equals("Seen"))
-                        {
-                            if (conf.module_config[x][1].Equals("True"))
-                            {
-                                seen.add_seen(nick, channel, ex, this);
-                            }
-                            break;
-                        }
-                    }
-
-                    if (spam_activated == false)
-                    {
+                    type = "line";
                         // On Message Events events
-                        if (ex[1].ToLower() == "privmsg")
+                    if (ex[1].ToLower() == "privmsg")
+                    {
+                        if (ex.GetUpperBound(0) >= 3) // If valid Input
                         {
-                            if (ex.GetUpperBound(0) >= 3) // If valid Input
+                            command = ex[3]; //grab the command sent
+                            command = command.ToLower();
+                            string msg_type = command.TrimStart(':');
+                            if (msg_type.StartsWith(conf.command) == true)
                             {
-                                bool bot_command = false;
-                                string command = ex[3]; //grab the command sent
-                                command = command.ToLower();
-                                string msg_type = command.TrimStart(':');
-                                if (msg_type.StartsWith(conf.command) == true)
-                                {
-                                    bot_command = true;
-                                    command = command.Remove(0, 2);
-                                }
+                                bot_command = true;
+                                command = command.Remove(0, 2);
+                            }
 
-                                if (bot_command == true) // Starts with the bots command deliminator (aka a command)
-                                {
-
-                                    if (ex[2].StartsWith("#") == true) // From Channel
-                                    {
-                                        // Get the nicks access from channel and access list
-                                        int nick_access = get_user_access(nick, channel);
-
-                                        // Access Module
-                                        for (int x = 0; x < conf.module_config.Count(); x++)
-                                        {
-                                            if (conf.module_config[x][0].Equals("Access"))
-                                            {
-                                                if (conf.module_config[x][1].Equals("True"))
-                                                {
-                                                    access.access_control(ex, command, this, conf, nick_access, nick);
-                                                }
-                                                break;
-                                            }
-                                        }
-
-                                        // Moderation Module
-                                        for (int x = 0; x < conf.module_config.Count(); x++)
-                                        {
-                                            if (conf.module_config[x][0].Equals("Moderation"))
-                                            {
-                                                if (conf.module_config[x][1].Equals("True"))
-                                                {
-                                                    moderation mod = new moderation();
-                                                    mod.moderation_control(ex, command, this, conf, nick_access, nick);
-                                                }
-                                                break;
-                                            }
-                                        }
-
-                                        // Owner Module
-                                        for (int x = 0; x < conf.module_config.Count(); x++)
-                                        {
-                                            if (conf.module_config[x][0].Equals("Owner"))
-                                            {
-                                                if (conf.module_config[x][1].Equals("True"))
-                                                {
-                                                    owner.owner_control(ex, command, this, ref conf, nick_access, nick);
-                                                }
-                                                break;
-                                            }
-                                        }
-
-                                        // Help Module
-                                        for (int x = 0; x < conf.module_config.Count(); x++)
-                                        {
-                                            if (conf.module_config[x][0].Equals("Help"))
-                                            {
-                                                if (conf.module_config[x][1].Equals("True"))
-                                                {
-                                                    help.help_control(ex, command, this, conf, nick_access, nick);
-                                                }
-                                                break;
-                                            }
-                                        }
-
-                                        // Rules Module
-                                        for (int x = 0; x < conf.module_config.Count(); x++)
-                                        {
-                                            if (conf.module_config[x][0].Equals("Rules"))
-                                            {
-                                                if (conf.module_config[x][1].Equals("True"))
-                                                {
-                                                    rules.rules_control(ex, command, this, nick_access, nick);
-                                                }
-                                                break;
-                                            }
-                                        }
-
-                                        // Messaging Module
-                                        for (int x = 0; x < conf.module_config.Count(); x++)
-                                        {
-                                            if (conf.module_config[x][0].Equals("Messaging"))
-                                            {
-                                                if (conf.module_config[x][1].Equals("True"))
-                                                {
-                                                    message_module.message_control(ex, command, this, nick);
-                                                }
-                                                break;
-                                            }
-                                        }
-
-                                        // Intro Message Module
-                                        for (int x = 0; x < conf.module_config.Count(); x++)
-                                        {
-                                            if (conf.module_config[x][0].Equals("Intro"))
-                                            {
-                                                if (conf.module_config[x][1].Equals("True"))
-                                                {
-                                                    intro.intro_control(ex, command, this, nick_access, nick);
-                                                }
-                                                break;
-                                            }
-                                        }
-
-                                        // Quote Module
-                                        for (int x = 0; x < conf.module_config.Count(); x++)
-                                        {
-                                            if (conf.module_config[x][0].Equals("Quote"))
-                                            {
-                                                if (conf.module_config[x][1].Equals("True"))
-                                                {
-                                                    quote.quote_control(ex, command, this, conf, x, nick_access, nick);
-                                                }
-                                                break;
-                                            }
-                                        }
-
-                                        // Seen Module
-                                        for (int x = 0; x < conf.module_config.Count(); x++)
-                                        {
-                                            if (conf.module_config[x][0].Equals("Seen"))
-                                            {
-                                                if (conf.module_config[x][1].Equals("True"))
-                                                {
-                                                    seen.seen_control(ex, command, this, nick_access, nick, sr);
-                                                }
-                                                break;
-                                            }
-                                        }
-
-                                        // Weather Module
-                                        for (int x = 0; x < conf.module_config.Count(); x++)
-                                        {
-                                            if (conf.module_config[x][0].Equals("Weather"))
-                                            {
-                                                if (conf.module_config[x][1].Equals("True"))
-                                                {
-                                                    weather.weather_control(ex, command, this, conf, x, nick_access, nick);
-                                                }
-                                                break;
-                                            }
-                                        }
-
-                                        // Google Module
-                                        for (int x = 0; x < conf.module_config.Count(); x++)
-                                        {
-                                            if (conf.module_config[x][0].Equals("Google"))
-                                            {
-                                                if (conf.module_config[x][1].Equals("True"))
-                                                {
-                                                    google.google_control(ex, command, this, conf, x, nick_access, nick);
-                                                }
-                                                break;
-                                            }
-                                        }
-
-                                        // Urban Dictionary Module
-                                        for (int x = 0; x < conf.module_config.Count(); x++)
-                                        {
-                                            if (conf.module_config[x][0].Equals("Urban Dictionary"))
-                                            {
-                                                if (conf.module_config[x][1].Equals("True"))
-                                                {
-                                                    ud.ud_control(ex, command, this, conf, x, nick_access, nick);
-                                                }
-                                                break;
-                                            }
-                                        }
-
-                                        // 8ball Module
-                                        for (int x = 0; x < conf.module_config.Count(); x++)
-                                        {
-                                            if (conf.module_config[x][0].Equals("8ball"))
-                                            {
-                                                if (conf.module_config[x][1].Equals("True"))
-                                                {
-                                                    _8ball._8ball_control(ex, command, this, nick_access, nick);
-                                                }
-                                                break;
-                                            }
-                                        }
-
-                                        // hbomb Module
-                                        for (int x = 0; x < conf.module_config.Count(); x++)
-                                        {
-                                            if (conf.module_config[x][0].Equals("HBomb"))
-                                            {
-                                                if (conf.module_config[x][1].Equals("True"))
-                                                {
-                                                    hbomb.hbomb_control(ex, command, this, nick_access, nick, channel, conf, idle);
-                                                } break;
-                                            }
-                                        }
-
-                                        // Ping Me Module
-                                        for (int x = 0; x < conf.module_config.Count(); x++)
-                                        {
-                                            if (conf.module_config[x][0].Equals("Ping Me"))
-                                            {
-                                                if (conf.module_config[x][1].Equals("True"))
-                                                {
-                                                    pingme.pingme_control(ex, command, this, nick_access, nick, channel);
-                                                }
-                                                break;
-                                            }
-                                        }
-
-                                        // Fun Module
-                                        for (int x = 0; x < conf.module_config.Count(); x++)
-                                        {
-                                            if (conf.module_config[x][0].Equals("Fun"))
-                                            {
-                                                if (conf.module_config[x][1].Equals("True"))
-                                                {
-                                                    fun.fun_control(ex, command, this, nick_access, nick, channel);
-                                                }
-                                                break;
-                                            }
-                                        }
-
-                                        // Poll Module
-                                        for (int x = 0; x < conf.module_config.Count(); x++)
-                                        {
-                                            if (conf.module_config[x][0].Equals("Poll"))
-                                            {
-                                                if (conf.module_config[x][1].Equals("True"))
-                                                {
-                                                    poll.poll_control(ex, command, this, nick_access, nick, channel);
-                                                }
-                                                break;
-                                            }
-                                        }
-
-                                        // Roll Call Module
-                                        for (int x = 0; x < conf.module_config.Count(); x++)
-                                        {
-                                            if (conf.module_config[x][0].Equals("Roll Call"))
-                                            {
-                                                if (conf.module_config[x][1].Equals("True"))
-                                                {
-                                                    roll_call.roll_call_control(ex, command, this, conf, x, nick_access, channel, nick);
-                                                }
-                                                break;
-                                            }
-                                        }
-
-                                        // Idle Module
-                                        for (int x = 0; x < conf.module_config.Count(); x++)
-                                        {
-                                            if (conf.module_config[x][0].Equals("Idle"))
-                                            {
-                                                if (conf.module_config[x][1].Equals("True"))
-                                                {
-                                                    idle.idle_control(ex, command, this, conf, nick_access, nick);
-                                                }
-                                                break;
-                                            }
-                                        }
-
-                                        // Roll Dice Module
-                                        for (int x = 0; x < conf.module_config.Count(); x++)
-                                        {
-                                            if (conf.module_config[x][0].Equals("Roll Dice"))
-                                            {
-                                                if (conf.module_config[x][1].Equals("True"))
-                                                {
-                                                    roll.roll_control(ex, command, this, conf, x, nick_access, nick, channel);
-                                                }
-                                                break;
-                                            }
-                                        }
-                                    }
-                                    else // From Query
-                                    {
-                                        // Get the nicks access from channel and access list
-                                        channel = null;
-                                        int nick_access = get_user_access(nick, channel);
-
-                                        // Access Module
-                                        for (int x = 0; x < conf.module_config.Count(); x++)
-                                        {
-                                            if (conf.module_config[x][0].Equals("Access"))
-                                            {
-                                                if (conf.module_config[x][1].Equals("True"))
-                                                {
-                                                    access.access_control(ex, command, this, conf, nick_access, nick);
-                                                }
-                                                break;
-                                            }
-                                        }
-
-                                        // Owner Module
-                                        for (int x = 0; x < conf.module_config.Count(); x++)
-                                        {
-                                            if (conf.module_config[x][0].Equals("Owner"))
-                                            {
-                                                if (conf.module_config[x][1].Equals("True"))
-                                                {
-                                                    owner.owner_control(ex, command, this, ref conf, nick_access, nick);
-                                                }
-                                                break;
-                                            }
-                                        }
-
-                                        // Messaging Module
-                                        for (int x = 0; x < conf.module_config.Count(); x++)
-                                        {
-                                            if (conf.module_config[x][0].Equals("Messaging"))
-                                            {
-                                                if (conf.module_config[x][1].Equals("True"))
-                                                {
-                                                    message_module.message_control(ex, command, this, nick);
-                                                }
-                                                break;
-                                            }
-                                        }
-
-                                        // Roll Call Module
-                                        for (int x = 0; x < conf.module_config.Count(); x++)
-                                        {
-                                            if (conf.module_config[x][0].Equals("Roll Call"))
-                                            {
-                                                if (conf.module_config[x][1].Equals("True"))
-                                                {
-                                                    roll_call.roll_call_control(ex, command, this, conf, x, nick_access, channel, nick);
-                                                }
-                                                break;
-                                            }
-                                        }
-
-                                        // Idle Module
-                                        for (int x = 0; x < conf.module_config.Count(); x++)
-                                        {
-                                            if (conf.module_config[x][0].Equals("Idle"))
-                                            {
-                                                if (conf.module_config[x][1].Equals("True"))
-                                                {
-                                                    idle.idle_control(ex, command, this, conf, nick_access, nick);
-                                                }
-                                                break;
-                                            }
-                                        }
-                                    }
-                                }
-                                else // All other text
-                                {
-                                    if (ex[2].StartsWith("#") == true) // From Channel
-                                    {
-                                        // ABan/AKick Module
-                                        for (int x = 0; x < conf.module_config.Count(); x++)
-                                        {
-                                            if (conf.module_config[x][0].Equals("Moderation"))
-                                            {
-                                                if (conf.module_config[x][1].Equals("True"))
-                                                {
-                                                    moderation mod = new moderation();
-                                                    mod.check_auto(nick, channel, nick_host, this);
-                                                }
-                                                break;
-                                            }
-                                        }
-
-                                        // Quote Module
-                                        for (int x = 0; x < conf.module_config.Count(); x++)
-                                        {
-                                            if (conf.module_config[x][0].Equals("Quote"))
-                                            {
-                                                if (conf.module_config[x][1].Equals("True"))
-                                                {
-                                                    quote.add_quote(nick, channel, ex, this, conf);
-                                                }
-                                                break;
-                                            }
-                                        }
-
-                                        // Response Module
-                                        for (int x = 0; x < conf.module_config.Count(); x++)
-                                        {
-                                            if (conf.module_config[x][0].Equals("Response"))
-                                            {
-                                                if (conf.module_config[x][1].Equals("True"))
-                                                {
-                                                    ai.AI_Parse(ex, channel, nick, this, conf, chat);
-                                                }
-                                                break;
-                                            }
-                                        }
-
-                                        // Messaging Module
-                                        for (int x = 0; x < conf.module_config.Count(); x++)
-                                        {
-                                            if (conf.module_config[x][0].Equals("Messaging"))
-                                            {
-                                                if (conf.module_config[x][1].Equals("True"))
-                                                {
-                                                    message_module.find_message(nick, this);
-                                                }
-                                                break;
-                                            }
-                                        }
-
-                                        // Chat Module
-                                        for (int x = 0; x < conf.module_config.Count(); x++)
-                                        {
-                                            if (conf.module_config[x][0].Equals("Chat"))
-                                            {
-                                                if (conf.module_config[x][1].Equals("True"))
-                                                {
-                                                    chat.chat_control(ex, this, conf, nick, channel);
-                                                }
-                                                break;
-                                            }
-                                        }
-                                    }
-                                    else // From Query
-                                    {
-                                        // Messaging Module
-                                        for (int x = 0; x < conf.module_config.Count(); x++)
-                                        {
-                                            if (conf.module_config[x][0].Equals("Messaging"))
-                                            {
-                                                if (conf.module_config[x][1].Equals("True"))
-                                                {
-                                                    message_module.find_message(nick, this);
-                                                }
-                                                break;
-                                            }
-                                        }
-
-                                        // Response Module
-                                        for (int x = 0; x < conf.module_config.Count(); x++)
-                                        {
-                                            if (conf.module_config[x][0].Equals("Response"))
-                                            {
-                                                if (conf.module_config[x][1].Equals("True"))
-                                                {
-                                                    ai.AI_Parse(ex, nick, nick, this, conf, chat);
-                                                }
-                                                break;
-                                            }
-                                        }
-
-                                        // Version Response Module
-                                        for (int x = 0; x < conf.module_config.Count(); x++)
-                                        {
-                                            if (conf.module_config[x][0].Equals("Version Response"))
-                                            {
-                                                if (conf.module_config[x][1].Equals("True"))
-                                                {
-                                                    version.version_control(ex, this, conf, x, nick);
-                                                }
-                                                break;
-                                            }
-                                        }
-                                    }
-                                }
+                            if (ex[2].StartsWith("#") == true) // From Channel
+                            {
+                                nick_access = get_user_access(nick, channel);
+                                type = "channel";
+                            }
+                            else // From Query
+                            {
+                                type = "query";
                             }
                         }
                     }
+                    
                     // On JOIN events
                     if (ex[1].ToLower() == "join")
                     {
+                        type = "join";
                         bool chan_found = false;
                         for (int x = 0; x < nick_list.Count(); x++)
                         {
@@ -1261,51 +760,12 @@ namespace IRCBot
                                 }
                             }
                         }
-
-                        // Intro Message Module
-                        for (int x = 0; x < conf.module_config.Count(); x++)
-                        {
-                            if (conf.module_config[x][0].Equals("Intro"))
-                            {
-                                if (conf.module_config[x][1].Equals("True"))
-                                {
-                                    intro.check_intro(nick, channel.TrimStart(':'), this);
-                                }
-                                break;
-                            }
-                        }
-
-                        // Messaging Module
-                        for (int x = 0; x < conf.module_config.Count(); x++)
-                        {
-                            if (conf.module_config[x][0].Equals("Messaging"))
-                            {
-                                if (conf.module_config[x][1].Equals("True"))
-                                {
-                                    message_module.find_message(nick, this);
-                                }
-                                break;
-                            }
-                        }
-
-                        // ABan/AKick Module
-                        for (int x = 0; x < conf.module_config.Count(); x++)
-                        {
-                            if (conf.module_config[x][0].Equals("Moderation"))
-                            {
-                                if (conf.module_config[x][1].Equals("True"))
-                                {
-                                    moderation mod = new moderation();
-                                    mod.check_auto(nick, channel.TrimStart(':'), nick_host, this);
-                                }
-                                break;
-                            }
-                        }
                     }
 
                     // On user QUIT events
                     if (ex[1].ToLower() == "quit")
                     {
+                        type = "quit";
                         for (int x = 0; x < nick_list.Count(); x++)
                         {
                             for (int i = 1; i < nick_list[x].Count(); i++)
@@ -1323,6 +783,7 @@ namespace IRCBot
                     // On user PART events
                     if (ex[1].ToLower() == "part")
                     {
+                        type = "part";
                         for (int x = 0; x < nick_list.Count(); x++)
                         {
                             if (nick_list[x][0].Equals(ex[2]))
@@ -1343,6 +804,8 @@ namespace IRCBot
                     // On user Nick Change events
                     if (ex[1].ToLower() == "nick")
                     {
+                        type = "nick";
+                        nick = ex[2].TrimStart(':');
                         for (int x = 0; x < nick_list.Count(); x++)
                         {
                             for (int i = 1; i < nick_list[x].Count(); i++)
@@ -1369,6 +832,7 @@ namespace IRCBot
                     // On ChanServ Mode Change
                     if (ex[1].ToLower() == "mode")
                     {
+                        type = "mode";
                         if (ex.GetUpperBound(0) > 3)
                         {
                             if (ex[3].TrimStart('-').TrimStart('+').ToLower() == "o" || ex[3].TrimStart('-').TrimStart('+').ToLower() == "v" || ex[3].TrimStart('-').TrimStart('+').ToLower() == "h" || ex[3].TrimStart('-').TrimStart('+').ToLower() == "q" || ex[3].TrimStart('-').TrimStart('+').ToLower() == "a")
@@ -1417,6 +881,14 @@ namespace IRCBot
                             }
                         }
                     }
+                }
+
+                //Run Enabled Modules
+                int index = 0;
+                foreach (Modules.Module module in module_list)
+                {
+                    module.control(this, ref conf, index, ex, command, nick_access, nick, channel, bot_command, type);
+                    index++;
                 }
             }
         }
@@ -1503,7 +975,7 @@ namespace IRCBot
                             ircbot.queue_text.Add(output);
                         }
                     }
-                    while (name_line[3] != "=")
+                    while (name_line[3] != "=" && name_line[3] != "@")
                     {
                         line = sr.ReadLine();
                         name_line = line.Split(charSeparator, 5);
@@ -1634,20 +1106,6 @@ namespace IRCBot
             {
                 sendData("PRIVMSG", "NickServ :Identify " + conf.pass);
             }
-        }
-
-        public int get_command_access(string command)
-        {
-            int access = 0;
-            for (int x = 0; x < conf.command_access.Count(); x++)
-            {
-                if (conf.command_access[x][0].Equals(command))
-                {
-                    access = Convert.ToInt32(conf.command_access[x][1]);
-                    break;
-                }
-            }
-            return access;
         }
 
         public string get_user_host(string nick)
@@ -1955,7 +1413,7 @@ namespace IRCBot
                         {
                             if (channel != null)
                             {
-                                access acc = new access();
+                                Modules.access acc = new Modules.access();
                                 tmp_custom_access = acc.get_access_list(nick, channel, this);
                                 if (user_identified == true)
                                 {

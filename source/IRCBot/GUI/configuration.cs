@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
+using System.Xml.Linq;
 using System.IO;
 using Microsoft.Win32;
 
@@ -164,6 +165,14 @@ namespace IRCBot
                 XmlNodeList optionList = xn.ChildNodes;
                 foreach (XmlNode option in optionList)
                 {
+                    if (option.Name.Equals("commands"))
+                    {
+                        XmlNodeList Options = option.ChildNodes;
+                        foreach (XmlNode options in Options)
+                        {
+                            command_list.Items.Add(options["name"].InnerText);
+                        }
+                    }
                     if (option.Name.Equals("options"))
                     {
                         XmlNodeList Options = option.ChildNodes;
@@ -227,16 +236,6 @@ namespace IRCBot
                 }
             }
 
-            string list_file = m_parent.cur_dir + "\\config\\help.txt";
-            if (File.Exists(list_file))
-            {
-                string[] file = System.IO.File.ReadAllLines(list_file);
-                foreach (string file_line in file)
-                {
-                    string[] split = file_line.Split(':');
-                    command_list.Items.Add(split[2]);
-                }
-            }
             command_list.SelectedIndexChanged += command_list_change;
             command_list.Sorted = true;
         }
@@ -259,22 +258,30 @@ namespace IRCBot
 
         private void command_list_change(Object sender, EventArgs e)
         {
-            string list_file = m_parent.cur_dir + "\\config\\help.txt";
-            if (File.Exists(list_file))
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.Load(m_parent.cur_dir + "\\config\\config.xml");
+            XmlNodeList xnList = xmlDoc.SelectNodes("/bot_settings/modules/module");
+            foreach (XmlNode xn in xnList)
             {
-                string[] file = System.IO.File.ReadAllLines(list_file);
-                foreach (string file_line in file)
+                XmlNodeList optionList = xn.ChildNodes;
+                foreach (XmlNode option in optionList)
                 {
-                    string[] split = file_line.Split(':');
-                    if (split.GetUpperBound(0) > 3)
+                    if (option.Name.Equals("commands"))
                     {
-                        if (split[2].Equals(command_list.SelectedItem))
+                        XmlNodeList Options = option.ChildNodes;
+                        foreach (XmlNode options in Options)
                         {
-                            command_name.Text = split[0];
-                            command_arguments.Text = split[3];
-                            command_description.Text = split[4];
-                            command_access_level.Text = split[1];
-                            break;
+                            if (options["name"].InnerText.Equals(command_list.SelectedItem))
+                            {
+                                command_name.Text = options["name"].InnerText;
+                                command_triggers.Text = options["triggers"].InnerText;
+                                command_arguments.Text = options["syntax"].InnerText;
+                                command_description.Text = options["description"].InnerText;
+                                command_access_level.Text = options["access_level"].InnerText;
+                                channel_blacklist.Text = options["blacklist"].InnerText;
+                                show_in_help.Checked = Convert.ToBoolean(options["show_help"].InnerText);
+                                spam_counter.Checked = Convert.ToBoolean(options["spam_check"].InnerText);
+                            }
                         }
                     }
                 }
@@ -421,28 +428,47 @@ namespace IRCBot
 
         private void button3_Click(object sender, EventArgs e)
         {
-            string list_file = m_parent.cur_dir + "\\config\\help.txt";
-            List<string> new_file = new List<string>();
-            if (File.Exists(list_file))
+            bool command_found = false;
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.Load(m_parent.cur_dir + "\\config\\config.xml");
+            XmlNodeList xnList = xmlDoc.SelectNodes("/bot_settings/modules/module");
+            foreach (XmlNode xn in xnList)
             {
-                string msg = "";
-                string[] file = System.IO.File.ReadAllLines(list_file);
-                foreach (string file_line in file)
+                XmlNodeList optionList = xn.ChildNodes;
+                foreach (XmlNode option in optionList)
                 {
-                    string[] split = file_line.Split(':');
-                    if (split[2].Equals(command_list.SelectedItem))
+                    if (option.Name.Equals("commands"))
                     {
-                        msg = command_name.Text + ":" + command_access_level.Text + ":" + command_list.SelectedItem + ":" + command_arguments.Text + ":" + command_description.Text;
+                        XmlNodeList Options = option.ChildNodes;
+                        foreach (XmlNode options in Options)
+                        {
+                            if (options["name"].InnerText.Equals(command_list.SelectedItem))
+                            {
+                                options["name"].InnerText = command_name.Text;
+                                options["triggers"].InnerText = command_triggers.Text;
+                                options["syntax"].InnerText = command_arguments.Text;
+                                options["description"].InnerText = command_description.Text;
+                                options["access_level"].InnerText = command_access_level.Text;
+                                options["blacklist"].InnerText = channel_blacklist.Text;
+                                options["show_help"].InnerText = show_in_help.Checked.ToString();
+                                options["spam_check"].InnerText = spam_counter.Checked.ToString();
+                                command_found = true;
+                                break;
+                            }
+                        }
                     }
-                    else
+                    if (command_found == true)
                     {
-                        msg = file_line;
+                        break;
                     }
-                    new_file.Add(msg);
-                    msg = "";
+                }
+                if (command_found == true)
+                {
+                    break;
                 }
             }
-            System.IO.File.WriteAllLines(list_file, new_file);
+            xmlDoc.Save(m_parent.cur_dir + "\\config\\config.xml");
+            m_parent.update_conf();
         }
 
         private void add_server_button_Click(object sender, EventArgs e)
@@ -490,32 +516,35 @@ namespace IRCBot
 
         private void connect_button_Click(object sender, EventArgs e)
         {
-            if (connect_button.Text.Equals("Connect"))
+            if (server_list.SelectedItem != null)
             {
-                connect_button.Text = "Connecting...";
-                bool connected = m_parent.start_connection(server_list.SelectedItem.ToString());
-                if (connected == true)
+                if (connect_button.Text.Equals("Connect"))
                 {
-                    connect_button.Text = "Disconnect";
+                    connect_button.Text = "Connecting...";
+                    bool connected = m_parent.start_connection(server_list.SelectedItem.ToString());
+                    if (connected == true)
+                    {
+                        connect_button.Text = "Disconnect";
+                    }
+                    else
+                    {
+                        MessageBox.Show("Could not connect");
+                        connect_button.Text = "Connect";
+                    }
                 }
                 else
                 {
-                    MessageBox.Show("Could not connect");
-                    connect_button.Text = "Connect";
-                }
-            }
-            else
-            {
-                connect_button.Text = "Disconnecting...";
-                bool disconnected = m_parent.end_connection(server_list.SelectedItem.ToString());
-                if (disconnected == true)
-                {
-                    connect_button.Text = "Connect";
-                }
-                else
-                {
-                    MessageBox.Show("Could not disconnect");
-                    connect_button.Text = "Disconnect";
+                    connect_button.Text = "Disconnecting...";
+                    bool disconnected = m_parent.end_connection(server_list.SelectedItem.ToString());
+                    if (disconnected == true)
+                    {
+                        connect_button.Text = "Connect";
+                    }
+                    else
+                    {
+                        MessageBox.Show("Could not disconnect");
+                        connect_button.Text = "Disconnect";
+                    }
                 }
             }
         }

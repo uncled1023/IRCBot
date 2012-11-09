@@ -10,64 +10,112 @@ using Newtonsoft.Json.Linq;
 using search.api;
 using System.Net;
 
-namespace IRCBot
+namespace IRCBot.Modules
 {
-    class google
+    class google : Module
     {
-        public void google_control(string[] line, string command, bot ircbot, IRCConfig conf, int conf_id, int nick_access, string nick)
+        public override void control(bot ircbot, ref IRCConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
-            switch (command)
+            string module_name = ircbot.conf.module_config[module_id][0];
+            if (type.Equals("channel") && bot_command == true)
             {
-                case "google":
-                    ircbot.spam_count++;
-                    if (nick_access >= ircbot.get_command_access(command))
+                foreach (List<string> tmp_command in conf.command_list)
+                {
+                    if (module_name.Equals(tmp_command[0]))
                     {
-                        if (line.GetUpperBound(0) > 3)
+                        string[] triggers = tmp_command[3].Split('|');
+                        int command_access = Convert.ToInt32(tmp_command[5]);
+                        string[] blacklist = tmp_command[6].Split(',');
+                        bool blocked = false;
+                        bool cmd_found = false;
+                        bool spam_check = Convert.ToBoolean(tmp_command[8]);
+                        foreach (string bl_chan in blacklist)
                         {
-                            if (line[4].StartsWith("DCC SEND"))
+                            if (bl_chan.Equals(channel))
                             {
-                                ircbot.sendData("PRIVMSG", line[2] + " :Invalid Search Term");
+                                blocked = true;
+                                break;
                             }
-                            else
+                        }
+                        if (spam_check == true)
+                        {
+                            if (ircbot.spam_activated == true)
                             {
-                                ISearchResult searchClass = new GoogleSearch(line[4]);
-                                try
+                                blocked = true;
+                            }
+                        }
+                        foreach (string trigger in triggers)
+                        {
+                            if (trigger.Equals(command))
+                            {
+                                cmd_found = true;
+                                break;
+                            }
+                        }
+                        if (blocked == false && cmd_found == true)
+                        {
+                            foreach (string trigger in triggers)
+                            {
+                                switch (trigger)
                                 {
-                                    var list = searchClass.Search();
-                                    if (list.Count > 0)
-                                    {
-                                        foreach (var searchType in list)
+                                    case "google":
+                                        if (spam_check == true)
                                         {
-                                            ircbot.sendData("PRIVMSG", line[2] + " :" + searchType.title.Replace("<b>", "").Replace("</b>", "").Replace("&quot;", "\"").Replace("&#39", "'").Replace("&amp;", "&") + ": " + searchType.content.Replace("<b>", "").Replace("</b>", "").Replace("&quot;", "\"").Replace("&#39", "'").Replace("&amp;", "&"));
-
-                                            if (conf.module_config[conf_id][2].Equals("True"))
-                                            {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :" + searchType.url);
-                                            }
-                                            break;
+                                            ircbot.spam_count++;
                                         }
-                                    }
-                                    else
-                                    {
-                                        ircbot.sendData("PRIVMSG", line[2] + " :No Results Found");
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    MessageBox.Show(ex.ToString());
+                                        if (nick_access >= command_access)
+                                        {
+                                            if (line.GetUpperBound(0) > 3)
+                                            {
+                                                if (line[4].StartsWith("DCC SEND"))
+                                                {
+                                                    ircbot.sendData("PRIVMSG", line[2] + " :Invalid Search Term");
+                                                }
+                                                else
+                                                {
+                                                    ISearchResult searchClass = new GoogleSearch(line[4]);
+                                                    try
+                                                    {
+                                                        var list = searchClass.Search();
+                                                        if (list.Count > 0)
+                                                        {
+                                                            foreach (var searchType in list)
+                                                            {
+                                                                ircbot.sendData("PRIVMSG", line[2] + " :" + searchType.title.Replace("<b>", "").Replace("</b>", "").Replace("&quot;", "\"").Replace("&#39", "'").Replace("&amp;", "&") + ": " + searchType.content.Replace("<b>", "").Replace("</b>", "").Replace("&quot;", "\"").Replace("&#39", "'").Replace("&amp;", "&"));
+
+                                                                if (conf.module_config[module_id][3].Equals("True"))
+                                                                {
+                                                                    ircbot.sendData("PRIVMSG", line[2] + " :" + searchType.url);
+                                                                }
+                                                                break;
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            ircbot.sendData("PRIVMSG", line[2] + " :No Results Found");
+                                                        }
+                                                    }
+                                                    catch (Exception ex)
+                                                    {
+                                                        MessageBox.Show(ex.ToString());
+                                                    }
+                                                }
+                                            }
+                                            else
+                                            {
+                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                        }
+                                        break;
                                 }
                             }
                         }
-                        else
-                        {
-                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                        }
                     }
-                    else
-                    {
-                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                    }
-                    break;
+                }
             }
         }
     }

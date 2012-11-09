@@ -85,8 +85,13 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="WolframAlpha.WrapperCore">
+      <HintPath>.\WolframAlpha.WrapperCore.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Modules\wolfram_alpha.cs" />
+    <Compile Include="Modules\module.cs" />
     <Compile Include="Modules\scripts.cs" />
     <Compile Include="Modules\8ball.cs" />
     <Compile Include="GUI\AboutBox1.cs">

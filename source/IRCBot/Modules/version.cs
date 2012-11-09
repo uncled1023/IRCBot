@@ -4,17 +4,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IRCBot
+namespace IRCBot.Modules
 {
-    class version
+    class version : Module
     {
-        public void version_control(string[] line, bot ircbot, IRCConfig conf, int conf_id, string nick)
+        public override void control(bot ircbot, ref IRCConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
-            string version = ":\u0001VERSION\u0001";
-            if (line[3] == version)
+            if (type.Equals("query"))
             {
-                AboutBox1 about = new AboutBox1();
-                ircbot.sendData("NOTICE", nick + " :\u0001VERSION IRCBot v" + about.AssemblyVersion + " on " + conf.module_config[conf_id][2] + "\u0001");
+                string version = ":\u0001VERSION\u0001";
+                if (line[3] == version)
+                {
+                    AboutBox1 about = new AboutBox1();
+                    ircbot.sendData("NOTICE", nick + " :\u0001VERSION IRCBot v" + about.AssemblyVersion + " on " + conf.module_config[module_id][3] + "\u0001");
+                }
             }
         }
     }

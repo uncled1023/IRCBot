@@ -43,7 +43,7 @@ struct IRCConfig
     public int founder_level;
     public int owner_level;
     public List<List<string>> module_config;
-    public List<List<string>> command_access;
+    public List<List<string>> command_list;
 }
 
 namespace IRCBot
@@ -126,26 +126,10 @@ namespace IRCBot
             InitializeComponent();
 
             conf.module_config = new List<List<string>>();
-            conf.command_access = new List<List<string>>();
+            conf.command_list = new List<List<string>>();
             
             cur_dir = Directory.GetCurrentDirectory();
-
-            string list_file = cur_dir + "\\config\\help.txt";
-            if (File.Exists(list_file))
-            {
-                string[] file = System.IO.File.ReadAllLines(list_file);
-                foreach (string file_line in file)
-                {
-                    List<string> tmp_list = new List<string>();
-                    string[] split = file_line.Split(':');
-                    string command_access = split[1];
-                    string command = split[2];
-                    tmp_list.Add(command);
-                    tmp_list.Add(command_access);
-                    conf.command_access.Add(tmp_list);
-                }
-            }
-
+            
             button1.Enabled = false;
             button1.Visible = false;
 
@@ -257,32 +241,54 @@ namespace IRCBot
             xnList = xmlDoc.SelectNodes("/bot_settings/modules/module");
             foreach (XmlNode xn in xnList)
             {
-                List<string> tmp_list = new List<string>();
-                String module_name = xn["name"].InnerText;
-                tmp_list.Add(module_name);
-                tmp_list.Add(xn["enabled"].InnerText);
-
-                XmlNodeList optionList = xn.ChildNodes;
-                foreach (XmlNode option in optionList)
+                if (xn["enabled"].InnerText == "True")
                 {
-                    if (option.Name.Equals("options"))
+                    List<string> tmp_list = new List<string>();
+                    String module_name = xn["name"].InnerText;
+                    tmp_list.Add(module_name);
+                    tmp_list.Add(xn["class_name"].InnerText);
+                    tmp_list.Add(xn["enabled"].InnerText);
+
+                    XmlNodeList optionList = xn.ChildNodes;
+                    foreach (XmlNode option in optionList)
                     {
-                        XmlNodeList Options = option.ChildNodes;
-                        foreach (XmlNode options in Options)
+                        if (option.Name.Equals("commands"))
                         {
-                            switch (options["type"].InnerText)
+                            XmlNodeList Options = option.ChildNodes;
+                            foreach (XmlNode options in Options)
                             {
-                                case "textbox":
+                                List<string> tmp2_list = new List<string>();
+                                tmp2_list.Add(module_name);
+                                tmp2_list.Add(options["name"].InnerText);
+                                tmp2_list.Add(options["description"].InnerText);
+                                tmp2_list.Add(options["triggers"].InnerText);
+                                tmp2_list.Add(options["syntax"].InnerText);
+                                tmp2_list.Add(options["access_level"].InnerText);
+                                tmp2_list.Add(options["blacklist"].InnerText);
+                                tmp2_list.Add(options["show_help"].InnerText);
+                                tmp2_list.Add(options["spam_check"].InnerText);
+                                conf.command_list.Add(tmp2_list);
+                            }
+                        }
+                        if (option.Name.Equals("options"))
+                        {
+                            XmlNodeList Options = option.ChildNodes;
+                            foreach (XmlNode options in Options)
+                            {
+                                switch (options["type"].InnerText)
+                                {
+                                    case "textbox":
                                         tmp_list.Add(options["value"].InnerText);
-                                    break;
-                                case "checkbox":
+                                        break;
+                                    case "checkbox":
                                         tmp_list.Add(options["checked"].InnerText);
-                                    break;
+                                        break;
+                                }
                             }
                         }
                     }
+                    conf.module_config.Add(tmp_list);
                 }
-                conf.module_config.Add(tmp_list);
             }
             string[] tmp_server_list = full_server_list.Split(',');
             bot_instances = new List<bot>();
@@ -1103,6 +1109,7 @@ namespace IRCBot
                     }
                 }
 
+                bot_instance.conf.command_list.Clear();
                 bot_instance.conf.module_config.Clear();
                 XmlNodeList xnList = xmlDoc.SelectNodes("/bot_settings/modules/module");
                 foreach (XmlNode xn in xnList)
@@ -1110,11 +1117,31 @@ namespace IRCBot
                     List<string> tmp_list = new List<string>();
                     String module_name = xn["name"].InnerText;
                     tmp_list.Add(module_name);
+                    tmp_list.Add(xn["class_name"].InnerText);
                     tmp_list.Add(xn["enabled"].InnerText);
+
 
                     XmlNodeList optionList = xn.ChildNodes;
                     foreach (XmlNode option in optionList)
                     {
+                        if (option.Name.Equals("commands"))
+                        {
+                            XmlNodeList Options = option.ChildNodes;
+                            foreach (XmlNode options in Options)
+                            {
+                                List<string> tmp2_list = new List<string>();
+                                tmp2_list.Add(module_name);
+                                tmp2_list.Add(options["name"].InnerText);
+                                tmp2_list.Add(options["description"].InnerText);
+                                tmp2_list.Add(options["triggers"].InnerText);
+                                tmp2_list.Add(options["syntax"].InnerText);
+                                tmp2_list.Add(options["access_level"].InnerText);
+                                tmp2_list.Add(options["blacklist"].InnerText);
+                                tmp2_list.Add(options["show_help"].InnerText);
+                                tmp2_list.Add(options["spam_check"].InnerText);
+                                bot_instance.conf.command_list.Add(tmp2_list);
+                            }
+                        }
                         if (option.Name.Equals("options"))
                         {
                             XmlNodeList Options = option.ChildNodes;
@@ -1133,23 +1160,6 @@ namespace IRCBot
                         }
                     }
                     bot_instance.conf.module_config.Add(tmp_list);
-                }
-
-                bot_instance.conf.command_access.Clear();
-                string list_file = cur_dir + "\\config\\help.txt";
-                if (File.Exists(list_file))
-                {
-                    string[] file = System.IO.File.ReadAllLines(list_file);
-                    foreach (string file_line in file)
-                    {
-                        List<string> tmp_list2 = new List<string>();
-                        string[] split = file_line.Split(':');
-                        string command_access = split[1];
-                        string command = split[2];
-                        tmp_list2.Add(command);
-                        tmp_list2.Add(command_access);
-                        bot_instance.conf.command_access.Add(tmp_list2);
-                    }
                 }
             }
 
@@ -1361,6 +1371,60 @@ namespace IRCBot
                 }
                 else
                 {
+                }
+                conf.command_list.Clear();
+                conf.module_config.Clear();
+                XmlNodeList xnList = xmlDoc.SelectNodes("/bot_settings/modules/module");
+                foreach (XmlNode xn in xnList)
+                {
+                    if (xn["enabled"].InnerText == "True")
+                    {
+                        List<string> tmp_list = new List<string>();
+                        String module_name = xn["name"].InnerText;
+                        tmp_list.Add(module_name);
+                        tmp_list.Add(xn["class_name"].InnerText);
+                        tmp_list.Add(xn["enabled"].InnerText);
+
+                        XmlNodeList optionList = xn.ChildNodes;
+                        foreach (XmlNode option in optionList)
+                        {
+                            if (option.Name.Equals("commands"))
+                            {
+                                XmlNodeList Options = option.ChildNodes;
+                                foreach (XmlNode options in Options)
+                                {
+                                    List<string> tmp2_list = new List<string>();
+                                    tmp2_list.Add(module_name);
+                                    tmp2_list.Add(options["name"].InnerText);
+                                    tmp2_list.Add(options["description"].InnerText);
+                                    tmp2_list.Add(options["triggers"].InnerText);
+                                    tmp2_list.Add(options["syntax"].InnerText);
+                                    tmp2_list.Add(options["access_level"].InnerText);
+                                    tmp2_list.Add(options["blacklist"].InnerText);
+                                    tmp2_list.Add(options["show_help"].InnerText);
+                                    tmp2_list.Add(options["spam_check"].InnerText);
+                                    conf.command_list.Add(tmp2_list);
+                                }
+                            }
+                            if (option.Name.Equals("options"))
+                            {
+                                XmlNodeList Options = option.ChildNodes;
+                                foreach (XmlNode options in Options)
+                                {
+                                    switch (options["type"].InnerText)
+                                    {
+                                        case "textbox":
+                                            tmp_list.Add(options["value"].InnerText);
+                                            break;
+                                        case "checkbox":
+                                            tmp_list.Add(options["checked"].InnerText);
+                                            break;
+                                    }
+                                }
+                            }
+                        }
+                        conf.module_config.Add(tmp_list);
+                    }
                 }
                 XmlNodeList ServerxnList = xmlDoc.SelectNodes("/bot_settings/connection_settings/server_list/server");
                 foreach (XmlNode xn in ServerxnList)

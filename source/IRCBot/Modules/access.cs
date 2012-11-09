@@ -5,103 +5,168 @@ using System.Text;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace IRCBot
+namespace IRCBot.Modules
 {
-    class access
+    class access : Module
     {
-        public void access_control(string[] line, string command, bot ircbot, IRCConfig conf, int access_level, string nick)
+        public override void control(bot ircbot, ref IRCConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
-            switch (command)
+            string module_name = ircbot.conf.module_config[module_id][0];
+            if ((type.Equals("channel") || type.Equals("query")) && bot_command == true)
             {
-                case "access":
-                    if (access_level >= ircbot.get_command_access(command))
+                foreach (List<string> tmp_command in conf.command_list)
+                {
+                    if (module_name.Equals(tmp_command[0]))
                     {
-                        if (line.GetUpperBound(0) > 3)
+                        string[] triggers = tmp_command[3].Split('|');
+                        int command_access = Convert.ToInt32(tmp_command[5]);
+                        string[] blacklist = tmp_command[6].Split(',');
+                        bool blocked = false;
+                        bool cmd_found = false;
+                        bool spam_check = Convert.ToBoolean(tmp_command[8]);
+                        foreach (string bl_chan in blacklist)
                         {
-                            string[] parse = line[4].Split(' ');
-                            if (parse.GetUpperBound(0) > 1)
+                            if (bl_chan.Equals(channel))
                             {
-                                if (Convert.ToInt32(parse[2]) <= access_level)
+                                blocked = true;
+                                break;
+                            }
+                        }
+                        if (spam_check == true)
+                        {
+                            if (ircbot.spam_activated == true)
+                            {
+                                blocked = true;
+                            }
+                        }
+                        foreach (string trigger in triggers)
+                        {
+                            if (trigger.Equals(command))
+                            {
+                                cmd_found = true;
+                                break;
+                            }
+                        }
+                        if (blocked == false && cmd_found == true)
+                        {
+                            foreach (string trigger in triggers)
+                            {
+                                switch (trigger)
                                 {
-                                    set_access_list(parse[0].Trim(), parse[1], parse[2], ircbot);
+                                    case "access":
+                                        if (spam_check == true)
+                                        {
+                                            ircbot.spam_count++;
+                                        }
+                                        if (nick_access >= command_access)
+                                        {
+                                            if (line.GetUpperBound(0) > 3)
+                                            {
+                                                string[] parse = line[4].Split(' ');
+                                                if (parse.GetUpperBound(0) > 1)
+                                                {
+                                                    if (Convert.ToInt32(parse[2]) <= nick_access)
+                                                    {
+                                                        set_access_list(parse[0].Trim(), parse[1], parse[2], ircbot);
+                                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to change their access.");
+                                                    }
+                                                    else
+                                                    {
+                                                        ircbot.sendData("NOTICE", nick + " :" + parse[0].Trim() + " hass been added to access level " + parse[2]);
+                                                    }
+                                                }
+                                                else if (type.Equals("channel") && parse.GetUpperBound(0) > 0)
+                                                {
+                                                    if (Convert.ToInt32(parse[1]) <= nick_access)
+                                                    {
+                                                        set_access_list(parse[0].Trim(), line[2], parse[1], ircbot);
+                                                        ircbot.sendData("NOTICE", nick + " :" + parse[0].Trim() + " hass been added to access level " + parse[1]);
+                                                    }
+                                                    else
+                                                    {
+                                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to change their access.");
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    ircbot.sendData("NOTICE", nick + " :" + nick + ", you need to include more info.");
+                                                }
+                                            }
+                                            else
+                                            {
+                                                ircbot.sendData("NOTICE", nick + " :" + nick + ", you need to include more info.");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                        }
+                                        break;
+                                    case "delaccess":
+                                        if (spam_check == true)
+                                        {
+                                            ircbot.spam_count++;
+                                        }
+                                        if (nick_access >= command_access)
+                                        {
+                                            if (line.GetUpperBound(0) > 3)
+                                            {
+                                                string[] parse = line[4].Split(' ');
+                                                if (parse.GetUpperBound(0) > 1)
+                                                {
+                                                    del_access_list(parse[0].Trim(), parse[1], parse[2], ircbot);
+                                                    ircbot.sendData("NOTICE", nick + " :" + parse[0].Trim() + " hass been removed from access level " + parse[2]);
+                                                }
+                                                else if (type.Equals("channel") && parse.GetUpperBound(0) > 0)
+                                                {
+                                                    del_access_list(parse[0].Trim(), line[2], parse[1], ircbot);
+                                                    ircbot.sendData("NOTICE", nick + " :" + parse[0].Trim() + " hass been removed from access level " + parse[1]);
+                                                }
+                                                else
+                                                {
+                                                    ircbot.sendData("NOTICE", nick + " :" + nick + ", you need to include more info.");
+                                                }
+                                            }
+                                            else
+                                            {
+                                                ircbot.sendData("NOTICE", nick + " :" + nick + ", you need to include more info.");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                        }
+                                        break;
+                                    case "listaccess":
+                                        if (spam_check == true)
+                                        {
+                                            ircbot.spam_count++;
+                                        }
+                                        if (nick_access >= command_access)
+                                        {
+                                            if (line.GetUpperBound(0) > 3)
+                                            {
+                                                list_access_list(nick, line[4], ircbot);
+                                            }
+                                            else if (type.Equals("channel"))
+                                            {
+                                                list_access_list(nick, line[2], ircbot);
+                                            }
+                                            else
+                                            {
+                                                ircbot.sendData("NOTICE", nick + " :" + nick + ", you need to include more info.");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                        }
+                                        break;
                                 }
-                                else
-                                {
-                                    ircbot.sendData("NOTICE", nick + " :You do not have permission to change their access.");
-                                }
-                            }
-                            else if (parse.GetUpperBound(0) > 0)
-                            {
-                                if (Convert.ToInt32(parse[1]) <= access_level)
-                                {
-                                    set_access_list(parse[0].Trim(), line[2], parse[1], ircbot);
-                                }
-                                else
-                                {
-                                    ircbot.sendData("NOTICE", nick + " :You do not have permission to change their access.");
-                                }
-                            }
-                            else
-                            {
-                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
                             }
                         }
-                        else
-                        {
-                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                        }
                     }
-                    else
-                    {
-                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                    }
-                    break;
-                case "delaccess":
-                    if (access_level >= ircbot.get_command_access(command))
-                    {
-                        if (line.GetUpperBound(0) > 3)
-                        {
-                            string[] parse = line[4].Split(' ');
-                            if (parse.GetUpperBound(0) > 1)
-                            {
-                                del_access_list(parse[0].Trim(), parse[1], parse[2], ircbot);
-                            }
-                            else if (parse.GetUpperBound(0) > 0)
-                            {
-                                del_access_list(parse[0].Trim(), line[2], parse[1], ircbot);
-                            }
-                            else
-                            {
-                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                            }
-                        }
-                        else
-                        {
-                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                        }
-                    }
-                    else
-                    {
-                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                    }
-                    break;
-                case "listaccess":
-                    if (access_level >= ircbot.get_command_access(command))
-                    {
-                        if (line.GetUpperBound(0) > 3)
-                        {
-                            list_access_list(nick, line[4], ircbot);
-                        }
-                        else
-                        {
-                            list_access_list(nick, line[2], ircbot);
-                        }
-                    }
-                    else
-                    {
-                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                    }
-                    break;
+                }
             }
         }
 

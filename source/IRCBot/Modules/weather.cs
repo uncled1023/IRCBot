@@ -6,102 +6,111 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml;
 
-namespace IRCBot
+namespace IRCBot.Modules
 {
-    class weather
+    class weather : Module
     {
-        public void weather_control(string[] line, string command, bot ircbot, IRCConfig conf, int conf_id, int nick_access, string nick)
+        public override void control(bot ircbot, ref IRCConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
-            switch (command)
+            string module_name = ircbot.conf.module_config[module_id][0];
+            if (type.Equals("channel") && bot_command == true)
             {
-                case "w":
-                    if (conf.module_config[conf_id][2].Equals("True"))
+                foreach (List<string> tmp_command in conf.command_list)
+                {
+                    if (module_name.Equals(tmp_command[0]))
                     {
-                        ircbot.spam_count++;
-                        if (nick_access >= ircbot.get_command_access(command))
+                        string[] triggers = tmp_command[3].Split('|');
+                        int command_access = Convert.ToInt32(tmp_command[5]);
+                        string[] blacklist = tmp_command[6].Split(',');
+                        bool blocked = false;
+                        bool cmd_found = false;
+                        bool spam_check = Convert.ToBoolean(tmp_command[8]);
+                        foreach (string bl_chan in blacklist)
                         {
-                            if (line.GetUpperBound(0) > 3)
+                            if (bl_chan.Equals(channel))
                             {
-                                // Add introduction
-                                get_weather(line[4], line[2], ircbot);
-                            }
-                            else
-                            {
-                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                                blocked = true;
+                                break;
                             }
                         }
-                        else
+                        if (spam_check == true)
                         {
-                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                            if (ircbot.spam_activated == true)
+                            {
+                                blocked = true;
+                            }
+                        }
+                        foreach (string trigger in triggers)
+                        {
+                            if (trigger.Equals(command))
+                            {
+                                cmd_found = true;
+                                break;
+                            }
+                        }
+                        if (blocked == false && cmd_found == true)
+                        {
+                            foreach (string trigger in triggers)
+                            {
+                                switch (trigger)
+                                {
+                                    case "weather":
+                                        if (spam_check == true)
+                                        {
+                                            ircbot.spam_count++;
+                                        }
+                                        if (conf.module_config[module_id][3].Equals("True"))
+                                        {
+                                            ircbot.spam_count++;
+                                            if (nick_access >= command_access)
+                                            {
+                                                if (line.GetUpperBound(0) > 3)
+                                                {
+                                                    // Add introduction
+                                                    get_weather(line[4], line[2], ircbot);
+                                                }
+                                                else
+                                                {
+                                                    ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                                                }
+                                            }
+                                            else
+                                            {
+                                                ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                            }
+                                        }
+                                        break;
+                                    case "forecast":
+                                        if (spam_check == true)
+                                        {
+                                            ircbot.spam_count++;
+                                        }
+                                        if (conf.module_config[module_id][4].Equals("True"))
+                                        {
+                                            ircbot.spam_count++;
+                                            if (nick_access >= command_access)
+                                            {
+                                                if (line.GetUpperBound(0) > 3)
+                                                {
+                                                    // Add introduction
+                                                    get_forecast(line[4], line[2], ircbot, Convert.ToInt32(conf.module_config[module_id][5]));
+                                                }
+                                                else
+                                                {
+                                                    ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                                                }
+                                            }
+                                            else
+                                            {
+                                                ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                            }
+                                        }
+                                        break;
+                                }
+                            }
                         }
                     }
-                    break;
-                case "weather":
-                    if (conf.module_config[conf_id][2].Equals("True"))
-                    {
-                        ircbot.spam_count++;
-                        if (nick_access >= ircbot.get_command_access(command))
-                        {
-                            if (line.GetUpperBound(0) > 3)
-                            {
-                                // Add introduction
-                                get_weather(line[4], line[2], ircbot);
-                            }
-                            else
-                            {
-                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                            }
-                        }
-                        else
-                        {
-                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                        }
-                    }
-                    break;
-                case "f":
-                    if (conf.module_config[conf_id][3].Equals("True"))
-                    {
-                        ircbot.spam_count++;
-                        if (nick_access >= ircbot.get_command_access(command))
-                        {
-                            if (line.GetUpperBound(0) > 3)
-                            {
-                                // Add introduction
-                                get_forecast(line[4], line[2], ircbot, Convert.ToInt32(conf.module_config[conf_id][4]));
-                            }
-                            else
-                            {
-                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                            }
-                        }
-                        else
-                        {
-                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                        }
-                    }
-                    break;
-                case "forecast":
-                    if (conf.module_config[conf_id][3].Equals("True"))
-                    {
-                        ircbot.spam_count++;
-                        if (nick_access >= ircbot.get_command_access(command))
-                        {
-                            if (line.GetUpperBound(0) > 3)
-                            {
-                                // Add introduction
-                                get_forecast(line[4], line[2], ircbot, Convert.ToInt32(conf.module_config[conf_id][4]));
-                            }
-                            else
-                            {
-                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                            }
-                        }
-                        else
-                        {
-                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                        }
-                    }
-                    break;
+                }
             }
         }
 

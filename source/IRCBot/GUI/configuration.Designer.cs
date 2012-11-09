@@ -68,24 +68,32 @@
             this.command_name = new System.Windows.Forms.TextBox();
             this.label17 = new System.Windows.Forms.Label();
             this.command_list = new System.Windows.Forms.ListBox();
+            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.owner_level_box = new System.Windows.Forms.TextBox();
+            this.label8 = new System.Windows.Forms.Label();
+            this.founder_level_box = new System.Windows.Forms.TextBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.sop_level_box = new System.Windows.Forms.TextBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.op_level_box = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.hop_level_box = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.voice_level_box = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.user_level_box = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
-            this.tabPage3 = new System.Windows.Forms.TabPage();
-            this.user_level_box = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
-            this.voice_level_box = new System.Windows.Forms.TextBox();
-            this.label2 = new System.Windows.Forms.Label();
-            this.hop_level_box = new System.Windows.Forms.TextBox();
-            this.label4 = new System.Windows.Forms.Label();
-            this.op_level_box = new System.Windows.Forms.TextBox();
-            this.label5 = new System.Windows.Forms.Label();
-            this.sop_level_box = new System.Windows.Forms.TextBox();
-            this.label6 = new System.Windows.Forms.Label();
-            this.founder_level_box = new System.Windows.Forms.TextBox();
-            this.label7 = new System.Windows.Forms.Label();
-            this.owner_level_box = new System.Windows.Forms.TextBox();
-            this.label8 = new System.Windows.Forms.Label();
+            this.command_triggers = new System.Windows.Forms.TextBox();
+            this.channel_blacklist = new System.Windows.Forms.TextBox();
+            this.label22 = new System.Windows.Forms.Label();
+            this.label23 = new System.Windows.Forms.Label();
+            this.show_in_help = new System.Windows.Forms.CheckBox();
+            this.label24 = new System.Windows.Forms.Label();
+            this.label25 = new System.Windows.Forms.Label();
+            this.spam_counter = new System.Windows.Forms.CheckBox();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -376,6 +384,14 @@
             // 
             // tabPage5
             // 
+            this.tabPage5.Controls.Add(this.label25);
+            this.tabPage5.Controls.Add(this.spam_counter);
+            this.tabPage5.Controls.Add(this.label24);
+            this.tabPage5.Controls.Add(this.show_in_help);
+            this.tabPage5.Controls.Add(this.label23);
+            this.tabPage5.Controls.Add(this.label22);
+            this.tabPage5.Controls.Add(this.channel_blacklist);
+            this.tabPage5.Controls.Add(this.command_triggers);
             this.tabPage5.Controls.Add(this.button3);
             this.tabPage5.Controls.Add(this.label21);
             this.tabPage5.Controls.Add(this.command_access_level);
@@ -397,7 +413,7 @@
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(132, 184);
+            this.button3.Location = new System.Drawing.Point(135, 193);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(75, 23);
             this.button3.TabIndex = 10;
@@ -408,7 +424,7 @@
             // label21
             // 
             this.label21.AutoSize = true;
-            this.label21.Location = new System.Drawing.Point(129, 142);
+            this.label21.Location = new System.Drawing.Point(132, 120);
             this.label21.Name = "label21";
             this.label21.Size = new System.Drawing.Size(71, 13);
             this.label21.TabIndex = 9;
@@ -416,15 +432,15 @@
             // 
             // command_access_level
             // 
-            this.command_access_level.Location = new System.Drawing.Point(132, 158);
+            this.command_access_level.Location = new System.Drawing.Point(217, 117);
             this.command_access_level.Name = "command_access_level";
-            this.command_access_level.Size = new System.Drawing.Size(254, 20);
+            this.command_access_level.Size = new System.Drawing.Size(169, 20);
             this.command_access_level.TabIndex = 8;
             // 
             // label20
             // 
             this.label20.AutoSize = true;
-            this.label20.Location = new System.Drawing.Point(129, 100);
+            this.label20.Location = new System.Drawing.Point(132, 42);
             this.label20.Name = "label20";
             this.label20.Size = new System.Drawing.Size(60, 13);
             this.label20.TabIndex = 7;
@@ -432,31 +448,31 @@
             // 
             // command_description
             // 
-            this.command_description.Location = new System.Drawing.Point(132, 116);
+            this.command_description.Location = new System.Drawing.Point(217, 39);
             this.command_description.Name = "command_description";
-            this.command_description.Size = new System.Drawing.Size(254, 20);
+            this.command_description.Size = new System.Drawing.Size(169, 20);
             this.command_description.TabIndex = 6;
             // 
             // label19
             // 
             this.label19.AutoSize = true;
-            this.label19.Location = new System.Drawing.Point(129, 58);
+            this.label19.Location = new System.Drawing.Point(132, 68);
             this.label19.Name = "label19";
-            this.label19.Size = new System.Drawing.Size(57, 13);
+            this.label19.Size = new System.Drawing.Size(45, 13);
             this.label19.TabIndex = 5;
-            this.label19.Text = "Arguments";
+            this.label19.Text = "Triggers";
             // 
             // command_arguments
             // 
-            this.command_arguments.Location = new System.Drawing.Point(132, 74);
+            this.command_arguments.Location = new System.Drawing.Point(217, 91);
             this.command_arguments.Name = "command_arguments";
-            this.command_arguments.Size = new System.Drawing.Size(254, 20);
+            this.command_arguments.Size = new System.Drawing.Size(169, 20);
             this.command_arguments.TabIndex = 4;
             // 
             // label18
             // 
             this.label18.AutoSize = true;
-            this.label18.Location = new System.Drawing.Point(129, 16);
+            this.label18.Location = new System.Drawing.Point(132, 16);
             this.label18.Name = "label18";
             this.label18.Size = new System.Drawing.Size(35, 13);
             this.label18.TabIndex = 3;
@@ -464,9 +480,9 @@
             // 
             // command_name
             // 
-            this.command_name.Location = new System.Drawing.Point(132, 32);
+            this.command_name.Location = new System.Drawing.Point(217, 13);
             this.command_name.Name = "command_name";
-            this.command_name.Size = new System.Drawing.Size(254, 20);
+            this.command_name.Size = new System.Drawing.Size(169, 20);
             this.command_name.TabIndex = 2;
             // 
             // label17
@@ -483,28 +499,8 @@
             this.command_list.FormattingEnabled = true;
             this.command_list.Location = new System.Drawing.Point(6, 32);
             this.command_list.Name = "command_list";
-            this.command_list.Size = new System.Drawing.Size(120, 173);
+            this.command_list.Size = new System.Drawing.Size(120, 147);
             this.command_list.TabIndex = 0;
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(337, 254);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 51;
-            this.button1.Text = "Cancel";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
-            // button2
-            // 
-            this.button2.Location = new System.Drawing.Point(256, 254);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
-            this.button2.TabIndex = 50;
-            this.button2.Text = "Save";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // tabPage3
             // 
@@ -530,85 +526,21 @@
             this.tabPage3.Text = "OP Levels";
             this.tabPage3.UseVisualStyleBackColor = true;
             // 
-            // user_level_box
+            // owner_level_box
             // 
-            this.user_level_box.Location = new System.Drawing.Point(201, 15);
-            this.user_level_box.Name = "user_level_box";
-            this.user_level_box.Size = new System.Drawing.Size(185, 20);
-            this.user_level_box.TabIndex = 12;
+            this.owner_level_box.Location = new System.Drawing.Point(201, 171);
+            this.owner_level_box.Name = "owner_level_box";
+            this.owner_level_box.Size = new System.Drawing.Size(185, 20);
+            this.owner_level_box.TabIndex = 24;
             // 
-            // label3
+            // label8
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(8, 18);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(96, 13);
-            this.label3.TabIndex = 13;
-            this.label3.Text = "User Access Level";
-            // 
-            // voice_level_box
-            // 
-            this.voice_level_box.Location = new System.Drawing.Point(201, 41);
-            this.voice_level_box.Name = "voice_level_box";
-            this.voice_level_box.Size = new System.Drawing.Size(185, 20);
-            this.voice_level_box.TabIndex = 14;
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(8, 44);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(101, 13);
-            this.label2.TabIndex = 15;
-            this.label2.Text = "Voice Access Level";
-            // 
-            // hop_level_box
-            // 
-            this.hop_level_box.Location = new System.Drawing.Point(201, 67);
-            this.hop_level_box.Name = "hop_level_box";
-            this.hop_level_box.Size = new System.Drawing.Size(185, 20);
-            this.hop_level_box.TabIndex = 16;
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(8, 70);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(111, 13);
-            this.label4.TabIndex = 17;
-            this.label4.Text = "Half-OP Access Level";
-            // 
-            // op_level_box
-            // 
-            this.op_level_box.Location = new System.Drawing.Point(201, 93);
-            this.op_level_box.Name = "op_level_box";
-            this.op_level_box.Size = new System.Drawing.Size(185, 20);
-            this.op_level_box.TabIndex = 18;
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(8, 96);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(89, 13);
-            this.label5.TabIndex = 19;
-            this.label5.Text = "OP Access Level";
-            // 
-            // sop_level_box
-            // 
-            this.sop_level_box.Location = new System.Drawing.Point(201, 119);
-            this.sop_level_box.Name = "sop_level_box";
-            this.sop_level_box.Size = new System.Drawing.Size(185, 20);
-            this.sop_level_box.TabIndex = 20;
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(8, 122);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(120, 13);
-            this.label6.TabIndex = 21;
-            this.label6.Text = "Super-OP Access Level";
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(8, 174);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(105, 13);
+            this.label8.TabIndex = 25;
+            this.label8.Text = "Owner Access Level";
             // 
             // founder_level_box
             // 
@@ -626,21 +558,173 @@
             this.label7.TabIndex = 23;
             this.label7.Text = "Founder Access Level";
             // 
-            // owner_level_box
+            // sop_level_box
             // 
-            this.owner_level_box.Location = new System.Drawing.Point(201, 171);
-            this.owner_level_box.Name = "owner_level_box";
-            this.owner_level_box.Size = new System.Drawing.Size(185, 20);
-            this.owner_level_box.TabIndex = 24;
+            this.sop_level_box.Location = new System.Drawing.Point(201, 119);
+            this.sop_level_box.Name = "sop_level_box";
+            this.sop_level_box.Size = new System.Drawing.Size(185, 20);
+            this.sop_level_box.TabIndex = 20;
             // 
-            // label8
+            // label6
             // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(8, 174);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(105, 13);
-            this.label8.TabIndex = 25;
-            this.label8.Text = "Owner Access Level";
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(8, 122);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(120, 13);
+            this.label6.TabIndex = 21;
+            this.label6.Text = "Super-OP Access Level";
+            // 
+            // op_level_box
+            // 
+            this.op_level_box.Location = new System.Drawing.Point(201, 93);
+            this.op_level_box.Name = "op_level_box";
+            this.op_level_box.Size = new System.Drawing.Size(185, 20);
+            this.op_level_box.TabIndex = 18;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(8, 96);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(89, 13);
+            this.label5.TabIndex = 19;
+            this.label5.Text = "OP Access Level";
+            // 
+            // hop_level_box
+            // 
+            this.hop_level_box.Location = new System.Drawing.Point(201, 67);
+            this.hop_level_box.Name = "hop_level_box";
+            this.hop_level_box.Size = new System.Drawing.Size(185, 20);
+            this.hop_level_box.TabIndex = 16;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(8, 70);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(111, 13);
+            this.label4.TabIndex = 17;
+            this.label4.Text = "Half-OP Access Level";
+            // 
+            // voice_level_box
+            // 
+            this.voice_level_box.Location = new System.Drawing.Point(201, 41);
+            this.voice_level_box.Name = "voice_level_box";
+            this.voice_level_box.Size = new System.Drawing.Size(185, 20);
+            this.voice_level_box.TabIndex = 14;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(8, 44);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(101, 13);
+            this.label2.TabIndex = 15;
+            this.label2.Text = "Voice Access Level";
+            // 
+            // user_level_box
+            // 
+            this.user_level_box.Location = new System.Drawing.Point(201, 15);
+            this.user_level_box.Name = "user_level_box";
+            this.user_level_box.Size = new System.Drawing.Size(185, 20);
+            this.user_level_box.TabIndex = 12;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(8, 18);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(96, 13);
+            this.label3.TabIndex = 13;
+            this.label3.Text = "User Access Level";
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(337, 254);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 51;
+            this.button1.Text = "Cancel";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(256, 254);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(75, 23);
+            this.button2.TabIndex = 50;
+            this.button2.Text = "Save";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
+            // command_triggers
+            // 
+            this.command_triggers.Location = new System.Drawing.Point(217, 65);
+            this.command_triggers.Name = "command_triggers";
+            this.command_triggers.Size = new System.Drawing.Size(169, 20);
+            this.command_triggers.TabIndex = 11;
+            // 
+            // channel_blacklist
+            // 
+            this.channel_blacklist.Location = new System.Drawing.Point(217, 143);
+            this.channel_blacklist.Name = "channel_blacklist";
+            this.channel_blacklist.Size = new System.Drawing.Size(169, 20);
+            this.channel_blacklist.TabIndex = 12;
+            // 
+            // label22
+            // 
+            this.label22.AutoSize = true;
+            this.label22.Location = new System.Drawing.Point(132, 94);
+            this.label22.Name = "label22";
+            this.label22.Size = new System.Drawing.Size(39, 13);
+            this.label22.TabIndex = 13;
+            this.label22.Text = "Syntax";
+            // 
+            // label23
+            // 
+            this.label23.AutoSize = true;
+            this.label23.Location = new System.Drawing.Point(132, 146);
+            this.label23.Name = "label23";
+            this.label23.Size = new System.Drawing.Size(46, 13);
+            this.label23.TabIndex = 14;
+            this.label23.Text = "Blacklist";
+            // 
+            // show_in_help
+            // 
+            this.show_in_help.AutoSize = true;
+            this.show_in_help.Location = new System.Drawing.Point(369, 169);
+            this.show_in_help.Name = "show_in_help";
+            this.show_in_help.Size = new System.Drawing.Size(15, 14);
+            this.show_in_help.TabIndex = 15;
+            this.show_in_help.UseVisualStyleBackColor = true;
+            // 
+            // label24
+            // 
+            this.label24.AutoSize = true;
+            this.label24.Location = new System.Drawing.Point(279, 169);
+            this.label24.Name = "label24";
+            this.label24.Size = new System.Drawing.Size(70, 13);
+            this.label24.TabIndex = 16;
+            this.label24.Text = "Show in Help";
+            // 
+            // label25
+            // 
+            this.label25.AutoSize = true;
+            this.label25.Location = new System.Drawing.Point(279, 188);
+            this.label25.Name = "label25";
+            this.label25.Size = new System.Drawing.Size(84, 13);
+            this.label25.TabIndex = 18;
+            this.label25.Text = "Watch for Spam";
+            // 
+            // spam_counter
+            // 
+            this.spam_counter.AutoSize = true;
+            this.spam_counter.Location = new System.Drawing.Point(369, 188);
+            this.spam_counter.Name = "spam_counter";
+            this.spam_counter.Size = new System.Drawing.Size(15, 14);
+            this.spam_counter.TabIndex = 17;
+            this.spam_counter.UseVisualStyleBackColor = true;
             // 
             // configuration
             // 
@@ -731,5 +815,13 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox user_level_box;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox command_triggers;
+        private System.Windows.Forms.TextBox channel_blacklist;
+        private System.Windows.Forms.Label label25;
+        private System.Windows.Forms.CheckBox spam_counter;
+        private System.Windows.Forms.Label label24;
+        private System.Windows.Forms.CheckBox show_in_help;
+        private System.Windows.Forms.Label label23;
+        private System.Windows.Forms.Label label22;
     }
 }

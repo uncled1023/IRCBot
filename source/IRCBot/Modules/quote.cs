@@ -6,65 +6,114 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Text.RegularExpressions;
 
-namespace IRCBot
+namespace IRCBot.Modules
 {
-    class quote
+    class quote : Module
     {
-        public void quote_control(string[] line, string command, bot ircbot, IRCConfig conf, int conf_id, int nick_access, string nick)
+        public override void control(bot ircbot, ref IRCConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
-            switch (command)
+            string module_name = ircbot.conf.module_config[module_id][0];
+            if (type.Equals("channel") && bot_command == true)
             {
-                case "quote":
-                    ircbot.spam_count++;
-                    if (nick_access >= ircbot.get_command_access(command))
+                foreach (List<string> tmp_command in conf.command_list)
+                {
+                    if (module_name.Equals(tmp_command[0]))
                     {
-                        if (conf.module_config[conf_id][2].Equals("True"))
+                        string[] triggers = tmp_command[3].Split('|');
+                        int command_access = Convert.ToInt32(tmp_command[5]);
+                        string[] blacklist = tmp_command[6].Split(',');
+                        bool blocked = false;
+                        bool cmd_found = false;
+                        bool spam_check = Convert.ToBoolean(tmp_command[8]);
+                        foreach (string bl_chan in blacklist)
                         {
-                            if (line.GetUpperBound(0) > 3)
+                            if (bl_chan.Equals(channel))
                             {
-                                get_specific_quote(line[2], line[4], ircbot, conf);
-                            }
-                            else
-                            {
-                                get_quote(line[2], ircbot, conf);
+                                blocked = true;
+                                break;
                             }
                         }
-                        else
+                        if (spam_check == true)
                         {
-                            get_quote(line[2], ircbot, conf);
+                            if (ircbot.spam_activated == true)
+                            {
+                                blocked = true;
+                            }
+                        }
+                        foreach (string trigger in triggers)
+                        {
+                            if (trigger.Equals(command))
+                            {
+                                cmd_found = true;
+                                break;
+                            }
+                        }
+                        if (blocked == false && cmd_found == true)
+                        {
+                            foreach (string trigger in triggers)
+                            {
+                                switch (trigger)
+                                {
+                                    case "quote":
+                                        if (spam_check == true)
+                                        {
+                                            ircbot.spam_count++;
+                                        }
+                                        if (nick_access >= command_access)
+                                        {
+                                            if (conf.module_config[module_id][3].Equals("True"))
+                                            {
+                                                if (line.GetUpperBound(0) > 3)
+                                                {
+                                                    get_specific_quote(line[2], line[4], ircbot, conf);
+                                                }
+                                                else
+                                                {
+                                                    get_quote(line[2], ircbot, conf);
+                                                }
+                                            }
+                                            else
+                                            {
+                                                get_quote(line[2], ircbot, conf);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                        }
+                                        break;
+                                }
+                            }
                         }
                     }
-                    else
-                    {
-                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                    }
-                    break;
+                }
+            }
+            if (type.Equals("channel") && bot_command == false && nick != conf.nick)
+            {
+                add_quote(nick, channel, line, ircbot, conf);
             }
         }
 
         public void add_quote(string nick, string channel, string[] line, bot ircbot, IRCConfig conf)
         {
-            if (!nick.Equals(conf.nick) && !line[3].Remove(0, 1).StartsWith(conf.command))
+            string tab_name = channel.TrimStart('#');
+            string pattern = "[^a-zA-Z0-9]"; //regex pattern
+            string new_tab_name = Regex.Replace(tab_name, pattern, "_");
+            string file_name = ircbot.server_name + "_#" + new_tab_name + ".log";
+            if (Directory.Exists(ircbot.cur_dir + "\\modules\\quotes\\logs") == false)
             {
-                string tab_name = channel.TrimStart('#');
-                string pattern = "[^a-zA-Z0-9]"; //regex pattern
-                string new_tab_name = Regex.Replace(tab_name, pattern, "_");
-                string file_name = ircbot.server_name + "_#" + new_tab_name + ".log";
-                if (Directory.Exists(ircbot.cur_dir + "\\modules\\quotes\\logs") == false)
-                {
-                    Directory.CreateDirectory(ircbot.cur_dir + "\\modules\\quotes\\logs");
-                }
-                StreamWriter log_file = File.AppendText(ircbot.cur_dir + "\\modules\\quotes\\logs\\" + file_name);
-                if (line.GetUpperBound(0) > 3)
-                {
-                    log_file.WriteLine(nick + "*" + line[3].Remove(0, 1) + " " + line[4]);
-                }
-                else
-                {
-                    log_file.WriteLine(nick + "*" + line[3].Remove(0, 1));
-                }
-                log_file.Close();
+                Directory.CreateDirectory(ircbot.cur_dir + "\\modules\\quotes\\logs");
             }
+            StreamWriter log_file = File.AppendText(ircbot.cur_dir + "\\modules\\quotes\\logs\\" + file_name);
+            if (line.GetUpperBound(0) > 3)
+            {
+                log_file.WriteLine(nick + "*" + line[3].Remove(0, 1) + " " + line[4]);
+            }
+            else
+            {
+                log_file.WriteLine(nick + "*" + line[3].Remove(0, 1));
+            }
+            log_file.Close();
         }
 
         private void get_quote(string channel, bot ircbot, IRCConfig conf)

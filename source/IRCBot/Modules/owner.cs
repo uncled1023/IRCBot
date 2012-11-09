@@ -262,6 +262,20 @@ namespace IRCBot.Modules
                                             ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
                                         }
                                         break;
+                                    case "update":
+                                        if (spam_check == true)
+                                        {
+                                            ircbot.spam_count++;
+                                        }
+                                        if (nick_access >= command_access)
+                                        {
+                                            ircbot.ircbot.update_conf();
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                        }
+                                        break;
                                 }
                             }
                         }

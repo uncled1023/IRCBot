@@ -587,6 +587,18 @@
           <show_help>True</show_help>
           <spam_check>False</spam_check>
         </command>
+        <command>
+          <name>Update Configuration</name>
+          <description>Updates the Modules and COnfigurations on all the server sessions.</description>
+          <triggers>update</triggers>
+          <syntax>
+          </syntax>
+          <access_level>10</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
       </commands>
     </module>
     <module>

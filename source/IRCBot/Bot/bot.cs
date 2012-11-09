@@ -48,7 +48,7 @@ namespace IRCBot
         public BackgroundWorker worker;
         public List<Modules.Module> module_list = new List<Modules.Module>();
 
-        Interface ircbot;
+        public Interface ircbot;
         public IRCConfig conf;
 
         public bot()

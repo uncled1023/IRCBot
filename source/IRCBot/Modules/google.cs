@@ -97,7 +97,7 @@ namespace IRCBot.Modules
                                                     }
                                                     catch (Exception ex)
                                                     {
-                                                        MessageBox.Show(ex.ToString());
+                                                        ircbot.sendData("PRIVMSG", line[2] + " :I can't search atm.");
                                                     }
                                                 }
                                             }

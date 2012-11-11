@@ -1288,27 +1288,25 @@ namespace IRCBot.Modules
             bool found_nick = false;
             if (File.Exists(list_file))
             {
-                int counter = 0;
                 string[] old_file = System.IO.File.ReadAllLines(list_file);
-                string[] new_file = new string[old_file.GetUpperBound(0) + 2];
+                List<string> new_file = new List<string>();
                 foreach (string file_line in old_file)
                 {
                     char[] charSeparator = new char[] { '*' };
                     string[] auto_nick = file_line.Split(charSeparator, 5);
                     if (nick.Equals(auto_nick[0]) && hostname.Equals(auto_nick[1]) && channel.Equals(auto_nick[2]) && type.Equals(auto_nick[3]))
                     {
-                        new_file[counter] = add_line;
+                        new_file.Add(add_line);
                         found_nick = true;
                     }
                     else
                     {
-                        new_file[counter] = file_line;
+                        new_file.Add(file_line);
                     }
-                    counter++;
                 }
                 if (found_nick == false)
                 {
-                    new_file[counter] = add_line;
+                    new_file.Add(add_line);
                 }
                 System.IO.File.WriteAllLines(@list_file, new_file);
                 string ban = "*!*@" + hostname;
@@ -1346,9 +1344,8 @@ namespace IRCBot.Modules
             bool found_nick = false;
             if (File.Exists(list_file))
             {
-                int counter = 0;
                 string[] old_file = System.IO.File.ReadAllLines(list_file);
-                string[] new_file = new string[old_file.GetUpperBound(0) + 2];
+                List<string> new_file = new List<string>();
                 foreach (string file_line in old_file)
                 {
                     char[] charSeparator = new char[] { '*' };
@@ -1359,9 +1356,8 @@ namespace IRCBot.Modules
                     }
                     else
                     {
-                        new_file[counter] = file_line;
+                        new_file.Add(file_line);
                     }
-                    counter++;
                 }
                 if (found_nick == false)
                 {

@@ -205,8 +205,7 @@ namespace IRCBot.Modules
                 {
                     string[] log_file = System.IO.File.ReadAllLines(ircbot.cur_dir + "\\modules\\seen\\" + file_name);
                     int number_of_lines = log_file.GetUpperBound(0) + 1;
-                    string[] new_file = new string[number_of_lines];
-                    int index = 0;
+                    List<string> new_file = new List<string>();
                     bool nick_found = false;
                     if (number_of_lines > 0)
                     {
@@ -218,14 +217,13 @@ namespace IRCBot.Modules
                             {
                                 if (new_line[0].Equals(nick) && new_line[1].Equals(channel))
                                 {
-                                    new_file[index] = new_line[0] + "*" + new_line[1] + "*" + current_date.ToString("yyyy-MM-dd HH:mm:ss") + "*" + msg;
+                                    new_file.Add(new_line[0] + "*" + new_line[1] + "*" + current_date.ToString("yyyy-MM-dd HH:mm:ss") + "*" + msg);
                                     nick_found = true;
                                 }
                                 else
                                 {
-                                    new_file[index] = lines;
+                                    new_file.Add(lines);
                                 }
-                                index++;
                             }
                         }
                         if (nick_found == false)

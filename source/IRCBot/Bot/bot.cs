@@ -496,6 +496,7 @@ namespace IRCBot
                             }
                             else // From Query
                             {
+                                nick_access = get_user_access(nick, null);
                                 type = "query";
                             }
                         }
@@ -1409,7 +1410,7 @@ namespace IRCBot
                 {
                     if (conf.module_config[x][0].Equals("Access"))
                     {
-                        if (conf.module_config[x][1].Equals("True"))
+                        if (conf.module_config[x][2].Equals("True"))
                         {
                             if (channel != null)
                             {

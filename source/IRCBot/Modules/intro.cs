@@ -137,27 +137,25 @@ namespace IRCBot.Modules
                 }
                 if (File.Exists(list_file))
                 {
-                    int counter = 0;
                     string[] old_file = System.IO.File.ReadAllLines(list_file);
-                    string[] new_file = new string[old_file.GetUpperBound(0) + 2];
+                    List<string> new_file = new List<string>();
                     foreach (string file_line in old_file)
                     {
                         char[] charSeparator = new char[] { ':' };
                         string[] intro_nick = file_line.Split(charSeparator, 3);
                         if (nick.Equals(intro_nick[0]) && channel.Equals(intro_nick[1]))
                         {
-                            new_file[counter] = add_line;
+                            new_file.Add(add_line);
                             found_nick = true;
                         }
                         else
                         {
-                            new_file[counter] = file_line;
+                            new_file.Add(file_line);
                         }
-                        counter++;
                     }
                     if (found_nick == false)
                     {
-                        new_file[counter] = add_line;
+                        new_file.Add(add_line);
                     }
                     System.IO.File.WriteAllLines(@list_file, new_file);
                 }
@@ -174,9 +172,8 @@ namespace IRCBot.Modules
             string list_file = ircbot.cur_dir + "\\modules\\intro\\" + ircbot.server_name + "_list.txt";
             if (File.Exists(list_file))
             {
-                int counter = 0;
                 string[] old_file = System.IO.File.ReadAllLines(list_file);
-                string[] new_file = new string[old_file.GetUpperBound(0) + 1];
+                List<string> new_file = new List<string>();
                 foreach (string file_line in old_file)
                 {
                     char[] charSeparator = new char[] { ':' };
@@ -186,8 +183,7 @@ namespace IRCBot.Modules
                     }
                     else
                     {
-                        new_file[counter] = file_line;
-                        counter++;
+                        new_file.Add(file_line);
                     }
                 }
                 System.IO.File.WriteAllLines(@list_file, new_file);

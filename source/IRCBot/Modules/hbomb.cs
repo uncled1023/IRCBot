@@ -322,6 +322,7 @@ namespace IRCBot.Modules
 
         public void activate_bomb(object sender, EventArgs e)
         {
+            hbomb_active = false;
             bomb_trigger.Enabled = false;
             main.sendData("PRIVMSG", bomb_channel + " :4,1/8,1!4,1\\ 1,8 WARNING! Nuclear Strike Inbound  4,1/8,1!4,1\\");
             Thread.Sleep(1000);
@@ -354,7 +355,6 @@ namespace IRCBot.Modules
             {
                 main.sendData("KICK", bomb_channel + " " + previous_bomb_holder + " :BOOM!!!");
             }
-            hbomb_active = false;
         }
 
         private void pass_hbomb(string pass_nick, string channel, string nick, bot ircbot, IRCConfig conf)

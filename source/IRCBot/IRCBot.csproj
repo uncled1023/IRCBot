@@ -58,6 +58,9 @@
     <Reference Include="AIMLbot">
       <HintPath>.\AIMLbot.dll</HintPath>
     </Reference>
+    <Reference Include="FridayThe13th">
+      <HintPath>.\FridayThe13th.dll</HintPath>
+    </Reference>
     <Reference Include="IronPython">
       <HintPath>.\IronPython.dll</HintPath>
     </Reference>
@@ -77,6 +80,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -90,6 +94,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="lib\json.cs" />
+    <Compile Include="Modules\github.cs" />
     <Compile Include="Modules\wolfram_alpha.cs" />
     <Compile Include="Modules\module.cs" />
     <Compile Include="Modules\scripts.cs" />

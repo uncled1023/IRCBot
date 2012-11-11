@@ -245,8 +245,9 @@ namespace IRCBot
                 {
                     List<string> tmp_list = new List<string>();
                     String module_name = xn["name"].InnerText;
+                    String class_name = xn["class_name"].InnerText;
+                    tmp_list.Add(class_name);
                     tmp_list.Add(module_name);
-                    tmp_list.Add(xn["class_name"].InnerText);
                     tmp_list.Add(xn["enabled"].InnerText);
 
                     XmlNodeList optionList = xn.ChildNodes;
@@ -258,7 +259,7 @@ namespace IRCBot
                             foreach (XmlNode options in Options)
                             {
                                 List<string> tmp2_list = new List<string>();
-                                tmp2_list.Add(module_name);
+                                tmp2_list.Add(class_name);
                                 tmp2_list.Add(options["name"].InnerText);
                                 tmp2_list.Add(options["description"].InnerText);
                                 tmp2_list.Add(options["triggers"].InnerText);
@@ -1116,8 +1117,9 @@ namespace IRCBot
                 {
                     List<string> tmp_list = new List<string>();
                     String module_name = xn["name"].InnerText;
+                    String class_name = xn["class_name"].InnerText;
+                    tmp_list.Add(class_name);
                     tmp_list.Add(module_name);
-                    tmp_list.Add(xn["class_name"].InnerText);
                     tmp_list.Add(xn["enabled"].InnerText);
 
 
@@ -1130,7 +1132,7 @@ namespace IRCBot
                             foreach (XmlNode options in Options)
                             {
                                 List<string> tmp2_list = new List<string>();
-                                tmp2_list.Add(module_name);
+                                tmp2_list.Add(class_name);
                                 tmp2_list.Add(options["name"].InnerText);
                                 tmp2_list.Add(options["description"].InnerText);
                                 tmp2_list.Add(options["triggers"].InnerText);
@@ -1381,8 +1383,9 @@ namespace IRCBot
                     {
                         List<string> tmp_list = new List<string>();
                         String module_name = xn["name"].InnerText;
+                        String class_name = xn["class_name"].InnerText;
+                        tmp_list.Add(class_name);
                         tmp_list.Add(module_name);
-                        tmp_list.Add(xn["class_name"].InnerText);
                         tmp_list.Add(xn["enabled"].InnerText);
 
                         XmlNodeList optionList = xn.ChildNodes;
@@ -1394,7 +1397,7 @@ namespace IRCBot
                                 foreach (XmlNode options in Options)
                                 {
                                     List<string> tmp2_list = new List<string>();
-                                    tmp2_list.Add(module_name);
+                                    tmp2_list.Add(class_name);
                                     tmp2_list.Add(options["name"].InnerText);
                                     tmp2_list.Add(options["description"].InnerText);
                                     tmp2_list.Add(options["triggers"].InnerText);

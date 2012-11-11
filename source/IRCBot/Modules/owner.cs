@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml;
 using System.IO;
+using Microsoft.Win32;
+using System.Runtime.InteropServices;
+using System.Management;
+using System.Reflection;
 
 namespace IRCBot.Modules
 {
@@ -270,6 +274,147 @@ namespace IRCBot.Modules
                                         if (nick_access >= command_access)
                                         {
                                             ircbot.ircbot.update_conf();
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                        }
+                                        break;
+                                    case "modules":
+                                        if (spam_check == true)
+                                        {
+                                            ircbot.spam_count++;
+                                        }
+                                        if (nick_access >= command_access)
+                                        {
+                                            string msg = "";
+                                            foreach (Module module in ircbot.module_list)
+                                            {
+                                                msg += ", " + module.ToString().Remove(0, 15);
+                                            }
+                                            if (type.Equals("channel"))
+                                            {
+                                                if (msg != "")
+                                                {
+                                                    ircbot.sendData("PRIVMSG", channel + " :" + msg.TrimStart(',').Trim());
+                                                }
+                                                else
+                                                {
+                                                    ircbot.sendData("PRIVMSG", channel + " :No Modules are loaded.");
+                                                }
+                                            }
+                                            else
+                                            {
+                                                if (msg != "")
+                                                {
+                                                    ircbot.sendData("NOTICE", nick + " :" + msg.TrimStart(',').Trim());
+                                                }
+                                                else
+                                                {
+                                                    ircbot.sendData("NOTICE", nick + " :No Modules are loaded.");
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                        }
+                                        break;
+                                    case "loadmodule":
+                                        if (spam_check == true)
+                                        {
+                                            ircbot.spam_count++;
+                                        }
+                                        if (nick_access >= command_access)
+                                        {
+                                            if (line.GetUpperBound(0) > 3)
+                                            {
+                                                bool module_found = ircbot.load_module(line[4]);
+                                                if (module_found == true)
+                                                {
+                                                    if (type.Equals("channel"))
+                                                    {
+                                                        ircbot.sendData("PRIVMSG", channel + " :Module Loaded Successfully");
+                                                    }
+                                                    else
+                                                    {
+                                                        ircbot.sendData("NOTICE", nick + " :Module Loaded Successfully");
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    if (type.Equals("channel"))
+                                                    {
+                                                        ircbot.sendData("PRIVMSG", channel + " :Error loading Module");
+                                                    }
+                                                    else
+                                                    {
+                                                        ircbot.sendData("NOTICE", nick + " :Error loading Module");
+                                                    }
+                                                }
+                                            }
+                                            else
+                                            {
+                                                if (type.Equals("channel"))
+                                                {
+                                                    ircbot.sendData("PRIVMSG", channel + " :" + nick + ", you need to include more info.");
+                                                }
+                                                else
+                                                {
+                                                    ircbot.sendData("NOTICE", nick + " :" + nick + ", you need to include more info.");
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                        }
+                                        break;
+                                    case "delmodule":
+                                        if (spam_check == true)
+                                        {
+                                            ircbot.spam_count++;
+                                        }
+                                        if (nick_access >= command_access)
+                                        {
+
+                                            if (line.GetUpperBound(0) > 3)
+                                            {
+                                                bool module_found = ircbot.unload_module(line[4]);
+                                                if (module_found == true)
+                                                {
+                                                    if (type.Equals("channel"))
+                                                    {
+                                                        ircbot.sendData("PRIVMSG", channel + " :Module Unloaded Successfully");
+                                                    }
+                                                    else
+                                                    {
+                                                        ircbot.sendData("NOTICE", nick + " :Module Unloaded Successfully");
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    if (type.Equals("channel"))
+                                                    {
+                                                        ircbot.sendData("PRIVMSG", channel + " :No Module found");
+                                                    }
+                                                    else
+                                                    {
+                                                        ircbot.sendData("NOTICE", nick + " :No Module found");
+                                                    }
+                                                }
+                                            }
+                                            else
+                                            {
+                                                if (type.Equals("channel"))
+                                                {
+                                                    ircbot.sendData("PRIVMSG", channel + " :" + nick + ", you need to include more info.");
+                                                }
+                                                else
+                                                {
+                                                    ircbot.sendData("NOTICE", nick + " :" + nick + ", you need to include more info.");
+                                                }
+                                            }
                                         }
                                         else
                                         {

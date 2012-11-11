@@ -149,9 +149,18 @@ namespace IRCBot.Modules
             requestStream.Write(postBytes, 0, postBytes.Length);
             requestStream.Close();
 
-            // grab te response and print it out to the console along with the status code
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-            return new StreamReader(response.GetResponseStream()).ReadToEnd();
+            string reply = "";
+            try
+            {
+                // grab te response and print it out to the console along with the status code
+                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                reply = new StreamReader(response.GetResponseStream()).ReadToEnd();
+            }
+            catch (WebException ex)
+            {
+                reply = ex.Message;
+            }
+            return reply;
         } // end HttpPost 
     }
 

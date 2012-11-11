@@ -47,6 +47,8 @@ namespace IRCBot
         public string cur_dir;
         public BackgroundWorker worker;
         public List<Modules.Module> module_list = new List<Modules.Module>();
+        public List<string> modules_loaded = new List<string>();
+        public List<string> modules_error = new List<string>();
 
         public Interface ircbot;
         public IRCConfig conf;
@@ -114,12 +116,10 @@ namespace IRCBot
         public void load_modules()
         {
             module_list.Clear();
-            string modules_loaded = "";
-            string modules_error = "";
             foreach (List<string> module in conf.module_config)
             {
-                string module_name = module[0];
-                string class_name = module[1];
+                string module_name = module[1];
+                string class_name = module[0];
                 //create the class base on string
                 //note : include the namespace and class name (namespace=IRCBot.Modules, class name=<class_name>)
                 Assembly a = Assembly.Load("IRCBot");
@@ -130,16 +130,21 @@ namespace IRCBot
                 {
                     Modules.Module new_module = (Modules.Module)Activator.CreateInstance(t);
                     module_list.Add(new_module);
-                    modules_loaded += ", " + module_name;
+                    modules_loaded.Add(module_name);
                 }
                 else
                 {
-                    modules_error += ", " + module_name;
+                    modules_error.Add(module_name);
                 }
             }
-            if (modules_loaded != "")
+            if (modules_loaded.Count > 0)
             {
-                string output = Environment.NewLine + server_name + ":Loaded Modules: " + modules_loaded.TrimStart(',').Trim();
+                string msg = "";
+                foreach (string module_name in modules_loaded)
+                {
+                    msg += ", " + module_name;
+                }
+                string output = Environment.NewLine + server_name + ":Loaded Modules: " + msg.TrimStart(',').Trim();
                 lock (ircbot.listLock)
                 {
                     if (ircbot.queue_text.Count >= 1000)
@@ -149,9 +154,14 @@ namespace IRCBot
                     ircbot.queue_text.Add(output);
                 }
             }
-            if (modules_error != "")
+            if (modules_error.Count > 0)
             {
-                string output = Environment.NewLine + server_name + ":Error Loading Modules: " + modules_error.TrimStart(',').Trim();
+                string msg = "";
+                foreach (string module_name in modules_loaded)
+                {
+                    msg += ", " + module_name;
+                }
+                string output = Environment.NewLine + server_name + ":Error Loading Modules: " + msg.TrimStart(',').Trim();
                 lock (ircbot.listLock)
                 {
                     if (ircbot.queue_text.Count >= 1000)
@@ -161,6 +171,53 @@ namespace IRCBot
                     ircbot.queue_text.Add(output);
                 }
             }
+        }
+
+        public bool load_module(string class_name)
+        {
+            bool module_found = false;
+            bool module_loaded = false;
+            foreach (Modules.Module module in module_list)
+            {
+                if (module.ToString().Equals("IRCBot.Modules." + class_name))
+                {
+                    module_found = true;
+                    break;
+                }
+            }
+            if (module_found == false)
+            {
+                //create the class base on string
+                //note : include the namespace and class name (namespace=IRCBot.Modules, class name=<class_name>)
+                Assembly a = Assembly.Load("IRCBot");
+                Type t = a.GetType("IRCBot.Modules." + class_name);
+
+                //check to see if the class is instantiated or not
+                if (t != null)
+                {
+                    Modules.Module new_module = (Modules.Module)Activator.CreateInstance(t);
+                    module_list.Add(new_module);
+                    module_loaded = true;
+                }
+            }
+            return module_loaded;
+        }
+
+        public bool unload_module(string class_name)
+        {
+            bool module_found = false;
+            int index = 0;
+            foreach (Modules.Module module in module_list)
+            {
+                if (module.ToString().Equals("IRCBot.Modules." + class_name))
+                {
+                    module_list.RemoveAt(index);
+                    module_found = true;
+                    break;
+                }
+                index++;
+            }
+            return module_found;
         }
 
         private void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
@@ -885,11 +942,20 @@ namespace IRCBot
                 }
 
                 //Run Enabled Modules
-                int index = 0;
-                foreach (Modules.Module module in module_list)
+                List<Modules.Module> tmp_module_list = new List<Modules.Module>();
+                tmp_module_list.AddRange(module_list);
+                foreach (Modules.Module module in tmp_module_list)
                 {
+                    int index = 0;
+                    foreach (List<string> conf_module in conf.module_config)
+                    {
+                        if (module.ToString().Equals("IRCBot.Modules." + conf_module[0]))
+                        {
+                            break;
+                        }
+                        index++;
+                    }
                     module.control(this, ref conf, index, ex, command, nick_access, nick, channel, bot_command, type);
-                    index++;
                 }
             }
         }

@@ -20,7 +20,7 @@ namespace IRCBot.Modules
             unban_trigger = new System.Timers.Timer();
             unban_trigger.Elapsed += unban_nick;
         }
-        
+
         public override void control(bot ircbot, ref IRCConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
             access access = new access();

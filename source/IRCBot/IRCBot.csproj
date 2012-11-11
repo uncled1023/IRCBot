@@ -58,9 +58,6 @@
     <Reference Include="AIMLbot">
       <HintPath>.\AIMLbot.dll</HintPath>
     </Reference>
-    <Reference Include="FridayThe13th">
-      <HintPath>.\FridayThe13th.dll</HintPath>
-    </Reference>
     <Reference Include="IronPython">
       <HintPath>.\IronPython.dll</HintPath>
     </Reference>

@@ -110,7 +110,7 @@ namespace IRCBot.Modules
                                             }
                                             else
                                             {
-                                                display_last_log(line[4], ircbot, conf);
+                                                display_last_log(channel, ircbot, conf);
                                             }
                                         }
                                         else

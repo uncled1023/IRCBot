@@ -126,11 +126,51 @@ namespace IRCBot.Modules
             }
             if (type.Equals("query") && bot_command == true)
             {
-                add_log(nick, "a private message", line, ircbot);
+                bool command_valid = false;
+                foreach (List<string> tmp_command in conf.command_list)
+                {
+                    string[] triggers = tmp_command[3].Split('|');
+                    foreach (string trigger in triggers)
+                    {
+                        if (command.Equals(trigger))
+                        {
+                            command_valid = true;
+                            break;
+                        }
+                    }
+                    if (command_valid == true)
+                    {
+                        break;
+                    }
+                }
+                if (command_valid == true)
+                {
+                    add_log(nick, "a private message", line, ircbot);
+                }
             }
             if (type.Equals("channel") && bot_command == true)
             {
-                add_log(nick, channel, line, ircbot);
+                bool command_valid = false;
+                foreach (List<string> tmp_command in conf.command_list)
+                {
+                    string[] triggers = tmp_command[3].Split('|');
+                    foreach (string trigger in triggers)
+                    {
+                        if (command.Equals(trigger))
+                        {
+                            command_valid = true;
+                            break;
+                        }
+                    }
+                    if (command_valid == true)
+                    {
+                        break;
+                    }
+                }
+                if (command_valid == true)
+                {
+                    add_log(nick, channel, line, ircbot);
+                }
             }
         }
 

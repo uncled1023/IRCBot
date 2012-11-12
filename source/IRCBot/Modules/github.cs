@@ -73,7 +73,7 @@ namespace IRCBot.Modules
                                                 string title = "";
                                                 string description = "";
                                                 string[] split = line[4].Split('|');
-                                                title = split[0];
+                                                title = "[" + nick + "] " + split[0];
                                                 if (split.GetUpperBound(0) > 0)
                                                 {
                                                     description = split[1];
@@ -105,7 +105,7 @@ namespace IRCBot.Modules
                                                 string title = "";
                                                 string description = "";
                                                 string[] split = line[4].Split('|');
-                                                title = split[0];
+                                                title = "[" + nick + "] " + split[0];
                                                 if (split.GetUpperBound(0) > 0)
                                                 {
                                                     description = split[1];

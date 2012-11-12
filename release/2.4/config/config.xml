@@ -1,0 +1,1313 @@
+<bot_settings>
+	<connection_settings>
+		<server_list>
+		</server_list>
+		<command_prefix>.</command_prefix>
+		<keep_logs>True</keep_logs>
+		<logs_path></logs_path>
+		<start_with_windows>False</start_with_windows>
+		<spam_count>5</spam_count>
+		<spam_threshold>1000</spam_threshold>
+		<spam_timeout>10000</spam_timeout>
+		<max_message_length>450</max_message_length>
+		<user_level>1</user_level>
+		<voice_level>3</voice_level>
+		<hop_level>6</hop_level>
+		<op_level>7</op_level>
+		<sop_level>8</sop_level>
+		<founder_level>9</founder_level>
+		<owner_level>10</owner_level>
+	</connection_settings>
+  <!-- Module Settings -->
+  <!-- Do not edit anything below this line.  Please use the built in configuration manager to avoid breaking anything -->
+  <modules>
+    <module>
+      <name>Ping Me</name>
+      <class_name>pingme</class_name>
+      <enabled>True</enabled>
+      <commands>
+        <command>
+          <name>Ping Me</name>
+          <description>Gets the ping time between your client and me.</description>
+          <triggers>pingme</triggers>
+          <syntax>
+          </syntax>
+          <access_level>1</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>True</spam_check>
+        </command>
+      </commands>
+    </module>
+    <module>
+      <name>Seen</name>
+      <class_name>seen</class_name>
+      <enabled>True</enabled>
+      <commands>
+        <command>
+          <name>Seen Nick</name>
+          <description>Displays the last time the nick has been seen in the channel.</description>
+          <triggers>seen</triggers>
+          <syntax>{nick}</syntax>
+          <access_level>1</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>True</spam_check>
+        </command>
+      </commands>
+    </module>
+    <module>
+      <name>Access</name>
+      <class_name>access</class_name>
+      <enabled>True</enabled>
+      <commands>
+        <command>
+          <name>Set Access</name>
+          <description>Adds the specified nick to the access list with the specified level.</description>
+          <triggers>access</triggers>
+          <syntax>{nick} {access_level}</syntax>
+          <access_level>7</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Remove Access</name>
+          <description>Removes the specified access level from the nick.</description>
+          <triggers>delaccess</triggers>
+          <syntax>{nick} {access_level}</syntax>
+          <access_level>7</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>List Access Levels</name>
+          <description>Lists all the users with access on the channel and their level.</description>
+          <triggers>listaccess</triggers>
+          <syntax>
+          </syntax>
+          <access_level>7</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+      </commands>
+    </module>
+    <module>
+      <name>Moderation</name>
+      <class_name>moderation</class_name>
+      <enabled>True</enabled>
+      <commands>
+        <command>
+          <name>Set Founder</name>
+          <description>Sets the nick to Owner of the chan.</description>
+          <triggers>founder</triggers>
+          <syntax>{nick}</syntax>
+          <access_level>9</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Remove Founder</name>
+          <description>Unsets the nick as Owner of the chan.</description>
+          <triggers>defounder</triggers>
+          <syntax>{nick}</syntax>
+          <access_level>9</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Add Auto-SOP</name>
+          <description>Adds the nick to the Auto Super Op List.</description>
+          <triggers>asop</triggers>
+          <syntax>{nick}</syntax>
+          <access_level>8</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Remove Auto-SOP</name>
+          <description>Removes the nick from the Auto Super Op List.</description>
+          <triggers>deasop</triggers>
+          <syntax>{nick}</syntax>
+          <access_level>8</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Set SOP</name>
+          <description>Sets the nick as Super Op.</description>
+          <triggers>sop</triggers>
+          <syntax>{nick}</syntax>
+          <access_level>8</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Remove SOP</name>
+          <description>Removes the nick as Super Op.</description>
+          <triggers>desop</triggers>
+          <syntax>{nick}</syntax>
+          <access_level>8</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Add Auto-OP</name>
+          <description>Adds the nick to the Auto Op List.</description>
+          <triggers>aop</triggers>
+          <syntax>{nick}</syntax>
+          <access_level>7</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Remove Auto-OP</name>
+          <description>Removes the nick from the Auto Op List.</description>
+          <triggers>deaop</triggers>
+          <syntax>{nick}</syntax>
+          <access_level>7</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Set OP</name>
+          <description>Sets the nick as an Op.</description>
+          <triggers>op</triggers>
+          <syntax>{nick}</syntax>
+          <access_level>7</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Remove OP</name>
+          <description>Removes the nick as an Op.</description>
+          <triggers>deop</triggers>
+          <syntax>{nick}</syntax>
+          <access_level>7</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Add Auto-HOP</name>
+          <description>Adds the nick to the Auto HOP List.</description>
+          <triggers>ahop</triggers>
+          <syntax>{nick}</syntax>
+          <access_level>7</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Remove Auto-HOP</name>
+          <description>Removes the nick from the Auto HOP List.</description>
+          <triggers>deahop</triggers>
+          <syntax>{nick}</syntax>
+          <access_level>7</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Add Auto-Voice</name>
+          <description>Adds the nick to the Auto Voice List.</description>
+          <triggers>avoice</triggers>
+          <syntax>{nick}</syntax>
+          <access_level>7</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Remove Auto-Voice</name>
+          <description>Removes the nick from the Auto Voice List.</description>
+          <triggers>davoice</triggers>
+          <syntax>{nick}</syntax>
+          <access_level>7</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Set Channel Mode</name>
+          <description>Sets or unsets a channel mode.</description>
+          <triggers>mode</triggers>
+          <syntax>+/-{flag}</syntax>
+          <access_level>7</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Set Channel Topic</name>
+          <description>Sets the channels topic.</description>
+          <triggers>topic</triggers>
+          <syntax>{topic}</syntax>
+          <access_level>7</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Invite to Channel</name>
+          <description>Invites the specified nick into the channel.</description>
+          <triggers>invite</triggers>
+          <syntax>{nick}</syntax>
+          <access_level>7</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Auto Kick a Nick</name>
+          <description>Adds the specified nick to the auto kick list.</description>
+          <triggers>ak</triggers>
+          <syntax>{nick} [{reason}]</syntax>
+          <access_level>7</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Auto Ban a Nick</name>
+          <description>Adds the specified nick to the auto ban list.</description>
+          <triggers>ab</triggers>
+          <syntax>{nick} [{reason}]</syntax>
+          <access_level>7</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Auto Kick-Ban a Nick</name>
+          <description>Adds the specified nick to the auto kick-ban list.</description>
+          <triggers>akb</triggers>
+          <syntax>{nick} [{reason}]</syntax>
+          <access_level>7</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Remove Nick's Auto Kick</name>
+          <description>Removess the specified nick to the auto kick list.</description>
+          <triggers>deak</triggers>
+          <syntax>{nick}</syntax>
+          <access_level>7</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Remove Nick's Auto Ban</name>
+          <description>Adds the specified nick to the auto ban list.</description>
+          <triggers>deab</triggers>
+          <syntax>{nick}</syntax>
+          <access_level>7</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Remove Nick's Auto Kick-Ban</name>
+          <description>Adds the specified nick to the auto kick-ban list.</description>
+          <triggers>deakb</triggers>
+          <syntax>{nick}</syntax>
+          <access_level>7</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Set HOP</name>
+          <description>Sets the nick as Half Op.</description>
+          <triggers>hop</triggers>
+          <syntax>{nick}</syntax>
+          <access_level>6</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Remove HOP</name>
+          <description>Removes the nick as Half Op.</description>
+          <triggers>dehop</triggers>
+          <syntax>{nick}</syntax>
+          <access_level>6</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Ban a Nick</name>
+          <description>Bans the specified nick.</description>
+          <triggers>b</triggers>
+          <syntax>{nick} [{reason}]</syntax>
+          <access_level>5</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>UnBan a Nick</name>
+          <description>UnBans the specified nick.</description>
+          <triggers>ub</triggers>
+          <syntax>{nick}</syntax>
+          <access_level>5</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Kick+Ban a Nick</name>
+          <description>Bans and then Kicks the specified nick.</description>
+          <triggers>kb</triggers>
+          <syntax>{nick} [{reason}]</syntax>
+          <access_level>5</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Timed Ban</name>
+          <description>Bans the specified nick for the ammount of time specified.</description>
+          <triggers>tb</triggers>
+          <syntax>{ban_time} {nick} [{reason}]</syntax>
+          <access_level>5</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Timed Kick+Ban</name>
+          <description>Bans and then Kicks the specified nick for the ammount of time specified.</description>
+          <triggers>tkb</triggers>
+          <syntax>{ban_time} {nick} [{reason}]</syntax>
+          <access_level>5</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Kick a User</name>
+          <description>Kicks the user from the channel.</description>
+          <triggers>k</triggers>
+          <syntax>{nick} [{reason}]</syntax>
+          <access_level>4</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Set Voice</name>
+          <description>Sets the nick as Voiced.</description>
+          <triggers>voice</triggers>
+          <syntax>{voice}</syntax>
+          <access_level>3</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Remove Voice</name>
+          <description>Removes the nick as Voiced.</description>
+          <triggers>devoice</triggers>
+          <syntax>{nick}</syntax>
+          <access_level>3</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Kick Yourself</name>
+          <description>Kicks you from the channel.</description>
+          <triggers>kme</triggers>
+          <syntax>
+          </syntax>
+          <access_level>1</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+      </commands>
+    </module>
+    <module>
+      <name>Owner</name>
+      <class_name>owner</class_name>
+      <enabled>True</enabled>
+      <commands>
+        <command>
+          <name>Identify as Owner</name>
+          <description>Identifies you as the Bot's owner.</description>
+          <triggers>owner</triggers>
+          <syntax>{password}</syntax>
+          <access_level>1</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Add Owner</name>
+          <description>Adds the defined nick as an owner to me.</description>
+          <triggers>addowner</triggers>
+          <syntax>{nick}</syntax>
+          <access_level>10</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Delete Owner</name>
+          <description>Removes the defined nick from my owners list.</description>
+          <triggers>delowner</triggers>
+          <syntax>{nick}</syntax>
+          <access_level>10</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Change Nickname</name>
+          <description>Changes my nickname to the one specified.</description>
+          <triggers>nick</triggers>
+          <syntax>{new_nick}</syntax>
+          <access_level>10</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Identify Bot</name>
+          <description>Makes me identify to the server.</description>
+          <triggers>id|identify</triggers>
+          <syntax>
+          </syntax>
+          <access_level>10</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Join Channel</name>
+          <description>Tells me to join the defined channel.</description>
+          <triggers>join</triggers>
+          <syntax>{channel}</syntax>
+          <access_level>10</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Part Channel</name>
+          <description>Tells me to leave the defined channel.</description>
+          <triggers>part</triggers>
+          <syntax>{channel}</syntax>
+          <access_level>10</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Say Message</name>
+          <description>I will display whatever the message is.</description>
+          <triggers>say</triggers>
+          <syntax>{channel} {message}</syntax>
+          <access_level>10</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Disconnect</name>
+          <description>Tells me to quit the server.</description>
+          <triggers>quit</triggers>
+          <syntax>
+          </syntax>
+          <access_level>10</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Update Configuration</name>
+          <description>Updates the Modules and Configurations on all the server sessions.</description>
+          <triggers>update</triggers>
+          <syntax>
+          </syntax>
+          <access_level>10</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Display Loaded Modules</name>
+          <description>Displays all the loaded modules.</description>
+          <triggers>modules</triggers>
+          <syntax>
+          </syntax>
+          <access_level>10</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Load Module</name>
+          <description>Loads the specified Module into the bot.</description>
+          <triggers>loadmodule</triggers>
+          <syntax>{module_class_name}</syntax>
+          <access_level>10</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Unload Module</name>
+          <description>Unloads the specified Module from the bot.</description>
+          <triggers>delmodule</triggers>
+          <syntax>{module_class_name}</syntax>
+          <access_level>10</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+      </commands>
+    </module>
+    <module>
+      <name>Help</name>
+      <class_name>help</class_name>
+      <enabled>True</enabled>
+      <commands>
+        <command>
+          <name>Channel Help</name>
+          <description>Displays the commands you can use in the channel.</description>
+          <triggers>help</triggers>
+          <syntax>[{command}]</syntax>
+          <access_level>1</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>True</spam_check>
+        </command>
+      </commands>
+    </module>
+    <module>
+      <name>Rules</name>
+      <class_name>rules</class_name>
+      <enabled>True</enabled>
+      <commands>
+        <command>
+          <name>View Channel Rules</name>
+          <description>Sends you the channel rules.</description>
+          <triggers>rules</triggers>
+          <syntax>
+          </syntax>
+          <access_level>1</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>True</spam_check>
+        </command>
+        <command>
+          <name>Remove Channel Rule</name>
+          <description>Removes the specified rule number from the rules list.</description>
+          <triggers>delrule</triggers>
+          <syntax>{rule_number}</syntax>
+          <access_level>7</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>True</spam_check>
+        </command>
+        <command>
+          <name>Add Channel Rule</name>
+          <description>Adds the specified rule to the end of the channel rules list.</description>
+          <triggers>addrule</triggers>
+          <syntax>{rule}</syntax>
+          <access_level>7</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>True</spam_check>
+        </command>
+      </commands>
+    </module>
+    <module>
+      <name>Messaging</name>
+      <class_name>messaging</class_name>
+      <enabled>True</enabled>
+      <commands>
+        <command>
+          <name>Send a Message</name>
+          <description>Leaves a message for the specified nick.  Will be delivered once the nick joins or speaks in a channel i'm in.</description>
+          <triggers>message|msg</triggers>
+          <syntax>{nick} {message}</syntax>
+          <access_level>1</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>True</spam_check>
+        </command>
+      </commands>
+    </module>
+    <module>
+      <name>Intro</name>
+      <class_name>intro</class_name>
+      <enabled>True</enabled>
+      <commands>
+        <command>
+          <name>Set your Introduction</name>
+          <description>Adds a personal greeting for whenever you enter the channel.  You can add multiple greetings by using | in between each greeting.</description>
+          <triggers>intro</triggers>
+          <syntax>{message}</syntax>
+          <access_level>1</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>True</spam_check>
+        </command>
+        <command>
+          <name>Delete your Introduction</name>
+          <description>Deletes all of your introductions.</description>
+          <triggers>introdelete</triggers>
+          <syntax>
+          </syntax>
+          <access_level>1</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>True</spam_check>
+        </command>
+      </commands>
+    </module>
+    <module>
+      <name>Quote</name>
+      <class_name>quote</class_name>
+      <enabled>True</enabled>
+      <commands>
+        <command>
+          <name>Channel Quote</name>
+          <description>Gets a random quote from the channel.  If a nickname is specified, it will get a quote from that nickname.</description>
+          <triggers>quote</triggers>
+          <syntax>[{nick}]</syntax>
+          <access_level>1</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>True</spam_check>
+        </command>
+      </commands>
+      <options>
+        <allow_lookup>
+          <type>checkbox</type>
+          <checked>True</checked>
+          <label>Allow Quote Lookup by Nick</label>
+        </allow_lookup>
+      </options>
+    </module>
+    <module>
+      <name>Weather</name>
+      <class_name>weather</class_name>
+      <enabled>True</enabled>
+      <commands>
+        <command>
+          <name>Get Current Weather</name>
+          <description>Displays the current weather conditions for the city you search for.</description>
+          <triggers>weather|w</triggers>
+          <syntax>{zip_code|city_name}</syntax>
+          <access_level>1</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>True</spam_check>
+        </command>
+        <command>
+          <name>Get Weather Forecast</name>
+          <description>Displays the weather forecast for the city you search for.</description>
+          <triggers>forecast|f</triggers>
+          <syntax>{zip_code|city_name}</syntax>
+          <access_level>1</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>True</spam_check>
+        </command>
+      </commands>
+      <options>
+        <allow_weather>
+          <type>checkbox</type>
+          <checked>True</checked>
+          <label>Allow Current Weather</label>
+        </allow_weather>
+        <allow_forecast>
+          <type>checkbox</type>
+          <checked>True</checked>
+          <label>Allow Forecast</label>
+        </allow_forecast>
+        <forecast_days>
+          <type>textbox</type>
+          <value>4</value>
+          <label>Days to forecast (5 Max)</label>
+        </forecast_days>
+      </options>
+    </module>
+    <module>
+      <name>Google</name>
+      <class_name>google</class_name>
+      <enabled>True</enabled>
+      <commands>
+        <command>
+          <name>Google Search</name>
+          <description>Returns the first result from Google.</description>
+          <triggers>google</triggers>
+          <syntax>{query}</syntax>
+          <access_level>1</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>True</spam_check>
+        </command>
+      </commands>
+      <options>
+        <show_url>
+          <type>checkbox</type>
+          <checked>True</checked>
+          <label>Show URL of result</label>
+        </show_url>
+      </options>
+    </module>
+    <module>
+      <name>Urban Dictionary</name>
+      <class_name>urban_dictionary</class_name>
+      <enabled>True</enabled>
+      <commands>
+        <command>
+          <name>Urban Dictionary</name>
+          <description>Returns the top result from Urban Dictionary.</description>
+          <triggers>ud</triggers>
+          <syntax>{query}</syntax>
+          <access_level>1</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>True</spam_check>
+        </command>
+      </commands>
+      <options>
+        <show_url>
+          <type>checkbox</type>
+          <checked>True</checked>
+          <label>Show URL of result</label>
+        </show_url>
+      </options>
+    </module>
+    <module>
+      <name>8ball</name>
+      <class_name>_8ball</class_name>
+      <enabled>True</enabled>
+      <commands>
+        <command>
+          <name>Magic 8-Ball</name>
+          <description>Answers any question you have!</description>
+          <triggers>8ball</triggers>
+          <syntax>{question}</syntax>
+          <access_level>1</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>True</spam_check>
+        </command>
+      </commands>
+    </module>
+    <module>
+      <name>HBomb</name>
+      <class_name>hbomb</class_name>
+      <enabled>True</enabled>
+      <commands>
+        <command>
+          <name>Initiate the H-Bomb</name>
+          <description>Initiates a new game of pass the Hbomb.</description>
+          <triggers>hbomb</triggers>
+          <syntax>
+          </syntax>
+          <access_level>1</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>True</spam_check>
+        </command>
+        <command>
+          <name>Pass the H-Bomb</name>
+          <description>Passes the H-Bomb to the specified nick.</description>
+          <triggers>pass</triggers>
+          <syntax>
+          </syntax>
+          <access_level>1</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>True</spam_check>
+        </command>
+        <command>
+          <name>Defuse the H-Bomb</name>
+          <description>Cuts a wire of the H-Bomb.  If you get it correct, the person who passed it to you gets bombed, otherwise you do.</description>
+          <triggers>defuse</triggers>
+          <syntax>
+          </syntax>
+          <access_level>1</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>True</spam_check>
+        </command>
+      </commands>
+    </module>
+    <module>
+      <name>Fun</name>
+      <class_name>fun</class_name>
+      <enabled>True</enabled>
+      <commands>
+        <command>
+          <name>Send Love</name>
+          <description>Sends some love to the nick or yourself.</description>
+          <triggers>love</triggers>
+          <syntax>[{nick}]</syntax>
+          <access_level>1</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>True</spam_check>
+        </command>
+        <command>
+          <name>Hug</name>
+          <description>Sends a hug to the nick or yourself.</description>
+          <triggers>hug</triggers>
+          <syntax>[{nick}]</syntax>
+          <access_level>1</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>True</spam_check>
+        </command>
+        <command>
+          <name>Slap Someone</name>
+          <description>Slaps a nick or yourself.</description>
+          <triggers>slap</triggers>
+          <syntax>[{nick}]</syntax>
+          <access_level>1</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>True</spam_check>
+        </command>
+        <command>
+          <name>Check In</name>
+          <description>Checks in to the channel!</description>
+          <triggers>bots</triggers>
+          <syntax>
+          </syntax>
+          <access_level>1</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>True</spam_check>
+        </command>
+      </commands>
+    </module>
+    <module>
+      <name>Response</name>
+      <class_name>AI</class_name>
+      <enabled>True</enabled>
+      <commands>
+      </commands>
+    </module>
+    <module>
+      <name>Chat</name>
+      <class_name>chat</class_name>
+      <enabled>True</enabled>
+      <commands>
+      </commands>
+      <options>
+        <chat_timeout>
+          <type>textbox</type>
+          <value>20</value>
+          <label>Chat Timeout in Seconds</label>
+        </chat_timeout>
+      </options>
+    </module>
+    <module>
+      <name>Poll</name>
+      <class_name>poll</class_name>
+      <enabled>True</enabled>
+      <commands>
+        <command>
+          <name>Create Poll</name>
+          <description>Creates a poll in the channel.</description>
+          <triggers>poll</triggers>
+          <syntax>{question}|{answer1}|{answer2}|...</syntax>
+          <access_level>1</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>True</spam_check>
+        </command>
+        <command>
+          <name>Add Answer</name>
+          <description>Adds an answer to the active poll.</description>
+          <triggers>addanswer</triggers>
+          <syntax>{answer}</syntax>
+          <access_level>1</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>True</spam_check>
+        </command>
+        <command>
+          <name>Delete Answer</name>
+          <description>Deletes the specified answer.</description>
+          <triggers>delanswer</triggers>
+          <syntax>{answer_number}</syntax>
+          <access_level>1</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>True</spam_check>
+        </command>
+        <command>
+          <name>Stop Poll</name>
+          <description>Stops the active poll and displays the results.</description>
+          <triggers>stoppoll</triggers>
+          <syntax>
+          </syntax>
+          <access_level>1</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>True</spam_check>
+        </command>
+        <command>
+          <name>Display Results</name>
+          <description>Displays the results of the current poll.</description>
+          <triggers>results</triggers>
+          <syntax>
+          </syntax>
+          <access_level>1</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>True</spam_check>
+        </command>
+        <command>
+          <name>Vote</name>
+          <description>Votes for the specified answer.</description>
+          <triggers>vote</triggers>
+          <syntax>{answer_number}</syntax>
+          <access_level>1</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>True</spam_check>
+        </command>
+      </commands>
+    </module>
+    <module>
+      <name>Roll Call</name>
+      <class_name>roll_call</class_name>
+      <enabled>True</enabled>
+      <commands>
+        <command>
+          <name>Roll Call</name>
+          <description>Has me say everyone's nick in the channel for a roll call.</description>
+          <triggers>rollcall</triggers>
+          <syntax>[{channel}]</syntax>
+          <access_level>10</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>True</spam_check>
+        </command>
+      </commands>
+      <options>
+        <roll_call_message>
+          <type>textbox</type>
+          <value>It's time for a Roll Call</value>
+          <label>Roll Call Message</label>
+        </roll_call_message>
+      </options>
+    </module>
+    <module>
+      <name>Version Response</name>
+      <class_name>version</class_name>
+      <enabled>True</enabled>
+      <commands>
+        <command>
+          <name>Get Version</name>
+          <description>Sends a Version request and displays the response.</description>
+          <triggers>ver</triggers>
+          <syntax>{nick}</syntax>
+          <access_level>1</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>True</spam_check>
+        </command>
+      </commands>
+      <options>
+        <bot_machine>
+          <type>textbox</type>
+          <value>the Moon</value>
+          <label>Machine bot is ran on</label>
+        </bot_machine>
+      </options>
+    </module>
+    <module>
+      <name>Idle</name>
+      <class_name>idle</class_name>
+      <enabled>True</enabled>
+      <commands>
+        <command>
+          <name>Go Idle</name>
+          <description>Sets you as idle.  Will protect you from certain games and actions.</description>
+          <triggers>idle</triggers>
+          <syntax>
+          </syntax>
+          <access_level>1</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
+          <name>Return from Idle</name>
+          <description>Returns you from idle.</description>
+          <triggers>deidle</triggers>
+          <syntax>
+          </syntax>
+          <access_level>1</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+      </commands>
+    </module>
+    <module>
+      <name>Roll Dice</name>
+      <class_name>roll</class_name>
+      <enabled>True</enabled>
+      <commands>
+        <command>
+          <name>Roll Dice</name>
+          <description>Rolls a specified number of dice with certain ammount of sides and displays the results.</description>
+          <triggers>roll</triggers>
+          <syntax>[{number_of_dice}] [{number_of_sides}]</syntax>
+          <access_level>1</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>True</spam_check>
+        </command>
+      </commands>
+      <options>
+        <max_dice>
+          <type>textbox</type>
+          <value>100</value>
+          <label>Maximum number of Dice allowed</label>
+        </max_dice>
+        <max_sides>
+          <type>textbox</type>
+          <value>999</value>
+          <label>Maximum number of sides allowed</label>
+        </max_sides>
+      </options>
+    </module>
+    <module>
+      <name>Wolfram Alpha</name>
+      <class_name>wolfram_alpha</class_name>
+      <enabled>True</enabled>
+      <commands>
+        <command>
+          <name>Wolfram Alpha</name>
+          <description>Returns the results of your query from Wolfram Alpha.</description>
+          <triggers>wa</triggers>
+          <syntax>{query}</syntax>
+          <access_level>1</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>True</spam_check>
+        </command>
+      </commands>
+      <options>
+        <API>
+          <type>textbox</type>
+          <value>892JG5-XVQVU5JUEW</value>
+          <label>Wolfram Alpha API</label>
+        </API>
+      </options>
+    </module>
+    <module>
+      <name>GitHub</name>
+      <class_name>github</class_name>
+      <enabled>True</enabled>
+      <commands>
+        <command>
+          <name>Add Bug</name>
+          <description>Creates a new bug issue.</description>
+          <triggers>bug</triggers>
+          <syntax>{title}|{description}</syntax>
+          <access_level>1</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>True</spam_check>
+        </command>
+        <command>
+          <name>Add Request</name>
+          <description>Creates a new feature request.</description>
+          <triggers>request</triggers>
+          <syntax>{title}|{description}</syntax>
+          <access_level>1</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>True</spam_check>
+        </command>
+      </commands>
+      <options>
+		<username>
+			<type>textbox</type>
+			<value></value>
+			<label>GitHub Username</label>
+		</username>
+		<api>
+			<type>textbox</type>
+			<value></value>
+			<label>GitHub Password</label>		
+		</api>
+        <repository>
+          <type>textbox</type>
+          <value></value>
+          <label>Repository Name</label>
+        </repository>
+      </options>
+    </module>
+    <module>
+      <name>About</name>
+      <class_name>about</class_name>
+      <enabled>True</enabled>
+      <commands>
+        <command>
+          <name>About</name>
+          <description>Displays my information.</description>
+          <triggers>about</triggers>
+          <syntax></syntax>
+          <access_level>1</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>True</spam_check>
+        </command>
+      </commands>
+      <options>
+        <display_version>
+          <type>checkbox</type>
+          <checked>True</checked>
+          <label>Display Version</label>
+        </display_version>
+        <display_creator>
+          <type>checkbox</type>
+          <checked>True</checked>
+          <label>Display Creator</label>
+        </display_creator>
+        <display_owner>
+          <type>checkbox</type>
+          <checked>True</checked>
+          <label>Display Owner</label>
+        </display_owner>
+      </options>
+    </module>
+    <module>
+      <name>Command Logging</name>
+      <class_name>logging</class_name>
+      <enabled>True</enabled>
+      <commands>
+        <command>
+          <name>Get Command Usage</name>
+          <description>Displays the last nickname who used that command, or when a nick last used a command.</description>
+          <triggers>last</triggers>
+          <syntax>[{command}] [{nick}] [{number_of_results}]</syntax>
+          <access_level>7</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>True</spam_check>
+        </command>
+      </commands>
+      <options>
+      </options>
+    </module>
+  </modules>
+</bot_settings>

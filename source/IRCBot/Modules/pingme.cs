@@ -60,13 +60,13 @@ namespace IRCBot.Modules
                                         }
                                         if (nick_access >= command_access)
                                         {
-                                            ircbot.sendData("PING", nick);
-                                            ping_list.Add(new List<string>());
-                                            int index = ping_list.Count() - 1;
+                                            ircbot.sendData("PRIVMSG", nick + " :\u0001PING\u0001");
+                                            List<string> tmp_list = new List<string>();
                                             string current_time = DateTime.Now.ToLongTimeString();
-                                            ping_list[index].Add(nick);
-                                            ping_list[index].Add(channel);
-                                            ping_list[index].Add(current_time);
+                                            tmp_list.Add(nick);
+                                            tmp_list.Add(channel);
+                                            tmp_list.Add(current_time);
+                                            ping_list.Add(tmp_list);
                                         }
                                         else
                                         {
@@ -79,19 +79,18 @@ namespace IRCBot.Modules
                     }
                 }
             }
-            if (type.Equals("base") || type.Equals("line") || type.Equals("channel") || type.Equals("query"))
+            if (type.Equals("line") || type.Equals("query"))
             {
-                check_ping(line, ircbot);
+                check_ping(line, ircbot, nick);
             }
         }
 
-        public void check_ping(string[] line, bot ircbot)
+        public void check_ping(string[] line, bot ircbot, string nick)
         {
-            if (line.GetUpperBound(0) > 2)
+            if (line.GetUpperBound(0) > 3)
             {
-                if (line[1].ToLower().Equals("pong"))
+                if (line[3].Equals(":\u0001PING"))
                 {
-                    string nick = line[3].TrimStart(':');
                     for (int x = 0; x < ping_list.Count(); x++)
                     {
                         if (ping_list[x][0].Equals(nick))

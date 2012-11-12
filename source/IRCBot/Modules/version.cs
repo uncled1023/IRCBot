@@ -62,9 +62,9 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                ircbot.sendData("PRIVMSG", line[4] + " :\u0001VERSION\u0001");
+                                                ircbot.sendData("PRIVMSG", line[4].Trim() + " :\u0001VERSION\u0001");
                                                 List<string> tmp_list = new List<string>();
-                                                tmp_list.Add(line[4]);
+                                                tmp_list.Add(line[4].Trim());
                                                 tmp_list.Add(channel);
                                                 version_list.Add(tmp_list);
                                             }

@@ -197,12 +197,55 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                line[4].Replace(' ', ',');
-                                                ircbot.sendData("PART", line[4]);
+                                                string[] channels = line[4].Split(' ');
+                                                bool chan_found = false;
+                                                foreach (string tmp_chan in channels)
+                                                {
+                                                    bool part_chan = false;
+                                                    int index = 0;
+                                                    foreach (string chan in ircbot.channel_list)
+                                                    {
+                                                        if (chan.Equals(tmp_chan))
+                                                        {
+                                                            part_chan = true;
+                                                            chan_found = true;
+                                                            index++;
+                                                            break;
+                                                        }
+                                                    }
+                                                    if (part_chan == true)
+                                                    {
+                                                        ircbot.sendData("PART", line[4]);
+                                                        ircbot.channel_list.RemoveAt(index);
+                                                    }
+                                                }
+                                                if (chan_found == false)
+                                                {
+                                                    ircbot.sendData("NOTICE", nick + " :I am not in that channel.");
+                                                }
                                             }
                                             else if (type.Equals("channel"))
                                             {
-                                                ircbot.sendData("PART", channel);
+                                                bool part_chan = false;
+                                                int index = 0;
+                                                foreach (string chan in ircbot.channel_list)
+                                                {
+                                                    if (chan.Equals(channel))
+                                                    {
+                                                        part_chan = true;
+                                                        index++;
+                                                        break;
+                                                    }
+                                                }
+                                                if (part_chan == true)
+                                                {
+                                                    ircbot.sendData("PART", channel);
+                                                    ircbot.channel_list.RemoveAt(index);
+                                                }
+                                                else
+                                                {
+                                                    ircbot.sendData("NOTICE", nick + " :I am not in that channel.");
+                                                }
                                             }
                                             else
                                             {

@@ -621,7 +621,7 @@ namespace IRCBot
                                             ircbot.queue_text.Add(output);
                                         }
                                     }
-                                    while (name_line[3] != "=")
+                                    while (name_line[3] != "=" && name_line[3] != "@")
                                     {
                                         line = sr.ReadLine();
                                         name_line = line.Split(charSeparator, 5);
@@ -733,7 +733,7 @@ namespace IRCBot
                                     ircbot.queue_text.Add(output);
                                 }
                             }
-                            while (name_line[3] != "=")
+                            while (name_line[3] != "=" && name_line[3] != "@")
                             {
                                 line = sr.ReadLine();
                                 name_line = line.Split(charSeparator, 5);

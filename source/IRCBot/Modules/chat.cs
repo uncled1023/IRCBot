@@ -100,10 +100,10 @@ namespace IRCBot.Modules
                                                     ircbot.sendData("PRIVMSG", channel + " :Ok, I will stop.");
                                                     break;
                                                 }
-                                                else
-                                                {
-                                                    ircbot.sendData("PRIVMSG", channel + " :You are not currently talking to me.");
-                                                }
+                                            }
+                                            if (still_chatting == true)
+                                            {
+                                                ircbot.sendData("PRIVMSG", channel + " :You are not currently talking to me.");
                                             }
                                         }
                                         else

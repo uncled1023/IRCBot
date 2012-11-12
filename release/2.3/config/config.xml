@@ -1289,5 +1289,25 @@
         </display_owner>
       </options>
     </module>
+    <module>
+      <name>Command Logging</name>
+      <class_name>logging</class_name>
+      <enabled>True</enabled>
+      <commands>
+        <command>
+          <name>last</name>
+          <description>Displays the last nickname who used that command, or when a nick last used a command.</description>
+          <triggers>last</triggers>
+          <syntax>{command} [{nick}] [{number_of_results}]</syntax>
+          <access_level>7</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>True</spam_check>
+        </command>
+      </commands>
+      <options>
+      </options>
+    </module>
   </modules>
 </bot_settings>

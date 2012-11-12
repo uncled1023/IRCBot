@@ -61,7 +61,14 @@ namespace IRCBot.Modules
                                         }
                                         if (nick_access >= command_access)
                                         {
-                                            display_seen(line[4], line[2], ircbot);
+                                            if (line.GetUpperBound(0) > 3)
+                                            {
+                                                display_seen(line[4], line[2], ircbot);
+                                            }
+                                            else
+                                            {
+                                                ircbot.sendData("NOTICE", nick + " :" + nick + ", you need to include more info.");
+                                            }
                                         }
                                         else
                                         {

@@ -92,6 +92,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="lib\json.cs" />
+    <Compile Include="Modules\about.cs" />
     <Compile Include="Modules\github.cs" />
     <Compile Include="Modules\wolfram_alpha.cs" />
     <Compile Include="Modules\module.cs" />

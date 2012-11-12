@@ -86,7 +86,8 @@ namespace IRCBot.Modules
                             chat_time.Stop();
                             Request r = new Request(msg, myUser, myBot);
                             Result res = myBot.Chat(r);
-                            ircbot.sendData("PRIVMSG", channel + " :" + res.Output.Replace("[nick]", nick).Replace("[me]", conf.nick).Replace("[owner]", conf.owner));
+                            AboutBox1 about = new AboutBox1();
+                            ircbot.sendData("PRIVMSG", channel + " :" + res.Output.Replace("[nick]", nick).Replace("[me]", conf.nick).Replace("[owner]", conf.owner.TrimStart(',').TrimEnd(',').Replace(",", " and ")).Replace("[version]", about.AssemblyVersion).Replace("\n", " "));
                             chat_time.Start();
                             still_chatting = true;
                         }

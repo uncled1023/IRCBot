@@ -60,7 +60,8 @@ namespace IRCBot.Modules
                                         }
                                         if (nick_access >= command_access)
                                         {
-                                            ircbot.sendData("PRIVMSG", nick + " :\u0001PING\u0001");
+                                            int epoch = (int)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds;
+                                            ircbot.sendData("PRIVMSG", nick + " :\u0001PING " + epoch.ToString() + "\u0001");
                                             List<string> tmp_list = new List<string>();
                                             string current_time = DateTime.Now.ToLongTimeString();
                                             tmp_list.Add(nick);

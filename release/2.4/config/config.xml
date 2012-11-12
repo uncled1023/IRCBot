@@ -988,6 +988,17 @@
       <class_name>chat</class_name>
       <enabled>True</enabled>
       <commands>
+        <command>
+          <name>Stop Chatting</name>
+          <description>Stops the bot from chatting to you.</description>
+          <triggers>stopchat</triggers>
+          <syntax></syntax>
+          <access_level>1</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>True</spam_check>
+        </command>
       </commands>
       <options>
         <chat_timeout>

@@ -167,6 +167,7 @@ namespace IRCBot.Modules
                             inside = new_line[1];
                             nick = new_line[0];
                             command = new_line[3];
+                            cmd_found = true;
                         }
                     }
                     if (cmd_found == true)

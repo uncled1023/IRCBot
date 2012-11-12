@@ -1298,7 +1298,7 @@
           <name>Get Command Usage</name>
           <description>Displays the last nickname who used that command, or when a nick last used a command.</description>
           <triggers>last</triggers>
-          <syntax>{command} [{nick}] [{number_of_results}]</syntax>
+          <syntax>[{command}] [{nick}] [{number_of_results}]</syntax>
           <access_level>7</access_level>
           <blacklist>
           </blacklist>

@@ -110,7 +110,7 @@ namespace IRCBot.Modules
                                             }
                                             else
                                             {
-                                                ircbot.sendData("NOTICE", nick + " :" + nick + ", you need to include more info.");
+                                                display_last_log(line[4], ircbot, conf);
                                             }
                                         }
                                         else
@@ -131,6 +131,61 @@ namespace IRCBot.Modules
             if (type.Equals("channel") && bot_command == true)
             {
                 add_log(nick, channel, line, ircbot);
+            }
+        }
+
+        private void display_last_log(string channel, bot ircbot, IRCConfig conf)
+        {
+            string file_name = ircbot.server_name + ".log";
+            bool cmd_found = false;
+            if (File.Exists(ircbot.cur_dir + "\\modules\\logging\\" + file_name))
+            {
+                string[] log_file = System.IO.File.ReadAllLines(ircbot.cur_dir + "\\modules\\logging\\" + file_name);
+                int number_of_lines = log_file.GetUpperBound(0) + 1;
+                if (number_of_lines > 0)
+                {
+                    string parameters = "";
+                    string date = "";
+                    string inside = "";
+                    string nick = "";
+                    string command = "";
+                    foreach (string line in log_file)
+                    {
+                        char[] sep = new char[] { '*' };
+                        string[] new_line = line.Split(sep, 5);
+                        if (new_line.GetUpperBound(0) > 0)
+                        {
+                            if (new_line[4] != "")
+                            {
+                                parameters = " with the following argument: " + new_line[4];
+                            }
+                            else
+                            {
+                                parameters = "";
+                            }
+                            date = new_line[2];
+                            inside = new_line[1];
+                            nick = new_line[0];
+                            command = new_line[3];
+                        }
+                    }
+                    if (cmd_found == true)
+                    {
+                        ircbot.sendData("PRIVMSG", channel + " :The last command used was " + conf.command + command + " by " + nick + " on " + date + " in " + inside + parameters);
+                    }
+                    else
+                    {
+                        ircbot.sendData("PRIVMSG", channel + " :No commands have been used");
+                    }
+                }
+                else
+                {
+                    ircbot.sendData("PRIVMSG", channel + " :No commands have been used");
+                }
+            }
+            else
+            {
+                ircbot.sendData("PRIVMSG", channel + " :No commands have been used");
             }
         }
 
@@ -180,17 +235,51 @@ namespace IRCBot.Modules
                     }
                     else
                     {
-                        ircbot.sendData("PRIVMSG", channel + " :" + conf.command + command + " has not been used");
+                        string new_command = "";
+                        foreach (string line in log_file)
+                        {
+                            char[] sep = new char[] { '*' };
+                            string[] new_line = line.Split(sep, 5);
+                            if (new_line.GetUpperBound(0) > 0)
+                            {
+                                if (new_line[0].Equals(command))
+                                {
+                                    if (new_line[4] != "")
+                                    {
+                                        parameters = " with the following argument: " + new_line[4];
+                                    }
+                                    else
+                                    {
+                                        parameters = "";
+                                    }
+                                    date = new_line[2];
+                                    inside = new_line[1];
+                                    nick = new_line[0];
+                                    new_command = new_line[3];
+                                    num_uses++;
+                                    cmd_found = true;
+                                }
+                            }
+                        }
+                        if (cmd_found == true)
+                        {
+                            ircbot.sendData("PRIVMSG", channel + " :" + nick + " has used " + num_uses + " commands.");
+                            ircbot.sendData("PRIVMSG", channel + " :The last command they used was " + conf.command + new_command + " on " + date + " in " + inside + parameters);
+                        }
+                        else
+                        {
+                            ircbot.sendData("PRIVMSG", channel + " :No results found");
+                        }
                     }
                 }
                 else
                 {
-                    ircbot.sendData("PRIVMSG", channel + " :" + conf.command + command + " has not been used");
+                    ircbot.sendData("PRIVMSG", channel + " :No results found");
                 }
             }
             else
             {
-                ircbot.sendData("PRIVMSG", channel + " :" + conf.command + command + " has not been used");
+                ircbot.sendData("PRIVMSG", channel + " :No results found");
             }
         }
 
@@ -254,7 +343,45 @@ namespace IRCBot.Modules
                     }
                     else
                     {
-                        ircbot.sendData("PRIVMSG", channel + " :" + conf.command + command + " has not been used");
+                        foreach (string line in log_file)
+                        {
+                            List<string> tmp_list = new List<string>();
+                            char[] sep = new char[] { '*' };
+                            string[] new_line = line.Split(sep, 5);
+                            if (new_line.GetUpperBound(0) > 0)
+                            {
+                                if (new_line[0].Equals(command))
+                                {
+                                    tmp_list.Add(new_line[0]);
+                                    tmp_list.Add(new_line[1]);
+                                    tmp_list.Add(new_line[2]);
+                                    tmp_list.Add(new_line[3]);
+                                    tmp_list.Add(new_line[4]);
+                                    command_list.Add(tmp_list);
+                                    num_uses++;
+                                    cmd_found = true;
+                                }
+                            }
+                        }
+                        if (number < num_uses && number >= 0)
+                        {
+                            if (command_list[number][4] != "")
+                            {
+                                parameters = " with the following argument: " + command_list[number][4];
+                            }
+                            else
+                            {
+                                parameters = "";
+                            }
+                            date = command_list[number][2];
+                            inside = command_list[number][1];
+                            nick = command_list[number][0];
+                            ircbot.sendData("PRIVMSG", channel + " :" + nick + " used " + conf.command + command_list[number][3] + " on " + date + " in " + inside + parameters);
+                        }
+                        else
+                        {
+                            ircbot.sendData("PRIVMSG", channel + " :The command has not been used that many times");
+                        }
                     }
                 }
                 else

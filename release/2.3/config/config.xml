@@ -1295,7 +1295,7 @@
       <enabled>True</enabled>
       <commands>
         <command>
-          <name>last</name>
+          <name>Get Command Usage</name>
           <description>Displays the last nickname who used that command, or when a nick last used a command.</description>
           <triggers>last</triggers>
           <syntax>{command} [{nick}] [{number_of_results}]</syntax>

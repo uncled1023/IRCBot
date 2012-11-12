@@ -215,7 +215,7 @@ namespace IRCBot.Modules
                                                     }
                                                     if (part_chan == true)
                                                     {
-                                                        ircbot.sendData("PART", line[4]);
+                                                        ircbot.sendData("PART", tmp_chan);
                                                         ircbot.channel_list.RemoveAt(index);
                                                     }
                                                 }

@@ -307,11 +307,11 @@ namespace IRCBot.Modules
                                                 string[] new_line = line[4].Split(charS, 2);
                                                 if (new_line[0].StartsWith("#") == true && new_line.GetUpperBound(0) > 0)
                                                 {
-                                                    ircbot.sendData("PRIVMSG", new_line[0] + " :\u0001ACTION\u0001" + new_line[1]);
+                                                    ircbot.sendData("PRIVMSG", new_line[0] + " :\u0001ACTION " + new_line[1] + "\u0001");
                                                 }
                                                 else
                                                 {
-                                                    ircbot.sendData("PRIVMSG", channel + " :\u0001ACTION\u0001" + line[4]);
+                                                    ircbot.sendData("PRIVMSG", channel + " :\u0001ACTION " + line[4] + "\u0001");
                                                 }
                                             }
                                             else

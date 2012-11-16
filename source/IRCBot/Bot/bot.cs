@@ -96,7 +96,8 @@ namespace IRCBot
             Spam_Check_Timer.Start();
 
             checkRegisterationTimer.Tick += new EventHandler(checkRegistration);
-            checkRegisterationTimer.Interval = 60000;
+            checkRegisterationTimer.Interval = 120000;
+            checkRegisterationTimer.Start();
 
             Spam_Timer.Tick += new EventHandler(spam_deactivate);
 
@@ -480,7 +481,6 @@ namespace IRCBot
             string data;
 
             joinChannels();
-            checkRegisterationTimer.Start();
             first_run = false;
             while (shouldRun)
             {
@@ -1013,7 +1013,7 @@ namespace IRCBot
                 }
                 else
                 {
-                    string output = Environment.NewLine + server_name + ":You are missing a username and/or password.  Please add those to the server configuration so I can register this nick.";
+                    string output = Environment.NewLine + server_name + ":You are missing an username and/or password.  Please add those to the server configuration so I can register this nick.";
 
                     lock (ircbot.listLock)
                     {

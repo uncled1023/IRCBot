@@ -72,7 +72,7 @@ namespace IRCBot.Modules
                                                     }
                                                     else
                                                     {
-                                                        ircbot.sendData("NOTICE", nick + " :" + parse[0].Trim() + " hass been added to access level " + parse[2]);
+                                                        ircbot.sendData("NOTICE", nick + " :" + parse[0].Trim() + " has been added to access level " + parse[2]);
                                                     }
                                                 }
                                                 else if (type.Equals("channel") && parse.GetUpperBound(0) > 0)
@@ -80,7 +80,7 @@ namespace IRCBot.Modules
                                                     if (Convert.ToInt32(parse[1]) <= nick_access)
                                                     {
                                                         set_access_list(parse[0].Trim(), line[2], parse[1], ircbot);
-                                                        ircbot.sendData("NOTICE", nick + " :" + parse[0].Trim() + " hass been added to access level " + parse[1]);
+                                                        ircbot.sendData("NOTICE", nick + " :" + parse[0].Trim() + " has been added to access level " + parse[1]);
                                                     }
                                                     else
                                                     {
@@ -115,12 +115,12 @@ namespace IRCBot.Modules
                                                 if (parse.GetUpperBound(0) > 1)
                                                 {
                                                     del_access_list(parse[0].Trim(), parse[1], parse[2], ircbot);
-                                                    ircbot.sendData("NOTICE", nick + " :" + parse[0].Trim() + " hass been removed from access level " + parse[2]);
+                                                    ircbot.sendData("NOTICE", nick + " :" + parse[0].Trim() + " has been removed from access level " + parse[2]);
                                                 }
                                                 else if (type.Equals("channel") && parse.GetUpperBound(0) > 0)
                                                 {
                                                     del_access_list(parse[0].Trim(), line[2], parse[1], ircbot);
-                                                    ircbot.sendData("NOTICE", nick + " :" + parse[0].Trim() + " hass been removed from access level " + parse[1]);
+                                                    ircbot.sendData("NOTICE", nick + " :" + parse[0].Trim() + " has been removed from access level " + parse[1]);
                                                 }
                                                 else
                                                 {

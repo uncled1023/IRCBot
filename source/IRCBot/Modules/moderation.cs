@@ -4,21 +4,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Timers;
 
 namespace IRCBot.Modules
 {
     class moderation : Module
     {
-        private System.Timers.Timer unban_trigger;
-        private string unban_nick_string;
-        private string unban_host_string;
-        private string unban_channel_string;
+        private List<System.Timers.Timer> unban_triggers;
+        private List<List<string>> ban_info;
         private bot main;
 
         public moderation()
         {
-            unban_trigger = new System.Timers.Timer();
-            unban_trigger.Elapsed += unban_nick;
+            unban_triggers = new List<System.Timers.Timer>();
+            ban_info = new List<List<string>>();
         }
 
         public override void control(bot ircbot, ref IRCConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
@@ -779,14 +778,13 @@ namespace IRCBot.Modules
                                                             {
                                                                 ircbot.sendData("MODE", line[2] + " +b " + ban + " :No Reason");
                                                             }
-
+                                                            Timer unban_trigger = new Timer();
                                                             unban_trigger.Interval = (Convert.ToInt32(new_line[0]) * 1000);
                                                             unban_trigger.Enabled = true;
                                                             unban_trigger.AutoReset = false;
+                                                            unban_trigger.Elapsed += (sender, e) => unban_nick(sender, e, new_line[1], target_host, line[2]);
+                                                            unban_triggers.Add(unban_trigger);
                                                             main = ircbot;
-                                                            unban_nick_string = new_line[1];
-                                                            unban_host_string = target_host;
-                                                            unban_channel_string = line[2];
                                                         }
                                                         else
                                                         {
@@ -862,14 +860,13 @@ namespace IRCBot.Modules
                                                                 ircbot.sendData("MODE", line[2] + " +b " + ban + " :No Reason");
                                                                 ircbot.sendData("KICK", line[2] + " " + new_line[1] + " :No Reason");
                                                             }
-
+                                                            System.Timers.Timer unban_trigger = new System.Timers.Timer();
                                                             unban_trigger.Interval = (Convert.ToInt32(new_line[0]) * 1000);
                                                             unban_trigger.Enabled = true;
                                                             unban_trigger.AutoReset = false;
+                                                            unban_trigger.Elapsed += (sender, e) => unban_nick(sender, e, new_line[1], target_host, line[2]);
+                                                            unban_triggers.Add(unban_trigger);
                                                             main = ircbot;
-                                                            unban_nick_string = new_line[1];
-                                                            unban_host_string = target_host;
-                                                            unban_channel_string = line[2];
                                                         }
                                                         else
                                                         {
@@ -1270,15 +1267,16 @@ namespace IRCBot.Modules
             }
         }
 
-        public void unban_nick(object sender, EventArgs e)
+        public void unban_nick(object sender, EventArgs e, string nick, string host, string channel)
         {
+            System.Timers.Timer unban_trigger = (System.Timers.Timer)sender;
             unban_trigger.Enabled = false;
-            string ban = "*!*@" + unban_host_string;
-            if (unban_host_string.Equals("was"))
+            string ban = "*!*@" + host;
+            if (host.Equals("was"))
             {
-                ban = unban_nick_string + "!*@*";
+                ban = nick + "!*@*";
             }
-            main.sendData("MODE", unban_channel_string + " -b " + ban);
+            main.sendData("MODE", channel + " -b " + ban);
         }
 
         private void add_auto(string nick, string channel, string hostname, string type, string reason, bot ircbot)

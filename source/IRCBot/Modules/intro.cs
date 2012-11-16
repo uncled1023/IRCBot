@@ -96,6 +96,10 @@ namespace IRCBot.Modules
                     }
                 }
             }
+            if (type.Equals("join"))
+            {
+                check_intro(nick, channel.TrimStart(':'), ircbot);
+            }
         }
 
         public void check_intro(string nick, string channel, bot ircbot)

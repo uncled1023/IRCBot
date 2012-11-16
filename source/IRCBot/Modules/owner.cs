@@ -99,6 +99,7 @@ namespace IRCBot.Modules
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 add_owner(line[4], ircbot, ref conf);
+                                                ircbot.sendData("NOTICE", nick + " :" + nick + " has been added as an owner.");
                                             }
                                             else
                                             {
@@ -120,6 +121,7 @@ namespace IRCBot.Modules
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 del_owner(line[4], ircbot, ref conf);
+                                                ircbot.sendData("NOTICE", nick + " :" + nick + " has been removed as an owner.");
                                             }
                                             else
                                             {
@@ -160,6 +162,7 @@ namespace IRCBot.Modules
                                         if (nick_access >= command_access)
                                         {
                                             ircbot.identify();
+                                            ircbot.sendData("NOTICE", nick + " :I have identified.");
                                         }
                                         else
                                         {
@@ -175,8 +178,12 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                line[4].Replace(' ', ',');
-                                                ircbot.sendData("JOIN", line[4]);
+                                                string[] chan_list = line[4].Replace(' ', ',').Split(',');
+                                                foreach (string chan in chan_list)
+                                                {
+                                                    ircbot.channel_list.Add(chan);
+                                                    ircbot.sendData("JOIN", chan);
+                                                }
                                             }
                                             else
                                             {
@@ -275,6 +282,36 @@ namespace IRCBot.Modules
                                                 else
                                                 {
                                                     ircbot.sendData("PRIVMSG", channel + " :" + line[4]);
+                                                }
+                                            }
+                                            else
+                                            {
+                                                ircbot.sendData("NOTICE", nick + " :" + nick + ", you need to include more info.");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                        }
+                                        break;
+                                    case "action":
+                                        if (spam_check == true)
+                                        {
+                                            ircbot.spam_count++;
+                                        }
+                                        if (nick_access >= command_access)
+                                        {
+                                            if (line.GetUpperBound(0) > 3)
+                                            {
+                                                char[] charS = new char[] { ' ' };
+                                                string[] new_line = line[4].Split(charS, 2);
+                                                if (new_line[0].StartsWith("#") == true && new_line.GetUpperBound(0) > 0)
+                                                {
+                                                    ircbot.sendData("PRIVMSG", new_line[0] + " :\u0001ACTION\u0001" + new_line[1]);
+                                                }
+                                                else
+                                                {
+                                                    ircbot.sendData("PRIVMSG", channel + " :\u0001ACTION\u0001" + line[4]);
                                                 }
                                             }
                                             else
@@ -456,6 +493,91 @@ namespace IRCBot.Modules
                                                 else
                                                 {
                                                     ircbot.sendData("NOTICE", nick + " :" + nick + ", you need to include more info.");
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                        }
+                                        break;
+                                    case "addchan":
+                                        if (spam_check == true)
+                                        {
+                                            ircbot.spam_count++;
+                                        }
+                                        if (nick_access >= command_access)
+                                        {
+                                            if (line.GetUpperBound(0) > 3)
+                                            {
+                                                bool in_chan = false;
+                                                foreach (string in_channel in ircbot.channel_list)
+                                                {
+                                                    if (line[4].Equals(in_channel))
+                                                    {
+                                                        ircbot.sendData("NOTICE", nick + " :I'm already in that channel!");
+                                                        in_chan = true;
+                                                        break;
+                                                    }
+                                                }
+                                                if (in_chan == false)
+                                                {
+                                                    if (nick_access != conf.owner_level)
+                                                    {
+                                                        string[] owners = conf.owner.Split(',');
+                                                        foreach (string owner_nick in owners)
+                                                        {
+                                                            ircbot.sendData("NOTICE", owner_nick + " :" + nick + " has invited me to join " + line[4]);
+                                                        }
+                                                    }
+                                                    ircbot.channel_list.Add(line[4]);
+                                                    ircbot.sendData("JOIN", line[4]);
+                                                }
+                                            }
+                                            else
+                                            {
+                                                ircbot.sendData("NOTICE", nick + " :" + nick + ", you need to include more info.");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                        }
+                                        break;
+                                    case "channels":
+                                        if (spam_check == true)
+                                        {
+                                            ircbot.spam_count++;
+                                        }
+                                        if (nick_access >= command_access)
+                                        {
+                                            bool chan_found = false;
+                                            string chan_list = "";
+                                            foreach (string in_channel in ircbot.channel_list)
+                                            {
+                                                chan_list += in_channel + ", ";
+                                                chan_found = true;
+                                            }
+                                            if (chan_found == true)
+                                            {
+                                                if (type.Equals("channel"))
+                                                {
+                                                    ircbot.sendData("PRIVMSG", channel + " :I am currently in the following channels: " + chan_list.Trim().TrimEnd(','));
+                                                }
+                                                else
+                                                {
+                                                    ircbot.sendData("NOTICE", nick + " :I am currently in the following channels: " + chan_list.Trim().TrimEnd(','));
+                                                }
+                                            }
+                                            else
+                                            {
+                                                if (type.Equals("channel"))
+                                                {
+                                                    ircbot.sendData("PRIVMSG", channel + " :I'm in no channels.");
+                                                }
+                                                else
+                                                {
+                                                    ircbot.sendData("NOTICE", nick + " :I'm in no channels.");
                                                 }
                                             }
                                         }

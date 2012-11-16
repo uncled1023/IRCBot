@@ -119,6 +119,8 @@ namespace IRCBot.Modules
                                                         tmp_list.Add(line[4]);
                                                         tmp_list.Add("0");
                                                         poll_answers.Add(tmp_list);
+                                                        ircbot.sendData("PRIVMSG", channel + " :An Answer has been added to the poll.");
+                                                        ircbot.sendData("PRIVMSG", channel + " :" + poll_answers.Count().ToString() + ")" + line[4]);
                                                     }
                                                     else
                                                     {
@@ -157,6 +159,7 @@ namespace IRCBot.Modules
                                                         {
                                                             if (x == Convert.ToInt32(line[4]))
                                                             {
+                                                                ircbot.sendData("PRIVMSG", channel + " :Answer " + x.ToString() + " has been removed.");
                                                                 poll_answers.RemoveAt(x);
                                                                 break;
                                                             }
@@ -287,6 +290,7 @@ namespace IRCBot.Modules
                                                                 poll_nick_responses.Add(tmp_list);
                                                                 poll_answers[vote - 1][1] = (Convert.ToInt32(poll_answers[vote - 1][1]) + 1).ToString();
                                                             }
+                                                            ircbot.sendData("PRIVMSG", channel + " :Thank you for voting for " + vote.ToString());
                                                         }
                                                         else
                                                         {

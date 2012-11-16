@@ -29,7 +29,7 @@ namespace IRCBot
         StreamReader sr;
         StreamWriter sw;
 
-        private System.Windows.Forms.Timer checkRegisterationTimer;
+        public System.Windows.Forms.Timer checkRegisterationTimer;
         private System.Windows.Forms.Timer Spam_Check_Timer;
         private System.Windows.Forms.Timer Spam_Timer;
         private System.Windows.Forms.Timer check_cancel;
@@ -1004,10 +1004,26 @@ namespace IRCBot
 
         private void checkRegistration(object sender, EventArgs e)
         {
-            checkRegisterationTimer.Stop();
-            if (conf.nick != "" && conf.pass != "" && conf.email != "")
+            if (connected == true)
             {
-                register_nick(conf.nick, conf.pass, conf.email);
+                checkRegisterationTimer.Stop();
+                if (conf.nick != "" && conf.pass != "" && conf.email != "")
+                {
+                    register_nick(conf.nick, conf.pass, conf.email);
+                }
+                else
+                {
+                    string output = Environment.NewLine + server_name + ":You are missing a username and/or password.  Please add those to the server configuration so I can register this nick.";
+
+                    lock (ircbot.listLock)
+                    {
+                        if (ircbot.queue_text.Count >= 1000)
+                        {
+                            ircbot.queue_text.RemoveAt(0);
+                        }
+                        ircbot.queue_text.Add(output);
+                    }
+                }
             }
         }
 

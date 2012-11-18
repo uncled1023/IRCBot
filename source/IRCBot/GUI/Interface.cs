@@ -710,7 +710,7 @@ namespace IRCBot
                                 {
                                     channel = new_lines[0];
                                     nickname = tmp_lines[0].TrimStart(':').Split('!')[0];
-                                    message = "Topic for " + channel + " is: " + new_lines[1].TrimStart(':');
+                                    message = new_lines[1].TrimStart(':');
                                     nickname = "";
                                     font_color = "#B037B0";
                                 }
@@ -859,34 +859,20 @@ namespace IRCBot
 
         private void ThreadProcSafeOutput()
         {
-            try
+            if (queue_text.Count > 0)
             {
-                if (queue_text.Count > 0)
+                string text = "";
+                lock (listLock)
                 {
-                    string text = "";
-                    lock (listLock)
-                    {
-                        text = string.Join("", queue_text.ToArray());
-                        queue_text.Clear();
-                    }
-                    string[] stringSeparators = new string[] { "\r\n" };
-                    string[] lines = text.Split(stringSeparators, StringSplitOptions.RemoveEmptyEntries);
-                    for (int x = 0; x <= lines.GetUpperBound(0); x++)
-                    {
-                        try
-                        {
-                            UpdateOutput_final(lines[x]);
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show(ex.ToString());
-                        }
-                    }
+                    text = string.Join("", queue_text.ToArray());
+                    queue_text.Clear();
                 }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.ToString());
+                string[] stringSeparators = new string[] { "\r\n" };
+                string[] lines = text.Split(stringSeparators, StringSplitOptions.RemoveEmptyEntries);
+                for (int x = 0; x <= lines.GetUpperBound(0); x++)
+                {
+                    UpdateOutput_final(lines[x]);
+                }
             }
 
         }

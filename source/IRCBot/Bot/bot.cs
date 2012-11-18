@@ -1206,12 +1206,27 @@ namespace IRCBot
             string line = sr.ReadLine();
             char[] charSeparator = new char[] { ' ' };
             string[] name_line = line.Split(charSeparator, 5);
-            while (name_line.GetUpperBound(0) < 4 && name_line[3] != ":STATUS")
+            while (name_line.GetUpperBound(0) < 4)
             {
                 line = sr.ReadLine();
                 name_line = line.Split(charSeparator, 5);
             }
-            if (name_line[4].Equals(nick + " 3"))
+            while (name_line[3] != ":STATUS")
+            {
+                line = sr.ReadLine();
+                name_line = line.Split(charSeparator, 5);
+                while (name_line.GetUpperBound(0) < 4)
+                {
+                    line = sr.ReadLine();
+                    name_line = line.Split(charSeparator, 5);
+                }
+            }
+            while (name_line.GetUpperBound(0) < 4)
+            {
+                line = sr.ReadLine();
+                name_line = line.Split(charSeparator, 5);
+            }
+            if (name_line[4].StartsWith(nick + " 3"))
             {
                 identified = true;
             }

@@ -586,6 +586,95 @@ namespace IRCBot.Modules
                                             ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
                                         }
                                         break;
+                                    case "servers":
+                                        if (spam_check == true)
+                                        {
+                                            ircbot.spam_count++;
+                                        }
+                                        if (nick_access >= command_access)
+                                        {
+                                            if (type.Equals("channel"))
+                                            {
+                                                ircbot.sendData("PRIVMSG", channel + " :I am currently in the following servers: " + ircbot.ircbot.full_server_list.Replace(",",", "));
+                                            }
+                                            else
+                                            {
+                                                ircbot.sendData("NOTICE", nick + " :I am currently in the following servers: " + ircbot.ircbot.full_server_list.Replace(",", ", "));
+                                            }
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                        }
+                                        break;
+                                    case "clear":
+                                        if (spam_check == true)
+                                        {
+                                            ircbot.spam_count++;
+                                        }
+                                        if (nick_access >= command_access)
+                                        {
+                                            if (type.Equals("channel"))
+                                            {
+                                                foreach (List<string> tmp_nick in ircbot.nick_list)
+                                                {
+                                                    if (tmp_nick[0].Equals(channel))
+                                                    {
+                                                        for (int i = 1; i < tmp_nick.Count(); i++)
+                                                        {
+                                                            string[] split = tmp_nick[i].Split(':');
+                                                            if (split.GetUpperBound(0) > 0)
+                                                            {
+                                                                if (split[1].Equals(nick) || split[1].Equals(conf.nick))
+                                                                {
+                                                                }
+                                                                else
+                                                                {
+                                                                    ircbot.sendData("KICK", channel + " :" + split[1]);
+                                                                }
+                                                            }
+                                                        }
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                            else
+                                            {
+                                                if (line.GetUpperBound(0) > 3)
+                                                {
+                                                    foreach (List<string> tmp_nick in ircbot.nick_list)
+                                                    {
+                                                        if (tmp_nick[0].Equals(line[4]))
+                                                        {
+                                                            for (int i = 1; i < tmp_nick.Count(); i++)
+                                                            {
+                                                                string[] split = tmp_nick[i].Split(':');
+                                                                if (split.GetUpperBound(0) > 0)
+                                                                {
+                                                                    if (split[1].Equals(nick) || split[1].Equals(conf.nick))
+                                                                    {
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        ircbot.sendData("KICK", line[4] + " :" + split[1]);
+                                                                    }
+                                                                }
+                                                            }
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    ircbot.sendData("NOTICE", nick + " :" + nick + ", you need to include more info.");
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                        }
+                                        break;
                                 }
                             }
                         }

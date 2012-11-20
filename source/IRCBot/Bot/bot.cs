@@ -49,6 +49,7 @@ namespace IRCBot
         public List<Modules.Module> module_list = new List<Modules.Module>();
         public List<string> modules_loaded = new List<string>();
         public List<string> modules_error = new List<string>();
+        public DateTime start_time = new DateTime();
 
         public Interface ircbot;
         public IRCConfig conf;
@@ -80,6 +81,7 @@ namespace IRCBot
 
         public void start_bot(Interface main, IRCConfig tmp_conf)
         {
+            start_time = DateTime.Now;
             ircbot = main;
             conf = tmp_conf;
             string[] tmp_server = conf.server.Split('.');

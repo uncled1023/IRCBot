@@ -93,6 +93,50 @@ namespace IRCBot.Modules
                                             ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
                                         }
                                         break;
+                                    case "uptime":
+                                        if (spam_check == true)
+                                        {
+                                            ircbot.spam_count++;
+                                        }
+                                        if (nick_access >= command_access)
+                                        {
+                                            DateTime now = new DateTime();
+                                            now = DateTime.Now;
+                                            int days = now.Subtract(ircbot.start_time).Days;
+                                            int hours = now.Subtract(ircbot.start_time).Hours;
+                                            int minutes = now.Subtract(ircbot.start_time).Minutes;
+                                            int seconds = now.Subtract(ircbot.start_time).Seconds;
+                                            string uptime = "";
+                                            if (days > 0)
+                                            {
+                                                uptime += days + " days, ";
+                                            }
+                                            if (hours > 0)
+                                            {
+                                                uptime += hours + " hours, ";
+                                            }
+                                            if (minutes > 0)
+                                            {
+                                                uptime += minutes + " minutes, ";
+                                            }
+                                            if (seconds > 0)
+                                            {
+                                                uptime += seconds + " seconds, ";
+                                            }
+                                            if (type.Equals("channel"))
+                                            {
+                                                ircbot.sendData("PRIVMSG", channel + " :I have been online for " + uptime.Trim().TrimEnd(','));
+                                            }
+                                            else
+                                            {
+                                                ircbot.sendData("NOTICE", nick + " :I have been online for " + uptime.Trim().TrimEnd(','));
+                                            }
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                        }
+                                        break;
                                 }
                             }
                         }

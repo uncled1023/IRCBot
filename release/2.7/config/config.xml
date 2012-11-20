@@ -977,6 +977,13 @@
           <spam_check>False</spam_check>
         </command>
       </commands>
+      <options>
+        <wire_colors>
+          <type>textbox</type>
+          <value>Black,Blue,Red,Green</value>
+          <label>Show URL of result</label>
+        </wire_colors>
+      </options>
     </module>
     <module>
       <name>Fun</name>

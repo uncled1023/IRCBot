@@ -18,7 +18,7 @@ namespace IRCBot.Modules
         private string previous_bomb_holder = "";
         private string bomb_channel = "";
         private string wire_color = "";
-        private string[] wire_colors = new string[] { "Black", "Blue", "Yellow", "Red", "Green", "White" };
+        private string[] wire_colors;
         private bot main;
 
         public hbomb()
@@ -103,6 +103,7 @@ namespace IRCBot.Modules
                                             {
                                                 if (hbomb_active == false)
                                                 {
+                                                    wire_colors = ircbot.conf.module_config[module_id][3].Split(',');
                                                     hbomb_active = true;
                                                     bomb_channel = channel;
 
@@ -333,7 +334,7 @@ namespace IRCBot.Modules
             main.sendData("PRIVMSG", bomb_channel + " :" + msg);
             msg = "15,1<,.14,1;'`\".,;`..,;`*.,';`.15,1;'>)1,1.";
             main.sendData("PRIVMSG", bomb_channel + " :" + msg);
-            msg = "15,1I.:;14,1.,`;~,`.;'`,.;'`,..15,1';`I1,1..";
+            msg = "15,1I.:;14,1.,`;~,`.;'`,.;'`,..15,1';`I1,1.";
             main.sendData("PRIVMSG", bomb_channel + " :" + msg);
             msg = "1,1.15,1._.14,1`'`..`';.,`';,`';,15,1._./1,1..";
             main.sendData("PRIVMSG", bomb_channel + " :" + msg);

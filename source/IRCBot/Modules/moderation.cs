@@ -1213,6 +1213,12 @@ namespace IRCBot.Modules
                     }
                 }
             }
+            if (type.Equals("join"))
+            {
+                string[] user_info = line[0].Split('@');
+                string nick_host = user_info[1];
+                check_auto(nick, channel.TrimStart(':'), nick_host, ircbot);
+            }
         }
 
         public void check_auto(string nick, string channel, string hostname, bot ircbot)

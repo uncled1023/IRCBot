@@ -113,7 +113,7 @@
     <Compile Include="GUI\add_server.Designer.cs">
       <DependentUpon>add_server.cs</DependentUpon>
     </Compile>
-    <Compile Include="Modules\AI.cs" />
+    <Compile Include="Modules\response.cs" />
     <Compile Include="Bot\bot.cs" />
     <Compile Include="Modules\chat.cs" />
     <Compile Include="GUI\configuration.cs">

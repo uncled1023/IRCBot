@@ -1032,9 +1032,20 @@
     </module>
     <module>
       <name>Response</name>
-      <class_name>AI</class_name>
+      <class_name>response</class_name>
       <enabled>True</enabled>
       <commands>
+        <command>
+          <name>Add Response</name>
+          <description>Adds a new response to the dictionary.</description>
+          <triggers>addresponse</triggers>
+          <syntax>{trigger1}|{trigger2}:{response1}|{response2}</syntax>
+          <access_level>10</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
       </commands>
     </module>
     <module>

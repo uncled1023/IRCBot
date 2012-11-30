@@ -149,6 +149,20 @@ namespace IRCBot.Modules
                                             ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
                                         }
                                         break;
+                                    case "br":
+                                        if (spam_check == true)
+                                        {
+                                            ircbot.spam_count++;
+                                        }
+                                        if (nick_access >= command_access)
+                                        {
+                                            ircbot.sendData("PRIVMSG", channel + " :HUEHUEHUE");
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                        }
+                                        break;
                                 }
                             }
                         }

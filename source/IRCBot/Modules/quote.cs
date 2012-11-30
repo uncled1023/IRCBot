@@ -168,11 +168,10 @@ namespace IRCBot.Modules
                     List<string> quote_list = new List<string>();
                     foreach (string file_line in log_file)
                     {
-                        nick_found = false;
                         char[] charSep = new char[] { '*' };
                         string[] tmp_line = file_line.Split(charSep, 2);
                         line_nick = tmp_line[0];
-                        if (nick.Trim().ToLower().Equals(line_nick.ToLower()))
+                        if (nick.Trim().ToLower().Equals(line_nick.Trim().ToLower()))
                         {
                             nick_found = true;
                             quote_list.Add(file_line);

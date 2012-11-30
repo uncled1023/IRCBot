@@ -94,6 +94,7 @@
     <Compile Include="Modules\4chan.cs" />
     <Compile Include="lib\json.cs" />
     <Compile Include="Modules\about.cs" />
+    <Compile Include="Modules\alarm.cs" />
     <Compile Include="Modules\github.cs" />
     <Compile Include="Modules\logging.cs" />
     <Compile Include="Modules\wolfram_alpha.cs" />

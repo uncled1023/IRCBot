@@ -83,6 +83,10 @@ namespace IRCBot.Modules
                                                     try
                                                     {
                                                         time = Convert.ToInt32(new_line[0]);
+                                                        if (time < 0)
+                                                        {
+                                                            int_allowed = false;
+                                                        }
                                                     }
                                                     catch (Exception ex)
                                                     {

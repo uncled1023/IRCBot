@@ -12,6 +12,7 @@ namespace IRCBot.Modules
     {
         private List<System.Timers.Timer> alarms;
         private IRCConfig tmp_conf;
+        private bot tmp_bot;
 
         public alarm()
         {
@@ -78,9 +79,10 @@ namespace IRCBot.Modules
                                                 if (new_line.GetUpperBound(0) > 0)
                                                 {
                                                     bool int_allowed = true;
+                                                    int time = 0;
                                                     try
                                                     {
-                                                        int time = Convert.ToInt32(new_line[0].TrimStart(':'));
+                                                        time = Convert.ToInt32(new_line[0]);
                                                     }
                                                     catch (Exception ex)
                                                     {
@@ -88,13 +90,40 @@ namespace IRCBot.Modules
                                                     }
                                                     if (int_allowed == true)
                                                     {
-                                                        Timer alarm_trigger = new Timer();
-                                                        alarm_trigger.Interval = (Convert.ToInt32(new_line[0]) * 1000);
-                                                        alarm_trigger.Enabled = true;
-                                                        alarm_trigger.AutoReset = false;
-                                                        tmp_conf = conf;
-                                                        alarm_trigger.Elapsed += (sender, e) => ring_alarm(sender, e, new_line[1], ircbot, ref tmp_conf, nick_access, nick, line[0], channel, type);
-                                                        alarms.Add(alarm_trigger);
+                                                        char[] charSplit = new char[] { ' ' };
+                                                        string[] ex = new_line[1].Split(charSplit);
+                                                        if (ex[0].TrimStart(Convert.ToChar(conf.command)).Equals("alarm"))
+                                                        {
+                                                            if (type.Equals("channel"))
+                                                            {
+                                                                ircbot.sendData("PRIVMSG", line[2] + " :Recursion is bad.");
+                                                            }
+                                                            else
+                                                            {
+                                                                ircbot.sendData("PRIVMSG", nick + " :Recursion is bad.");
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            Timer alarm_trigger = new Timer();
+                                                            alarm_trigger.Interval = (time * 1000);
+                                                            alarm_trigger.Enabled = true;
+                                                            alarm_trigger.AutoReset = false;
+                                                            alarm_trigger.Elapsed += (sender, e) => ring_alarm(sender, e, nick, line[0], nick_access, channel, type, new_line[1]);
+                                                            alarms.Add(alarm_trigger);
+
+                                                            tmp_conf = conf;
+                                                            tmp_bot = ircbot;
+
+                                                            if (type.Equals("channel"))
+                                                            {
+                                                                ircbot.sendData("PRIVMSG", line[2] + " :Alarm added for " + new_line[0] + " seconds from now.");
+                                                            }
+                                                            else
+                                                            {
+                                                                ircbot.sendData("PRIVMSG", nick + " :Alarm added for " + new_line[0] + " seconds from now.");
+                                                            }
+                                                        }
                                                     }
                                                     else
                                                     {
@@ -145,8 +174,9 @@ namespace IRCBot.Modules
             }
         }
 
-        public void ring_alarm(object sender, EventArgs e, string msg, bot ircbot, ref IRCConfig conf, int nick_access, string nick, string full_nick, string channel, string type)
+        public void ring_alarm(object sender, EventArgs e, string nick, string full_nick, int nick_access, string channel, string type, string msg)
         {
+            IRCConfig conf = tmp_conf;
             System.Timers.Timer alarm_trigger = (System.Timers.Timer)sender;
             alarm_trigger.Enabled = false;
             if (msg.StartsWith(conf.command))
@@ -165,7 +195,7 @@ namespace IRCBot.Modules
                 string[] ex = line.Split(charSplit, 5);
                 //Run Enabled Modules
                 List<Modules.Module> tmp_module_list = new List<Modules.Module>();
-                tmp_module_list.AddRange(ircbot.module_list);
+                tmp_module_list.AddRange(tmp_bot.module_list);
                 foreach (Modules.Module module in tmp_module_list)
                 {
                     int index = 0;
@@ -177,12 +207,12 @@ namespace IRCBot.Modules
                         }
                         index++;
                     }
-                    module.control(ircbot, ref conf, index, ex, ex[3].TrimStart(':').TrimStart(Convert.ToChar(conf.command)), nick_access, nick, channel, bot_command, type);
+                    module.control(tmp_bot, ref conf, index, ex, ex[3].TrimStart(':').TrimStart(Convert.ToChar(conf.command)), nick_access, nick, channel, bot_command, type);
                 }
             }
             else
             {
-                ircbot.sendData("PRIVMSG", nick + " :ALARM:" + msg);
+                tmp_bot.sendData("PRIVMSG", nick + " :ALARM:" + msg);
             }
         }
     }

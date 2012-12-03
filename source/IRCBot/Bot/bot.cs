@@ -119,6 +119,8 @@ namespace IRCBot
         public void load_modules()
         {
             module_list.Clear();
+            modules_loaded.Clear();
+            modules_error.Clear();
             foreach (List<string> module in conf.module_config)
             {
                 string module_name = module[1];

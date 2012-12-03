@@ -83,7 +83,7 @@ namespace IRCBot.Modules
                                                     try
                                                     {
                                                         time = Convert.ToInt32(new_line[0]);
-                                                        if (time < 0)
+                                                        if ((time * 1000) <= 0)
                                                         {
                                                             int_allowed = false;
                                                         }

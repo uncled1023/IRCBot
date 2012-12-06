@@ -660,6 +660,20 @@ namespace IRCBot.Modules
                                             ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
                                         }
                                         break;
+                                    case "clearban":
+                                        if (spam_check == true)
+                                        {
+                                            ircbot.spam_count++;
+                                        }
+                                        if (nick_access >= command_access)
+                                        {
+                                            ircbot.sendData("PRIVMSG", "chanserv :clear " + channel + " bans");
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                        }
+                                        break;
                                     case "kb":
                                         if (spam_check == true)
                                         {

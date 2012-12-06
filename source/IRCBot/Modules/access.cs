@@ -68,11 +68,11 @@ namespace IRCBot.Modules
                                                     if (Convert.ToInt32(parse[2]) <= nick_access)
                                                     {
                                                         set_access_list(parse[0].Trim(), parse[1], parse[2], ircbot);
-                                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to change their access.");
+                                                        ircbot.sendData("NOTICE", nick + " :" + parse[0].Trim() + " has been added to access level " + parse[2]);
                                                     }
                                                     else
                                                     {
-                                                        ircbot.sendData("NOTICE", nick + " :" + parse[0].Trim() + " has been added to access level " + parse[2]);
+                                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to change their access.");
                                                     }
                                                 }
                                                 else if (type.Equals("channel") && parse.GetUpperBound(0) > 0)
@@ -114,13 +114,27 @@ namespace IRCBot.Modules
                                                 string[] parse = line[4].Split(' ');
                                                 if (parse.GetUpperBound(0) > 1)
                                                 {
-                                                    del_access_list(parse[0].Trim(), parse[1], parse[2], ircbot);
-                                                    ircbot.sendData("NOTICE", nick + " :" + parse[0].Trim() + " has been removed from access level " + parse[2]);
+                                                    if (Convert.ToInt32(parse[2]) <= nick_access)
+                                                    {
+                                                        del_access_list(parse[0].Trim(), parse[1], parse[2], ircbot);
+                                                        ircbot.sendData("NOTICE", nick + " :" + parse[0].Trim() + " has been removed from access level " + parse[2]);
+                                                    }
+                                                    else
+                                                    {
+                                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to change their access.");
+                                                    }
                                                 }
                                                 else if (type.Equals("channel") && parse.GetUpperBound(0) > 0)
                                                 {
-                                                    del_access_list(parse[0].Trim(), line[2], parse[1], ircbot);
-                                                    ircbot.sendData("NOTICE", nick + " :" + parse[0].Trim() + " has been removed from access level " + parse[1]);
+                                                    if (Convert.ToInt32(parse[1]) <= nick_access)
+                                                    {
+                                                        del_access_list(parse[0].Trim(), line[2], parse[1], ircbot);
+                                                        ircbot.sendData("NOTICE", nick + " :" + parse[0].Trim() + " has been removed from access level " + parse[1]);
+                                                    }
+                                                    else
+                                                    {
+                                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to change their access.");
+                                                    }
                                                 }
                                                 else
                                                 {
@@ -333,7 +347,7 @@ namespace IRCBot.Modules
             {
                 if (ircbot.nick_list[x][0].Equals(channel))
                 {
-                    for (int i = 1; i < ircbot.nick_list[x].Count(); i++)
+                    for (int i = 2; i < ircbot.nick_list[x].Count(); i++)
                     {
                         string[] split = ircbot.nick_list[x][i].Split(':');
                         if (split[1].Equals(nick))
@@ -436,12 +450,14 @@ namespace IRCBot.Modules
             {
                 if (ircbot.nick_list[x][0].Equals(channel))
                 {
-                    for (int i = 1; i < ircbot.nick_list[x].Count(); i++)
+                    for (int i = 2; i < ircbot.nick_list[x].Count(); i++)
                     {
                         string[] split = ircbot.nick_list[x][i].Split(':');
                         if (split[1].Equals(nick))
                         {
-                            int new_access = ircbot.get_user_access(nick, channel);
+                            int new_access = ircbot.get_user_op(nick, channel);
+                            ircbot.nick_list[x][i] = new_access.ToString() + ":" + nick;
+                            new_access = ircbot.get_user_access(nick, channel);
                             ircbot.nick_list[x][i] = new_access.ToString() + ":" + nick;
                             break;
                         }

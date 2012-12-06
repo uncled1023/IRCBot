@@ -401,6 +401,17 @@
           <spam_check>False</spam_check>
         </command>
         <command>
+          <name>Clear all Bans</name>
+          <description>Clears all the bans in the channel.</description>
+          <triggers>clearban</triggers>
+          <syntax></syntax>
+          <access_level>7</access_level>
+          <blacklist>
+          </blacklist>
+          <show_help>True</show_help>
+          <spam_check>False</spam_check>
+        </command>
+        <command>
           <name>Kick+Ban a Nick</name>
           <description>Bans and then Kicks the specified nick.</description>
           <triggers>kb</triggers>
@@ -659,7 +670,7 @@
           <description>Displays the channels I am in.</description>
           <triggers>channels</triggers>
           <syntax></syntax>
-          <access_level>10</access_level>
+          <access_level>1</access_level>
           <blacklist>
           </blacklist>
           <show_help>True</show_help>
@@ -688,6 +699,13 @@
           <spam_check>False</spam_check>
         </command>
       </commands>
+      <options>
+        <hide_private>
+          <type>checkbox</type>
+          <checked>False</checked>
+          <label>Don't display Private channels</label>
+        </hide_private>
+      </options>
     </module>
     <module>
       <name>Help</name>

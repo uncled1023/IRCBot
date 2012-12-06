@@ -555,14 +555,38 @@ namespace IRCBot.Modules
                                             string chan_list = "";
                                             foreach (string in_channel in ircbot.channel_list)
                                             {
-                                                chan_list += in_channel + ", ";
-                                                chan_found = true;
+                                                if (conf.module_config[module_id][3].Equals("False") || nick_access == conf.owner_level) // if "hide 
+                                                {
+                                                    chan_list += in_channel + ", ";
+                                                    chan_found = true;
+                                                }
+                                                else
+                                                {
+                                                    foreach (List<string> chan_types in ircbot.nick_list)
+                                                    {
+                                                        if (chan_types[0].Equals(in_channel))
+                                                        {
+                                                            if (chan_types[1].Equals("="))
+                                                            {
+                                                                chan_list += in_channel + ", ";
+                                                                chan_found = true;
+                                                            }
+                                                        }
+                                                    }
+                                                }
                                             }
                                             if (chan_found == true)
                                             {
                                                 if (type.Equals("channel"))
                                                 {
-                                                    ircbot.sendData("PRIVMSG", channel + " :I am currently in the following channels: " + chan_list.Trim().TrimEnd(','));
+                                                    if (nick_access == conf.owner_level)
+                                                    {
+                                                        ircbot.sendData("NOTICE", nick + " :I am currently in the following channels: " + chan_list.Trim().TrimEnd(','));
+                                                    }
+                                                    else
+                                                    {
+                                                        ircbot.sendData("PRIVMSG", channel + " :I am currently in the following channels: " + chan_list.Trim().TrimEnd(','));
+                                                    }
                                                 }
                                                 else
                                                 {

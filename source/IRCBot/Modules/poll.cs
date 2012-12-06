@@ -266,7 +266,7 @@ namespace IRCBot.Modules
                                                             bool nick_voted = false;
                                                             int index = 0;
                                                             string nick_host = ircbot.get_user_host(nick);
-                                                            if (nick_host.Equals("was"))
+                                                            if (nick_host.Equals(""))
                                                             {
                                                                 nick_host = nick;
                                                             }

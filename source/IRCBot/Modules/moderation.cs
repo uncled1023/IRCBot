@@ -587,9 +587,9 @@ namespace IRCBot.Modules
                                                     {
                                                         string target_host = ircbot.get_user_host(new_line[0]);
                                                         string ban = "*!*@" + target_host;
-                                                        if (target_host.Equals("was"))
+                                                        if (target_host.Equals(""))
                                                         {
-                                                            ban = nick + "!*@*";
+                                                            ban = new_line[0] + "!*@*";
                                                         }
                                                         if (new_line.GetUpperBound(0) > 0)
                                                         {
@@ -632,9 +632,9 @@ namespace IRCBot.Modules
                                                 {
                                                     string target_host = ircbot.get_user_host(new_line[0]);
                                                     string ban = "*!*@" + target_host;
-                                                    if (target_host.Equals("was"))
+                                                    if (target_host.Equals(""))
                                                     {
-                                                        ban = nick + "!*@*";
+                                                        ban = new_line[0] + "!*@*";
                                                     }
                                                     if (new_line.GetUpperBound(0) > 0)
                                                     {
@@ -696,9 +696,9 @@ namespace IRCBot.Modules
                                                     {
                                                         string target_host = ircbot.get_user_host(new_line[0]);
                                                         string ban = "*!*@" + target_host;
-                                                        if (target_host.Equals("was"))
+                                                        if (target_host.Equals(""))
                                                         {
-                                                            ban = nick + "!*@*";
+                                                            ban = new_line[0] + "!*@*";
                                                         }
                                                         if (new_line.GetUpperBound(0) > 0)
                                                         {
@@ -766,9 +766,9 @@ namespace IRCBot.Modules
                                                         if (nick_access >= sent_nick_access)
                                                         {
                                                             string ban = "*!*@" + target_host;
-                                                            if (target_host.Equals("was"))
+                                                            if (target_host.Equals(""))
                                                             {
-                                                                ban = nick + "!*@*";
+                                                                ban = new_line[0] + "!*@*";
                                                             }
                                                             if (new_line.GetUpperBound(0) > 1)
                                                             {
@@ -846,9 +846,9 @@ namespace IRCBot.Modules
                                                         if (nick_access >= sent_nick_access)
                                                         {
                                                             string ban = "*!*@" + target_host;
-                                                            if (target_host.Equals("was"))
+                                                            if (target_host.Equals(""))
                                                             {
-                                                                ban = nick + "!*@*";
+                                                                ban = new_line[0] + "!*@*";
                                                             }
                                                             if (new_line.GetUpperBound(0) > 1)
                                                             {
@@ -1238,7 +1238,7 @@ namespace IRCBot.Modules
                         if ((nick.Equals(auto_nick[0]) == true || hostname.Equals(auto_nick[1])) && channel.Equals(auto_nick[2]))
                         {
                             string ban = "*!*@" + hostname;
-                            if (hostname.Equals("was"))
+                            if (hostname.Equals(""))
                             {
                                 ban = nick + "!*@*";
                             }
@@ -1278,7 +1278,7 @@ namespace IRCBot.Modules
             System.Timers.Timer unban_trigger = (System.Timers.Timer)sender;
             unban_trigger.Enabled = false;
             string ban = "*!*@" + host;
-            if (host.Equals("was"))
+            if (host.Equals(""))
             {
                 ban = nick + "!*@*";
             }
@@ -1314,7 +1314,7 @@ namespace IRCBot.Modules
                 }
                 System.IO.File.WriteAllLines(@list_file, new_file);
                 string ban = "*!*@" + hostname;
-                if (hostname.Equals("was"))
+                if (hostname.Equals(""))
                 {
                     ban = nick + "!*@*";
                 }
@@ -1371,7 +1371,7 @@ namespace IRCBot.Modules
                 {
                     System.IO.File.WriteAllLines(@list_file, new_file);
                     string ban = "*!*@" + hostname;
-                    if (hostname.Equals("was"))
+                    if (hostname.Equals(""))
                     {
                         ban = nick + "!*@*";
                     }

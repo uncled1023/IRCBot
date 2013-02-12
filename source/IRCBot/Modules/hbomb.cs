@@ -190,16 +190,16 @@ namespace IRCBot.Modules
                                                     {
                                                         if (line.GetUpperBound(0) > 3)
                                                         {
-                                                            if (line[4].TrimEnd(' ').Equals(conf.nick))
+                                                            if (line[4].TrimEnd(' ').ToLower().Equals(conf.nick.ToLower()))
                                                             {
                                                                 ircbot.sendData("PRIVMSG", channel + " :" + nick + ", you can't pass it to me!");
                                                             }
                                                             else
                                                             {
-                                                                int user_access = ircbot.get_user_access(line[4].TrimEnd(' '), channel);
-                                                                if (user_access > 0 && idle.check_idle(line[4].TrimEnd(' ')) == false)
+                                                                int user_access = ircbot.get_user_access(line[4].TrimEnd(' ').ToLower(), channel);
+                                                                if (user_access > 0 && idle.check_idle(line[4].TrimEnd(' ').ToLower()) == false)
                                                                 {
-                                                                    pass_hbomb(line[4].TrimEnd(' '), channel, nick, ircbot, conf);
+                                                                    pass_hbomb(line[4].TrimEnd(' ').ToLower(), channel, nick, ircbot, conf);
                                                                 }
                                                                 else
                                                                 {

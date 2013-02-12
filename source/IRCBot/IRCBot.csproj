@@ -91,6 +91,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GUI\add_server.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\add_server.Designer.cs">
+      <DependentUpon>add_server.cs</DependentUpon>
+    </Compile>
     <Compile Include="Modules\4chan.cs" />
     <Compile Include="lib\json.cs" />
     <Compile Include="Modules\about.cs" />
@@ -108,12 +114,6 @@
       <DependentUpon>AboutBox1.cs</DependentUpon>
     </Compile>
     <Compile Include="Modules\access.cs" />
-    <Compile Include="GUI\add_server.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\add_server.Designer.cs">
-      <DependentUpon>add_server.cs</DependentUpon>
-    </Compile>
     <Compile Include="Modules\response.cs" />
     <Compile Include="Bot\bot.cs" />
     <Compile Include="Modules\chat.cs" />
@@ -159,11 +159,11 @@
     <EmbeddedResource Include="GUI\AboutBox1.resx">
       <DependentUpon>AboutBox1.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GUI\add_server.resx">
-      <DependentUpon>add_server.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="GUI\configuration.resx">
       <DependentUpon>configuration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\add_server.resx">
+      <DependentUpon>add_server.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\edit_server.resx">
       <DependentUpon>edit_server.cs</DependentUpon>

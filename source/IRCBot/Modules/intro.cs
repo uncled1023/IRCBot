@@ -121,7 +121,7 @@ namespace IRCBot.Modules
                         int number_of_responses = intro_line.GetUpperBound(0) + 1;
                         Random random = new Random();
                         int index = random.Next(0, number_of_responses);
-                        ircbot.sendData("PRIVMSG", channel + " : " + intro_line[index]);
+                        ircbot.sendData("PRIVMSG", channel + " :\u200B" + intro_line[index]);
                     }
                 }
                 file.Close();

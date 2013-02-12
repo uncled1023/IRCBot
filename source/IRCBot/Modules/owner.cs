@@ -98,7 +98,7 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                add_owner(line[4], ircbot, ref conf);
+                                                add_owner(line[4].ToLower(), ircbot, ref conf);
                                                 ircbot.sendData("NOTICE", nick + " :" + nick + " has been added as an owner.");
                                             }
                                             else
@@ -120,7 +120,7 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                del_owner(line[4], ircbot, ref conf);
+                                                del_owner(line[4].ToLower(), ircbot, ref conf);
                                                 ircbot.sendData("NOTICE", nick + " :" + nick + " has been removed as an owner.");
                                             }
                                             else
@@ -143,6 +143,7 @@ namespace IRCBot.Modules
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 ircbot.sendData("NICK", line[4]);
+                                                ircbot.conf.nick = line[4];
                                             }
                                             else
                                             {

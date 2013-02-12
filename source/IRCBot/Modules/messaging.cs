@@ -97,7 +97,7 @@ namespace IRCBot.Modules
             string list_file = ircbot.cur_dir + "\\modules\\messaging\\" + ircbot.server_name + "_messages.txt";
             char[] charS = new char[] { ' ' };
             string[] tmp = line[4].Split(charS, 2);
-            string to_nick = tmp[0];
+            string to_nick = tmp[0].ToLower();
             string add_line = nick + "*" + to_nick + "*" + DateTime.Now.ToString("MMMM d, yyyy h:mm:ss tt") + "*";
             bool found_nick = false;
             if (tmp.GetUpperBound(0) >= 1)

@@ -76,8 +76,8 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                ircbot.sendData("MODE", line[2] + " +q " + line[4]);
-                                                access.set_access_list(line[4], line[2], conf.founder_level.ToString(), ircbot);
+                                                ircbot.sendData("MODE", line[2] + " +q " + line[4].ToLower());
+                                                access.set_access_list(line[4].ToLower(), line[2], conf.founder_level.ToString(), ircbot);
                                             }
                                             else
                                             {
@@ -98,8 +98,8 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                ircbot.sendData("MODE", line[2] + " -q " + line[4]);
-                                                access.del_access_list(line[4], line[2], conf.founder_level.ToString(), ircbot);
+                                                ircbot.sendData("MODE", line[2] + " -q " + line[4].ToLower());
+                                                access.del_access_list(line[4].ToLower(), line[2], conf.founder_level.ToString(), ircbot);
                                             }
                                             else
                                             {
@@ -120,8 +120,8 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                ircbot.sendData("MODE", line[2] + " +a " + line[4]);
-                                                access.set_access_list(line[4], line[2], conf.sop_level.ToString(), ircbot);
+                                                ircbot.sendData("MODE", line[2] + " +a " + line[4].ToLower());
+                                                access.set_access_list(line[4].ToLower(), line[2], conf.sop_level.ToString(), ircbot);
                                             }
                                             else
                                             {
@@ -142,9 +142,9 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                ircbot.sendData("MODE", line[2] + " +a " + line[4]);
-                                                ircbot.sendData("PRIVMSG", "chanserv :SOP " + line[2] + " add " + line[4]);
-                                                access.set_access_list(line[4], line[2], conf.sop_level.ToString(), ircbot);
+                                                ircbot.sendData("MODE", line[2] + " +a " + line[4].ToLower());
+                                                ircbot.sendData("PRIVMSG", "chanserv :SOP " + line[2] + " add " + line[4].ToLower());
+                                                access.set_access_list(line[4].ToLower(), line[2], conf.sop_level.ToString(), ircbot);
                                             }
                                             else
                                             {
@@ -165,9 +165,9 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                ircbot.sendData("MODE", line[2] + " -a " + line[4]);
-                                                ircbot.sendData("PRIVMSG", "chanserv :SOP " + line[2] + " del " + line[4]);
-                                                access.del_access_list(line[4], line[2], conf.sop_level.ToString(), ircbot);
+                                                ircbot.sendData("MODE", line[2] + " -a " + line[4].ToLower());
+                                                ircbot.sendData("PRIVMSG", "chanserv :SOP " + line[2] + " del " + line[4].ToLower());
+                                                access.del_access_list(line[4].ToLower(), line[2], conf.sop_level.ToString(), ircbot);
                                             }
                                             else
                                             {
@@ -188,8 +188,8 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                ircbot.sendData("MODE", line[2] + " -a " + line[4]);
-                                                access.del_access_list(line[4], line[2], conf.sop_level.ToString(), ircbot);
+                                                ircbot.sendData("MODE", line[2] + " -a " + line[4].ToLower());
+                                                access.del_access_list(line[4].ToLower(), line[2], conf.sop_level.ToString(), ircbot);
                                             }
                                             else
                                             {
@@ -210,8 +210,8 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                ircbot.sendData("MODE", line[2] + " +o " + line[4]);
-                                                access.set_access_list(line[4], line[2], conf.op_level.ToString(), ircbot);
+                                                ircbot.sendData("MODE", line[2] + " +o " + line[4].ToLower());
+                                                access.set_access_list(line[4].ToLower(), line[2], conf.op_level.ToString(), ircbot);
                                             }
                                             else
                                             {
@@ -232,9 +232,9 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                ircbot.sendData("MODE", line[2] + " +o " + line[4]);
-                                                ircbot.sendData("PRIVMSG", "chanserv :AOP " + line[2] + " add " + line[4]);
-                                                access.set_access_list(line[4], line[2], conf.op_level.ToString(), ircbot);
+                                                ircbot.sendData("MODE", line[2] + " +o " + line[4].ToLower());
+                                                ircbot.sendData("PRIVMSG", "chanserv :AOP " + line[2] + " add " + line[4].ToLower());
+                                                access.set_access_list(line[4].ToLower(), line[2], conf.op_level.ToString(), ircbot);
                                             }
                                             else
                                             {
@@ -255,9 +255,9 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                ircbot.sendData("MODE", line[2] + " -o " + line[4]);
-                                                ircbot.sendData("PRIVMSG", "chanserv :AOP " + line[2] + " del " + line[4]);
-                                                access.del_access_list(line[4], line[2], conf.op_level.ToString(), ircbot);
+                                                ircbot.sendData("MODE", line[2] + " -o " + line[4].ToLower());
+                                                ircbot.sendData("PRIVMSG", "chanserv :AOP " + line[2] + " del " + line[4].ToLower());
+                                                access.del_access_list(line[4].ToLower(), line[2], conf.op_level.ToString(), ircbot);
                                             }
                                             else
                                             {
@@ -278,8 +278,8 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                ircbot.sendData("MODE", line[2] + " -o " + line[4]);
-                                                access.del_access_list(line[4], line[2], conf.op_level.ToString(), ircbot);
+                                                ircbot.sendData("MODE", line[2] + " -o " + line[4].ToLower());
+                                                access.del_access_list(line[4].ToLower(), line[2], conf.op_level.ToString(), ircbot);
                                             }
                                             else
                                             {
@@ -300,9 +300,9 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                ircbot.sendData("MODE", line[2] + " + " + line[4]);
-                                                ircbot.sendData("PRIVMSG", "chanserv :HOP " + line[2] + " add " + line[4]);
-                                                access.set_access_list(line[4], line[2], conf.hop_level.ToString(), ircbot);
+                                                ircbot.sendData("MODE", line[2] + " + " + line[4].ToLower());
+                                                ircbot.sendData("PRIVMSG", "chanserv :HOP " + line[2] + " add " + line[4].ToLower());
+                                                access.set_access_list(line[4].ToLower(), line[2], conf.hop_level.ToString(), ircbot);
                                             }
                                             else
                                             {
@@ -323,9 +323,9 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                ircbot.sendData("MODE", line[2] + " -h " + line[4]);
-                                                ircbot.sendData("PRIVMSG", "chanserv :HOP " + line[2] + " del " + line[4]);
-                                                access.del_access_list(line[4], line[2], conf.hop_level.ToString(), ircbot);
+                                                ircbot.sendData("MODE", line[2] + " -h " + line[4].ToLower());
+                                                ircbot.sendData("PRIVMSG", "chanserv :HOP " + line[2] + " del " + line[4].ToLower());
+                                                access.del_access_list(line[4].ToLower(), line[2], conf.hop_level.ToString(), ircbot);
                                             }
                                             else
                                             {
@@ -346,8 +346,8 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                ircbot.sendData("MODE", line[2] + " +h " + line[4]);
-                                                access.set_access_list(line[4], line[2], conf.hop_level.ToString(), ircbot);
+                                                ircbot.sendData("MODE", line[2] + " +h " + line[4].ToLower());
+                                                access.set_access_list(line[4].ToLower(), line[2], conf.hop_level.ToString(), ircbot);
                                             }
                                             else
                                             {
@@ -368,8 +368,8 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                ircbot.sendData("MODE", line[2] + " -h " + line[4]);
-                                                access.del_access_list(line[4], line[2], conf.hop_level.ToString(), ircbot);
+                                                ircbot.sendData("MODE", line[2] + " -h " + line[4].ToLower());
+                                                access.del_access_list(line[4].ToLower(), line[2], conf.hop_level.ToString(), ircbot);
                                             }
                                             else
                                             {
@@ -390,9 +390,9 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                ircbot.sendData("MODE", line[2] + " +v " + line[4]);
-                                                ircbot.sendData("PRIVMSG", "chanserv :VOP " + line[2] + " add " + line[4]);
-                                                access.set_access_list(line[4], line[2], conf.voice_level.ToString(), ircbot);
+                                                ircbot.sendData("MODE", line[2] + " +v " + line[4].ToLower());
+                                                ircbot.sendData("PRIVMSG", "chanserv :VOP " + line[2] + " add " + line[4].ToLower());
+                                                access.set_access_list(line[4].ToLower(), line[2], conf.voice_level.ToString(), ircbot);
                                             }
                                             else
                                             {
@@ -413,9 +413,9 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                ircbot.sendData("MODE", line[2] + " -v " + line[4]);
-                                                ircbot.sendData("PRIVMSG", "chanserv :VOP " + line[2] + " del " + line[4]);
-                                                access.del_access_list(line[4], line[2], conf.voice_level.ToString(), ircbot);
+                                                ircbot.sendData("MODE", line[2] + " -v " + line[4].ToLower());
+                                                ircbot.sendData("PRIVMSG", "chanserv :VOP " + line[2] + " del " + line[4].ToLower());
+                                                access.del_access_list(line[4].ToLower(), line[2], conf.voice_level.ToString(), ircbot);
                                             }
                                             else
                                             {
@@ -436,8 +436,8 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                ircbot.sendData("MODE", line[2] + " +v " + line[4]);
-                                                access.set_access_list(line[4], line[2], conf.voice_level.ToString(), ircbot);
+                                                ircbot.sendData("MODE", line[2] + " +v " + line[4].ToLower());
+                                                access.set_access_list(line[4].ToLower(), line[2], conf.voice_level.ToString(), ircbot);
                                             }
                                             else
                                             {
@@ -458,8 +458,8 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                ircbot.sendData("MODE", line[2] + " -v " + line[4]);
-                                                access.del_access_list(line[4], line[2], conf.voice_level.ToString(), ircbot);
+                                                ircbot.sendData("MODE", line[2] + " -v " + line[4].ToLower());
+                                                access.del_access_list(line[4].ToLower(), line[2], conf.voice_level.ToString(), ircbot);
                                             }
                                             else
                                             {
@@ -538,7 +538,7 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                string[] new_line = line[4].Split(charS, 2);
+                                                string[] new_line = line[4].ToLower().Split(charS, 2);
                                                 ircbot.sendData("INVITE", new_line[0] + " " + line[2]);
                                             }
                                             else
@@ -560,7 +560,7 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                string[] new_line = line[4].Split(charS, 2);
+                                                string[] new_line = line[4].ToLower().Split(charS, 2);
                                                 string nicks = new_line[0].TrimStart(':');
                                                 string[] total_nicks = nicks.Split(',');
                                                 int sent_nick_access = ircbot.get_user_access(new_line[0].TrimStart(':'), line[2]);
@@ -625,7 +625,7 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                string[] new_line = line[4].Split(charS, 2);
+                                                string[] new_line = line[4].ToLower().Split(charS, 2);
                                                 int sent_nick_access = ircbot.get_user_access(new_line[0].TrimStart(':'), line[2]);
 
                                                 if (nick_access >= sent_nick_access)
@@ -683,7 +683,7 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                string[] new_line = line[4].Split(charS, 2);
+                                                string[] new_line = line[4].ToLower().Split(charS, 2);
                                                 string nicks = new_line[0].TrimStart(':');
                                                 string[] total_nicks = nicks.Split(',');
                                                 int sent_nick_access = ircbot.get_user_access(new_line[0].TrimStart(':'), line[2]);
@@ -750,7 +750,7 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                string[] new_line = line[4].Split(charS, 3, StringSplitOptions.RemoveEmptyEntries);
+                                                string[] new_line = line[4].ToLower().Split(charS, 3, StringSplitOptions.RemoveEmptyEntries);
                                                 if (new_line.GetUpperBound(0) > 0)
                                                 {
                                                     int time = Convert.ToInt32(new_line[0].TrimStart(':'));
@@ -782,7 +782,7 @@ namespace IRCBot.Modules
                                                             string ban = "*!*@" + target_host;
                                                             if (target_host.Equals(""))
                                                             {
-                                                                ban = new_line[0] + "!*@*";
+                                                                ban = new_line[1] + "!*@*";
                                                             }
                                                             if (new_line.GetUpperBound(0) > 1)
                                                             {
@@ -830,7 +830,7 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                string[] new_line = line[4].Split(charS, 3, StringSplitOptions.RemoveEmptyEntries);
+                                                string[] new_line = line[4].ToLower().Split(charS, 3, StringSplitOptions.RemoveEmptyEntries);
                                                 if (new_line.GetUpperBound(0) > 0)
                                                 {
                                                     int time = Convert.ToInt32(new_line[0].TrimStart(':'));
@@ -862,7 +862,7 @@ namespace IRCBot.Modules
                                                             string ban = "*!*@" + target_host;
                                                             if (target_host.Equals(""))
                                                             {
-                                                                ban = new_line[0] + "!*@*";
+                                                                ban = new_line[1] + "!*@*";
                                                             }
                                                             if (new_line.GetUpperBound(0) > 1)
                                                             {
@@ -912,7 +912,7 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                string[] new_line = line[4].Split(charS, 2);
+                                                string[] new_line = line[4].ToLower().Split(charS, 2);
                                                 string nicks = new_line[0].TrimStart(':');
                                                 string[] total_nicks = nicks.Split(',');
                                                 int sent_nick_access = ircbot.get_user_access(new_line[0].TrimStart(':'), line[2]);
@@ -971,7 +971,7 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                string[] new_line = line[4].Split(charS, 2);
+                                                string[] new_line = line[4].ToLower().Split(charS, 2);
                                                 string target_host = ircbot.get_user_host(new_line[0]);
                                                 string nicks = new_line[0].TrimStart(':');
                                                 string[] total_nicks = nicks.Split(',');
@@ -1030,7 +1030,7 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                string[] new_line = line[4].Split(charS, 2);
+                                                string[] new_line = line[4].ToLower().Split(charS, 2);
                                                 string target_host = ircbot.get_user_host(new_line[0]);
                                                 string nicks = new_line[0].TrimStart(':');
                                                 string[] total_nicks = nicks.Split(',');
@@ -1089,8 +1089,8 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                string target_host = ircbot.get_user_host(line[4]);
-                                                del_auto(line[4], line[2], target_host, "k", ircbot);
+                                                string target_host = ircbot.get_user_host(line[4].ToLower());
+                                                del_auto(line[4].ToLower(), line[2], target_host, "k", ircbot);
                                             }
                                             else
                                             {
@@ -1111,8 +1111,8 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                string target_host = ircbot.get_user_host(line[4]);
-                                                del_auto(line[4], line[2], target_host, "b", ircbot);
+                                                string target_host = ircbot.get_user_host(line[4].ToLower());
+                                                del_auto(line[4].ToLower(), line[2], target_host, "b", ircbot);
                                             }
                                             else
                                             {
@@ -1133,8 +1133,8 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                string target_host = ircbot.get_user_host(line[4]);
-                                                del_auto(line[4], line[2], target_host, "kb", ircbot);
+                                                string target_host = ircbot.get_user_host(line[4].ToLower());
+                                                del_auto(line[4].ToLower(), line[2], target_host, "kb", ircbot);
                                             }
                                             else
                                             {
@@ -1155,7 +1155,7 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                string[] new_line = line[4].Split(charS, 2);
+                                                string[] new_line = line[4].ToLower().Split(charS, 2);
                                                 string nicks = new_line[0].TrimStart(':');
                                                 string[] total_nicks = nicks.Split(',');
                                                 int sent_nick_access = ircbot.get_user_access(new_line[0].TrimStart(':'), line[2]);

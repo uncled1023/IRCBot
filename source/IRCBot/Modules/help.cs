@@ -95,7 +95,7 @@ namespace IRCBot.Modules
                             {
                                 more_info = true;
                                 search_term = line[4];
-                                if (search_term.ToLower().Equals(trigger))
+                                if (search_term.ToLower().Equals(trigger.ToLower()))
                                 {
                                     ircbot.sendData("NOTICE", nick + " :" + tmp_command[1] + " | Usage: " + conf.command + trigger + " " + tmp_command[4] + " | Description: " + tmp_command[2]);
                                 }

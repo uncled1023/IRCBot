@@ -196,6 +196,7 @@
             this.Name = "Interface";
             this.Text = "IRCBot";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Interface_FormClosing);
+            this.Resize += new System.EventHandler(this.Interface_Resize);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.tabPage1.ResumeLayout(false);

@@ -65,7 +65,7 @@ namespace IRCBot.Modules
                                             {
                                                 if (line.GetUpperBound(0) > 3)
                                                 {
-                                                    get_specific_quote(line[2], line[4], ircbot, conf);
+                                                    get_specific_quote(line[2], line[4].ToLower(), ircbot, conf);
                                                 }
                                                 else
                                                 {

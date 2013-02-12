@@ -67,7 +67,7 @@ namespace IRCBot.Modules
                                                 {
                                                     if (Convert.ToInt32(parse[2]) <= nick_access)
                                                     {
-                                                        set_access_list(parse[0].Trim(), parse[1], parse[2], ircbot);
+                                                        set_access_list(parse[0].Trim().ToLower(), parse[1], parse[2], ircbot);
                                                         ircbot.sendData("NOTICE", nick + " :" + parse[0].Trim() + " has been added to access level " + parse[2]);
                                                     }
                                                     else
@@ -79,7 +79,7 @@ namespace IRCBot.Modules
                                                 {
                                                     if (Convert.ToInt32(parse[1]) <= nick_access)
                                                     {
-                                                        set_access_list(parse[0].Trim(), line[2], parse[1], ircbot);
+                                                        set_access_list(parse[0].Trim().ToLower(), line[2], parse[1], ircbot);
                                                         ircbot.sendData("NOTICE", nick + " :" + parse[0].Trim() + " has been added to access level " + parse[1]);
                                                     }
                                                     else
@@ -116,7 +116,7 @@ namespace IRCBot.Modules
                                                 {
                                                     if (Convert.ToInt32(parse[2]) <= nick_access)
                                                     {
-                                                        del_access_list(parse[0].Trim(), parse[1], parse[2], ircbot);
+                                                        del_access_list(parse[0].Trim().ToLower(), parse[1], parse[2], ircbot);
                                                         ircbot.sendData("NOTICE", nick + " :" + parse[0].Trim() + " has been removed from access level " + parse[2]);
                                                     }
                                                     else
@@ -128,7 +128,7 @@ namespace IRCBot.Modules
                                                 {
                                                     if (Convert.ToInt32(parse[1]) <= nick_access)
                                                     {
-                                                        del_access_list(parse[0].Trim(), line[2], parse[1], ircbot);
+                                                        del_access_list(parse[0].Trim().ToLower(), line[2], parse[1], ircbot);
                                                         ircbot.sendData("NOTICE", nick + " :" + parse[0].Trim() + " has been removed from access level " + parse[1]);
                                                     }
                                                     else
@@ -188,12 +188,12 @@ namespace IRCBot.Modules
                                                 string[] new_line = line[4].Split(' ');
                                                 if (new_line.GetUpperBound(0) > 0 && new_line[0].StartsWith("#"))
                                                 {
-                                                    int viewed_access = ircbot.get_user_access(new_line[1].Trim(), new_line[0].Trim());
+                                                    int viewed_access = ircbot.get_user_access(new_line[1].Trim().ToLower(), new_line[0].Trim());
                                                     ircbot.sendData("NOTICE", nick + " :" + new_line[1].Trim() + " has access level " + viewed_access.ToString());
                                                 }
                                                 else if (type.Equals("channel"))
                                                 {
-                                                    int viewed_access = ircbot.get_user_access(line[4].Trim(), channel);
+                                                    int viewed_access = ircbot.get_user_access(line[4].Trim().ToLower(), channel);
                                                     ircbot.sendData("NOTICE", nick + " :" + line[4].Trim() + " has access level " + viewed_access.ToString());
                                                 }
                                                 else

@@ -63,7 +63,7 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                display_seen(line[4], line[2], ircbot);
+                                                display_seen(line[4].ToLower(), line[2], ircbot);
                                             }
                                             else
                                             {

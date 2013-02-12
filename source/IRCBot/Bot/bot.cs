@@ -29,7 +29,7 @@ namespace IRCBot
         StreamReader sr;
         StreamWriter sw;
 
-        public System.Windows.Forms.Timer checkRegisterationTimer;
+        public System.Windows.Forms.Timer checkRegisterationTimer = new System.Windows.Forms.Timer();
         private System.Windows.Forms.Timer Spam_Check_Timer;
         private System.Windows.Forms.Timer Spam_Timer;
         private System.Windows.Forms.Timer check_cancel;
@@ -106,7 +106,7 @@ namespace IRCBot
 
             checkRegisterationTimer.Tick += new EventHandler(checkRegistration);
             checkRegisterationTimer.Interval = 120000;
-            checkRegisterationTimer.Start();
+            checkRegisterationTimer.Enabled = true;
 
             Spam_Timer.Tick += new EventHandler(spam_deactivate);
 
@@ -238,6 +238,7 @@ namespace IRCBot
 
             Spam_Timer.Interval = conf.spam_timout;
             nick_list.Clear();
+            channel_list.Clear();
             first_run = true;
 
             IRCBot(bw);
@@ -538,9 +539,11 @@ namespace IRCBot
         {
             string data = "";
 
+            checkRegisterationTimer.Enabled = true;
+
             joinChannels();
             first_run = false;
-
+            shouldRun = true;
             BackgroundWorker work = new BackgroundWorker();
             work.DoWork += (sender, e) => save_stream(sender, e);
             work.RunWorkerAsync(2000);
@@ -585,14 +588,6 @@ namespace IRCBot
                         ircbot.queue_text.RemoveAt(0);
                     }
                     ircbot.queue_text.Add(output);
-                }
-            }
-
-            if (ex.GetUpperBound(0) > 3)
-            {
-                if (ex[3] == ":Password" && ex[4].StartsWith("accepted"))
-                {
-                    bot_identified = true;
                 }
             }
 
@@ -914,7 +909,7 @@ namespace IRCBot
                     index++;
                 }
                 BackgroundWorker work = new BackgroundWorker();
-                work.DoWork += (sender, e) => backgroundWorker_RunModule(sender, e, module, index, ex, command, nick_access, nick, channel, bot_command, type);
+                work.DoWork += (sender, e) => backgroundWorker_RunModule(sender, e, module, index, ex, command, nick_access, nick.ToLower(), channel, bot_command, type);
                 work.RunWorkerAsync(2000);
             }
         }
@@ -963,42 +958,22 @@ namespace IRCBot
             if (conf.chans != "")
             {
                 string[] channels = conf.chans.Split(',');
+                string[] channels_blacklist = conf.chan_blacklist.Split(',');
                 for (int x = 0; x <= channels.GetUpperBound(0); x++)
                 {
-                    sendData("JOIN", channels[x]);
-                    string line = sr.ReadLine();
-                    string output = Environment.NewLine + server_name + ":" + line;
-                    lock (ircbot.listLock)
+                    bool chan_blocked = false;
+                    for (int i = 0; i <= channels_blacklist.GetUpperBound(0); i++)
                     {
-                        if (ircbot.queue_text.Count >= 1000)
+                        if(channels[x].Equals(channels_blacklist[i]))
                         {
-                            ircbot.queue_text.RemoveAt(0);
-                        }
-                        ircbot.queue_text.Add(output);
-                    }
-                    bool channel_found = false;
-                    for (int i = 0; i < channel_list.Count(); i++)
-                    {
-                        if (channel_list[i].Equals(channels[x].Split(' ')[0]))
-                        {
-                            channel_found = true;
-                            break;
+                            chan_blocked = true;
                         }
                     }
-                    if (channel_found == false)
+                    if (chan_blocked == false)
                     {
-                        channel_list.Add(channels[x].Split(' ')[0]);
-                    }
-                    channel_found = false;
-                    List<string> tmp_list = new List<string>();
-                    tmp_list.Add(channels[x].Split(' ')[0]);
-                    char[] charSeparator = new char[] { ' ' };
-                    string[] name_line = line.Split(charSeparator, 5);
-                    while (name_line.GetUpperBound(0) < 3)
-                    {
-                        line = sr.ReadLine();
-                        name_line = line.Split(charSeparator, 5);
-                        output = Environment.NewLine + server_name + ":" + line;
+                        sendData("JOIN", channels[x]);
+                        string line = sr.ReadLine();
+                        string output = Environment.NewLine + server_name + ":" + line;
                         lock (ircbot.listLock)
                         {
                             if (ircbot.queue_text.Count >= 1000)
@@ -1007,20 +982,24 @@ namespace IRCBot
                             }
                             ircbot.queue_text.Add(output);
                         }
-                    }
-                    while (name_line[3] != "=" && name_line[3] != "@" && name_line[3] != "*")
-                    {
-                        line = sr.ReadLine();
-                        name_line = line.Split(charSeparator, 5);
-                        output = Environment.NewLine + server_name + ":" + line;
-                        lock (ircbot.listLock)
+                        bool channel_found = false;
+                        for (int i = 0; i < channel_list.Count(); i++)
                         {
-                            if (ircbot.queue_text.Count >= 1000)
+                            if (channel_list[i].Equals(channels[x].Split(' ')[0]))
                             {
-                                ircbot.queue_text.RemoveAt(0);
+                                channel_found = true;
+                                break;
                             }
-                            ircbot.queue_text.Add(output);
                         }
+                        if (channel_found == false)
+                        {
+                            channel_list.Add(channels[x].Split(' ')[0]);
+                        }
+                        channel_found = false;
+                        List<string> tmp_list = new List<string>();
+                        tmp_list.Add(channels[x].Split(' ')[0]);
+                        char[] charSeparator = new char[] { ' ' };
+                        string[] name_line = line.Split(charSeparator, 5);
                         while (name_line.GetUpperBound(0) < 3)
                         {
                             line = sr.ReadLine();
@@ -1035,59 +1014,87 @@ namespace IRCBot
                                 ircbot.queue_text.Add(output);
                             }
                         }
-                    }
-                    tmp_list.Add(name_line[3]);
-                    string[] names_list = name_line[4].Split(':');
-                    string[] names = names_list[1].Split(' ');
-                    while (name_line[4] != ":End of /NAMES list.")
-                    {
-                        channel_found = true;
-                        names_list = name_line[4].Split(':');
-                        char[] charSep = new char[] { ' ' };
-                        names = names_list[1].Split(charSep, StringSplitOptions.RemoveEmptyEntries);
-                        for (int i = 0; i <= names.GetUpperBound(0); i++)
+                        while (name_line[3] != "=" && name_line[3] != "@" && name_line[3] != "*")
                         {
-                            char[] arr = names[i].ToCharArray();
-                            int user_access = conf.user_level;
-                            foreach (char c in arr)
+                            line = sr.ReadLine();
+                            name_line = line.Split(charSeparator, 5);
+                            output = Environment.NewLine + server_name + ":" + line;
+                            lock (ircbot.listLock)
                             {
-                                if (c.Equals('~') || c.Equals('&') || c.Equals('@') || c.Equals('%') || c.Equals('+'))
+                                if (ircbot.queue_text.Count >= 1000)
                                 {
-                                    int tmp_access = get_access_num(c.ToString(), false);
-                                    if (tmp_access > user_access)
+                                    ircbot.queue_text.RemoveAt(0);
+                                }
+                                ircbot.queue_text.Add(output);
+                            }
+                            while (name_line.GetUpperBound(0) < 3)
+                            {
+                                line = sr.ReadLine();
+                                name_line = line.Split(charSeparator, 5);
+                                output = Environment.NewLine + server_name + ":" + line;
+                                lock (ircbot.listLock)
+                                {
+                                    if (ircbot.queue_text.Count >= 1000)
                                     {
-                                        user_access = tmp_access;
+                                        ircbot.queue_text.RemoveAt(0);
+                                    }
+                                    ircbot.queue_text.Add(output);
+                                }
+                            }
+                        }
+                        tmp_list.Add(name_line[3]);
+                        string[] names_list = name_line[4].Split(':');
+                        string[] names = names_list[1].Split(' ');
+                        while (name_line[4] != ":End of /NAMES list.")
+                        {
+                            channel_found = true;
+                            names_list = name_line[4].Split(':');
+                            char[] charSep = new char[] { ' ' };
+                            names = names_list[1].Split(charSep, StringSplitOptions.RemoveEmptyEntries);
+                            for (int i = 0; i <= names.GetUpperBound(0); i++)
+                            {
+                                char[] arr = names[i].ToCharArray();
+                                int user_access = conf.user_level;
+                                foreach (char c in arr)
+                                {
+                                    if (c.Equals('~') || c.Equals('&') || c.Equals('@') || c.Equals('%') || c.Equals('+'))
+                                    {
+                                        int tmp_access = get_access_num(c.ToString(), false);
+                                        if (tmp_access > user_access)
+                                        {
+                                            user_access = tmp_access;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        break;
                                     }
                                 }
-                                else
+                                tmp_list.Add(user_access + ":" + names[i].TrimStart('~').TrimStart('&').TrimStart('@').TrimStart('%').TrimStart('+'));
+                            }
+                            line = sr.ReadLine();
+                            name_line = line.Split(charSeparator, 5);
+                            output = Environment.NewLine + server_name + ":" + line;
+                            lock (ircbot.listLock)
+                            {
+                                if (ircbot.queue_text.Count >= 1000)
                                 {
-                                    break;
+                                    ircbot.queue_text.RemoveAt(0);
+                                }
+                                ircbot.queue_text.Add(output);
+                            }
+                        }
+                        if (channel_found == true)
+                        {
+                            for (int i = 0; i < nick_list.Count(); i++)
+                            {
+                                if (nick_list[i][0].Equals(channels[x].Split(' ')[0]))
+                                {
+                                    nick_list.RemoveAt(i);
                                 }
                             }
-                            tmp_list.Add(user_access + ":" + names[i].TrimStart('~').TrimStart('&').TrimStart('@').TrimStart('%').TrimStart('+'));
+                            nick_list.Add(tmp_list);
                         }
-                        line = sr.ReadLine();
-                        name_line = line.Split(charSeparator, 5);
-                        output = Environment.NewLine + server_name + ":" + line;
-                        lock (ircbot.listLock)
-                        {
-                            if (ircbot.queue_text.Count >= 1000)
-                            {
-                                ircbot.queue_text.RemoveAt(0);
-                            }
-                            ircbot.queue_text.Add(output);
-                        }
-                    }
-                    if (channel_found == true)
-                    {
-                        for (int i = 0; i < nick_list.Count(); i++)
-                        {
-                            if (nick_list[i][0].Equals(channels[x].Split(' ')[0]))
-                            {
-                                nick_list.RemoveAt(i);
-                            }
-                        }
-                        nick_list.Add(tmp_list);
                     }
                 }
             }
@@ -1097,25 +1104,22 @@ namespace IRCBot
         {
             if (connected == true)
             {
-                checkRegisterationTimer.Stop();
-                if (bot_identified == false)
+                checkRegisterationTimer.Enabled = false;
+                if (conf.nick != "" && conf.pass != "" && conf.email != "")
                 {
-                    if (conf.nick != "" && conf.pass != "" && conf.email != "")
-                    {
-                        register_nick(conf.nick, conf.pass, conf.email);
-                    }
-                    else
-                    {
-                        string output = Environment.NewLine + server_name + ":You are missing an username and/or password.  Please add those to the server configuration so I can register this nick.";
+                    register_nick(conf.nick, conf.pass, conf.email);
+                }
+                else
+                {
+                    string output = Environment.NewLine + server_name + ":You are missing an username and/or password.  Please add those to the server configuration so I can register this nick.";
 
-                        lock (ircbot.listLock)
+                    lock (ircbot.listLock)
+                    {
+                        if (ircbot.queue_text.Count >= 1000)
                         {
-                            if (ircbot.queue_text.Count >= 1000)
-                            {
-                                ircbot.queue_text.RemoveAt(0);
-                            }
-                            ircbot.queue_text.Add(output);
+                            ircbot.queue_text.RemoveAt(0);
                         }
+                        ircbot.queue_text.Add(output);
                     }
                 }
             }
@@ -1134,7 +1138,7 @@ namespace IRCBot
                     ns.Close();
                 if (IRCConnection != null)
                     IRCConnection.Close();
-                checkRegisterationTimer.Stop();
+                checkRegisterationTimer.Enabled = false;
                 string output = Environment.NewLine + server_name + ":" + "Disconnected";
 
                 lock (ircbot.listLock)
@@ -1174,6 +1178,72 @@ namespace IRCBot
             if (conf.pass != "")
             {
                 sendData("PRIVMSG", "NickServ :Identify " + conf.pass);
+                string line = sr.ReadLine();
+                char[] charSeparator = new char[] { ' ' };
+                string[] name_line = line.Split(charSeparator, 5);
+                string output = Environment.NewLine + server_name + ":" + line;
+                lock (ircbot.listLock)
+                {
+                    if (ircbot.queue_text.Count >= 1000)
+                    {
+                        ircbot.queue_text.RemoveAt(0);
+                    }
+                    ircbot.queue_text.Add(output);
+                }
+                while (name_line.GetUpperBound(0) <= 3)
+                {
+                    line = sr.ReadLine();
+                    name_line = line.Split(charSeparator, 5);
+                    output = Environment.NewLine + server_name + ":" + line;
+                    lock (ircbot.listLock)
+                    {
+                        if (ircbot.queue_text.Count >= 1000)
+                        {
+                            ircbot.queue_text.RemoveAt(0);
+                        }
+                        ircbot.queue_text.Add(output);
+                    }
+                }
+                while(bot_identified == false)
+                {
+                    if (name_line[3] == ":Password" && name_line[4].StartsWith("accepted"))
+                    {
+                        checkRegisterationTimer.Enabled = false;
+                        bot_identified = true;
+                    }
+                    else if (name_line[3] == ":Your" && name_line[4].StartsWith("nick"))
+                    {
+                        bot_identified = true;
+                    }
+                    else
+                    {
+                        line = sr.ReadLine();
+                        name_line = line.Split(charSeparator, 5);
+                        output = Environment.NewLine + server_name + ":" + line;
+                        lock (ircbot.listLock)
+                        {
+                            if (ircbot.queue_text.Count >= 1000)
+                            {
+                                ircbot.queue_text.RemoveAt(0);
+                            }
+                            ircbot.queue_text.Add(output);
+                        }
+                        while (name_line.GetUpperBound(0) <= 3)
+                        {
+                            line = sr.ReadLine();
+                            name_line = line.Split(charSeparator, 5);
+                            output = Environment.NewLine + server_name + ":" + line;
+                            lock (ircbot.listLock)
+                            {
+                                if (ircbot.queue_text.Count >= 1000)
+                                {
+                                    ircbot.queue_text.RemoveAt(0);
+                                }
+                                ircbot.queue_text.Add(output);
+                            }
+                        }
+                    }
+                }
             }
         }
 

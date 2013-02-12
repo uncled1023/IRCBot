@@ -185,7 +185,7 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                string[] new_line = line[4].Split(' ');
+                                                string[] new_line = line[4].ToLower().Split(' ');
                                                 if (new_line.GetUpperBound(0) > 0 && new_line[0].StartsWith("#"))
                                                 {
                                                     int viewed_access = ircbot.get_user_access(new_line[1].Trim().ToLower(), new_line[0].Trim());

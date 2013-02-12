@@ -595,7 +595,7 @@ namespace IRCBot
             string[] name = user_info[0].Split('!');
             if (name.GetUpperBound(0) > 0)
             {
-                nick = name[0].TrimStart(':');
+                nick = name[0].ToLower().TrimStart(':');
                 nick_host = user_info[1];
                 channel = ex[2];
 
@@ -909,7 +909,7 @@ namespace IRCBot
                     index++;
                 }
                 BackgroundWorker work = new BackgroundWorker();
-                work.DoWork += (sender, e) => backgroundWorker_RunModule(sender, e, module, index, ex, command, nick_access, nick.ToLower(), channel, bot_command, type);
+                work.DoWork += (sender, e) => backgroundWorker_RunModule(sender, e, module, index, ex, command, nick_access, nick, channel, bot_command, type);
                 work.RunWorkerAsync(2000);
             }
         }
@@ -1070,7 +1070,7 @@ namespace IRCBot
                                         break;
                                     }
                                 }
-                                tmp_list.Add(user_access + ":" + names[i].TrimStart('~').TrimStart('&').TrimStart('@').TrimStart('%').TrimStart('+'));
+                                tmp_list.Add(user_access + ":" + names[i].ToLower().TrimStart('~').TrimStart('&').TrimStart('@').TrimStart('%').TrimStart('+'));
                             }
                             line = sr.ReadLine();
                             name_line = line.Split(charSeparator, 5);
@@ -1345,7 +1345,7 @@ namespace IRCBot
                         name_line = line.Split(charSeparator, 5);
                     }
                 }
-                if (name_line[4].StartsWith(nick + " 3"))
+                if (name_line[4].ToLower().StartsWith(nick + " 3"))
                 {
                     identified = true;
                 }
@@ -1397,7 +1397,7 @@ namespace IRCBot
                             names = names_list[1].Split(charSep, StringSplitOptions.RemoveEmptyEntries);
                             for (int i = 0; i <= names.GetUpperBound(0); i++)
                             {
-                                if (names[i].TrimStart('~').TrimStart('&').TrimStart('@').TrimStart('%').TrimStart('+') == nick)
+                                if (names[i].ToLower().TrimStart('~').TrimStart('&').TrimStart('@').TrimStart('%').TrimStart('+') == nick)
                                 {
                                     char[] arr = names[i].ToCharArray();
                                     foreach (char c in arr)
@@ -1476,7 +1476,7 @@ namespace IRCBot
                             string[] lists = nick_list[x][i].Split(':');
                             if (lists.GetUpperBound(0) > 0)
                             {
-                                if (lists[1].Equals(nick))
+                                if (lists[1].ToLower().Equals(nick))
                                 {
                                     access += "," + lists[0];
                                     break;
@@ -1491,7 +1491,7 @@ namespace IRCBot
                     string[] owners = conf.owner.Split(','); // Get list of owners
                     for (int x = 0; x <= owners.GetUpperBound(0); x++)
                     {
-                        if (nick.Equals(owners[x]))
+                        if (nick.Equals(owners[x].ToLower()))
                         {
                             access += "," + conf.owner_level.ToString();
                         }

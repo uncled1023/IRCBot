@@ -721,7 +721,7 @@ namespace IRCBot
                                 }
                             }
                             channel = channel.TrimStart(',');
-                            if (tmp_lines.GetUpperBound(0) > 3)
+                            if (tmp_lines.GetUpperBound(0) > 2)
                             {
                                 message = nickname + " has quit (" + tmp_lines[2].TrimStart(':') + " " + tmp_lines[3] + ")";
                             }

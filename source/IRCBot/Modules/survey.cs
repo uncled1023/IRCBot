@@ -142,12 +142,12 @@ namespace IRCBot.Modules
                                                         }
                                                         else
                                                         {
-                                                            ircbot.sendData("PRIVMSG", nick + " :The survey no longer exists.  Please rety adding your survey.");
+                                                            ircbot.sendData("PRIVMSG", nick + " :The survey no longer exists.  Please retry adding your survey.");
                                                         }
                                                     }
                                                     else
                                                     {
-                                                        ircbot.sendData("PRIVMSG", nick + " :The survey no longer exists.  Please rety adding your survey.");
+                                                        ircbot.sendData("PRIVMSG", nick + " :The survey no longer exists.  Please retry adding your survey.");
                                                     }
                                                     break;
                                                 }
@@ -179,16 +179,21 @@ namespace IRCBot.Modules
                                                         if (fsi.GetUpperBound(0) >= 0 && fsi.GetUpperBound(0) >= survey.survey_number)
                                                         {
                                                             File.Delete(fsi[survey.survey_number].FullName);
+                                                            string[] owners = File.ReadAllLines(fsi[survey.survey_number].FullName)[2].Split(',');
+                                                            foreach (string owner in owners)
+                                                            {
+                                                                ircbot.sendData("NOTICE", owner + " :" + nick + " has canceled your survey, " + File.ReadAllLines(fsi[survey.survey_number].FullName)[1]);
+                                                            }
                                                             active_surveys.RemoveAt(index);
                                                         }
                                                         else
                                                         {
-                                                            ircbot.sendData("PRIVMSG", nick + " :The survey does not exist.");
+                                                            ircbot.sendData("NOTICE", nick + " :The survey does not exist.");
                                                         }
                                                     }
                                                     else
                                                     {
-                                                        ircbot.sendData("PRIVMSG", nick + " :The survey does not exist.");
+                                                        ircbot.sendData("NOTICE", nick + " :The survey does not exist.");
                                                     }
                                                     break;
                                                 }
@@ -201,7 +206,7 @@ namespace IRCBot.Modules
                                                     }
                                                     else
                                                     {
-                                                        ircbot.sendData("PRIVMSG", nick + " :The survey does not exist.");
+                                                        ircbot.sendData("NOTICE", nick + " :The survey does not exist.");
                                                     }
                                                     break;
                                                 }
@@ -331,7 +336,8 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                string[] new_line = line[4].Split(' ');
+                                                char[] charSep = new char[] { ' ' };
+                                                string[] new_line = line[4].Split(charSep, 2);
                                                 if (new_line.GetUpperBound(0) > 0)
                                                 {
                                                     int survey_access = conf.user_level - 1;
@@ -474,17 +480,17 @@ namespace IRCBot.Modules
                                     survey_found = true;
                                     if (Directory.Exists(ircbot.cur_dir + "\\modules\\survey\\answers\\" + fsi[survey_num].Name.Substring(0, fsi[survey_num].Name.Length - 4) + "\\"))
                                     {
-                                        ircbot.sendData("PRIVMSG", nick + " :The following nicks have completed your survey, \"" + questions[1] + "\":");
+                                        ircbot.sendData("NOTICE", nick + " :The following nicks have completed or are taking your survey, \"" + questions[1] + "\":");
                                         string nicks = "";
                                         foreach (string dir in Directory.GetDirectories(ircbot.cur_dir + "\\modules\\survey\\answers\\" + fsi[survey_num].Name.Substring(0, fsi[survey_num].Name.Length - 4) + "\\"))
                                         {
                                             nicks += "," + dir.Replace(ircbot.cur_dir + "\\modules\\survey\\answers\\" + fsi[survey_num].Name.Substring(0, fsi[survey_num].Name.Length - 4) + "\\", "");
                                         }
-                                        ircbot.sendData("PRIVMSG", nick + " :" + nicks.TrimStart(','));
+                                        ircbot.sendData("NOTICE", nick + " :" + nicks.TrimStart(','));
                                     }
                                     else
                                     {
-                                        ircbot.sendData("PRIVMSG", nick + " :No nicks have taken that survey.");
+                                        ircbot.sendData("NOTICE", nick + " :No nicks have taken that survey.");
                                     }
                                 }
                             }
@@ -519,7 +525,7 @@ namespace IRCBot.Modules
                                     survey_found = true;
                                     if (Directory.Exists(ircbot.cur_dir + "\\modules\\survey\\answers\\" + fsi[survey_num].Name.Substring(0, fsi[survey_num].Name.Length - 4) + "\\" + requested_nick + "\\"))
                                     {
-                                        ircbot.sendData("PRIVMSG", nick + " :Nick has supplied the following answers for your survey, \"" + questions[1] + "\":");
+                                        ircbot.sendData("PRIVMSG", nick + " :" + nick + " has supplied the following answers for your survey, \"" + questions[1] + "\":");
                                         string[] answers = Directory.GetFiles(ircbot.cur_dir + "\\modules\\survey\\answers\\" + fsi[survey_num].Name.Substring(0, fsi[survey_num].Name.Length - 4) + "\\" + requested_nick + "\\");
                                         int question_num = 0;
                                         for (int x = 3; x <= questions.GetUpperBound(0); x++)
@@ -534,7 +540,7 @@ namespace IRCBot.Modules
                                     }
                                     else
                                     {
-                                        ircbot.sendData("PRIVMSG", nick + " :" + requested_nick + " has not taken that survey.");
+                                        ircbot.sendData("NOTICE", nick + " :" + requested_nick + " has not taken that survey.");
                                     }
                                 }
                             }
@@ -544,7 +550,7 @@ namespace IRCBot.Modules
                 }
                 if (survey_found == false)
                 {
-                    ircbot.sendData("PRIVMSG", nick + " :Sorry, but either you are not the owner of the survey, or the survey does not exist.  To view all surveys available to you, please type " + conf.command + "surveys");
+                    ircbot.sendData("NOTICE", nick + " :Sorry, but either you are not the owner of the survey, or the survey does not exist.  To view all surveys available to you, please type " + conf.command + "surveys");
                 }
             }
             else
@@ -564,7 +570,7 @@ namespace IRCBot.Modules
                             if (survey_access <= nick_access)
                             {
                                 survey_found = true;
-                                ircbot.sendData("PRIVMSG", nick + " :" + file_number.ToString() + ") " + questions[1]);
+                                ircbot.sendData("NOTICE", nick + " :" + file_number.ToString() + ") " + questions[1]);
                             }
                             file_number++;
                         }
@@ -573,7 +579,7 @@ namespace IRCBot.Modules
                 }
                 if (survey_found == false)
                 {
-                    ircbot.sendData("PRIVMSG", nick + " :There are no surveys available to you.");
+                    ircbot.sendData("NOTICE", nick + " :There are no surveys available to you.");
                 }
             }
         }
@@ -609,12 +615,12 @@ namespace IRCBot.Modules
                                 sw.Write(line + Environment.NewLine);
                             }
                             sw.Close();
-                            ircbot.sendData("PRIVMSG", nick + " :Owner added successfully");
+                            ircbot.sendData("NOTICE", nick + " :Owner added successfully");
                         }
                         else
                         {
                             survey_found = true;
-                            ircbot.sendData("PRIVMSG", nick + " :You do not have permission to edit this survey.");
+                            ircbot.sendData("NOTICE", nick + " :You do not have permission to edit this survey.");
                         }
                     }
 
@@ -622,7 +628,7 @@ namespace IRCBot.Modules
             }
             if (survey_found == false)
             {
-                ircbot.sendData("PRIVMSG", nick + " :The specified survey does not exist.");
+                ircbot.sendData("NOTICE", nick + " :The specified survey does not exist.");
             }
         }
 
@@ -677,17 +683,17 @@ namespace IRCBot.Modules
                                     sw.Write(line + Environment.NewLine);
                                 }
                                 sw.Close();
-                                ircbot.sendData("PRIVMSG", nick + " :Owner deleted successfully");
+                                ircbot.sendData("NOTICE", nick + " :Owner deleted successfully");
                             }
                             else
                             {
-                                ircbot.sendData("PRIVMSG", nick + " :Owner was not found");
+                                ircbot.sendData("NOTICE", nick + " :Owner was not found");
                             }
                         }
                         else
                         {
                             survey_found = true;
-                            ircbot.sendData("PRIVMSG", nick + " :You do not have permission to edit this survey.");
+                            ircbot.sendData("NOTICE", nick + " :You do not have permission to edit this survey.");
                         }
                     }
 
@@ -695,7 +701,7 @@ namespace IRCBot.Modules
             }
             if (survey_found == false)
             {
-                ircbot.sendData("PRIVMSG", nick + " :The specified survey does not exist.");
+                ircbot.sendData("NOTICE", nick + " :The specified survey does not exist.");
             }
         }
 
@@ -752,7 +758,7 @@ namespace IRCBot.Modules
             {
                 if (survey_num == survey.survey_number)
                 {
-                    ircbot.sendData("PRIVMSG", survey.nick + " :Sorry, but the survey you are currently taking has been deleted.");
+                    ircbot.sendData("NOTICE", survey.nick + " :Sorry, but the survey you are currently taking has been deleted.");
                     active_surveys.RemoveAt(current_survey);
                 }
                 else
@@ -770,11 +776,11 @@ namespace IRCBot.Modules
                 {
                     Directory.Delete(ircbot.cur_dir + "\\modules\\survey\\answers\\" + fsi[survey_num].Name.Substring(0, fsi[survey_num].Name.Length - 4) + "\\", true);
                     File.Delete(fsi[survey_num].FullName);
-                    ircbot.sendData("PRIVMSG", nick + " :Survey deleted successfully");
+                    ircbot.sendData("NOTICE", nick + " :Survey deleted successfully");
                 }
                 else
                 {
-                    ircbot.sendData("PRIVMSG", nick + " :Survey not found");
+                    ircbot.sendData("NOTICE", nick + " :Survey not found");
                 }
             }
         }
@@ -908,7 +914,7 @@ namespace IRCBot.Modules
                                 string[] owners = questions[2].Split(',');
                                 foreach (string owner in owners)
                                 {
-                                    ircbot.sendData("PRIVMSG", owner + " :" + nick + " has started your survey, \"" + questions[1] + "\"");
+                                    ircbot.sendData("NOTICE", owner + " :" + nick + " has started your survey, \"" + questions[1] + "\"");
                                 }
                                 ircbot.sendData("PRIVMSG", nick + " :" + questions[3]);
                             }
@@ -916,13 +922,13 @@ namespace IRCBot.Modules
                     }
                     else
                     {
-                        ircbot.sendData("PRIVMSG", nick + " :You are already taking a survey.  Please finish the current survey or cancel it to choose a new survey.");
+                        ircbot.sendData("NOTICE", nick + " :You are already taking a survey.  Please finish the current survey or cancel it to choose a new survey.");
                     }
                 }
             }
             if (survey_found == false)
             {
-                ircbot.sendData("PRIVMSG", nick + " :Sorry, but that survey is not available to you.  To view all surveys available to you, please type " + conf.command + "surveys");
+                ircbot.sendData("NOTICE", nick + " :Sorry, but that survey is not available to you.  To view all surveys available to you, please type " + conf.command + "surveys");
             }
         }
     }

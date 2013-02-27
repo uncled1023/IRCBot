@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace IRCBot.Modules
 {
@@ -119,25 +120,30 @@ namespace IRCBot.Modules
 
         private void add_rule(string rule, string nick, string channel, bot ircbot)
         {
-            if (File.Exists(ircbot.cur_dir + "\\modules\\rules\\" + ircbot.server_name + "_rules.txt"))
+            string pattern = "[^a-zA-Z0-9]"; //regex pattern
+            string tab_name = Regex.Replace(channel, pattern, "_");
+            if (File.Exists(ircbot.cur_dir + "\\modules\\rules\\" + ircbot.server_name + "_" + tab_name + "_rules.txt"))
             {
-                List<string> rules_file = System.IO.File.ReadAllLines(ircbot.cur_dir + "\\modules\\rules\\" + ircbot.server_name + "_rules.txt").ToList();
+                List<string> rules_file = System.IO.File.ReadAllLines(ircbot.cur_dir + "\\modules\\rules\\" + ircbot.server_name + "_" + tab_name + "_rules.txt").ToList();
                 rules_file.Add(channel + "*" + rule);
-                System.IO.File.WriteAllLines(ircbot.cur_dir + "\\modules\\rules\\" + ircbot.server_name + "_rules.txt", rules_file);
+                System.IO.File.WriteAllLines(ircbot.cur_dir + "\\modules\\rules\\" + ircbot.server_name + "_" + tab_name + "_rules.txt", rules_file);
             }
             else
             {
                 List<string> rules_file = new List<string>();
                 rules_file.Add(channel + "*" + rule);
-                System.IO.File.WriteAllLines(ircbot.cur_dir + "\\modules\\rules\\" + ircbot.server_name + "_rules.txt", rules_file);
+                System.IO.File.WriteAllLines(ircbot.cur_dir + "\\modules\\rules\\" + ircbot.server_name + "_" + tab_name + "_rules.txt", rules_file);
             }
+            ircbot.sendData("PRIVMSG", channel + " :Rule added successfully");
         }
 
         private void del_rule(string rule_num, string nick, string channel, bot ircbot)
         {
-            if (File.Exists(ircbot.cur_dir + "\\modules\\rules\\" + ircbot.server_name + "_rules.txt"))
+            string pattern = "[^a-zA-Z0-9]"; //regex pattern
+            string tab_name = Regex.Replace(channel, pattern, "_");
+            if (File.Exists(ircbot.cur_dir + "\\modules\\rules\\" + ircbot.server_name + "_" + tab_name + "_rules.txt"))
             {
-                List<string> rules_file = System.IO.File.ReadAllLines(ircbot.cur_dir + "\\modules\\rules\\" + ircbot.server_name + "_rules.txt").ToList();
+                List<string> rules_file = System.IO.File.ReadAllLines(ircbot.cur_dir + "\\modules\\rules\\" + ircbot.server_name + "_" + tab_name + "_rules.txt").ToList();
                 int number_of_lines = rules_file.Count + 1;
                 if (number_of_lines > 0)
                 {
@@ -160,7 +166,7 @@ namespace IRCBot.Modules
                     }
                     else
                     {
-                        System.IO.File.WriteAllLines(ircbot.cur_dir + "\\modules\\rules\\" + ircbot.server_name + "_rules.txt", rules_file);
+                        System.IO.File.WriteAllLines(ircbot.cur_dir + "\\modules\\rules\\" + ircbot.server_name + "_" + tab_name + "_rules.txt", rules_file);
                     }
                 }
                 else
@@ -176,9 +182,11 @@ namespace IRCBot.Modules
 
         private void get_rules(string nick, string channel, bot ircbot)
         {
-            if (File.Exists(ircbot.cur_dir + "\\modules\\rules\\" + ircbot.server_name + "_rules.txt"))
+            string pattern = "[^a-zA-Z0-9]"; //regex pattern
+            string tab_name = Regex.Replace(channel, pattern, "_");
+            if (File.Exists(ircbot.cur_dir + "\\modules\\rules\\" + ircbot.server_name + "_" + tab_name + "_rules.txt"))
             {
-                string[] answer_file = System.IO.File.ReadAllLines(ircbot.cur_dir + "\\modules\\rules\\" + ircbot.server_name + "_rules.txt");
+                string[] answer_file = System.IO.File.ReadAllLines(ircbot.cur_dir + "\\modules\\rules\\" + ircbot.server_name + "_" + tab_name + "_rules.txt");
                 int number_of_lines = answer_file.GetUpperBound(0) + 1;
                 if (number_of_lines > 0)
                 {

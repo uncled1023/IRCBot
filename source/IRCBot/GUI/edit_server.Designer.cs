@@ -101,7 +101,7 @@
             this.port_box.Location = new System.Drawing.Point(165, 34);
             this.port_box.Name = "port_box";
             this.port_box.Size = new System.Drawing.Size(301, 20);
-            this.port_box.TabIndex = 11;
+            this.port_box.TabIndex = 2;
             this.port_box.Text = "6667";
             // 
             // label7
@@ -118,7 +118,7 @@
             this.channels_box.Location = new System.Drawing.Point(165, 60);
             this.channels_box.Name = "channels_box";
             this.channels_box.Size = new System.Drawing.Size(301, 20);
-            this.channels_box.TabIndex = 9;
+            this.channels_box.TabIndex = 3;
             // 
             // label2
             // 
@@ -134,7 +134,7 @@
             this.server_name_box.Location = new System.Drawing.Point(165, 8);
             this.server_name_box.Name = "server_name_box";
             this.server_name_box.Size = new System.Drawing.Size(301, 20);
-            this.server_name_box.TabIndex = 7;
+            this.server_name_box.TabIndex = 1;
             // 
             // label1
             // 
@@ -150,7 +150,7 @@
             this.email_box.Location = new System.Drawing.Point(165, 164);
             this.email_box.Name = "email_box";
             this.email_box.Size = new System.Drawing.Size(301, 20);
-            this.email_box.TabIndex = 21;
+            this.email_box.TabIndex = 7;
             // 
             // label8
             // 
@@ -166,7 +166,7 @@
             this.password_box.Location = new System.Drawing.Point(165, 138);
             this.password_box.Name = "password_box";
             this.password_box.Size = new System.Drawing.Size(301, 20);
-            this.password_box.TabIndex = 19;
+            this.password_box.TabIndex = 6;
             // 
             // label6
             // 
@@ -182,7 +182,7 @@
             this.owner_nicks_box.Location = new System.Drawing.Point(165, 190);
             this.owner_nicks_box.Name = "owner_nicks_box";
             this.owner_nicks_box.Size = new System.Drawing.Size(301, 20);
-            this.owner_nicks_box.TabIndex = 17;
+            this.owner_nicks_box.TabIndex = 8;
             // 
             // label5
             // 
@@ -198,7 +198,7 @@
             this.bot_nick_box.Location = new System.Drawing.Point(165, 112);
             this.bot_nick_box.Name = "bot_nick_box";
             this.bot_nick_box.Size = new System.Drawing.Size(301, 20);
-            this.bot_nick_box.TabIndex = 15;
+            this.bot_nick_box.TabIndex = 5;
             // 
             // label4
             // 
@@ -214,7 +214,7 @@
             this.bot_name_box.Location = new System.Drawing.Point(165, 86);
             this.bot_name_box.Name = "bot_name_box";
             this.bot_name_box.Size = new System.Drawing.Size(301, 20);
-            this.bot_name_box.TabIndex = 13;
+            this.bot_name_box.TabIndex = 4;
             // 
             // label3
             // 
@@ -230,7 +230,7 @@
             this.save_server_button.Location = new System.Drawing.Point(336, 320);
             this.save_server_button.Name = "save_server_button";
             this.save_server_button.Size = new System.Drawing.Size(75, 23);
-            this.save_server_button.TabIndex = 23;
+            this.save_server_button.TabIndex = 98;
             this.save_server_button.Text = "Save";
             this.save_server_button.UseVisualStyleBackColor = true;
             this.save_server_button.Click += new System.EventHandler(this.save_server_button_Click);
@@ -240,7 +240,7 @@
             this.cancel_button.Location = new System.Drawing.Point(417, 320);
             this.cancel_button.Name = "cancel_button";
             this.cancel_button.Size = new System.Drawing.Size(75, 23);
-            this.cancel_button.TabIndex = 24;
+            this.cancel_button.TabIndex = 99;
             this.cancel_button.Text = "Cancel";
             this.cancel_button.UseVisualStyleBackColor = true;
             this.cancel_button.Click += new System.EventHandler(this.cancel_button_Click);
@@ -255,7 +255,7 @@
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(480, 313);
-            this.tabControl1.TabIndex = 25;
+            this.tabControl1.TabIndex = 0;
             // 
             // tabPage1
             // 
@@ -290,7 +290,7 @@
             this.channel_blacklist_box.Location = new System.Drawing.Point(165, 216);
             this.channel_blacklist_box.Name = "channel_blacklist_box";
             this.channel_blacklist_box.Size = new System.Drawing.Size(301, 20);
-            this.channel_blacklist_box.TabIndex = 23;
+            this.channel_blacklist_box.TabIndex = 9;
             // 
             // label16
             // 
@@ -366,7 +366,7 @@
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
             this.tabPage3.Size = new System.Drawing.Size(472, 287);
             this.tabPage3.TabIndex = 2;
-            this.tabPage3.Text = "Access Levels";
+            this.tabPage3.Text = "Command Options";
             this.tabPage3.UseVisualStyleBackColor = true;
             // 
             // label25
@@ -384,7 +384,7 @@
             this.spam_counter.Location = new System.Drawing.Point(234, 200);
             this.spam_counter.Name = "spam_counter";
             this.spam_counter.Size = new System.Drawing.Size(15, 14);
-            this.spam_counter.TabIndex = 36;
+            this.spam_counter.TabIndex = 9;
             this.spam_counter.UseVisualStyleBackColor = true;
             // 
             // label24
@@ -402,7 +402,7 @@
             this.show_in_help.Location = new System.Drawing.Point(234, 181);
             this.show_in_help.Name = "show_in_help";
             this.show_in_help.Size = new System.Drawing.Size(15, 14);
-            this.show_in_help.TabIndex = 34;
+            this.show_in_help.TabIndex = 8;
             this.show_in_help.UseVisualStyleBackColor = true;
             // 
             // label23
@@ -410,9 +410,9 @@
             this.label23.AutoSize = true;
             this.label23.Location = new System.Drawing.Point(132, 159);
             this.label23.Name = "label23";
-            this.label23.Size = new System.Drawing.Size(88, 13);
+            this.label23.Size = new System.Drawing.Size(46, 13);
             this.label23.TabIndex = 33;
-            this.label23.Text = "Channel Blacklist";
+            this.label23.Text = "Blacklist";
             // 
             // label22
             // 
@@ -428,21 +428,21 @@
             this.channel_blacklist.Location = new System.Drawing.Point(234, 156);
             this.channel_blacklist.Name = "channel_blacklist";
             this.channel_blacklist.Size = new System.Drawing.Size(232, 20);
-            this.channel_blacklist.TabIndex = 31;
+            this.channel_blacklist.TabIndex = 7;
             // 
             // command_triggers
             // 
             this.command_triggers.Location = new System.Drawing.Point(234, 78);
             this.command_triggers.Name = "command_triggers";
             this.command_triggers.Size = new System.Drawing.Size(232, 20);
-            this.command_triggers.TabIndex = 30;
+            this.command_triggers.TabIndex = 4;
             // 
             // button3
             // 
             this.button3.Location = new System.Drawing.Point(135, 241);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(75, 23);
-            this.button3.TabIndex = 29;
+            this.button3.TabIndex = 10;
             this.button3.Text = "Save";
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
@@ -461,7 +461,7 @@
             this.command_access_level.Location = new System.Drawing.Point(234, 130);
             this.command_access_level.Name = "command_access_level";
             this.command_access_level.Size = new System.Drawing.Size(232, 20);
-            this.command_access_level.TabIndex = 27;
+            this.command_access_level.TabIndex = 6;
             // 
             // label20
             // 
@@ -477,7 +477,7 @@
             this.command_description.Location = new System.Drawing.Point(234, 52);
             this.command_description.Name = "command_description";
             this.command_description.Size = new System.Drawing.Size(232, 20);
-            this.command_description.TabIndex = 25;
+            this.command_description.TabIndex = 3;
             // 
             // label19
             // 
@@ -493,7 +493,7 @@
             this.command_arguments.Location = new System.Drawing.Point(234, 104);
             this.command_arguments.Name = "command_arguments";
             this.command_arguments.Size = new System.Drawing.Size(232, 20);
-            this.command_arguments.TabIndex = 23;
+            this.command_arguments.TabIndex = 5;
             // 
             // label18
             // 
@@ -509,7 +509,7 @@
             this.command_name.Location = new System.Drawing.Point(234, 26);
             this.command_name.Name = "command_name";
             this.command_name.Size = new System.Drawing.Size(232, 20);
-            this.command_name.TabIndex = 21;
+            this.command_name.TabIndex = 2;
             // 
             // label17
             // 
@@ -526,7 +526,7 @@
             this.command_list.Location = new System.Drawing.Point(6, 26);
             this.command_list.Name = "command_list";
             this.command_list.Size = new System.Drawing.Size(120, 238);
-            this.command_list.TabIndex = 19;
+            this.command_list.TabIndex = 1;
             this.command_list.SelectedIndexChanged += new System.EventHandler(this.command_list_change);
             // 
             // tabPage4
@@ -558,7 +558,7 @@
             this.owner_level_box.Location = new System.Drawing.Point(155, 173);
             this.owner_level_box.Name = "owner_level_box";
             this.owner_level_box.Size = new System.Drawing.Size(311, 20);
-            this.owner_level_box.TabIndex = 38;
+            this.owner_level_box.TabIndex = 7;
             // 
             // label9
             // 
@@ -574,7 +574,7 @@
             this.founder_level_box.Location = new System.Drawing.Point(155, 147);
             this.founder_level_box.Name = "founder_level_box";
             this.founder_level_box.Size = new System.Drawing.Size(311, 20);
-            this.founder_level_box.TabIndex = 36;
+            this.founder_level_box.TabIndex = 6;
             // 
             // label10
             // 
@@ -590,7 +590,7 @@
             this.sop_level_box.Location = new System.Drawing.Point(155, 121);
             this.sop_level_box.Name = "sop_level_box";
             this.sop_level_box.Size = new System.Drawing.Size(311, 20);
-            this.sop_level_box.TabIndex = 34;
+            this.sop_level_box.TabIndex = 5;
             // 
             // label11
             // 
@@ -606,7 +606,7 @@
             this.op_level_box.Location = new System.Drawing.Point(155, 95);
             this.op_level_box.Name = "op_level_box";
             this.op_level_box.Size = new System.Drawing.Size(311, 20);
-            this.op_level_box.TabIndex = 32;
+            this.op_level_box.TabIndex = 4;
             // 
             // label12
             // 
@@ -622,7 +622,7 @@
             this.hop_level_box.Location = new System.Drawing.Point(155, 69);
             this.hop_level_box.Name = "hop_level_box";
             this.hop_level_box.Size = new System.Drawing.Size(311, 20);
-            this.hop_level_box.TabIndex = 30;
+            this.hop_level_box.TabIndex = 3;
             // 
             // label13
             // 
@@ -638,7 +638,7 @@
             this.voice_level_box.Location = new System.Drawing.Point(155, 43);
             this.voice_level_box.Name = "voice_level_box";
             this.voice_level_box.Size = new System.Drawing.Size(311, 20);
-            this.voice_level_box.TabIndex = 28;
+            this.voice_level_box.TabIndex = 2;
             // 
             // label14
             // 
@@ -654,7 +654,7 @@
             this.user_level_box.Location = new System.Drawing.Point(155, 17);
             this.user_level_box.Name = "user_level_box";
             this.user_level_box.Size = new System.Drawing.Size(311, 20);
-            this.user_level_box.TabIndex = 26;
+            this.user_level_box.TabIndex = 1;
             // 
             // label15
             // 

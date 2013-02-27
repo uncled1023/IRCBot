@@ -67,6 +67,7 @@ namespace IRCBot
         delegate void SetTextCallback(string text);
 
         ContextMenu TrayMenu = new ContextMenu();
+        ContextMenu TabMenu = new ContextMenu();
 
         //inner enum used only internally
         [Flags]
@@ -325,7 +326,7 @@ namespace IRCBot
                                     String class_name = xn_module["class_name"].InnerText;
                                     tmp_list.Add(class_name);
                                     tmp_list.Add(module_name);
-                                    tmp_list.Add(xn_module["enabled"].InnerText);
+                                    tmp_list.Add(xn_module["blacklist"].InnerText);
 
                                     XmlNodeList optionList = xn_module.ChildNodes;
                                     foreach (XmlNode option in optionList)
@@ -679,7 +680,7 @@ namespace IRCBot
                             nickname = tmp_lines[0].TrimStart(':').Split('!')[0];
                             if (channel.StartsWith("#"))
                             {
-                                if (nickname.Equals(conf.nick))
+                                if (nickname.ToLower().Equals(conf.nick.ToLower()))
                                 {
                                     channel = "System";
                                 }
@@ -695,8 +696,31 @@ namespace IRCBot
                         else if (tmp_lines[1].Equals("quit"))
                         {
                             nickname = tmp_lines[0].TrimStart(':').Split('!')[0];
-                            channel = "System";
-
+                            channel = "";
+                            int index = 0;
+                            foreach (bot bot_instance in bot_instances)
+                            {
+                                foreach (List<string> nicks in bot_instance.nick_list)
+                                {
+                                    int nick_index = 0;
+                                    foreach (string nick in nicks)
+                                    {
+                                        string[] sep_nick = nick.Split(':');
+                                        if (sep_nick.GetUpperBound(0) > 0)
+                                        {
+                                            if (sep_nick[1].Equals(nickname.ToLower()))
+                                            {
+                                                channel += "," + bot_instance.channel_list[index];
+                                                bot_instance.nick_list[index].RemoveAt(nick_index);
+                                                break;
+                                            }
+                                        }
+                                        nick_index++;
+                                    }
+                                    index++;
+                                }
+                            }
+                            channel = channel.TrimStart(',');
                             if (tmp_lines.GetUpperBound(0) > 3)
                             {
                                 message = nickname + " has quit (" + tmp_lines[2].TrimStart(':') + " " + tmp_lines[3] + ")";
@@ -973,6 +997,7 @@ namespace IRCBot
                 tabpage.Size = new System.Drawing.Size(832, 353);
                 tabpage.Text = channel[1];
                 tabpage.UseVisualStyleBackColor = true;
+
                 string[] server_list = full_server_list.Split(',');
                 int index = 0;
                 string tmp_server = "No_Server_Specified";
@@ -1175,7 +1200,7 @@ namespace IRCBot
                                 String class_name = xn_module["class_name"].InnerText;
                                 tmp_list.Add(class_name);
                                 tmp_list.Add(module_name);
-                                tmp_list.Add(xn_module["enabled"].InnerText);
+                                tmp_list.Add(xn_module["blacklist"].InnerText);
 
                                 XmlNodeList optionList = xn_module.ChildNodes;
                                 foreach (XmlNode option in optionList)
@@ -1317,11 +1342,12 @@ namespace IRCBot
 
         private void Interface_FormClosing(object sender, FormClosingEventArgs e)
         {
-            updateOutput.Stop();
             foreach (bot bot_instance in bot_instances)
             {
                 bot_instance.worker.CancelAsync();
             }
+            MyNotifyIcon.Visible = false;
+            updateOutput.Stop();
         }
 
         public bool start_connection(string start_server_name)
@@ -1481,7 +1507,7 @@ namespace IRCBot
                                 String class_name = xn_module["class_name"].InnerText;
                                 tmp_list.Add(class_name);
                                 tmp_list.Add(module_name);
-                                tmp_list.Add(xn_module["enabled"].InnerText);
+                                tmp_list.Add(xn_module["blacklist"].InnerText);
 
                                 XmlNodeList optionList = xn_module.ChildNodes;
                                 foreach (XmlNode option in optionList)
@@ -1529,6 +1555,14 @@ namespace IRCBot
                 }
                 bot bot_instance = new bot();
                 bot_instances.Add(bot_instance);
+                if (index == 0)
+                {
+                    index = 0;
+                }
+                else
+                {
+                    index = index - 1;
+                }
                 bot_instances[index].start_bot(this, conf);
                 server_initiated = true;
                 connectToolStripMenuItem.Enabled = true;
@@ -1598,6 +1632,29 @@ namespace IRCBot
         private void tabControl1_MouseClick(object sender, MouseEventArgs e)
         {
             input_box.Focus();
+            if (e.Button == System.Windows.Forms.MouseButtons.Middle)
+            {
+                bool server_tab = false;
+                string[] server_list = full_server_list.Split(',');
+                foreach (string server_name in server_list)
+                {
+                    string[] server = server_name.Split('.');
+                    string tmp_server_name = "No_Server_Specified";
+                    if (server.GetUpperBound(0) > 0)
+                    {
+                        tmp_server_name = server[1];
+                    }
+                    if (tabControl1.SelectedTab.Text.Equals(tmp_server_name))
+                    {
+                        server_tab = true;
+                        break;
+                    }
+                }
+                if (server_tab == false)
+                {
+                    button1_Click(sender, e);
+                }
+            }
         }
 
         private void tabControl1_MouseClick(object sender, EventArgs e)

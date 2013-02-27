@@ -730,7 +730,7 @@ namespace IRCBot
                                                     break;
                                                 }
                                             }
-                                            tmp_list.Add(user_access + ":" + names[i].TrimStart('~').TrimStart('&').TrimStart('@').TrimStart('%').TrimStart('+'));
+                                            tmp_list.Add(user_access + ":" + names[i].TrimStart('~').TrimStart('&').TrimStart('@').TrimStart('%').TrimStart('+').ToLower());
                                         }
                                     }
                                     line = sr.ReadLine();
@@ -754,18 +754,6 @@ namespace IRCBot
                 if (ex[1].ToLower() == "quit")
                 {
                     type = "quit";
-                    for (int x = 0; x < nick_list.Count(); x++)
-                    {
-                        for (int i = 2; i < nick_list[x].Count(); i++)
-                        {
-                            string[] split = nick_list[x][i].Split(':');
-                            if (split[1].Equals(nick))
-                            {
-                                nick_list[x].RemoveAt(i);
-                                break;
-                            }
-                        }
-                    }
                 }
 
                 // On user PART events
@@ -789,6 +777,35 @@ namespace IRCBot
                     }
                 }
 
+                // On user KICK events
+                if (ex[1].ToLower() == "kick")
+                {
+                    type = "kick";
+                    for (int x = 0; x < nick_list.Count(); x++)
+                    {
+                        if (nick_list[x][0].Equals(ex[2]))
+                        {
+                            if (ex[3].ToLower().Equals(conf.nick.ToLower()))
+                            {
+                                nick_list.RemoveAt(x);
+                                channel_list.RemoveAt(x);
+                            }
+                            else
+                            {
+                                for (int i = 2; i < nick_list[x].Count(); i++)
+                                {
+                                    string[] split = nick_list[x][i].Split(':');
+                                    if (split[1].Equals(nick))
+                                    {
+                                        nick_list[x].RemoveAt(i);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
                 // On user Nick Change events
                 if (ex[1].ToLower() == "nick")
                 {
@@ -802,7 +819,7 @@ namespace IRCBot
                             {
                                 if (split[1].Equals(nick))
                                 {
-                                    nick_list[x][i] = split[0] + ":" + ex[2].TrimStart(':');
+                                    nick_list[x][i] = split[0] + ":" + ex[2].TrimStart(':').ToLower();
                                     break;
                                 }
                             }
@@ -844,14 +861,14 @@ namespace IRCBot
                                                 string[] split = nick_list[x][i].Split(':');
                                                 if (split.GetUpperBound(0) > 0)
                                                 {
-                                                    if (split[1].Equals(new_nick[y]))
+                                                    if (split[1].Equals(new_nick[y].ToLower()))
                                                     {
-                                                        nick_list[x][i] = get_user_op(new_nick[y], channel).ToString() + ":" + new_nick[y];
+                                                        nick_list[x][i] = get_user_op(new_nick[y].ToLower(), channel).ToString() + ":" + new_nick[y].ToLower();
                                                         break;
                                                     }
                                                 }
                                             }
-                                            new_access = get_user_access(new_nick[y], channel);
+                                            new_access = get_user_access(new_nick[y].ToLower(), channel);
                                         }
                                         else
                                         {
@@ -874,17 +891,17 @@ namespace IRCBot
                                             string[] split = nick_list[x][i].Split(':');
                                             if (split.GetUpperBound(0) > 0)
                                             {
-                                                if (split[1].Equals(new_nick[y]))
+                                                if (split[1].Equals(new_nick[y].ToLower()))
                                                 {
                                                     nick_found = true;
-                                                    nick_list[x][i] = new_access.ToString() + ":" + new_nick[y];
+                                                    nick_list[x][i] = new_access.ToString() + ":" + new_nick[y].ToLower();
                                                     break;
                                                 }
                                             }
                                         }
                                         if (nick_found == false)
                                         {
-                                            nick_list[x].Add(new_access.ToString() + ":" + new_nick[y]);
+                                            nick_list[x].Add(new_access.ToString() + ":" + new_nick[y].ToLower());
                                         }
                                     }
                                 }
@@ -900,17 +917,47 @@ namespace IRCBot
             foreach (Modules.Module module in tmp_module_list)
             {
                 int index = 0;
+                bool module_found = false;
+                string module_blacklist = "";
                 foreach (List<string> conf_module in conf.module_config)
                 {
                     if (module.ToString().Equals("IRCBot.Modules." + conf_module[0]))
                     {
+                        module_blacklist = conf_module[2];
+                        module_found = true;
                         break;
                     }
                     index++;
                 }
-                BackgroundWorker work = new BackgroundWorker();
-                work.DoWork += (sender, e) => backgroundWorker_RunModule(sender, e, module, index, ex, command, nick_access, nick, channel, bot_command, type);
-                work.RunWorkerAsync(2000);
+                if (module_found == true)
+                {
+                    char[] sepComma = new char[] { ',' };
+                    char[] sepSpace = new char[] { ' ' };
+                    string[] blacklist = module_blacklist.Split(sepComma, StringSplitOptions.RemoveEmptyEntries);
+                    bool module_allowed = true;
+                    foreach (string blacklist_node in blacklist)
+                    {
+                        string[] nodes = blacklist_node.Split(sepSpace, StringSplitOptions.RemoveEmptyEntries);
+                        foreach (string node in nodes)
+                        {
+                            if (node.ToLower().Equals(nick) || node.ToLower().TrimStart('#').Equals(channel.ToLower().TrimStart('#')))
+                            {
+                                module_allowed = false;
+                                break;
+                            }
+                        }
+                        if (module_allowed == false)
+                        {
+                            break;
+                        }
+                    }
+                    if (module_allowed == true)
+                    {
+                        BackgroundWorker work = new BackgroundWorker();
+                        work.DoWork += (sender, e) => backgroundWorker_RunModule(sender, e, module, index, ex, command, nick_access, nick, channel, bot_command, type);
+                        work.RunWorkerAsync(2000);
+                    }
+                }
             }
         }
 

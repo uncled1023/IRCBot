@@ -37,6 +37,8 @@
             this.label1 = new System.Windows.Forms.Label();
             this.server_list = new System.Windows.Forms.ListBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.label2 = new System.Windows.Forms.Label();
+            this.minimize_to_tray = new System.Windows.Forms.CheckBox();
             this.label12 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
             this.windows_start_box = new System.Windows.Forms.CheckBox();
@@ -57,8 +59,6 @@
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
-            this.label2 = new System.Windows.Forms.Label();
-            this.minimize_to_tray = new System.Windows.Forms.CheckBox();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -85,7 +85,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(409, 231);
+            this.tabPage1.Size = new System.Drawing.Size(409, 240);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Server Configuration";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -96,7 +96,7 @@
             this.connect_button.Location = new System.Drawing.Point(262, 119);
             this.connect_button.Name = "connect_button";
             this.connect_button.Size = new System.Drawing.Size(102, 23);
-            this.connect_button.TabIndex = 11;
+            this.connect_button.TabIndex = 5;
             this.connect_button.Text = "Connect";
             this.connect_button.UseVisualStyleBackColor = true;
             this.connect_button.Click += new System.EventHandler(this.connect_button_Click);
@@ -107,7 +107,7 @@
             this.edit_server_button.Location = new System.Drawing.Point(262, 61);
             this.edit_server_button.Name = "edit_server_button";
             this.edit_server_button.Size = new System.Drawing.Size(102, 23);
-            this.edit_server_button.TabIndex = 9;
+            this.edit_server_button.TabIndex = 3;
             this.edit_server_button.Text = "Edit Server";
             this.edit_server_button.UseVisualStyleBackColor = true;
             this.edit_server_button.Click += new System.EventHandler(this.edit_server_button_Click);
@@ -118,7 +118,7 @@
             this.delete_server_button.Location = new System.Drawing.Point(262, 90);
             this.delete_server_button.Name = "delete_server_button";
             this.delete_server_button.Size = new System.Drawing.Size(102, 23);
-            this.delete_server_button.TabIndex = 10;
+            this.delete_server_button.TabIndex = 4;
             this.delete_server_button.Text = "Delete Server";
             this.delete_server_button.UseVisualStyleBackColor = true;
             this.delete_server_button.Click += new System.EventHandler(this.delete_server_button_Click);
@@ -128,7 +128,7 @@
             this.add_server_button.Location = new System.Drawing.Point(262, 32);
             this.add_server_button.Name = "add_server_button";
             this.add_server_button.Size = new System.Drawing.Size(102, 23);
-            this.add_server_button.TabIndex = 8;
+            this.add_server_button.TabIndex = 2;
             this.add_server_button.Text = "Add Server";
             this.add_server_button.UseVisualStyleBackColor = true;
             this.add_server_button.Click += new System.EventHandler(this.add_server_button_Click);
@@ -149,7 +149,7 @@
             this.server_list.Location = new System.Drawing.Point(9, 32);
             this.server_list.Name = "server_list";
             this.server_list.Size = new System.Drawing.Size(201, 186);
-            this.server_list.TabIndex = 6;
+            this.server_list.TabIndex = 1;
             this.server_list.SelectedIndexChanged += new System.EventHandler(this.server_list_SelectedIndexChanged);
             // 
             // tabPage2
@@ -180,6 +180,24 @@
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Bot Configuration";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(8, 215);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(83, 13);
+            this.label2.TabIndex = 29;
+            this.label2.Text = "Minimize to Tray";
+            // 
+            // minimize_to_tray
+            // 
+            this.minimize_to_tray.AutoSize = true;
+            this.minimize_to_tray.Location = new System.Drawing.Point(179, 217);
+            this.minimize_to_tray.Name = "minimize_to_tray";
+            this.minimize_to_tray.Size = new System.Drawing.Size(15, 14);
+            this.minimize_to_tray.TabIndex = 10;
+            this.minimize_to_tray.UseVisualStyleBackColor = true;
             // 
             // label12
             // 
@@ -342,24 +360,6 @@
             this.button2.Text = "Save";
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(8, 215);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(83, 13);
-            this.label2.TabIndex = 29;
-            this.label2.Text = "Minimize to Tray";
-            // 
-            // minimize_to_tray
-            // 
-            this.minimize_to_tray.AutoSize = true;
-            this.minimize_to_tray.Location = new System.Drawing.Point(179, 217);
-            this.minimize_to_tray.Name = "minimize_to_tray";
-            this.minimize_to_tray.Size = new System.Drawing.Size(15, 14);
-            this.minimize_to_tray.TabIndex = 28;
-            this.minimize_to_tray.UseVisualStyleBackColor = true;
             // 
             // configuration
             // 

@@ -26,6 +26,7 @@ namespace IRCBot.Modules
 
             char[] charS = new char[] { ' ' };
             string module_name = ircbot.conf.module_config[module_id][0];
+            string disallowed_modes = ircbot.conf.module_config[module_id][3];
             if (type.Equals("channel") && bot_command == true)
             {
                 foreach (List<string> tmp_command in conf.command_list)
@@ -481,13 +482,46 @@ namespace IRCBot.Modules
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 string[] new_line = line[4].Split(charS, 2);
-                                                if (new_line.GetUpperBound(0) > 0)
+                                                char[] arr = new_line[0].TrimStart('-').TrimStart('+').ToCharArray();
+                                                bool mode_allowed = true;
+                                                foreach (char c in arr)
                                                 {
-                                                    ircbot.sendData("MODE", line[2] + " " + new_line[0] + " :" + new_line[1]);
+                                                    char[] modes_disallowed = disallowed_modes.ToCharArray();
+                                                    foreach (char m in modes_disallowed)
+                                                    {
+                                                        if (m.Equals(c))
+                                                        {
+                                                            mode_allowed = false;
+                                                            break;
+                                                        }
+                                                    }
+                                                    if (mode_allowed == true)
+                                                    {
+                                                        if (c.Equals('q') || c.Equals('a') || c.Equals('o') || c.Equals('h') || c.Equals('v'))
+                                                        {
+                                                            int mode_access = ircbot.get_access_num(c.ToString(), true);
+                                                            if (nick_access < mode_access)
+                                                            {
+                                                                mode_allowed = false;
+                                                                break;
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                if (mode_allowed == true)
+                                                {
+                                                    if (new_line.GetUpperBound(0) > 0)
+                                                    {
+                                                        ircbot.sendData("MODE", line[2] + " " + new_line[0] + " :" + new_line[1]);
+                                                    }
+                                                    else
+                                                    {
+                                                        ircbot.sendData("MODE", line[2] + " " + new_line[0]);
+                                                    }
                                                 }
                                                 else
                                                 {
-                                                    ircbot.sendData("MODE", line[2] + " " + new_line[0]);
+                                                    ircbot.sendData("PRIVMSG", line[2] + " :You do not have permission to use that command.");
                                                 }
                                             }
                                             else
@@ -563,7 +597,7 @@ namespace IRCBot.Modules
                                                 string[] new_line = line[4].ToLower().Split(charS, 2);
                                                 string nicks = new_line[0].TrimStart(':');
                                                 string[] total_nicks = nicks.Split(',');
-                                                int sent_nick_access = ircbot.get_user_access(new_line[0].TrimStart(':'), line[2]);
+                                                int sent_nick_access = ircbot.get_user_access(total_nicks[0], line[2]);
 
                                                 bool tmp_me = false;
                                                 for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
@@ -686,7 +720,7 @@ namespace IRCBot.Modules
                                                 string[] new_line = line[4].ToLower().Split(charS, 2);
                                                 string nicks = new_line[0].TrimStart(':');
                                                 string[] total_nicks = nicks.Split(',');
-                                                int sent_nick_access = ircbot.get_user_access(new_line[0].TrimStart(':'), line[2]);
+                                                int sent_nick_access = ircbot.get_user_access(total_nicks[0], line[2]);
 
                                                 bool tmp_me = false;
                                                 for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
@@ -757,7 +791,7 @@ namespace IRCBot.Modules
                                                     string nicks = new_line[1];
                                                     string target_host = ircbot.get_user_host(new_line[1]);
                                                     string[] total_nicks = nicks.Split(',');
-                                                    int sent_nick_access = ircbot.get_user_access(new_line[1], line[2]);
+                                                    int sent_nick_access = ircbot.get_user_access(total_nicks[0], line[2]);
 
                                                     bool tmp_me = false;
                                                     for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
@@ -837,7 +871,7 @@ namespace IRCBot.Modules
                                                     string nicks = new_line[1];
                                                     string target_host = ircbot.get_user_host(new_line[1]);
                                                     string[] total_nicks = nicks.Split(',');
-                                                    int sent_nick_access = ircbot.get_user_access(new_line[1], line[2]);
+                                                    int sent_nick_access = ircbot.get_user_access(total_nicks[0], line[2]);
 
                                                     bool tmp_me = false;
                                                     for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
@@ -915,7 +949,7 @@ namespace IRCBot.Modules
                                                 string[] new_line = line[4].ToLower().Split(charS, 2);
                                                 string nicks = new_line[0].TrimStart(':');
                                                 string[] total_nicks = nicks.Split(',');
-                                                int sent_nick_access = ircbot.get_user_access(new_line[0].TrimStart(':'), line[2]);
+                                                int sent_nick_access = ircbot.get_user_access(total_nicks[0], line[2]);
                                                 bool tmp_me = false;
                                                 for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
                                                 {
@@ -975,7 +1009,7 @@ namespace IRCBot.Modules
                                                 string target_host = ircbot.get_user_host(new_line[0]);
                                                 string nicks = new_line[0].TrimStart(':');
                                                 string[] total_nicks = nicks.Split(',');
-                                                int sent_nick_access = ircbot.get_user_access(new_line[0].TrimStart(':'), line[2]);
+                                                int sent_nick_access = ircbot.get_user_access(total_nicks[0], line[2]);
                                                 bool tmp_me = false;
                                                 for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
                                                 {
@@ -1034,7 +1068,7 @@ namespace IRCBot.Modules
                                                 string target_host = ircbot.get_user_host(new_line[0]);
                                                 string nicks = new_line[0].TrimStart(':');
                                                 string[] total_nicks = nicks.Split(',');
-                                                int sent_nick_access = ircbot.get_user_access(new_line[0].TrimStart(':'), line[2]);
+                                                int sent_nick_access = ircbot.get_user_access(total_nicks[0], line[2]);
                                                 bool tmp_me = false;
                                                 for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
                                                 {
@@ -1158,7 +1192,7 @@ namespace IRCBot.Modules
                                                 string[] new_line = line[4].ToLower().Split(charS, 2);
                                                 string nicks = new_line[0].TrimStart(':');
                                                 string[] total_nicks = nicks.Split(',');
-                                                int sent_nick_access = ircbot.get_user_access(new_line[0].TrimStart(':'), line[2]);
+                                                int sent_nick_access = ircbot.get_user_access(total_nicks[0], line[2]);
                                                 bool tmp_me = false;
                                                 for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
                                                 {

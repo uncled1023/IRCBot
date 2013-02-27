@@ -19,6 +19,7 @@ namespace IRCBot
         private string server_name;
         private string server_module_folder;
         private configuration old_configeration;
+        private XmlDocument xmlDocModules = new XmlDocument();
         public add_server(Interface frmctrl, configuration config)
         {
             InitializeComponent();
@@ -31,7 +32,6 @@ namespace IRCBot
             sop_level_box.Text = "8";
             founder_level_box.Text = "9";
             owner_level_box.Text = "10";
-            XmlDocument xmlDocModules = new XmlDocument();
             xmlDocModules.Load(m_parent.cur_dir + "\\config\\Module_Config\\Default\\modules.xml");
             XmlNodeList xnList = xmlDocModules.SelectNodes("/modules/module");
             foreach (XmlNode xnModules in xnList)
@@ -139,8 +139,6 @@ namespace IRCBot
 
                 Directory.CreateDirectory(m_parent.cur_dir + "\\config\\Module_Config\\" + server[1]);
 
-                XmlDocument xmlDocModules = new XmlDocument();
-                xmlDocModules.Load(m_parent.cur_dir + "\\config\\Module_Config\\Default\\modules.xml");
                 XmlNodeList xnList = xmlDocModules.SelectNodes("/modules/module");
                 foreach (XmlNode xn in xnList)
                 {
@@ -151,6 +149,8 @@ namespace IRCBot
                     {
                         CheckBox myCheckboxEnabled = (CheckBox)module_options.Controls.Find("checkBox_" + module_name + "_enabled", true)[0];
                         xn["enabled"].InnerText = myCheckboxEnabled.Checked.ToString();
+                        element_num++;
+                        xn["blacklist"].InnerText = module_options.Controls.Find("textBox_" + module_name + "_blacklist", true)[0].Text;
 
                         element_num++;
                         XmlNodeList optionList = xn.ChildNodes;
@@ -165,12 +165,12 @@ namespace IRCBot
                                     {
                                         case "textbox":
                                             TextBox myTextBox = (TextBox)module_options.Controls.Find("textBox_" + module_name + "_" + options.Name + "_" + element_num.ToString(), true)[0];
-                                            xn["value"].InnerText = myTextBox.Text;
+                                            options["value"].InnerText = myTextBox.Text;
                                             element_num++;
                                             break;
                                         case "checkbox":
                                             CheckBox myCheckbox = (CheckBox)module_options.Controls.Find("checkBox_" + module_name + "_" + options.Name + "_" + element_num.ToString(), true)[0];
-                                            xn["checked"].InnerText = myCheckbox.Checked.ToString();
+                                            options["checked"].InnerText = myCheckbox.Checked.ToString();
                                             element_num++;
                                             break;
                                     }
@@ -259,10 +259,51 @@ namespace IRCBot
 
         private void module_list_SelectedIndexChanged(object sender, EventArgs e)
         {
-            XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.Load(m_parent.cur_dir + "\\config\\Module_Config\\Default\\modules.xml");
-            XmlNodeList xnList = xmlDoc.SelectNodes("/modules/module");
-            foreach (XmlNode xn in xnList)
+            if (module_options.Controls.Count > 0)
+            {
+                XmlNodeList xnList = xmlDocModules.SelectNodes("/modules/module");
+                foreach (XmlNode xn in xnList)
+                {
+                    int element_num = 0;
+                    String module_name = xn["name"].InnerText;
+
+                    if (module_options.Controls.Find("checkBox_" + module_name + "_enabled", true).GetUpperBound(0) >= 0)
+                    {
+                        CheckBox myCheckboxEnabled = (CheckBox)module_options.Controls.Find("checkBox_" + module_name + "_enabled", true)[0];
+                        xn["enabled"].InnerText = myCheckboxEnabled.Checked.ToString();
+                        element_num++;
+                        xn["blacklist"].InnerText = module_options.Controls.Find("textBox_" + module_name + "_blacklist", true)[0].Text;
+
+                        element_num++;
+                        XmlNodeList optionList = xn.ChildNodes;
+                        foreach (XmlNode option in optionList)
+                        {
+                            if (option.Name.Equals("options"))
+                            {
+                                XmlNodeList Options = option.ChildNodes;
+                                foreach (XmlNode options in Options)
+                                {
+                                    switch (options["type"].InnerText)
+                                    {
+                                        case "textbox":
+                                            TextBox myTextBox = (TextBox)module_options.Controls.Find("textBox_" + module_name + "_" + options.Name + "_" + element_num.ToString(), true)[0];
+                                            options["value"].InnerText = myTextBox.Text;
+                                            element_num++;
+                                            break;
+                                        case "checkbox":
+                                            CheckBox myCheckbox = (CheckBox)module_options.Controls.Find("checkBox_" + module_name + "_" + options.Name + "_" + element_num.ToString(), true)[0];
+                                            options["checked"].InnerText = myCheckbox.Checked.ToString();
+                                            element_num++;
+                                            break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            XmlNodeList xnList_2 = xmlDocModules.SelectNodes("/modules/module");
+            foreach (XmlNode xn in xnList_2)
             {
                 int element_num = 0;
                 String module_name = xn["name"].InnerText;
@@ -294,7 +335,29 @@ namespace IRCBot
                     module_options.Controls.Add(myLabelEnabled);
 
                     element_num++;
+
+                    TextBox Blacklist = new TextBox();
+                    Blacklist.Name = "textBox_" + module_name + "_blacklist";
+                    Blacklist.Text = xn["blacklist"].InnerText;
+                    Blacklist.Width = 140;
+                    Blacklist.Height = 20;
+                    Blacklist.Left = 185;
+                    Blacklist.Top = 10 + (element_num * 25);
+                    Blacklist.TabIndex = element_num + 1;
+                    Blacklist.TabStop = true;
+                    module_options.Controls.Add(Blacklist);
+
+                    Label myLabelBlacklist = new Label();
+                    myLabelBlacklist.Name = "label_" + module_name + "_blacklist";
+                    myLabelBlacklist.Text = "Blacklist";
+                    myLabelBlacklist.Width = 180;
+                    myLabelBlacklist.Height = 13;
+                    myLabelBlacklist.Left = 8;
+                    myLabelBlacklist.Top = 13 + (element_num * 25);
+                    module_options.Controls.Add(myLabelBlacklist);
                     XmlNodeList optionList = xn.ChildNodes;
+
+                    element_num++;
                     foreach (XmlNode option in optionList)
                     {
                         if (option.Name.Equals("commands"))

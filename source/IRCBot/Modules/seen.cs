@@ -106,7 +106,7 @@ namespace IRCBot.Modules
                         string[] new_line = line.Split(sep, 4);
                         if (new_line.GetUpperBound(0) > 0)
                         {
-                            if (new_line[0].Equals(nick) && new_line[1].Equals(channel))
+                            if (new_line[0].ToLower().Equals(nick) && new_line[1].Equals(channel))
                             {
                                 DateTime current_date = DateTime.Now;
                                 DateTime past_date = DateTime.Parse(new_line[2]);

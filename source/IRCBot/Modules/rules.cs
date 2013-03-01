@@ -125,13 +125,13 @@ namespace IRCBot.Modules
             if (File.Exists(ircbot.cur_dir + "\\modules\\rules\\" + ircbot.server_name + "_" + tab_name + "_rules.txt"))
             {
                 List<string> rules_file = System.IO.File.ReadAllLines(ircbot.cur_dir + "\\modules\\rules\\" + ircbot.server_name + "_" + tab_name + "_rules.txt").ToList();
-                rules_file.Add(channel + "*" + rule);
+                rules_file.Add(rule);
                 System.IO.File.WriteAllLines(ircbot.cur_dir + "\\modules\\rules\\" + ircbot.server_name + "_" + tab_name + "_rules.txt", rules_file);
             }
             else
             {
                 List<string> rules_file = new List<string>();
-                rules_file.Add(channel + "*" + rule);
+                rules_file.Add(rule);
                 System.IO.File.WriteAllLines(ircbot.cur_dir + "\\modules\\rules\\" + ircbot.server_name + "_" + tab_name + "_rules.txt", rules_file);
             }
             ircbot.sendData("PRIVMSG", channel + " :Rule added successfully");
@@ -152,7 +152,7 @@ namespace IRCBot.Modules
                     foreach (string line in rules_file)
                     {
                         string[] split = line.Split('*');
-                        if (split.GetUpperBound(0) > 0 && channel.Equals(split[0]) && (index + 1) == Convert.ToInt32(rule_num))
+                        if ((index + 1) == Convert.ToInt32(rule_num))
                         {
                             rules_file.RemoveAt(index);
                             rule_found = true;
@@ -193,12 +193,8 @@ namespace IRCBot.Modules
                     int index = 1;
                     foreach (string line in answer_file)
                     {
-                        string[] split = line.Split('*');
-                        if (split.GetUpperBound(0) > 0 && channel.Equals(split[0]))
-                        {
-                            ircbot.sendData("NOTICE", nick + " :Rule " + index + ") " + split[1]);
-                            index++;
-                        }
+                        ircbot.sendData("NOTICE", nick + " :Rule " + index + ") " + line);
+                        index++;
                     }
                     if (index == 1)
                     {

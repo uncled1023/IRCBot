@@ -94,9 +94,9 @@ namespace IRCBot.Modules
             tab_name = Regex.Replace(tab_name, pattern, "_");
             string file_name = ircbot.server_name + "_#" + tab_name + ".log";
             bool nick_found = false;
-            if (File.Exists(ircbot.cur_dir + "\\modules\\seen\\" + file_name))
+            if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "seen" + Path.DirectorySeparatorChar + file_name))
             {
-                string[] log_file = System.IO.File.ReadAllLines(ircbot.cur_dir + "\\modules\\seen\\" + file_name);
+                string[] log_file = System.IO.File.ReadAllLines(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "seen" + Path.DirectorySeparatorChar + file_name);
                 int number_of_lines = log_file.GetUpperBound(0) + 1;
                 if (number_of_lines > 0)
                 {
@@ -204,13 +204,13 @@ namespace IRCBot.Modules
                 {
                     msg = "";
                 }
-                if (Directory.Exists(ircbot.cur_dir + "\\modules\\seen\\") == false)
+                if (Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "seen" + Path.DirectorySeparatorChar + "") == false)
                 {
-                    Directory.CreateDirectory(ircbot.cur_dir + "\\modules\\seen");
+                    Directory.CreateDirectory(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "seen");
                 }
-                if (File.Exists(ircbot.cur_dir + "\\modules\\seen\\" + file_name))
+                if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "seen" + Path.DirectorySeparatorChar + file_name))
                 {
-                    string[] log_file = System.IO.File.ReadAllLines(ircbot.cur_dir + "\\modules\\seen\\" + file_name);
+                    string[] log_file = System.IO.File.ReadAllLines(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "seen" + Path.DirectorySeparatorChar + file_name);
                     int number_of_lines = log_file.GetUpperBound(0) + 1;
                     List<string> new_file = new List<string>();
                     bool nick_found = false;
@@ -235,25 +235,25 @@ namespace IRCBot.Modules
                         }
                         if (nick_found == false)
                         {
-                            StreamWriter log = File.AppendText(ircbot.cur_dir + "\\modules\\seen\\" + file_name);
+                            StreamWriter log = File.AppendText(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "seen" + Path.DirectorySeparatorChar + file_name);
                             log.WriteLine(nick + "*" + channel + "*" + current_date.ToString("yyyy-MM-dd HH:mm:ss") + "*" + msg);
                             log.Close();
                         }
                         else
                         {
-                            System.IO.File.WriteAllLines(ircbot.cur_dir + "\\modules\\seen\\" + file_name, new_file);
+                            System.IO.File.WriteAllLines(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "seen" + Path.DirectorySeparatorChar + file_name, new_file);
                         }
                     }
                     else
                     {
-                        StreamWriter log = File.AppendText(ircbot.cur_dir + "\\modules\\seen\\" + file_name);
+                        StreamWriter log = File.AppendText(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "seen" + Path.DirectorySeparatorChar + file_name);
                         log.WriteLine(nick + "*" + channel + "*" + current_date.ToString("yyyy-MM-dd HH:mm:ss") + "*" + msg);
                         log.Close();
                     }
                 }
                 else
                 {
-                    StreamWriter log_file = File.CreateText(ircbot.cur_dir + "\\modules\\seen\\" + file_name);
+                    StreamWriter log_file = File.CreateText(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "seen" + Path.DirectorySeparatorChar + file_name);
                     log_file.WriteLine(nick + "*" + channel + "*" + current_date.ToString("yyyy-MM-dd HH:mm:ss") + "*" + msg);
                     log_file.Close();
                 }

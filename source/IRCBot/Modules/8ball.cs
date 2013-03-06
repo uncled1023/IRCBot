@@ -84,9 +84,9 @@ namespace IRCBot.Modules
 
         private void get_answer(string channel, bot ircbot)
         {
-            if (File.Exists(ircbot.cur_dir + "\\modules\\8ball\\answers.txt"))
+            if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "8ball" + Path.DirectorySeparatorChar + "answers.txt"))
             {
-                string[] answer_file = System.IO.File.ReadAllLines(ircbot.cur_dir + "\\modules\\8ball\\answers.txt");
+                string[] answer_file = System.IO.File.ReadAllLines(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "8ball" + Path.DirectorySeparatorChar + "answers.txt");
                 int number_of_lines = answer_file.GetUpperBound(0) + 1;
                 if (number_of_lines > 0)
                 {

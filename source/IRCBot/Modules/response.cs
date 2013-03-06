@@ -63,20 +63,20 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                string list_file = ircbot.cur_dir + "\\modules\\Response\\dictionary.txt";
-                                                if (Directory.Exists(ircbot.cur_dir + "\\modules\\Response\\") == false)
+                                                string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "Response" + Path.DirectorySeparatorChar + "dictionary.txt";
+                                                if (Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "Response" + Path.DirectorySeparatorChar + "") == false)
                                                 {
-                                                    Directory.CreateDirectory(ircbot.cur_dir + "\\modules\\Response");
+                                                    Directory.CreateDirectory(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "Response");
                                                 }
-                                                if (File.Exists(ircbot.cur_dir + "\\modules\\Response\\dictionary.txt"))
+                                                if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "Response" + Path.DirectorySeparatorChar + "dictionary.txt"))
                                                 {
-                                                    StreamWriter log = File.AppendText(ircbot.cur_dir + "\\modules\\Response\\dictionary.txt");
+                                                    StreamWriter log = File.AppendText(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "Response" + Path.DirectorySeparatorChar + "dictionary.txt");
                                                     log.WriteLine(line[4]);
                                                     log.Close();
                                                 }
                                                 else
                                                 {
-                                                    StreamWriter log_file = File.CreateText(ircbot.cur_dir + "\\modules\\Response\\dictionary.txt");
+                                                    StreamWriter log_file = File.CreateText(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "Response" + Path.DirectorySeparatorChar + "dictionary.txt");
                                                     log_file.WriteLine(line[4]);
                                                     log_file.Close();
                                                 }
@@ -105,7 +105,7 @@ namespace IRCBot.Modules
                     try
                     {
                         string[] file;
-                        string list_file = ircbot.cur_dir + "\\modules\\Response\\dictionary.txt";
+                        string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "Response" + Path.DirectorySeparatorChar + "dictionary.txt";
                         if (File.Exists(list_file))
                         {
                             file = System.IO.File.ReadAllLines(list_file);

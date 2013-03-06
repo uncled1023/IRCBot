@@ -23,9 +23,9 @@ namespace IRCBot
             m_parent = frmctrl;
 
             XmlDocument xmlDoc = new XmlDocument();
-            if (File.Exists(m_parent.cur_dir + "\\config\\config.xml"))
+            if (File.Exists(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml"))
             {
-                xmlDoc.Load(m_parent.cur_dir + "\\config\\config.xml");
+                xmlDoc.Load(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
             }
             else
             {
@@ -37,7 +37,7 @@ namespace IRCBot
                 nodeKeep.InnerText = "True";
                 node.AppendChild(nodeKeep);
                 XmlNode nodeLogs = xmlDoc.CreateElement("logs_path");
-                nodeLogs.InnerText = m_parent.cur_dir + "\\logs\\";
+                nodeLogs.InnerText = m_parent.cur_dir + Path.DirectorySeparatorChar + "logs" + Path.DirectorySeparatorChar + "";
                 node.AppendChild(nodeLogs);
                 XmlNode nodeStart = xmlDoc.CreateElement("start_with_windows");
                 nodeStart.InnerText = "False";
@@ -58,8 +58,8 @@ namespace IRCBot
                 nodeSpamMaxMsgLength.InnerText = "450";
                 node.AppendChild(nodeSpamMaxMsgLength);
                 xmlDoc.AppendChild(node);
-                xmlDoc.Save(m_parent.cur_dir + "\\config\\config.xml");
-                xmlDoc.Load(m_parent.cur_dir + "\\config\\config.xml");
+                xmlDoc.Save(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
+                xmlDoc.Load(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
             }
             XmlNode list = xmlDoc.SelectSingleNode("/bot_settings/global_settings");
 
@@ -123,7 +123,7 @@ namespace IRCBot
         private void button2_Click(object sender, EventArgs e)
         {
             XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.Load(m_parent.cur_dir + "\\config\\config.xml");
+            xmlDoc.Load(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
             XmlNode node = xmlDoc.SelectSingleNode("/bot_settings/global_settings");
             node["command_prefix"].InnerText = command_prefix_box.Text;
             node["keep_logs"].InnerText = keep_logs_box.Checked.ToString();
@@ -135,9 +135,9 @@ namespace IRCBot
             node["spam_timeout"].InnerText = spam_timeout_box.Text;
             node["max_message_length"].InnerText = max_message_length_box.Text;
 
-            xmlDoc.Save(m_parent.cur_dir + "\\config\\config.xml");
+            xmlDoc.Save(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
 
-            RegistryKey rkApp = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+            RegistryKey rkApp = Registry.CurrentUser.OpenSubKey("SOFTWARE" + Path.DirectorySeparatorChar + "Microsoft" + Path.DirectorySeparatorChar + "Windows" + Path.DirectorySeparatorChar + "CurrentVersion" + Path.DirectorySeparatorChar + "Run", true);
             if (windows_start_box.Checked.ToString() == "True")
             {
                 rkApp.SetValue("IRCBot", Application.ExecutablePath.ToString());
@@ -197,7 +197,7 @@ namespace IRCBot
             server_list.SelectedIndexChanged -= server_changed;
             string server_name = server_list.SelectedItem.ToString();
             XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.Load(m_parent.cur_dir + "\\config\\config.xml");
+            xmlDoc.Load(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
             XmlNodeList ServerxnList = xmlDoc.SelectNodes("/bot_settings/server_list/server");
             foreach (XmlNode xn in ServerxnList)
             {
@@ -205,11 +205,11 @@ namespace IRCBot
                 if (tmp_server.Equals(server_name))
                 {
                     xn.ParentNode.RemoveChild(xn);
-                    Directory.Delete(m_parent.cur_dir + "\\config\\Module_Config\\" + xn["server_folder"].InnerText, true);
+                    Directory.Delete(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + xn["server_folder"].InnerText, true);
                     break;
                 }
             }
-            xmlDoc.Save(m_parent.cur_dir + "\\config\\config.xml");
+            xmlDoc.Save(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
             server_list.Items.RemoveAt(server_list.SelectedIndex);
             m_parent.update_conf();
             server_list.SelectedIndexChanged += server_changed;

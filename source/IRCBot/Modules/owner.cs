@@ -727,9 +727,9 @@ namespace IRCBot.Modules
         private void add_owner(string nick, bot ircbot, ref IRCConfig conf)
         {
             XmlDocument xmlDoc = new XmlDocument();
-            if (File.Exists(ircbot.cur_dir + "\\config\\config.xml"))
+            if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml"))
             {
-                xmlDoc.Load(ircbot.cur_dir + "\\config\\config.xml");
+                xmlDoc.Load(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
                 XmlNodeList ServerxnList = xmlDoc.SelectNodes("/bot_settings/connection_settings/server_list/server");
                 foreach (XmlNode xn in ServerxnList)
                 {
@@ -741,7 +741,7 @@ namespace IRCBot.Modules
                         break;
                     }
                 }
-                xmlDoc.Save(ircbot.cur_dir + "\\config\\config.xml");
+                xmlDoc.Save(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
                 conf.owner += "," + nick;
             }
         }
@@ -750,9 +750,9 @@ namespace IRCBot.Modules
         {
             XmlDocument xmlDoc = new XmlDocument();
             string new_owner = "";
-            if (File.Exists(ircbot.cur_dir + "\\config\\config.xml"))
+            if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml"))
             {
-                xmlDoc.Load(ircbot.cur_dir + "\\config\\config.xml");
+                xmlDoc.Load(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
                 XmlNodeList ServerxnList = xmlDoc.SelectNodes("/bot_settings/connection_settings/server_list/server");
                 foreach (XmlNode xn in ServerxnList)
                 {
@@ -774,7 +774,7 @@ namespace IRCBot.Modules
                         break;
                     }
                 }
-                xmlDoc.Save(ircbot.cur_dir + "\\config\\config.xml");
+                xmlDoc.Save(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
                 conf.owner = new_owner.TrimEnd(',');
             }
         }

@@ -1271,7 +1271,7 @@ namespace IRCBot.Modules
 
         public void check_auto(string nick, string channel, string hostname, bot ircbot)
         {
-            string list_file = ircbot.cur_dir + "\\modules\\auto_kb\\" + ircbot.server_name + "_list.txt";
+            string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "auto_kb" + Path.DirectorySeparatorChar + ircbot.server_name + "_list.txt";
             if (File.Exists(list_file))
             {
                 int counter = 0;
@@ -1335,7 +1335,7 @@ namespace IRCBot.Modules
 
         private void add_auto(string nick, string channel, string hostname, string type, string reason, bot ircbot)
         {
-            string list_file = ircbot.cur_dir + "\\modules\\auto_kb\\" + ircbot.server_name + "_list.txt";
+            string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "auto_kb" + Path.DirectorySeparatorChar + ircbot.server_name + "_list.txt";
             string add_line = nick + "*" + hostname + "*" + channel + "*" + type + "*" + reason + "*" + DateTime.Now.ToString("MMMM d, yyyy h:mm:ss tt");
             bool found_nick = false;
             if (File.Exists(list_file))
@@ -1392,7 +1392,7 @@ namespace IRCBot.Modules
 
         private void del_auto(string nick, string channel, string hostname, string type, bot ircbot)
         {
-            string list_file = ircbot.cur_dir + "\\modules\\auto_kb\\" + ircbot.server_name + "_list.txt";
+            string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "auto_kb" + Path.DirectorySeparatorChar + ircbot.server_name + "_list.txt";
             bool found_nick = false;
             if (File.Exists(list_file))
             {

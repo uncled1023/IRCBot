@@ -223,9 +223,9 @@ namespace IRCBot.Modules
         {
             string file_name = ircbot.server_name + "_list.txt";
 
-            if (File.Exists(ircbot.cur_dir + "\\modules\\access\\" + file_name))
+            if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "access" + Path.DirectorySeparatorChar + file_name))
             {
-                string[] log_file = System.IO.File.ReadAllLines(ircbot.cur_dir + "\\modules\\access\\" + file_name);
+                string[] log_file = System.IO.File.ReadAllLines(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "access" + Path.DirectorySeparatorChar + file_name);
                 int number_of_lines = log_file.GetUpperBound(0) + 1;
                 if (number_of_lines > 0)
                 {
@@ -268,13 +268,13 @@ namespace IRCBot.Modules
             string file_name = ircbot.server_name + "_list.txt";
             DateTime current_date = DateTime.Now;
 
-            if (Directory.Exists(ircbot.cur_dir + "\\modules\\access\\") == false)
+            if (Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "access" + Path.DirectorySeparatorChar + "") == false)
             {
-                Directory.CreateDirectory(ircbot.cur_dir + "\\modules\\access");
+                Directory.CreateDirectory(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "access");
             }
-            if (File.Exists(ircbot.cur_dir + "\\modules\\access\\" + file_name))
+            if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "access" + Path.DirectorySeparatorChar + file_name))
             {
-                string[] log_file = System.IO.File.ReadAllLines(ircbot.cur_dir + "\\modules\\access\\" + file_name);
+                string[] log_file = System.IO.File.ReadAllLines(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "access" + Path.DirectorySeparatorChar + file_name);
                 int number_of_lines = log_file.GetUpperBound(0) + 1;
                 List<string> new_file = new List<string>();
                 int index = 0;
@@ -320,25 +320,25 @@ namespace IRCBot.Modules
                     }
                     if (nick_found == false)
                     {
-                        StreamWriter log = File.AppendText(ircbot.cur_dir + "\\modules\\access\\" + file_name);
+                        StreamWriter log = File.AppendText(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "access" + Path.DirectorySeparatorChar + file_name);
                         log.WriteLine(nick.Trim() + "*" + channel + "*" + access.Trim());
                         log.Close();
                     }
                     else
                     {
-                        System.IO.File.WriteAllLines(ircbot.cur_dir + "\\modules\\access\\" + file_name, new_file);
+                        System.IO.File.WriteAllLines(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "access" + Path.DirectorySeparatorChar + file_name, new_file);
                     }
                 }
                 else
                 {
-                    StreamWriter log = File.AppendText(ircbot.cur_dir + "\\modules\\access\\" + file_name);
+                    StreamWriter log = File.AppendText(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "access" + Path.DirectorySeparatorChar + file_name);
                     log.WriteLine(nick.Trim() + "*" + channel + "*" + access.Trim());
                     log.Close();
                 }
             }
             else
             {
-                StreamWriter log_file = File.CreateText(ircbot.cur_dir + "\\modules\\access\\" + file_name);
+                StreamWriter log_file = File.CreateText(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "access" + Path.DirectorySeparatorChar + file_name);
                 log_file.WriteLine(nick.Trim() + "*" + channel + "*" + access.Trim());
                 log_file.Close();
             }
@@ -371,9 +371,9 @@ namespace IRCBot.Modules
             string file_name = ircbot.server_name + "_list.txt";
             string access = "";
 
-            if (File.Exists(ircbot.cur_dir + "\\modules\\access\\" + file_name))
+            if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "access" + Path.DirectorySeparatorChar + file_name))
             {
-                string[] log_file = System.IO.File.ReadAllLines(ircbot.cur_dir + "\\modules\\access\\" + file_name);
+                string[] log_file = System.IO.File.ReadAllLines(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "access" + Path.DirectorySeparatorChar + file_name);
                 int number_of_lines = log_file.GetUpperBound(0) + 1;
                 if (number_of_lines > 0)
                 {
@@ -400,13 +400,13 @@ namespace IRCBot.Modules
             string file_name = ircbot.server_name + "_list.txt";
             DateTime current_date = DateTime.Now;
 
-            if (Directory.Exists(ircbot.cur_dir + "\\modules\\access\\") == false)
+            if (Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "access" + Path.DirectorySeparatorChar + "") == false)
             {
-                Directory.CreateDirectory(ircbot.cur_dir + "\\modules\\access");
+                Directory.CreateDirectory(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "access");
             }
-            if (File.Exists(ircbot.cur_dir + "\\modules\\access\\" + file_name))
+            if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "access" + Path.DirectorySeparatorChar + file_name))
             {
-                string[] log_file = System.IO.File.ReadAllLines(ircbot.cur_dir + "\\modules\\access\\" + file_name);
+                string[] log_file = System.IO.File.ReadAllLines(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "access" + Path.DirectorySeparatorChar + file_name);
                 int number_of_lines = log_file.GetUpperBound(0) + 1;
                 List<string> new_file = new List<string>();
                 if (number_of_lines > 0)
@@ -442,7 +442,7 @@ namespace IRCBot.Modules
                             }
                         }
                     }
-                    System.IO.File.WriteAllLines(ircbot.cur_dir + "\\modules\\access\\" + file_name, new_file);
+                    System.IO.File.WriteAllLines(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "access" + Path.DirectorySeparatorChar + file_name, new_file);
                 }
             }
 

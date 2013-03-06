@@ -104,7 +104,7 @@ namespace IRCBot.Modules
 
         public void check_intro(string nick, string channel, bot ircbot)
         {
-            string list_file = ircbot.cur_dir + "\\modules\\intro\\" + ircbot.server_name + "_list.txt";
+            string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "intro" + Path.DirectorySeparatorChar + ircbot.server_name + "_list.txt";
             if (File.Exists(list_file))
             {
                 string line;
@@ -130,7 +130,7 @@ namespace IRCBot.Modules
 
         private void add_intro(string nick, string channel, string[] line, bot ircbot)
         {
-            string list_file = ircbot.cur_dir + "\\modules\\intro\\" + ircbot.server_name + "_list.txt";
+            string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "intro" + Path.DirectorySeparatorChar + ircbot.server_name + "_list.txt";
             string add_line = nick + ":" + channel + ":";
             bool found_nick = false;
             if (line.GetUpperBound(0) > 3)
@@ -173,7 +173,7 @@ namespace IRCBot.Modules
 
         private void delete_intro(string nick, string channel, bot ircbot)
         {
-            string list_file = ircbot.cur_dir + "\\modules\\intro\\" + ircbot.server_name + "_list.txt";
+            string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "intro" + Path.DirectorySeparatorChar + ircbot.server_name + "_list.txt";
             if (File.Exists(list_file))
             {
                 string[] old_file = System.IO.File.ReadAllLines(list_file);

@@ -100,11 +100,11 @@ namespace IRCBot.Modules
             string pattern = "[^a-zA-Z0-9]"; //regex pattern
             string new_tab_name = Regex.Replace(tab_name, pattern, "_");
             string file_name = ircbot.server_name + "_#" + new_tab_name + ".log";
-            if (Directory.Exists(ircbot.cur_dir + "\\modules\\quotes\\logs") == false)
+            if (Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "quotes" + Path.DirectorySeparatorChar + "logs") == false)
             {
-                Directory.CreateDirectory(ircbot.cur_dir + "\\modules\\quotes\\logs");
+                Directory.CreateDirectory(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "quotes" + Path.DirectorySeparatorChar + "logs");
             }
-            StreamWriter log_file = File.AppendText(ircbot.cur_dir + "\\modules\\quotes\\logs\\" + file_name);
+            StreamWriter log_file = File.AppendText(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "quotes" + Path.DirectorySeparatorChar + "logs" + Path.DirectorySeparatorChar + file_name);
             if (line.GetUpperBound(0) > 3)
             {
                 log_file.WriteLine(nick + "*" + line[3].Remove(0, 1) + " " + line[4]);
@@ -122,9 +122,9 @@ namespace IRCBot.Modules
             string pattern = "[^a-zA-Z0-9]"; //regex pattern
             tab_name = Regex.Replace(tab_name, pattern, "_");
             string file_name = ircbot.server_name + "_#" + tab_name + ".log";
-            if (File.Exists(ircbot.cur_dir + "\\modules\\quotes\\logs\\" + file_name))
+            if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "quotes" + Path.DirectorySeparatorChar + "logs" + Path.DirectorySeparatorChar + file_name))
             {
-                string[] log_file = System.IO.File.ReadAllLines(ircbot.cur_dir + "\\modules\\quotes\\logs\\" + file_name);
+                string[] log_file = System.IO.File.ReadAllLines(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "quotes" + Path.DirectorySeparatorChar + "logs" + Path.DirectorySeparatorChar + file_name);
                 int number_of_lines = log_file.GetUpperBound(0) + 1;
                 if (number_of_lines > 0)
                 {
@@ -156,9 +156,9 @@ namespace IRCBot.Modules
             string pattern = "[^a-zA-Z0-9]"; //regex pattern
             tab_name = Regex.Replace(tab_name, pattern, "_");
             string file_name = ircbot.server_name + "_#" + tab_name + ".log";
-            if (File.Exists(ircbot.cur_dir + "\\modules\\quotes\\logs\\" + file_name))
+            if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "quotes" + Path.DirectorySeparatorChar + "logs" + Path.DirectorySeparatorChar + file_name))
             {
-                string[] log_file = System.IO.File.ReadAllLines(ircbot.cur_dir + "\\modules\\quotes\\logs\\" + file_name);
+                string[] log_file = System.IO.File.ReadAllLines(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "quotes" + Path.DirectorySeparatorChar + "logs" + Path.DirectorySeparatorChar + file_name);
                 int number_of_lines = log_file.GetUpperBound(0) + 1;
                 if (number_of_lines > 0)
                 {

@@ -122,9 +122,9 @@ namespace IRCBot.Modules
                                             {
                                                 if (nick.Equals(survey.nick) && survey.user_submission == false)
                                                 {
-                                                    if (Directory.Exists(ircbot.cur_dir + "\\modules\\survey\\surveys\\"))
+                                                    if (Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + ""))
                                                     {
-                                                        FileInfo fi = new FileInfo(ircbot.cur_dir + "\\modules\\survey\\surveys\\");
+                                                        FileInfo fi = new FileInfo(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + "");
                                                         DirectoryInfo di = fi.Directory;
                                                         FileSystemInfo[] fsi = di.GetFiles();
                                                         if (fsi.GetUpperBound(0) >= 0 && fsi.GetUpperBound(0) >= survey.survey_number)
@@ -171,9 +171,9 @@ namespace IRCBot.Modules
                                             {
                                                 if (nick.Equals(survey.nick) && survey.user_submission == false)
                                                 {
-                                                    if (Directory.Exists(ircbot.cur_dir + "\\modules\\survey\\surveys\\"))
+                                                    if (Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + ""))
                                                     {
-                                                        FileInfo fi = new FileInfo(ircbot.cur_dir + "\\modules\\survey\\surveys\\");
+                                                        FileInfo fi = new FileInfo(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + "");
                                                         DirectoryInfo di = fi.Directory;
                                                         FileSystemInfo[] fsi = di.GetFiles();
                                                         if (fsi.GetUpperBound(0) >= 0 && fsi.GetUpperBound(0) >= survey.survey_number)
@@ -199,9 +199,9 @@ namespace IRCBot.Modules
                                                 }
                                                 else if(nick.Equals(survey.nick) && survey.user_submission == true)
                                                 {
-                                                    if (Directory.Exists(ircbot.cur_dir + "\\modules\\survey\\answers\\" + survey.name + "\\" + nick))
+                                                    if (Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "answers" + Path.DirectorySeparatorChar + survey.name + Path.DirectorySeparatorChar + nick))
                                                     {
-                                                        Directory.Delete(ircbot.cur_dir + "\\modules\\survey\\answers\\" + survey.name + "\\" + nick, true);
+                                                        Directory.Delete(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "answers" + Path.DirectorySeparatorChar + survey.name + Path.DirectorySeparatorChar + nick, true);
                                                         active_surveys.RemoveAt(index);
                                                     }
                                                     else
@@ -428,19 +428,19 @@ namespace IRCBot.Modules
                         }
                         if (survey.user_submission == true)
                         {
-                            if (!Directory.Exists(ircbot.cur_dir + "\\modules\\survey\\answers\\" + survey.name + "\\" + survey.nick + "\\"))
+                            if (!Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "answers" + Path.DirectorySeparatorChar + survey.name + Path.DirectorySeparatorChar + survey.nick + Path.DirectorySeparatorChar + ""))
                             {
-                                Directory.CreateDirectory(ircbot.cur_dir + "\\modules\\survey\\answers\\" + survey.name + "\\" + survey.nick + "\\");
+                                Directory.CreateDirectory(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "answers" + Path.DirectorySeparatorChar + survey.name + Path.DirectorySeparatorChar + survey.nick + Path.DirectorySeparatorChar + "");
                             }
-                            File.AppendAllText(ircbot.cur_dir + "\\modules\\survey\\answers\\" + survey.name + "\\" + survey.nick + " \\" + survey.current_question + ".txt", answer);
+                            File.AppendAllText(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "answers" + Path.DirectorySeparatorChar + survey.name + Path.DirectorySeparatorChar + survey.nick + " " + Path.DirectorySeparatorChar + survey.current_question + ".txt", answer);
                         }
                         else
                         {
-                            if (!Directory.Exists(ircbot.cur_dir + "\\modules\\survey\\surveys\\"))
+                            if (!Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + ""))
                             {
-                                Directory.CreateDirectory(ircbot.cur_dir + "\\modules\\survey\\surveys\\");
+                                Directory.CreateDirectory(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + "");
                             }
-                            File.AppendAllText(ircbot.cur_dir + "\\modules\\survey\\surveys\\" + survey.name + ".txt", answer);
+                            File.AppendAllText(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + survey.name + ".txt", answer);
                         }
                         break;
                     }
@@ -455,9 +455,9 @@ namespace IRCBot.Modules
             {
                 if (requested_nick == null)
                 {
-                    if (Directory.Exists(ircbot.cur_dir + "\\modules\\survey\\surveys\\"))
+                    if (Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + ""))
                     {
-                        FileInfo fi = new FileInfo(ircbot.cur_dir + "\\modules\\survey\\surveys\\");
+                        FileInfo fi = new FileInfo(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + "");
                         DirectoryInfo di = fi.Directory;
                         FileSystemInfo[] fsi = di.GetFiles();
                         if (fsi.GetUpperBound(0) >= 0 && fsi.GetUpperBound(0) >= survey_num)
@@ -478,13 +478,13 @@ namespace IRCBot.Modules
                                 if (survey_owner == true)
                                 {
                                     survey_found = true;
-                                    if (Directory.Exists(ircbot.cur_dir + "\\modules\\survey\\answers\\" + fsi[survey_num].Name.Substring(0, fsi[survey_num].Name.Length - 4) + "\\"))
+                                    if (Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "answers" + Path.DirectorySeparatorChar + fsi[survey_num].Name.Substring(0, fsi[survey_num].Name.Length - 4) + Path.DirectorySeparatorChar + ""))
                                     {
                                         ircbot.sendData("NOTICE", nick + " :The following nicks have completed or are taking your survey, \"" + questions[1] + "\":");
                                         string nicks = "";
-                                        foreach (string dir in Directory.GetDirectories(ircbot.cur_dir + "\\modules\\survey\\answers\\" + fsi[survey_num].Name.Substring(0, fsi[survey_num].Name.Length - 4) + "\\"))
+                                        foreach (string dir in Directory.GetDirectories(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "answers" + Path.DirectorySeparatorChar + fsi[survey_num].Name.Substring(0, fsi[survey_num].Name.Length - 4) + Path.DirectorySeparatorChar + ""))
                                         {
-                                            nicks += "," + dir.Replace(ircbot.cur_dir + "\\modules\\survey\\answers\\" + fsi[survey_num].Name.Substring(0, fsi[survey_num].Name.Length - 4) + "\\", "");
+                                            nicks += "," + dir.Replace(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "answers" + Path.DirectorySeparatorChar + fsi[survey_num].Name.Substring(0, fsi[survey_num].Name.Length - 4) + Path.DirectorySeparatorChar + "", "");
                                         }
                                         ircbot.sendData("NOTICE", nick + " :" + nicks.TrimStart(','));
                                     }
@@ -500,9 +500,9 @@ namespace IRCBot.Modules
                 }
                 else
                 {
-                    if (Directory.Exists(ircbot.cur_dir + "\\modules\\survey\\surveys\\"))
+                    if (Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + ""))
                     {
-                        FileInfo fi = new FileInfo(ircbot.cur_dir + "\\modules\\survey\\surveys\\");
+                        FileInfo fi = new FileInfo(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + "");
                         DirectoryInfo di = fi.Directory;
                         FileSystemInfo[] fsi = di.GetFiles();
                         if (fsi.GetUpperBound(0) >= 0 && fsi.GetUpperBound(0) >= survey_num)
@@ -523,10 +523,10 @@ namespace IRCBot.Modules
                                 if (survey_owner == true)
                                 {
                                     survey_found = true;
-                                    if (Directory.Exists(ircbot.cur_dir + "\\modules\\survey\\answers\\" + fsi[survey_num].Name.Substring(0, fsi[survey_num].Name.Length - 4) + "\\" + requested_nick + "\\"))
+                                    if (Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "answers" + Path.DirectorySeparatorChar + fsi[survey_num].Name.Substring(0, fsi[survey_num].Name.Length - 4) + Path.DirectorySeparatorChar + requested_nick + Path.DirectorySeparatorChar + ""))
                                     {
                                         ircbot.sendData("PRIVMSG", nick + " :" + nick + " has supplied the following answers for your survey, \"" + questions[1] + "\":");
-                                        string[] answers = Directory.GetFiles(ircbot.cur_dir + "\\modules\\survey\\answers\\" + fsi[survey_num].Name.Substring(0, fsi[survey_num].Name.Length - 4) + "\\" + requested_nick + "\\");
+                                        string[] answers = Directory.GetFiles(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "answers" + Path.DirectorySeparatorChar + fsi[survey_num].Name.Substring(0, fsi[survey_num].Name.Length - 4) + Path.DirectorySeparatorChar + requested_nick + Path.DirectorySeparatorChar + "");
                                         int question_num = 0;
                                         for (int x = 3; x <= questions.GetUpperBound(0); x++)
                                         {
@@ -555,9 +555,9 @@ namespace IRCBot.Modules
             }
             else
             {
-                if (Directory.Exists(ircbot.cur_dir + "\\modules\\survey\\surveys\\"))
+                if (Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + ""))
                 {
-                    FileInfo fi = new FileInfo(ircbot.cur_dir + "\\modules\\survey\\surveys\\");
+                    FileInfo fi = new FileInfo(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + "");
                     DirectoryInfo di = fi.Directory;
                     FileSystemInfo[] fsi = di.GetFiles();
                     int file_number = 1;
@@ -587,9 +587,9 @@ namespace IRCBot.Modules
         private void add_survey_owner(int survey_num, string nick, string add_owner, bot ircbot, IRCConfig conf)
         {
             bool survey_found = false;
-            if (Directory.Exists(ircbot.cur_dir + "\\modules\\survey\\surveys\\"))
+            if (Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + ""))
             {
-                FileInfo fi = new FileInfo(ircbot.cur_dir + "\\modules\\survey\\surveys\\");
+                FileInfo fi = new FileInfo(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + "");
                 DirectoryInfo di = fi.Directory;
                 FileSystemInfo[] fsi = di.GetFiles();
                 if (fsi.GetUpperBound(0) >= 0 && fsi.GetUpperBound(0) >= survey_num)
@@ -635,9 +635,9 @@ namespace IRCBot.Modules
         private void del_survey_owner(int survey_num, string nick, string del_owner, bot ircbot, IRCConfig conf)
         {
             bool survey_found = false;
-            if (Directory.Exists(ircbot.cur_dir + "\\modules\\survey\\surveys\\"))
+            if (Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + ""))
             {
-                FileInfo fi = new FileInfo(ircbot.cur_dir + "\\modules\\survey\\surveys\\");
+                FileInfo fi = new FileInfo(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + "");
                 DirectoryInfo di = fi.Directory;
                 FileSystemInfo[] fsi = di.GetFiles();
                 if (fsi.GetUpperBound(0) >= 0 && fsi.GetUpperBound(0) >= survey_num)
@@ -719,17 +719,17 @@ namespace IRCBot.Modules
             }
             if (survey_found == false)
             {
-                if (!Directory.Exists(ircbot.cur_dir + "\\modules\\survey\\surveys\\"))
+                if (!Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + ""))
                 {
-                    Directory.CreateDirectory(ircbot.cur_dir + "\\modules\\survey\\surveys\\");
+                    Directory.CreateDirectory(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + "");
                 }
 
-                FileInfo fi = new FileInfo(ircbot.cur_dir + "\\modules\\survey\\surveys\\");
+                FileInfo fi = new FileInfo(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + "");
                 DirectoryInfo di = fi.Directory;
                 FileSystemInfo[] fsi = di.GetFiles();
-                File.AppendAllText(ircbot.cur_dir + "\\modules\\survey\\surveys\\" + "survey_" + (fsi.GetUpperBound(0) + 1).ToString() + ".txt", survey_access.ToString() + Environment.NewLine);
-                File.AppendAllText(ircbot.cur_dir + "\\modules\\survey\\surveys\\" + "survey_" + (fsi.GetUpperBound(0) + 1).ToString() + ".txt", survey_name + Environment.NewLine);
-                File.AppendAllText(ircbot.cur_dir + "\\modules\\survey\\surveys\\" + "survey_" + (fsi.GetUpperBound(0) + 1).ToString() + ".txt", nick + Environment.NewLine);
+                File.AppendAllText(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + "survey_" + (fsi.GetUpperBound(0) + 1).ToString() + ".txt", survey_access.ToString() + Environment.NewLine);
+                File.AppendAllText(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + "survey_" + (fsi.GetUpperBound(0) + 1).ToString() + ".txt", survey_name + Environment.NewLine);
+                File.AppendAllText(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + "survey_" + (fsi.GetUpperBound(0) + 1).ToString() + ".txt", nick + Environment.NewLine);
 
                 survey_info tmp_info = new survey_info();
                 tmp_info.name = "survey_" + (fsi.GetUpperBound(0) + 1).ToString();
@@ -767,14 +767,14 @@ namespace IRCBot.Modules
                 }
             }
 
-            if (Directory.Exists(ircbot.cur_dir + "\\modules\\survey\\surveys\\"))
+            if (Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + ""))
             {
-                FileInfo fi = new FileInfo(ircbot.cur_dir + "\\modules\\survey\\surveys\\");
+                FileInfo fi = new FileInfo(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + "");
                 DirectoryInfo di = fi.Directory;
                 FileSystemInfo[] fsi = di.GetFiles();
                 if (fsi.GetUpperBound(0) >= 0 && fsi.GetUpperBound(0) >= survey_num)
                 {
-                    Directory.Delete(ircbot.cur_dir + "\\modules\\survey\\answers\\" + fsi[survey_num].Name.Substring(0, fsi[survey_num].Name.Length - 4) + "\\", true);
+                    Directory.Delete(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "answers" + Path.DirectorySeparatorChar + fsi[survey_num].Name.Substring(0, fsi[survey_num].Name.Length - 4) + Path.DirectorySeparatorChar + "", true);
                     File.Delete(fsi[survey_num].FullName);
                     ircbot.sendData("NOTICE", nick + " :Survey deleted successfully");
                 }
@@ -795,11 +795,11 @@ namespace IRCBot.Modules
                 if (nick.Equals(tmp_survey.nick))
                 {
                     survey_info this_survey = active_surveys[cur_survey];
-                    FileInfo fi = new FileInfo(ircbot.cur_dir + "\\modules\\survey\\surveys\\");
+                    FileInfo fi = new FileInfo(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + "");
                     DirectoryInfo di = fi.Directory;
                     FileSystemInfo[] fsi = di.GetFiles();
                     bool survey_found = false;
-                    if (Directory.Exists(ircbot.cur_dir + "\\modules\\survey\\surveys\\"))
+                    if (Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + ""))
                     {
                         if (fsi.GetUpperBound(0) >= 0 && fsi.GetUpperBound(0) >= tmp_survey.survey_number)
                         {
@@ -813,19 +813,19 @@ namespace IRCBot.Modules
                                     active_surveys[cur_survey] = this_survey;
                                     if (questions.GetUpperBound(0) > this_survey.current_question + 1)
                                     {
-                                        if (!Directory.Exists(ircbot.cur_dir + "\\modules\\survey\\answers\\" + tmp_survey.name + "\\" + tmp_survey.nick + "\\"))
+                                        if (!Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "answers" + Path.DirectorySeparatorChar + tmp_survey.name + Path.DirectorySeparatorChar + tmp_survey.nick + Path.DirectorySeparatorChar + ""))
                                         {
-                                            Directory.CreateDirectory(ircbot.cur_dir + "\\modules\\survey\\answers\\" + tmp_survey.name + "\\" + tmp_survey.nick + "\\");
+                                            Directory.CreateDirectory(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "answers" + Path.DirectorySeparatorChar + tmp_survey.name + Path.DirectorySeparatorChar + tmp_survey.nick + Path.DirectorySeparatorChar + "");
                                         }
 
-                                        if (File.Exists(ircbot.cur_dir + "\\modules\\survey\\answers\\" + tmp_survey.name + "\\" + tmp_survey.nick + "\\" + this_survey.current_question + ".txt"))
+                                        if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "answers" + Path.DirectorySeparatorChar + tmp_survey.name + Path.DirectorySeparatorChar + tmp_survey.nick + Path.DirectorySeparatorChar + this_survey.current_question + ".txt"))
                                         {
-                                            File.Delete(ircbot.cur_dir + "\\modules\\survey\\answers\\" + tmp_survey.name + "\\" + tmp_survey.nick + "\\" + this_survey.current_question + ".txt");
-                                            File.Create(ircbot.cur_dir + "\\modules\\survey\\answers\\" + tmp_survey.name + "\\" + tmp_survey.nick + "\\" + this_survey.current_question + ".txt");
+                                            File.Delete(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "answers" + Path.DirectorySeparatorChar + tmp_survey.name + Path.DirectorySeparatorChar + tmp_survey.nick + Path.DirectorySeparatorChar + this_survey.current_question + ".txt");
+                                            File.Create(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "answers" + Path.DirectorySeparatorChar + tmp_survey.name + Path.DirectorySeparatorChar + tmp_survey.nick + Path.DirectorySeparatorChar + this_survey.current_question + ".txt");
                                         }
                                         else
                                         {
-                                            File.Create(ircbot.cur_dir + "\\modules\\survey\\answers\\" + "survey_" + tmp_survey.survey_number + "\\" + tmp_survey.nick + "\\" + this_survey.current_question + ".txt");
+                                            File.Create(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "answers" + Path.DirectorySeparatorChar + "survey_" + tmp_survey.survey_number + Path.DirectorySeparatorChar + tmp_survey.nick + Path.DirectorySeparatorChar + this_survey.current_question + ".txt");
                                         }
 
                                         ircbot.sendData("PRIVMSG", nick + " :" + questions[this_survey.current_question + 2]);
@@ -860,9 +860,9 @@ namespace IRCBot.Modules
         private void start_survey(string nick, int nick_access, int survey_num, bot ircbot, IRCConfig conf)
         {
             bool survey_found = false;
-            if (Directory.Exists(ircbot.cur_dir + "\\modules\\survey\\surveys\\"))
+            if (Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + ""))
             {
-                FileInfo fi = new FileInfo(ircbot.cur_dir + "\\modules\\survey\\surveys\\");
+                FileInfo fi = new FileInfo(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + "");
                 DirectoryInfo di = fi.Directory;
                 FileSystemInfo[] fsi = di.GetFiles();
                 if (fsi.GetUpperBound(0) >= 0 && fsi.GetUpperBound(0) >= survey_num)
@@ -893,19 +893,19 @@ namespace IRCBot.Modules
 
                                 active_surveys.Add(tmp_info);
 
-                                if (!Directory.Exists(ircbot.cur_dir + "\\modules\\survey\\answers\\" + tmp_info.name + "\\" + tmp_info.nick + "\\"))
+                                if (!Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "answers" + Path.DirectorySeparatorChar + tmp_info.name + Path.DirectorySeparatorChar + tmp_info.nick + Path.DirectorySeparatorChar + ""))
                                 {
-                                    Directory.CreateDirectory(ircbot.cur_dir + "\\modules\\survey\\answers\\" + tmp_info.name + "\\" + tmp_info.nick + "\\");
+                                    Directory.CreateDirectory(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "answers" + Path.DirectorySeparatorChar + tmp_info.name + Path.DirectorySeparatorChar + tmp_info.nick + Path.DirectorySeparatorChar + "");
                                 }
 
-                                if (File.Exists(ircbot.cur_dir + "\\modules\\survey\\answers\\" + tmp_info.name + "\\" + tmp_info.nick + "\\" + tmp_info.current_question + ".txt"))
+                                if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "answers" + Path.DirectorySeparatorChar + tmp_info.name + Path.DirectorySeparatorChar + tmp_info.nick + Path.DirectorySeparatorChar + tmp_info.current_question + ".txt"))
                                 {
-                                    File.Delete(ircbot.cur_dir + "\\modules\\survey\\answers\\" + tmp_info.name + "\\" + tmp_info.nick + "\\" + tmp_info.current_question + ".txt");
-                                    File.Create(ircbot.cur_dir + "\\modules\\survey\\answers\\" + tmp_info.name + "\\" + tmp_info.nick + "\\" + tmp_info.current_question + ".txt");
+                                    File.Delete(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "answers" + Path.DirectorySeparatorChar + tmp_info.name + Path.DirectorySeparatorChar + tmp_info.nick + Path.DirectorySeparatorChar + tmp_info.current_question + ".txt");
+                                    File.Create(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "answers" + Path.DirectorySeparatorChar + tmp_info.name + Path.DirectorySeparatorChar + tmp_info.nick + Path.DirectorySeparatorChar + tmp_info.current_question + ".txt");
                                 }
                                 else
                                 {
-                                    File.Create(ircbot.cur_dir + "\\modules\\survey\\answers\\" + "survey_" + tmp_info.survey_number + "\\" + tmp_info.nick + "\\" + tmp_info.current_question + ".txt");
+                                    File.Create(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "answers" + Path.DirectorySeparatorChar + "survey_" + tmp_info.survey_number + Path.DirectorySeparatorChar + tmp_info.nick + Path.DirectorySeparatorChar + tmp_info.current_question + ".txt");
                                 }
 
                                 ircbot.sendData("PRIVMSG", nick + " :You have chosen to take the following survey: " + questions[1]);

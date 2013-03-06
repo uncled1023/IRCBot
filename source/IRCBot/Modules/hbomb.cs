@@ -325,7 +325,7 @@ namespace IRCBot.Modules
         {
             hbomb_active = false;
             bomb_trigger.Enabled = false;
-            main.sendData("PRIVMSG", bomb_channel + " :4,1/8,1!4,1\\ 1,8 WARNING! Nuclear Strike Inbound  4,1/8,1!4,1\\");
+            main.sendData("PRIVMSG", bomb_channel + " :4,1/8,1!4,1" + Path.DirectorySeparatorChar + " 1,8 WARNING! Nuclear Strike Inbound  4,1/8,1!4,1" + Path.DirectorySeparatorChar + "");
             Thread.Sleep(1000);
             string msg = "";
             msg = "1,1.....15,1_.14,1-^^---....,15,1,--1,1.......";
@@ -366,9 +366,9 @@ namespace IRCBot.Modules
             string file_name = ircbot.server_name + "_#" + tab_name + ".log";
             bool nick_idle = true;
 
-            if (File.Exists(ircbot.cur_dir + "\\modules\\seen\\" + file_name))
+            if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "seen" + Path.DirectorySeparatorChar + file_name))
             {
-                string[] log_file = System.IO.File.ReadAllLines(ircbot.cur_dir + "\\modules\\seen\\" + file_name);
+                string[] log_file = System.IO.File.ReadAllLines(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "seen" + Path.DirectorySeparatorChar + file_name);
                 int number_of_lines = log_file.GetUpperBound(0) + 1;
                 if (number_of_lines > 0)
                 {

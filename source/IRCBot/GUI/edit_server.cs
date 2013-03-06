@@ -25,7 +25,7 @@ namespace IRCBot
             m_parent = frmctrl;
             server_name = tmp_server_name;
             XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.Load(m_parent.cur_dir + "\\config\\config.xml");
+            xmlDoc.Load(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
             XmlNodeList ServerxnList = xmlDoc.SelectNodes("/bot_settings/server_list/server");
             foreach (XmlNode xn in ServerxnList)
             {
@@ -50,15 +50,15 @@ namespace IRCBot
                     founder_level_box.Text = xn["founder_level"].InnerText;
                     owner_level_box.Text = xn["owner_level"].InnerText;
 
-                    if (File.Exists(m_parent.cur_dir + "\\config\\Module_Config\\" + server_module_folder + "\\modules.xml"))
+                    if (File.Exists(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + server_module_folder + Path.DirectorySeparatorChar + "modules.xml"))
                     {
-                        xmlDocModules.Load(m_parent.cur_dir + "\\config\\Module_Config\\" + server_module_folder + "\\modules.xml");
+                        xmlDocModules.Load(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + server_module_folder + Path.DirectorySeparatorChar + "modules.xml");
                     }
                     else
                     {
-                        Directory.CreateDirectory(m_parent.cur_dir + "\\config\\Module_Config\\" + server_module_folder);
-                        File.Copy(m_parent.cur_dir + "\\config\\Module_Config\\Default\\modules.xml", m_parent.cur_dir + "\\config\\Module_Config\\" + server_module_folder + "\\modules.xml");
-                        xmlDocModules.Load(m_parent.cur_dir + "\\config\\Module_Config\\" + server_module_folder + "\\modules.xml");
+                        Directory.CreateDirectory(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + server_module_folder);
+                        File.Copy(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + "Default" + Path.DirectorySeparatorChar + "modules.xml", m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + server_module_folder + Path.DirectorySeparatorChar + "modules.xml");
+                        xmlDocModules.Load(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + server_module_folder + Path.DirectorySeparatorChar + "modules.xml");
                     }
                     XmlNodeList xnList = xmlDocModules.SelectNodes("/modules/module");
                     foreach (XmlNode xnModules in xnList)
@@ -106,7 +106,7 @@ namespace IRCBot
             else
             {
                 XmlDocument xmlDoc = new XmlDocument();
-                xmlDoc.Load(m_parent.cur_dir + "\\config\\config.xml");
+                xmlDoc.Load(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
                 XmlNodeList ServerxnList = xmlDoc.SelectNodes("/bot_settings/server_list/server");
                 foreach (XmlNode xn in ServerxnList)
                 {
@@ -132,7 +132,7 @@ namespace IRCBot
                         break;
                     }
                 }
-                xmlDoc.Save(m_parent.cur_dir + "\\config\\config.xml");
+                xmlDoc.Save(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
 
                 XmlNodeList xnList = xmlDocModules.SelectNodes("/modules/module");
                 foreach (XmlNode xn in xnList)
@@ -174,7 +174,7 @@ namespace IRCBot
                         }
                     }
                 }
-                xmlDocModules.Save(m_parent.cur_dir + "\\config\\Module_Config\\" + server_module_folder + "\\modules.xml");
+                xmlDocModules.Save(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + server_module_folder + Path.DirectorySeparatorChar + "modules.xml");
                 this.Close();
             }
         }
@@ -187,7 +187,7 @@ namespace IRCBot
         private void button3_Click(object sender, EventArgs e)
         {
             XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.Load(m_parent.cur_dir + "\\config\\Module_Config\\" + server_module_folder + "\\modules.xml");
+            xmlDoc.Load(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + server_module_folder + Path.DirectorySeparatorChar + "modules.xml");
             XmlNodeList xnList = xmlDoc.SelectNodes("/modules/module");
             foreach (XmlNode xn in xnList)
             {
@@ -215,13 +215,13 @@ namespace IRCBot
                     }
                 }
             }
-            xmlDoc.Save(m_parent.cur_dir + "\\config\\Module_Config\\" + server_module_folder + "\\modules.xml");
+            xmlDoc.Save(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + server_module_folder + Path.DirectorySeparatorChar + "modules.xml");
         }
 
         private void command_list_change(Object sender, EventArgs e)
         {
             XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.Load(m_parent.cur_dir + "\\config\\Module_Config\\" + server_module_folder + "\\modules.xml");
+            xmlDoc.Load(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + server_module_folder + Path.DirectorySeparatorChar + "modules.xml");
             XmlNodeList xnList = xmlDoc.SelectNodes("/modules/module");
             foreach (XmlNode xn in xnList)
             {

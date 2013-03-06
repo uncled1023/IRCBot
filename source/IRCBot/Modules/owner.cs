@@ -512,27 +512,43 @@ namespace IRCBot.Modules
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 bool in_chan = false;
-                                                foreach (string in_channel in ircbot.channel_list)
+                                                bool chan_allowed = true;
+                                                foreach (string chan in ircbot.conf.chan_blacklist.Split(','))
                                                 {
-                                                    if (line[4].Equals(in_channel))
+                                                    if (chan.Equals(line[4]))
                                                     {
-                                                        ircbot.sendData("NOTICE", nick + " :I'm already in that channel!");
-                                                        in_chan = true;
+                                                        chan_allowed = false;
                                                         break;
                                                     }
                                                 }
-                                                if (in_chan == false)
+                                                if (chan_allowed == true)
                                                 {
-                                                    if (nick_access != conf.owner_level)
+                                                    foreach (string in_channel in ircbot.channel_list)
                                                     {
-                                                        string[] owners = conf.owner.Split(',');
-                                                        foreach (string owner_nick in owners)
+                                                        if (line[4].Equals(in_channel))
                                                         {
-                                                            ircbot.sendData("NOTICE", owner_nick + " :" + nick + " has invited me to join " + line[4]);
+                                                            ircbot.sendData("NOTICE", nick + " :I'm already in that channel!");
+                                                            in_chan = true;
+                                                            break;
                                                         }
                                                     }
-                                                    ircbot.channel_list.Add(line[4]);
-                                                    ircbot.sendData("JOIN", line[4]);
+                                                    if (in_chan == false)
+                                                    {
+                                                        if (nick_access != conf.owner_level)
+                                                        {
+                                                            string[] owners = conf.owner.Split(',');
+                                                            foreach (string owner_nick in owners)
+                                                            {
+                                                                ircbot.sendData("NOTICE", owner_nick + " :" + nick + " has invited me to join " + line[4]);
+                                                            }
+                                                        }
+                                                        ircbot.channel_list.Add(line[4]);
+                                                        ircbot.sendData("JOIN", line[4]);
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    ircbot.sendData("NOTICE", nick + " :I am not allowed to join that channel.");
                                                 }
                                             }
                                             else

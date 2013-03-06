@@ -80,6 +80,7 @@ namespace IRCBot.Modules
                                                     log_file.WriteLine(line[4]);
                                                     log_file.Close();
                                                 }
+                                                ircbot.sendData("PRIVMSG", channel + " :Response added successfully");
                                             }
                                             else
                                             {

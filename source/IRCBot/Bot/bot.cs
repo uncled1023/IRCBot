@@ -122,6 +122,34 @@ namespace IRCBot
             worker = work;
             worker.RunWorkerAsync(2000);
         }
+
+        public void restart_server()
+        {
+            start_time = DateTime.Now;
+            string[] tmp_server = conf.server.Split('.');
+            if (tmp_server.GetUpperBound(0) > 0)
+            {
+                server_name = tmp_server[1];
+            }
+            cur_dir = ircbot.cur_dir;
+
+            Spam_Check_Timer.Interval = conf.spam_threshold;
+            Spam_Check_Timer.Start();
+
+            checkRegisterationTimer.Interval = 120000;
+            checkRegisterationTimer.Enabled = true;
+
+            check_cancel.Interval = 500;
+            check_cancel.Start();
+
+            BackgroundWorker work = new BackgroundWorker();
+            work.DoWork += new DoWorkEventHandler(backgroundWorker_DoWork);
+            work.RunWorkerCompleted += new RunWorkerCompletedEventHandler(backgroundWorker_RunWorkerCompleted);
+            work.WorkerSupportsCancellation = true;
+
+            worker = work;
+            worker.RunWorkerAsync(2000);
+        }
        
         public void load_modules()
         {
@@ -272,7 +300,7 @@ namespace IRCBot
                     }
                     ircbot.queue_text.Add(output);
                 }
-                start_bot(ircbot, conf);
+                restart_server();
             }
             else
             {
@@ -298,15 +326,17 @@ namespace IRCBot
             {
                 Thread.Sleep(Convert.ToInt32(Math.Pow(2, Convert.ToDouble(restart_attempts))) * 1000);
             }
+            restart = false;
             config = conf;
             try
             {
                 connected = true;
                 IRCConnection = new TcpClient(conf.server, conf.port);
-                restart = false;
             }
             catch
             {
+                restart = true;
+                restart_attempts++;
                 connected = false;
                 string output = Environment.NewLine + server_name + ":" + "Connection Error";
 
@@ -318,15 +348,12 @@ namespace IRCBot
                     }
                     ircbot.queue_text.Add(output);
                 }
-                restart = true;
-                restart_attempts++;
             }
 
             if (restart == false)
             {
                 try
                 {
-                    connected = true;
                     ns = IRCConnection.GetStream();
                     sr = new StreamReader(ns);
                     sw = new StreamWriter(ns);
@@ -344,10 +371,13 @@ namespace IRCBot
                         sendData("USER", config.nick + " default_host default_server :" + config.name);
                     }
                     sendData("NICK", config.nick);
+                    connected = true;
                     IRCWork();
                 }
                 catch (Exception ex)
                 {
+                    restart = true;
+                    restart_attempts++;
                     string output =  Environment.NewLine + server_name + ":" + ex.ToString().Replace("\r\n", " ");
 
                     lock (ircbot.listLock)
@@ -370,11 +400,6 @@ namespace IRCBot
                         ns.Close();
                     if (IRCConnection != null)
                         IRCConnection.Close();
-                    if (bw.CancellationPending != true)
-                    {
-                        restart = true;
-                        restart_attempts++;
-                    }
                 }
             }
         }
@@ -548,6 +573,8 @@ namespace IRCBot
             work.DoWork += (sender, e) => save_stream(sender, e);
             work.RunWorkerAsync(2000);
 
+            connected = true;
+            restart_attempts = 0;
             while (shouldRun)
             {
                 Thread.Sleep(30);

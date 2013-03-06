@@ -697,9 +697,9 @@ namespace IRCBot
                         {
                             nickname = tmp_lines[0].TrimStart(':').Split('!')[0];
                             channel = "";
-                            int index = 0;
                             foreach (bot bot_instance in bot_instances)
                             {
+                                int index = 0;
                                 foreach (List<string> nicks in bot_instance.nick_list)
                                 {
                                     int nick_index = 0;
@@ -731,6 +731,35 @@ namespace IRCBot
                             }
                             nickname = "";
                             font_color = "#66361F";
+                        }
+                        else if (tmp_lines[1].Equals("nick"))
+                        {
+                            nickname = tmp_lines[2].TrimStart(':').ToLower();
+                            channel = "";
+                            foreach (bot bot_instance in bot_instances)
+                            {
+                                int index = 0;
+                                foreach (List<string> nicks in bot_instance.nick_list)
+                                {
+                                    foreach (string nick in nicks)
+                                    {
+                                        string[] sep_nick = nick.Split(':');
+                                        if (sep_nick.GetUpperBound(0) > 0)
+                                        {
+                                            if (sep_nick[1].Equals(nickname.ToLower()))
+                                            {
+                                                channel += "," + bot_instance.channel_list[index];
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    index++;
+                                }
+                            }
+                            channel = channel.TrimStart(',');
+                            message = tmp_lines[0].TrimStart(':').Split('!')[0] + " is now known as " + nickname;
+                            nickname = "";
+                            font_color = "#000000";
                         }
                         else if (tmp_lines[1].Equals("mode"))
                         {
@@ -844,6 +873,10 @@ namespace IRCBot
                                 font_color = "000000";
                             }
                         }
+                    }
+                    if (channel.Equals(""))
+                    {
+                        channel = "System";
                     }
                     string[] channels = channel.Split(',');
                     foreach (string channel_line in channels)
@@ -1283,8 +1316,21 @@ namespace IRCBot
             }
             string name = tabControl1.SelectedTab.Text;
             int selected_tab = tabControl1.SelectedIndex;
-            if (name.StartsWith("#") == true && bot_instances[index].connected == true)
+            bool chan_connected = false;
+            int chan_index = 0;
+            foreach (string channel in bot_instances[index].channel_list)
             {
+                if (channel.Equals(name))
+                {
+                    chan_connected = true;
+                    break;
+                }
+                chan_index++;
+            }
+            if (name.StartsWith("#") == true && bot_instances[index].connected == true && chan_connected == true)
+            {
+                bot_instances[index].channel_list.RemoveAt(chan_index);
+                bot_instances[index].nick_list.RemoveAt(chan_index);
                 bot_instances[index].sendData("PART", name);
             }
             TabControl tmp_tabs = new TabControl();
@@ -1555,15 +1601,7 @@ namespace IRCBot
                 }
                 bot bot_instance = new bot();
                 bot_instances.Add(bot_instance);
-                if (index == 0)
-                {
-                    index = 0;
-                }
-                else
-                {
-                    index = index - 1;
-                }
-                bot_instances[index].start_bot(this, conf);
+                bot_instances[bot_instances.Count - 1].start_bot(this, conf);
                 server_initiated = true;
                 connectToolStripMenuItem.Enabled = true;
                 connectToolStripMenuItem.Text = "Disconnect";

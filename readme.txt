@@ -36,3 +36,9 @@ Contact Info
 Email: admin@inb4u.com
 IRC: (Rizon)#/g/technology
 Nick: Uncled1023
+
+---------------------
+Acknowledgements
+---------------------
+Cameron Lucas
+GitStack: http://gitstack.com/

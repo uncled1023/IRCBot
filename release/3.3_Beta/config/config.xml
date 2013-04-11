@@ -1,5 +1,28 @@
 <bot_settings>
   <server_list>
+    <server>
+      <name>IRCBot</name>
+      <nick>IRCBot</nick>
+      <password>
+      </password>
+      <email>
+      </email>
+      <owner>
+      </owner>
+      <port>6667</port>
+      <server_name>irc.rizon.net</server_name>
+      <server_folder>rizon</server_folder>
+      <chan_list>#testing</chan_list>
+      <chan_blacklist>
+      </chan_blacklist>
+      <user_level>1</user_level>
+      <voice_level>3</voice_level>
+      <hop_level>6</hop_level>
+      <op_level>7</op_level>
+      <sop_level>8</sop_level>
+      <founder_level>9</founder_level>
+      <owner_level>10</owner_level>
+    </server>
   </server_list>
   <global_settings>
     <command_prefix>.</command_prefix>

@@ -71,7 +71,7 @@ namespace IRCBot.Modules
                                                         bool isNumeric = int.TryParse(args[2], out n);
                                                         if (isNumeric)
                                                         {
-                                                            display_log_nick_num(args[1], Convert.ToInt32(args[2]), channel, args[0], ircbot, conf);
+                                                            display_log_nick_num(args[1], Convert.ToInt32(args[2]), channel, nick, args[0], ircbot, conf);
                                                         }
                                                         else
                                                         {
@@ -84,33 +84,33 @@ namespace IRCBot.Modules
                                                         bool isNumeric = int.TryParse(args[1], out n);
                                                         if (isNumeric)
                                                         {
-                                                            display_log_number(Convert.ToInt32(args[1]), channel, args[0], ircbot, conf);
+                                                            display_log_number(Convert.ToInt32(args[1]), channel, nick, args[0], ircbot, conf);
                                                         }
                                                         else
                                                         {
-                                                            display_log_nick(args[1], channel, args[0], ircbot, conf);
+                                                            display_log_nick(args[1], channel, nick, args[0], ircbot, conf);
                                                         }
                                                     }
                                                     else
                                                     {
-                                                        display_log(channel, line[4], ircbot, conf);
+                                                        display_log(channel, nick, line[4], ircbot, conf);
                                                     }
                                                 }
                                                 else
                                                 {
                                                     if (args.GetUpperBound(0) > 0)
                                                     {
-                                                        display_log_nick(args[1], nick, args[0], ircbot, conf);
+                                                        display_log_nick(args[1], channel, nick, args[0], ircbot, conf);
                                                     }
                                                     else
                                                     {
-                                                        display_log(nick, line[4], ircbot, conf);
+                                                        display_log(channel, nick, line[4], ircbot, conf);
                                                     }
                                                 }
                                             }
                                             else
                                             {
-                                                display_last_log(channel, ircbot, conf);
+                                                display_last_log(channel, nick, ircbot, conf);
                                             }
                                         }
                                         else
@@ -174,7 +174,7 @@ namespace IRCBot.Modules
             }
         }
 
-        private void display_last_log(string channel, bot ircbot, IRCConfig conf)
+        private void display_last_log(string channel, string requst_nick, bot ircbot, IRCConfig conf)
         {
             string file_name = ircbot.server_name + ".log";
             bool cmd_found = false;
@@ -212,25 +212,25 @@ namespace IRCBot.Modules
                     }
                     if (cmd_found == true)
                     {
-                        ircbot.sendData("PRIVMSG", channel + " :The last command used was " + conf.command + command + " by " + nick + " on " + date + " in " + inside + parameters);
+                        ircbot.sendData("NOTICE", requst_nick + " :The last command used was " + conf.command + command + " by " + nick + " on " + date + " in " + inside + parameters);
                     }
                     else
                     {
-                        ircbot.sendData("PRIVMSG", channel + " :No commands have been used");
+                        ircbot.sendData("NOTICE", requst_nick + " :No commands have been used");
                     }
                 }
                 else
                 {
-                    ircbot.sendData("PRIVMSG", channel + " :No commands have been used");
+                    ircbot.sendData("NOTICE", requst_nick + " :No commands have been used");
                 }
             }
             else
             {
-                ircbot.sendData("PRIVMSG", channel + " :No commands have been used");
+                ircbot.sendData("NOTICE", requst_nick + " :No commands have been used");
             }
         }
 
-        private void display_log(string channel, string command, bot ircbot, IRCConfig conf)
+        private void display_log(string channel, string requst_nick, string command, bot ircbot, IRCConfig conf)
         {
             string file_name = ircbot.server_name + ".log";
             bool cmd_found = false;
@@ -271,8 +271,8 @@ namespace IRCBot.Modules
                     }
                     if (cmd_found == true)
                     {
-                        ircbot.sendData("PRIVMSG", channel + " :" + conf.command + command + " has been used " + num_uses + " times.");
-                        ircbot.sendData("PRIVMSG", channel + " :It was last used by " + nick + " on " + date + " in " + inside + parameters);
+                        ircbot.sendData("NOTICE", requst_nick + " :" + conf.command + command + " has been used " + num_uses + " times.");
+                        ircbot.sendData("NOTICE", requst_nick + " :It was last used by " + nick + " on " + date + " in " + inside + parameters);
                     }
                     else
                     {
@@ -304,27 +304,27 @@ namespace IRCBot.Modules
                         }
                         if (cmd_found == true)
                         {
-                            ircbot.sendData("PRIVMSG", channel + " :" + nick + " has used " + num_uses + " commands.");
-                            ircbot.sendData("PRIVMSG", channel + " :The last command they used was " + conf.command + new_command + " on " + date + " in " + inside + parameters);
+                            ircbot.sendData("NOTICE", requst_nick + " :" + nick + " has used " + num_uses + " commands.");
+                            ircbot.sendData("NOTICE", requst_nick + " :The last command they used was " + conf.command + new_command + " on " + date + " in " + inside + parameters);
                         }
                         else
                         {
-                            ircbot.sendData("PRIVMSG", channel + " :No results found");
+                            ircbot.sendData("NOTICE", requst_nick + " :No results found");
                         }
                     }
                 }
                 else
                 {
-                    ircbot.sendData("PRIVMSG", channel + " :No results found");
+                    ircbot.sendData("NOTICE", requst_nick + " :No results found");
                 }
             }
             else
             {
-                ircbot.sendData("PRIVMSG", channel + " :No results found");
+                ircbot.sendData("NOTICE", requst_nick + " :No results found");
             }
         }
 
-        private void display_log_number(int number, string channel, string command, bot ircbot, IRCConfig conf)
+        private void display_log_number(int number, string channel, string requst_nick, string command, bot ircbot, IRCConfig conf)
         {
             string file_name = ircbot.server_name + ".log";
             bool cmd_found = false;
@@ -375,11 +375,11 @@ namespace IRCBot.Modules
                             date = command_list[number][2];
                             inside = command_list[number][1];
                             nick = command_list[number][0];
-                            ircbot.sendData("PRIVMSG", channel + " :" + conf.command + command + " was used by " + nick + " on " + date + " in " + inside + parameters);
+                            ircbot.sendData("NOTICE", requst_nick + " :" + conf.command + command + " was used by " + nick + " on " + date + " in " + inside + parameters);
                         }
                         else
                         {
-                            ircbot.sendData("PRIVMSG", channel + " :The command has not been used that many times");
+                            ircbot.sendData("NOTICE", requst_nick + " :The command has not been used that many times");
                         }
                     }
                     else
@@ -417,26 +417,26 @@ namespace IRCBot.Modules
                             date = command_list[number][2];
                             inside = command_list[number][1];
                             nick = command_list[number][0];
-                            ircbot.sendData("PRIVMSG", channel + " :" + nick + " used " + conf.command + command_list[number][3] + " on " + date + " in " + inside + parameters);
+                            ircbot.sendData("NOTICE", requst_nick + " :" + nick + " used " + conf.command + command_list[number][3] + " on " + date + " in " + inside + parameters);
                         }
                         else
                         {
-                            ircbot.sendData("PRIVMSG", channel + " :The command has not been used that many times");
+                            ircbot.sendData("NOTICE", requst_nick + " :The command has not been used that many times");
                         }
                     }
                 }
                 else
                 {
-                    ircbot.sendData("PRIVMSG", channel + " :" + conf.command + command + " has not been used");
+                    ircbot.sendData("NOTICE", requst_nick + " :" + conf.command + command + " has not been used");
                 }
             }
             else
             {
-                ircbot.sendData("PRIVMSG", channel + " :" + conf.command + command + " has not been used");
+                ircbot.sendData("NOTICE", requst_nick + " :" + conf.command + command + " has not been used");
             }
         }
 
-        private void display_log_nick(string nick, string channel, string command, bot ircbot, IRCConfig conf)
+        private void display_log_nick(string nick, string channel, string requst_nick, string command, bot ircbot, IRCConfig conf)
         {
             string file_name = ircbot.server_name + ".log";
             bool cmd_found = false;
@@ -475,26 +475,26 @@ namespace IRCBot.Modules
                     }
                     if (cmd_found == true)
                     {
-                        ircbot.sendData("PRIVMSG", channel + " :" + nick + " has used " + conf.command + command + " " + num_uses + " times.");
-                        ircbot.sendData("PRIVMSG", channel + " :They last used " + conf.command + command + " on " + date + " in " + inside + parameters);
+                        ircbot.sendData("NOTICE", requst_nick + " :" + nick + " has used " + conf.command + command + " " + num_uses + " times.");
+                        ircbot.sendData("NOTICE", requst_nick + " :They last used " + conf.command + command + " on " + date + " in " + inside + parameters);
                     }
                     else
                     {
-                        ircbot.sendData("PRIVMSG", channel + " :" + nick + " has not used " + conf.command + command);
+                        ircbot.sendData("NOTICE", requst_nick + " :" + nick + " has not used " + conf.command + command);
                     }
                 }
                 else
                 {
-                    ircbot.sendData("PRIVMSG", channel + " :" + nick + " has not used any commands");
+                    ircbot.sendData("NOTICE", requst_nick + " :" + nick + " has not used any commands");
                 }
             }
             else
             {
-                ircbot.sendData("PRIVMSG", channel + " :" + nick + " has not used any commands");
+                ircbot.sendData("NOTICE", requst_nick + " :" + nick + " has not used any commands");
             }
         }
 
-        private void display_log_nick_num(string nick, int number, string channel, string command, bot ircbot, IRCConfig conf)
+        private void display_log_nick_num(string nick, int number, string channel, string requst_nick, string command, bot ircbot, IRCConfig conf)
         {
             string file_name = ircbot.server_name + ".log";
             bool cmd_found = false;
@@ -544,26 +544,26 @@ namespace IRCBot.Modules
                             date = command_list[number][2];
                             inside = command_list[number][1];
                             nick = command_list[number][0];
-                            ircbot.sendData("PRIVMSG", channel + " :" + nick + " used " + conf.command + command + " on " + date + " in " + inside + parameters);
+                            ircbot.sendData("NOTICE", requst_nick + " :" + nick + " used " + conf.command + command + " on " + date + " in " + inside + parameters);
                         }
                         else
                         {
-                            ircbot.sendData("PRIVMSG", channel + " :" + nick + " has not used " + conf.command + command + " that many times");
+                            ircbot.sendData("NOTICE", requst_nick + " :" + nick + " has not used " + conf.command + command + " that many times");
                         }
                     }
                     else
                     {
-                        ircbot.sendData("PRIVMSG", channel + " :" + nick + " has not used " + conf.command + command);
+                        ircbot.sendData("NOTICE", requst_nick + " :" + nick + " has not used " + conf.command + command);
                     }
                 }
                 else
                 {
-                    ircbot.sendData("PRIVMSG", channel + " :" + nick + " has not used any commands");
+                    ircbot.sendData("NOTICE", requst_nick + " :" + nick + " has not used any commands");
                 }
             }
             else
             {
-                ircbot.sendData("PRIVMSG", channel + " :" + nick + " has not used any commands");
+                ircbot.sendData("NOTICE", requst_nick + " :" + nick + " has not used any commands");
             }
         }
 

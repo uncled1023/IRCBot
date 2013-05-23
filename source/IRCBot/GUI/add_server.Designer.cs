@@ -89,6 +89,8 @@
             this.label14 = new System.Windows.Forms.Label();
             this.user_level_box = new System.Windows.Forms.TextBox();
             this.label15 = new System.Windows.Forms.Label();
+            this.label27 = new System.Windows.Forms.Label();
+            this.sec_nicks = new System.Windows.Forms.TextBox();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -147,7 +149,7 @@
             // 
             // email_box
             // 
-            this.email_box.Location = new System.Drawing.Point(165, 164);
+            this.email_box.Location = new System.Drawing.Point(165, 190);
             this.email_box.Name = "email_box";
             this.email_box.Size = new System.Drawing.Size(301, 20);
             this.email_box.TabIndex = 7;
@@ -155,7 +157,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(18, 167);
+            this.label8.Location = new System.Drawing.Point(18, 193);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(32, 13);
             this.label8.TabIndex = 20;
@@ -163,7 +165,7 @@
             // 
             // password_box
             // 
-            this.password_box.Location = new System.Drawing.Point(165, 138);
+            this.password_box.Location = new System.Drawing.Point(165, 164);
             this.password_box.Name = "password_box";
             this.password_box.Size = new System.Drawing.Size(301, 20);
             this.password_box.TabIndex = 6;
@@ -171,7 +173,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(18, 141);
+            this.label6.Location = new System.Drawing.Point(18, 167);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(53, 13);
             this.label6.TabIndex = 18;
@@ -179,7 +181,7 @@
             // 
             // owner_nicks_box
             // 
-            this.owner_nicks_box.Location = new System.Drawing.Point(165, 190);
+            this.owner_nicks_box.Location = new System.Drawing.Point(165, 216);
             this.owner_nicks_box.Name = "owner_nicks_box";
             this.owner_nicks_box.Size = new System.Drawing.Size(301, 20);
             this.owner_nicks_box.TabIndex = 8;
@@ -187,7 +189,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(18, 193);
+            this.label5.Location = new System.Drawing.Point(18, 219);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(75, 13);
             this.label5.TabIndex = 16;
@@ -259,6 +261,8 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.label27);
+            this.tabPage1.Controls.Add(this.sec_nicks);
             this.tabPage1.Controls.Add(this.channel_blacklist_box);
             this.tabPage1.Controls.Add(this.label16);
             this.tabPage1.Controls.Add(this.port_box);
@@ -287,7 +291,7 @@
             // 
             // channel_blacklist_box
             // 
-            this.channel_blacklist_box.Location = new System.Drawing.Point(165, 216);
+            this.channel_blacklist_box.Location = new System.Drawing.Point(165, 242);
             this.channel_blacklist_box.Name = "channel_blacklist_box";
             this.channel_blacklist_box.Size = new System.Drawing.Size(301, 20);
             this.channel_blacklist_box.TabIndex = 9;
@@ -295,7 +299,7 @@
             // label16
             // 
             this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(18, 219);
+            this.label16.Location = new System.Drawing.Point(18, 245);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(88, 13);
             this.label16.TabIndex = 22;
@@ -665,6 +669,22 @@
             this.label15.TabIndex = 27;
             this.label15.Text = "User Access Level";
             // 
+            // label27
+            // 
+            this.label27.AutoSize = true;
+            this.label27.Location = new System.Drawing.Point(18, 141);
+            this.label27.Name = "label27";
+            this.label27.Size = new System.Drawing.Size(125, 13);
+            this.label27.TabIndex = 26;
+            this.label27.Text = "Alt Nicks (Separate by \',\')";
+            // 
+            // sec_nicks
+            // 
+            this.sec_nicks.Location = new System.Drawing.Point(165, 138);
+            this.sec_nicks.Name = "sec_nicks";
+            this.sec_nicks.Size = new System.Drawing.Size(301, 20);
+            this.sec_nicks.TabIndex = 25;
+            // 
             // add_server
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -755,5 +775,7 @@
         private System.Windows.Forms.Label label14;
         private System.Windows.Forms.TextBox user_level_box;
         private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.Label label27;
+        private System.Windows.Forms.TextBox sec_nicks;
     }
 }

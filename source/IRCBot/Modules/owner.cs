@@ -99,11 +99,11 @@ namespace IRCBot.Modules
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 add_owner(line[4].ToLower(), ircbot, ref conf);
-                                                ircbot.sendData("NOTICE", nick + " :" + nick + " has been added as an owner.");
+                                                ircbot.sendData("NOTICE", nick + " :" + line[4] + " has been added as an owner.");
                                             }
                                             else
                                             {
-                                                ircbot.sendData("NOTICE", nick + " :" + nick + ", you need to include more info.");
+                                                ircbot.sendData("NOTICE", nick + " :You need to include more info.");
                                             }
                                         }
                                         else
@@ -121,11 +121,11 @@ namespace IRCBot.Modules
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 del_owner(line[4].ToLower(), ircbot, ref conf);
-                                                ircbot.sendData("NOTICE", nick + " :" + nick + " has been removed as an owner.");
+                                                ircbot.sendData("NOTICE", nick + " :" + line[4] + " has been removed as an owner.");
                                             }
                                             else
                                             {
-                                                ircbot.sendData("NOTICE", nick + " :" + nick + ", you need to include more info.");
+                                                ircbot.sendData("NOTICE", nick + " :You need to include more info.");
                                             }
                                         }
                                         else
@@ -224,6 +224,7 @@ namespace IRCBot.Modules
                                                     if (part_chan == true)
                                                     {
                                                         ircbot.sendData("PART", tmp_chan);
+                                                        ircbot.nick_list.RemoveAt(index);
                                                         ircbot.channel_list.RemoveAt(index);
                                                     }
                                                 }
@@ -248,6 +249,7 @@ namespace IRCBot.Modules
                                                 if (part_chan == true)
                                                 {
                                                     ircbot.sendData("PART", channel);
+                                                    ircbot.nick_list.RemoveAt(index);
                                                     ircbot.channel_list.RemoveAt(index);
                                                 }
                                                 else
@@ -540,6 +542,7 @@ namespace IRCBot.Modules
                                                             foreach (string owner_nick in owners)
                                                             {
                                                                 ircbot.sendData("NOTICE", owner_nick + " :" + nick + " has invited me to join " + line[4]);
+                                                                ircbot.sendData("NOTICE", owner_nick + " :If you would like to permanently add this channel, please type " + conf.command + "addchanlist " + channel);
                                                             }
                                                         }
                                                         ircbot.channel_list.Add(line[4]);
@@ -550,6 +553,64 @@ namespace IRCBot.Modules
                                                 {
                                                     ircbot.sendData("NOTICE", nick + " :I am not allowed to join that channel.");
                                                 }
+                                            }
+                                            else
+                                            {
+                                                ircbot.sendData("NOTICE", nick + " :" + nick + ", you need to include more info.");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                        }
+                                        break;
+                                    case "addchanlist":
+                                        if (spam_check == true)
+                                        {
+                                            ircbot.spam_count++;
+                                        }
+                                        if (nick_access >= command_access)
+                                        {
+                                            if (line.GetUpperBound(0) > 3)
+                                            {
+                                                bool in_chan = false;
+                                                foreach (string in_channel in ircbot.channel_list)
+                                                {
+                                                    if (line[4].Equals(in_channel))
+                                                    {
+                                                        in_chan = true;
+                                                        break;
+                                                    }
+                                                }
+                                                if (in_chan == false)
+                                                {
+                                                    ircbot.channel_list.Add(line[4]);
+                                                    ircbot.sendData("JOIN", line[4]);
+                                                }
+                                                add_channel_list(line[4], ircbot, ref conf);
+                                                ircbot.sendData("NOTICE", nick + " :" + line[4] + " successfully added to auto-join list.");
+                                            }
+                                            else
+                                            {
+                                                ircbot.sendData("NOTICE", nick + " :" + nick + ", you need to include more info.");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                        }
+                                        break;
+                                    case "delchanlist":
+                                        if (spam_check == true)
+                                        {
+                                            ircbot.spam_count++;
+                                        }
+                                        if (nick_access >= command_access)
+                                        {
+                                            if (line.GetUpperBound(0) > 3)
+                                            {
+                                                del_channel_list(line[4], ircbot, ref conf);
+                                                ircbot.sendData("NOTICE", nick + " :" + line[4] + " successfully removed to auto-join list.");
                                             }
                                             else
                                             {
@@ -724,13 +785,66 @@ namespace IRCBot.Modules
             }
         }
 
+        private void add_channel_list(string channel, bot ircbot, ref IRCConfig conf)
+        {
+            XmlDocument xmlDoc = new XmlDocument();
+            if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml"))
+            {
+                xmlDoc.Load(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
+                XmlNodeList ServerxnList = xmlDoc.SelectNodes("/bot_settings/server_list/server");
+                foreach (XmlNode xn in ServerxnList)
+                {
+                    string tmp_server = xn["server_name"].InnerText;
+                    if (tmp_server.Equals(conf.server))
+                    {
+                        string new_channel = xn["chan_list"].InnerText + "," + channel;
+                        xn["chan_list"].InnerText = new_channel;
+                        break;
+                    }
+                }
+                xmlDoc.Save(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
+                conf.chans += "," + channel;
+            }
+        }
+
+        private void del_channel_list(string channel, bot ircbot, ref IRCConfig conf)
+        {
+            XmlDocument xmlDoc = new XmlDocument();
+            if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml"))
+            {
+                xmlDoc.Load(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
+                XmlNodeList ServerxnList = xmlDoc.SelectNodes("/bot_settings/server_list/server");
+                foreach (XmlNode xn in ServerxnList)
+                {
+                    string tmp_server = xn["server_name"].InnerText;
+                    if (tmp_server.Equals(conf.server))
+                    {
+                        string new_channel = "";
+                        conf.chans = "";
+                        foreach (string list_chan in xn["chan_list"].InnerText.Split(','))
+                        {
+                            if (!list_chan.Equals(channel))
+                            {
+                                new_channel += list_chan + ",";
+                                conf.chans += list_chan + ",";
+                            }
+                        }
+                        xn["chan_list"].InnerText = new_channel.TrimEnd(',');
+                        conf.chans = conf.chans.TrimEnd(',');
+                        break;
+                    }
+                }
+                xmlDoc.Save(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
+            }
+        }
+
         private void add_owner(string nick, bot ircbot, ref IRCConfig conf)
         {
             XmlDocument xmlDoc = new XmlDocument();
             if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml"))
             {
                 xmlDoc.Load(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
-                XmlNodeList ServerxnList = xmlDoc.SelectNodes("/bot_settings/connection_settings/server_list/server");
+                XmlNodeList ServerxnList = xmlDoc.SelectNodes("/bot_settings/server_list/server");
                 foreach (XmlNode xn in ServerxnList)
                 {
                     string tmp_server = xn["server_name"].InnerText;
@@ -753,7 +867,7 @@ namespace IRCBot.Modules
             if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml"))
             {
                 xmlDoc.Load(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
-                XmlNodeList ServerxnList = xmlDoc.SelectNodes("/bot_settings/connection_settings/server_list/server");
+                XmlNodeList ServerxnList = xmlDoc.SelectNodes("/bot_settings/server_list/server");
                 foreach (XmlNode xn in ServerxnList)
                 {
                     string tmp_server = xn["server_name"].InnerText;

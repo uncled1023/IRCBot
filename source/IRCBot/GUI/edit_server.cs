@@ -34,6 +34,7 @@ namespace IRCBot
                 {
                     bot_name_box.Text = xn["name"].InnerText;
                     bot_nick_box.Text = xn["nick"].InnerText;
+                    sec_nicks.Text = xn["sec_nicks"].InnerText;
                     password_box.Text = xn["password"].InnerText;
                     email_box.Text = xn["email"].InnerText;
                     owner_nicks_box.Text = xn["owner"].InnerText;
@@ -115,6 +116,7 @@ namespace IRCBot
                     {
                         xn["name"].InnerText = bot_name_box.Text;
                         xn["nick"].InnerText = bot_nick_box.Text;
+                        xn["sec_nicks"].InnerText = sec_nicks.Text;
                         xn["password"].InnerText = password_box.Text;
                         xn["email"].InnerText = email_box.Text;
                         xn["owner"].InnerText = owner_nicks_box.Text;

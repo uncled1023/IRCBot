@@ -25,6 +25,7 @@ struct IRCConfig
     public string chan_blacklist;
     public int port;
     public string nick;
+    public string secondary_nicks;
     public string pass;
     public string email;
     public string name;
@@ -247,7 +248,14 @@ namespace IRCBot
 
             conf.command = list["command_prefix"].InnerText;
             conf.keep_logs = list["keep_logs"].InnerText;
-            conf.logs_path = list["logs_path"].InnerText;
+            if (Directory.Exists(list["logs_path"].InnerText))
+            {
+                conf.logs_path = list["logs_path"].InnerText;
+            }
+            else
+            {
+                conf.logs_path = cur_dir + Path.DirectorySeparatorChar + "logs";
+            }
             conf.spam_count_max = Convert.ToInt32(list["spam_count"].InnerText);
             conf.spam_threshold = Convert.ToInt32(list["spam_threshold"].InnerText);
             conf.spam_timout = Convert.ToInt32(list["spam_timeout"].InnerText);
@@ -289,6 +297,7 @@ namespace IRCBot
                         {
                             conf.name = xn["name"].InnerText;
                             conf.nick = xn["nick"].InnerText;
+                            conf.secondary_nicks = xn["sec_nicks"].InnerText;
                             conf.pass = xn["password"].InnerText;
                             conf.email = xn["email"].InnerText;
                             conf.owner = xn["owner"].InnerText;
@@ -386,7 +395,7 @@ namespace IRCBot
                         output_box.Name = "output_box_" + tmp_server_name + ":system";
                         control = tabControl1.Controls.Find("tabPage1", true)[0];
                         TabPage tabpage = (TabPage)control;
-                        tabpage.Name = "tabPage_:" + tmp_server_name + ":system";
+                        tabpage.Name = "tabPage:" + tmp_server_name + ":__:system";
                         tabpage.Text = tmp_server_name;
                     }
                     else if (tabControl1.Controls.Find("output_box_" + tmp_server_name + ":system", true).GetUpperBound(0) < 0)
@@ -401,7 +410,7 @@ namespace IRCBot
                         TabPage tabpage = new TabPage();
                         tabpage.Controls.Add(box);
                         tabpage.Location = new System.Drawing.Point(4, 22);
-                        tabpage.Name = "tabPage_:" + tmp_server_name + ":system";
+                        tabpage.Name = "tabPage:" + tmp_server_name + ":__:system";
                         tabpage.Padding = new System.Windows.Forms.Padding(3);
                         tabpage.Size = new System.Drawing.Size(832, 353);
                         tabpage.Text = tmp_server_name;
@@ -414,6 +423,9 @@ namespace IRCBot
                     else
                     {
                     }
+
+                    button1.Visible = true;
+                    button1.Enabled = true;
 
                     bot bot_instance = new bot();
                     bot_instances.Add(bot_instance);
@@ -441,17 +453,6 @@ namespace IRCBot
                 {
                     tmp_server_name = server[1];
                 }
-                if (tabControl1.SelectedTab.Text.Equals(tmp_server_name))
-                {
-                    button1.Enabled = false;
-                    button1.Visible = false;
-                    break;
-                }
-                else
-                {
-                    button1.Enabled = true;
-                    button1.Visible = true;
-                }
             }
             int index = 0;
             string tmp_server = "No_Server_Specified";
@@ -478,10 +479,14 @@ namespace IRCBot
             if (bot_instances[index].connected == true)
             {
                 connectToolStripMenuItem.Text = "Disconnect";
+                input_box.Enabled = true;
+                send_button.Enabled = true;
             }
             else
             {
                 connectToolStripMenuItem.Text = "Connect";
+                input_box.Enabled = false;
+                send_button.Enabled = false;
             }
         }
 
@@ -603,7 +608,7 @@ namespace IRCBot
                 string tab_name = "System";
                 string message = text;
                 string nickname = "";
-                string pattern = "[^a-zA-Z0-9]"; //regex pattern
+                string pattern = "[^a-zA-Z0-9-_.+#]"; //regex pattern
                 if (tabControl1.Controls.Find("output_box_" + tmp_server_name + ":system", true).GetUpperBound(0) >= 0)
                 {
                     Control control = tabControl1.Controls.Find("output_box_" + tmp_server_name + ":system", true)[0];
@@ -881,8 +886,7 @@ namespace IRCBot
                     string[] channels = channel.Split(',');
                     foreach (string channel_line in channels)
                     {
-                        tab_name = channel_line.TrimStart('#');
-                        tab_name = Regex.Replace(tab_name, pattern, "_");
+                        tab_name = Regex.Replace(channel_line, pattern, "_");
                         string[] nick = tmp_lines[0].Split('!');
                         if (channel != "System")
                         {
@@ -939,14 +943,7 @@ namespace IRCBot
                         if (conf.keep_logs.Equals("True"))
                         {
                             string file_name = "";
-                            if (channel_line.StartsWith("#"))
-                            {
-                                file_name = tmp_server_name + "-#" + tab_name + ".log";
-                            }
-                            else
-                            {
-                                file_name = tmp_server_name + "-" + tab_name + ".log";
-                            }
+                            file_name = tmp_server_name + "-" + tab_name + ".log";
                             if (conf.logs_path == "")
                             {
                                 conf.logs_path = cur_dir + Path.DirectorySeparatorChar + "logs";
@@ -1020,71 +1017,65 @@ namespace IRCBot
                 tabpage.Location = new System.Drawing.Point(4, 22);
                 if (channel[1].StartsWith("#"))
                 {
-                    tabpage.Name = "tabPage_chan_:" + tab_name;
+                    tabpage.Name = "tabPage:" + channel[0] + ":_chan_:" + channel[1];
                 }
                 else
                 {
-                    tabpage.Name = "tabPage_user_:" + tab_name;
+                    tabpage.Name = "tabPage:" + channel[0] + ":_user_:" + channel[1];
                 }
                 tabpage.Padding = new System.Windows.Forms.Padding(3);
                 tabpage.Size = new System.Drawing.Size(832, 353);
                 tabpage.Text = channel[1];
                 tabpage.UseVisualStyleBackColor = true;
 
-                string[] server_list = full_server_list.Split(',');
-                int index = 0;
-                string tmp_server = "No_Server_Specified";
-                foreach (string server_name in server_list)
-                {
-                    string[] server = server_name.Split('.');
-                    string tmp_server_name = "No_Server_Specified";
-                    if (server.GetUpperBound(0) > 0)
-                    {
-                        tmp_server_name = server[1];
-                    }
-                    if (channel[0].Equals(tmp_server_name))
-                    {
-                        tmp_server = tmp_server_name;
-                        break;
-                    }
-                    else
-                    {
-                        index++;
-                    }
-                }
-                if (index < server_list.GetUpperBound(0))
-                {
-                    TabControl tmp_tabs = new TabControl();
-                    string[] server = server_list[index + 1].Split('.');
-                    string tmp_server_name = "No_Server_Specified";
-                    if (server.GetUpperBound(0) > 0)
-                    {
-                        tmp_server_name = server[1];
-                    }
-                    int next_index = tabControl1.Controls.Find("tabPage_:" + tmp_server_name + ":system", true)[0].TabIndex;
-                    int end_index = tabControl1.Controls.Count;
-                    for (int x = next_index; x < end_index; x++)
-                    {
-                        tmp_tabs.Controls.Add(tabControl1.GetControl(next_index));
-                    }
-                    tabControl1.Controls.Add(tabpage);
-                    tabControl1.GetControl(tabControl1.Controls.Count - 1).TabIndex = next_index;
-                    end_index = tmp_tabs.Controls.Count;
-                    for (int x = 0; x < end_index; x++)
-                    {
-                        tabControl1.Controls.Add(tmp_tabs.GetControl(0));
-                        tabControl1.GetControl(tabControl1.Controls.Count - 1).TabIndex = next_index + x + 1;
-                    }
-                }
-                else
-                {
-                    tabControl1.Controls.Add(tabpage);
-                }
+                tabControl1.Controls.Add(tabpage);
+
                 tabControl1.Update();
+
+                string[][] tab_names = new string[tabControl1.TabPages.Count][];
+
+                int index = 0;
+                foreach (TabPage tab in tabControl1.TabPages)
+                {
+                    string[] tmp = new string[2] {
+                        tab.Name,
+                        index.ToString()
+                    };
+                    tab_names[index] = tmp;
+                    index++;
+                }
+
+                Sort<string>(tab_names, 0);
+
+                index = 1;
+                for (int i = 0; i <= tab_names.GetUpperBound(0); i++)
+                {
+                    TabPage tmp = new TabPage();
+                    tmp = tabControl1.TabPages[Convert.ToInt32(tab_names[i][1])];
+                    tabControl1.TabPages.RemoveAt(Convert.ToInt32(tab_names[i][1]));
+                    tabControl1.Controls.Add(tmp);
+                    for (int x = index; x <= tab_names.GetUpperBound(0); x++)
+                    {
+                        if (Convert.ToInt32(tab_names[x][1]) > Convert.ToInt32(tab_names[i][1]))
+                        {
+                            tab_names[x][1] = (Convert.ToInt32(tab_names[x][1]) - 1).ToString();
+                        }
+                    }
+                    index++;
+                }
+
+                tabControl1.Update();
+
                 box.LinkClicked += new LinkClickedEventHandler(link_Click);
 
                 tabControl1.SelectedIndex = tabControl1.Controls.Find(tabpage.Name, true)[0].TabIndex;
             }
+        }
+
+        private static void Sort<T>(T[][] data, int col)
+        {
+            Comparer<T> comparer = Comparer<T>.Default;
+            Array.Sort<T[]>(data, (x, y) => comparer.Compare(x[col], y[col]));
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1190,7 +1181,14 @@ namespace IRCBot
                 XmlNode list = xmlDoc.SelectSingleNode("/bot_settings/global_settings");
                 bot_instance.conf.command = list["command_prefix"].InnerText;
                 bot_instance.conf.keep_logs = list["keep_logs"].InnerText;
-                bot_instance.conf.logs_path = list["logs_path"].InnerText;
+                if (Directory.Exists(list["logs_path"].InnerText))
+                {
+                    bot_instance.conf.logs_path = list["logs_path"].InnerText;
+                }
+                else
+                {
+                    bot_instance.conf.logs_path = cur_dir + Path.DirectorySeparatorChar + "logs";
+                }
                 bot_instance.conf.max_message_length = Convert.ToInt32(list["max_message_length"].InnerText);
                 bot_instance.conf.minimize_to_tray = Convert.ToBoolean(list["minimize_to_tray"].InnerText);
 
@@ -1202,6 +1200,7 @@ namespace IRCBot
                     {
                         bot_instance.conf.name = xn["name"].InnerText;
                         bot_instance.conf.nick = xn["nick"].InnerText;
+                        bot_instance.conf.secondary_nicks = xn["sec_nicks"].InnerText;
                         bot_instance.conf.pass = xn["password"].InnerText;
                         bot_instance.conf.email = xn["email"].InnerText;
                         bot_instance.conf.owner = xn["owner"].InnerText;
@@ -1253,7 +1252,7 @@ namespace IRCBot
                                             tmp2_list.Add(options["blacklist"].InnerText);
                                             tmp2_list.Add(options["show_help"].InnerText);
                                             tmp2_list.Add(options["spam_check"].InnerText);
-                                            conf.command_list.Add(tmp2_list);
+                                            bot_instance.conf.command_list.Add(tmp2_list);
                                         }
                                     }
                                     if (option.Name.Equals("options"))
@@ -1273,7 +1272,7 @@ namespace IRCBot
                                         }
                                     }
                                 }
-                                conf.module_config.Add(tmp_list);
+                                bot_instance.conf.module_config.Add(tmp_list);
                             }
                         }
                     }
@@ -1294,6 +1293,7 @@ namespace IRCBot
             string[] server_list = full_server_list.Split(',');
             int index = 0;
             string tmp_server = "No_Server_Specified";
+            string tmp_full_server = "No_Server_Specified";
             foreach (string server_name in server_list)
             {
                 string[] server = server_name.Split('.');
@@ -1307,6 +1307,7 @@ namespace IRCBot
                 if (tab_name[1].Equals(tmp_server_name))
                 {
                     tmp_server = tmp_server_name;
+                    tmp_full_server = server_name;
                     break;
                 }
                 else
@@ -1333,18 +1334,102 @@ namespace IRCBot
                 bot_instances[index].nick_list.RemoveAt(chan_index);
                 bot_instances[index].sendData("PART", name);
             }
-            TabControl tmp_tabs = new TabControl();
-            int end_index = tabControl1.Controls.Count;
-            for (int x = selected_tab; x < end_index; x++)
+
+            tabControl1.SelectedIndexChanged -= tab_changed;
+
+            if (name.Equals(tmp_server))
             {
-                tmp_tabs.Controls.Add(tabControl1.GetControl(selected_tab));
+                bool ended = false;
+
+                while (!ended)
+                {
+                    ended = end_connection(tmp_full_server);
+                }
+
+                char[] charSep = new char[] { ':' };
+                for (int x = tabControl1.SelectedIndex; x < tabControl1.TabPages.Count; x++)
+                {
+                    string[] tab_name = tabControl1.TabPages[x].Name.ToString().Split(charSep, 3);
+                    if (tab_name[1].Equals(tmp_server))
+                    {
+                        if (tabControl1.TabPages.Count == 1)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            tabControl1.Controls.RemoveAt(x);
+                            x--;
+                        }
+                    }
+                }
+
+                if (tabControl1.TabPages.Count == 1)
+                {
+                    tabControl1.SelectedIndex = 0;
+                    Control control = tabControl1.TabPages[0].Controls[0];
+                    RichTextBox output_box = (RichTextBox)control;
+                    output_box.Name = "output_box_system";
+                    output_box.Text = "No Server Connected";
+                    control = tabControl1.TabPages[0];
+                    TabPage tabpage = (TabPage)control;
+                    tabpage.Name = "No_Server_Specified";
+                    tabpage.Text = "System";
+
+                    button1.Visible = false;
+                    button1.Enabled = false;
+                    connectToolStripMenuItem.Text = "Connect";
+                    connectToolStripMenuItem.Enabled = false;
+                }
+                bool server_found = false;
+                foreach (string server_name in server_list)
+                {
+                    if (tmp_full_server.Equals(server_name))
+                    {
+                        server_found = true;
+                        break;
+                    }
+                    else
+                    {
+                        server_found = false;
+                        index++;
+                    }
+                }
+                if (server_found == true && bot_instances.Count > index)
+                {
+                    bot_instances.RemoveAt(index);
+                }
             }
-            end_index = tmp_tabs.Controls.Count;
-            for (int x = 1; x < end_index; x++)
+            else
             {
-                tabControl1.Controls.Add(tmp_tabs.GetControl(1));
-                tabControl1.GetControl(tabControl1.Controls.Count - 1).TabIndex = selected_tab + x + 1;
+                if (tabControl1.TabPages.Count == 1)
+                {
+                    tabControl1.SelectedIndex = 0;
+                    Control control = tabControl1.TabPages[0].Controls[0];
+                    RichTextBox output_box = (RichTextBox)control;
+                    output_box.Name = "output_box_system";
+                    output_box.Text = "No Server Connected";
+                    control = tabControl1.TabPages[0];
+                    TabPage tabpage = (TabPage)control;
+                    tabpage.Name = "No_Server_Specified";
+                    tabpage.Text = "System";
+
+                    button1.Visible = false;
+                    button1.Enabled = false;
+                    connectToolStripMenuItem.Text = "Connect";
+                    connectToolStripMenuItem.Enabled = false;
+                }
+                else
+                {
+                    tabControl1.Controls.RemoveAt(selected_tab);
+                    if (tabControl1.TabPages.Count <= selected_tab)
+                    {
+                        tabControl1.SelectedIndex = tabControl1.TabPages.Count - 1;
+                    }
+                }
             }
+
+            tabControl1.SelectedIndexChanged += tab_changed;
         }
 
         private void connectToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1378,11 +1463,15 @@ namespace IRCBot
             {
                 bot_instances[index].worker.CancelAsync();
                 connectToolStripMenuItem.Text = "Connect";
+                send_button.Enabled = false;
+                input_box.Enabled = false;
             }
             else
             {
                 bot_instances[index].worker.RunWorkerAsync(2000);
                 connectToolStripMenuItem.Text = "Disconnect";
+                send_button.Enabled = true;
+                input_box.Enabled = true;
             }
         }
 
@@ -1421,6 +1510,8 @@ namespace IRCBot
                 {
                     server_initiated = true;
                     bot_instances[index].worker.RunWorkerAsync(2000);
+                    send_button.Enabled = true;
+                    input_box.Enabled = true;
                 }
             }
             else
@@ -1478,7 +1569,7 @@ namespace IRCBot
                     output_box.Name = "output_box_" + tmp_server_name + ":system";
                     control = tabControl1.Controls.Find("tabPage1", true)[0];
                     TabPage tabpage = (TabPage)control;
-                    tabpage.Name = "tabPage_:" + tmp_server_name + ":system";
+                    tabpage.Name = "tabPage:" + tmp_server_name + ":__:system";
                     tabpage.Text = tmp_server_name;
                 }
                 else if (tabControl1.Controls.Find("output_box_" + tmp_server_name + ":system", true).GetUpperBound(0) < 0)
@@ -1493,7 +1584,7 @@ namespace IRCBot
                     TabPage tabpage = new TabPage();
                     tabpage.Controls.Add(box);
                     tabpage.Location = new System.Drawing.Point(4, 22);
-                    tabpage.Name = "tabPage_:" + tmp_server_name + ":system";
+                    tabpage.Name = "tabPage:" + tmp_server_name + ":__:system";
                     tabpage.Padding = new System.Windows.Forms.Padding(3);
                     tabpage.Size = new System.Drawing.Size(832, 353);
                     tabpage.Text = tmp_server_name;
@@ -1516,6 +1607,7 @@ namespace IRCBot
                     {
                         conf.name = xn["name"].InnerText;
                         conf.nick = xn["nick"].InnerText;
+                        conf.secondary_nicks = xn["sec_nicks"].InnerText;
                         conf.pass = xn["password"].InnerText;
                         conf.email = xn["email"].InnerText;
                         conf.owner = xn["owner"].InnerText;
@@ -1599,13 +1691,17 @@ namespace IRCBot
                         break;
                     }
                 }
+
+                button1.Visible = true;
+                button1.Enabled = true;
+
                 bot bot_instance = new bot();
                 bot_instances.Add(bot_instance);
                 bot_instances[bot_instances.Count - 1].start_bot(this, conf);
                 server_initiated = true;
                 connectToolStripMenuItem.Enabled = true;
                 connectToolStripMenuItem.Text = "Disconnect";
-                tabControl1.SelectedIndex = tabControl1.TabPages.IndexOfKey("tabPage_:" + tmp_server_name + ":system");
+                tabControl1.SelectedIndex = tabControl1.TabPages.IndexOfKey("tabPage:" + tmp_server_name + ":__:system");
             }
             return server_initiated;
         }
@@ -1634,7 +1730,10 @@ namespace IRCBot
                 if (bot_instances[index].connected == true)
                 {
                     server_initiated = true;
+                    bot_instances[index].disconnected = true;
                     bot_instances[index].worker.CancelAsync();
+                    input_box.Enabled = false;
+                    send_button.Enabled = false;
                 }
             }
             return server_initiated;
@@ -1672,26 +1771,7 @@ namespace IRCBot
             input_box.Focus();
             if (e.Button == System.Windows.Forms.MouseButtons.Middle)
             {
-                bool server_tab = false;
-                string[] server_list = full_server_list.Split(',');
-                foreach (string server_name in server_list)
-                {
-                    string[] server = server_name.Split('.');
-                    string tmp_server_name = "No_Server_Specified";
-                    if (server.GetUpperBound(0) > 0)
-                    {
-                        tmp_server_name = server[1];
-                    }
-                    if (tabControl1.SelectedTab.Text.Equals(tmp_server_name))
-                    {
-                        server_tab = true;
-                        break;
-                    }
-                }
-                if (server_tab == false)
-                {
-                    button1_Click(sender, e);
-                }
+                button1_Click(sender, e);
             }
         }
 

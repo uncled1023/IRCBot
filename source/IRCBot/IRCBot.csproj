@@ -106,6 +106,7 @@
     <Compile Include="Modules\alarm.cs" />
     <Compile Include="Modules\github.cs" />
     <Compile Include="Modules\logging.cs" />
+    <Compile Include="Modules\site_status.cs" />
     <Compile Include="Modules\survey.cs" />
     <Compile Include="Modules\wolfram_alpha.cs" />
     <Compile Include="Modules\module.cs" />

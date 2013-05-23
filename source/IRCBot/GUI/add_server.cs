@@ -89,6 +89,9 @@ namespace IRCBot
                 XmlNode nodeNick = xmlDoc.CreateElement("nick");
                 nodeNick.InnerText = bot_nick_box.Text;
                 node.AppendChild(nodeNick);
+                XmlNode nodeSecNick = xmlDoc.CreateElement("sec_nicks");
+                nodeSecNick.InnerText = sec_nicks.Text;
+                node.AppendChild(nodeSecNick);
                 XmlNode nodePassword = xmlDoc.CreateElement("password");
                 nodePassword.InnerText = password_box.Text;
                 node.AppendChild(nodePassword);

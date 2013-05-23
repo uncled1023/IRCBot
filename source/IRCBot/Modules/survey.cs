@@ -279,7 +279,7 @@ namespace IRCBot.Modules
                                                 try
                                                 {
                                                     num_survey = Convert.ToInt32(new_line[0]);
-                                                    add_survey_owner(num_survey - 1, nick, new_line[1], ircbot, conf);
+                                                    add_survey_owner(num_survey - 1, nick, new_line[1].ToLower(), ircbot, conf);
                                                 }
                                                 catch (Exception ex)
                                                 {
@@ -310,7 +310,7 @@ namespace IRCBot.Modules
                                                 try
                                                 {
                                                     num_survey = Convert.ToInt32(new_line[0]);
-                                                    del_survey_owner(num_survey - 1, nick, new_line[1], ircbot, conf);
+                                                    del_survey_owner(num_survey - 1, nick, new_line[1].ToLower(), ircbot, conf);
                                                 }
                                                 catch (Exception ex)
                                                 {
@@ -525,7 +525,7 @@ namespace IRCBot.Modules
                                     survey_found = true;
                                     if (Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "answers" + Path.DirectorySeparatorChar + fsi[survey_num].Name.Substring(0, fsi[survey_num].Name.Length - 4) + Path.DirectorySeparatorChar + requested_nick + Path.DirectorySeparatorChar + ""))
                                     {
-                                        ircbot.sendData("PRIVMSG", nick + " :" + nick + " has supplied the following answers for your survey, \"" + questions[1] + "\":");
+                                        ircbot.sendData("PRIVMSG", nick + " :" + requested_nick + " has supplied the following answers for your survey, \"" + questions[1] + "\":");
                                         string[] answers = Directory.GetFiles(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "answers" + Path.DirectorySeparatorChar + fsi[survey_num].Name.Substring(0, fsi[survey_num].Name.Length - 4) + Path.DirectorySeparatorChar + requested_nick + Path.DirectorySeparatorChar + "");
                                         int question_num = 0;
                                         for (int x = 3; x <= questions.GetUpperBound(0); x++)

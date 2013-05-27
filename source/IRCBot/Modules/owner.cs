@@ -182,7 +182,6 @@ namespace IRCBot.Modules
                                                 string[] chan_list = line[4].Replace(' ', ',').Split(',');
                                                 foreach (string chan in chan_list)
                                                 {
-                                                    ircbot.channel_list.Add(chan);
                                                     ircbot.sendData("JOIN", chan);
                                                 }
                                             }
@@ -545,7 +544,6 @@ namespace IRCBot.Modules
                                                                 ircbot.sendData("NOTICE", owner_nick + " :If you would like to permanently add this channel, please type " + conf.command + "addchanlist " + channel);
                                                             }
                                                         }
-                                                        ircbot.channel_list.Add(line[4]);
                                                         ircbot.sendData("JOIN", line[4]);
                                                     }
                                                 }
@@ -584,7 +582,6 @@ namespace IRCBot.Modules
                                                 }
                                                 if (in_chan == false)
                                                 {
-                                                    ircbot.channel_list.Add(line[4]);
                                                     ircbot.sendData("JOIN", line[4]);
                                                 }
                                                 add_channel_list(line[4], ircbot, ref conf);

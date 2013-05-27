@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading;
@@ -15,6 +16,7 @@ using System.Xml.Linq;
 using System.Xml;
 using System.Text.RegularExpressions;
 using Microsoft.Win32;
+using System.Runtime;
 using System.Runtime.InteropServices;
 using System.Management;
 using System.Reflection;
@@ -172,6 +174,20 @@ namespace IRCBot
             {
                 conn_open = false;
             }
+
+            Socket s = new Socket(AddressFamily.InterNetwork,
+            SocketType.Stream,
+            ProtocolType.Tcp);
+
+            try
+            {
+                s.Connect(conf.server_ip[0], conf.port);
+            }
+            catch (Exception ex)
+            {
+                conn_open = false;
+            }
+
             return conn_open;
         }
        
@@ -396,41 +412,6 @@ namespace IRCBot
                         sendData("USER", config.nick + " default_host default_server :" + config.name);
                     }
 
-                    sendData("NICK", config.nick);
-                    string line = sr.ReadLine();
-                    bool nick_accepted = true;
-                    if (line.Equals("Nickname is already in use."))
-                    {
-                        nick_accepted = false;
-                        string[] nicks = conf.secondary_nicks.Split(',');
-                        foreach (string nick in nicks)
-                        {
-                            sendData("NICK", config.nick);
-                            line = sr.ReadLine();
-                            if (!line.Equals("Nickname is already in use."))
-                            {
-                                nick_accepted = true;
-                                conf.nick = nick;
-                                ircbot.Name = nick;
-                                break;
-                            }
-                        }
-                    }
-                    while(nick_accepted == false)
-                    {
-                        Random rand = new Random();
-                        string nick_rand = "Guest" + rand.Next(100000).ToString();
-                        sendData("NICK", nick_rand);
-                        line = sr.ReadLine();
-                        if (!line.Equals("Nickname is already in use."))
-                        {
-                            nick_accepted = true;
-                            conf.nick = nick_rand;
-                            ircbot.Name = nick_rand;
-                        }
-                    }
-                    connected = true;
-                    disconnected = false;
                     IRCWork(bw);
                 }
                 catch (Exception ex)
@@ -576,6 +557,16 @@ namespace IRCBot
                     string line = sr.ReadLine();
                     lock (streamlock)
                     {
+                        string output = Environment.NewLine + server_name + ":" + line;
+                        lock (ircbot.listLock)
+                        {
+                            if (ircbot.queue_text.Count >= 1000)
+                            {
+                                ircbot.queue_text.RemoveAt(0);
+                            }
+                            ircbot.queue_text.Add(output);
+                        }
+
                         data_queue.Add(line);
                         stream_queue.Add(line);
                     }
@@ -619,34 +610,87 @@ namespace IRCBot
             return response;
         }
 
+        public void initiate_nick()
+        {
+            sendData("NICK", config.nick);
+            Thread.Sleep(30);
+            string line = "test";
+            bool nick_accepted = true;
+            while (!line.Equals(""))
+            {
+                if (line.Equals("Nickname is already in use."))
+                {
+                    nick_accepted = false;
+                    string[] nicks = conf.secondary_nicks.Split(',');
+                    foreach (string nick in nicks)
+                    {
+                        sendData("NICK", config.nick);
+                        Thread.Sleep(30);
+                        line = read_queue();
+                        if (!line.Equals("Nickname is already in use."))
+                        {
+                            nick_accepted = true;
+                            conf.nick = nick;
+                            ircbot.Name = nick;
+                            break;
+                        }
+                    }
+                }
+                while (nick_accepted == false)
+                {
+                    Random rand = new Random();
+                    string nick_rand = "Guest" + rand.Next(100000).ToString();
+                    sendData("NICK", nick_rand);
+                    Thread.Sleep(30);
+                    line = read_queue();
+                    if (!line.Equals("Nickname is already in use."))
+                    {
+                        nick_accepted = true;
+                        conf.nick = nick_rand;
+                        ircbot.Name = nick_rand;
+                    }
+                }
+                line = read_queue();
+            }
+        }
+
         public void IRCWork(BackgroundWorker bw)
         {
+            shouldRun = true;
+            connected = true;
+            disconnected = false;
+
+            BackgroundWorker work = new BackgroundWorker();
+            work.DoWork += (sender, e) => save_stream(sender, e);
+            work.RunWorkerAsync(2000);
+
+            Thread.Sleep(100);
+
             string data = "";
 
             checkRegisterationTimer.Enabled = true;
 
+            Thread.Sleep(100);
+
+            initiate_nick();
+
             bool tmp_connected = false;
             while (tmp_connected == false)
             {
-                Thread.Sleep(50);
-                string line = sr.ReadLine();
+                Thread.Sleep(30);
+                string line = read_queue();
                 char[] charSeparator = new char[] { ' ' };
                 string[] ex = line.Split(charSeparator, 5, StringSplitOptions.RemoveEmptyEntries);
 
-                if (ex[0] == "PING")
+                if (ex.GetUpperBound(0) >= 0)
                 {
-                    sendData("PONG", ex[1]);
-                }
-                string[] new_line = line.Split(charSeparator, 5);
-                string output = Environment.NewLine + server_name + ":" + line;
-                lock (ircbot.listLock)
-                {
-                    if (ircbot.queue_text.Count >= 1000)
+                    if (ex[0] == "PING")
                     {
-                        ircbot.queue_text.RemoveAt(0);
+                        sendData("PONG", ex[1]);
                     }
-                    ircbot.queue_text.Add(output);
                 }
+
+                string[] new_line = line.Split(charSeparator, 5);
                 if (new_line.GetUpperBound(0) > 3)
                 {
                     if (new_line[3] == ":End" && new_line[4] == "of /MOTD command.")
@@ -655,18 +699,16 @@ namespace IRCBot
                     }
                 }
             }
+
+            Thread.Sleep(100);
+
             identify();
 
-            BackgroundWorker join = new BackgroundWorker();
-            join.DoWork += (sender, e) => joinChannels();
-            join.RunWorkerAsync(2000);
+            Thread.Sleep(100);
+
+            joinChannels();
 
             first_run = false;
-            shouldRun = true;
-            BackgroundWorker work = new BackgroundWorker();
-            work.DoWork += (sender, e) => save_stream(sender, e);
-            work.RunWorkerAsync(2000);
-
             connected = true;
             disconnected = false;
             restart_attempts = 0;
@@ -699,6 +741,162 @@ namespace IRCBot
             }
         }
 
+        public void identify()
+        {
+            if (conf.pass != "")
+            {
+                sendData("PRIVMSG", "NickServ :Identify " + conf.pass);
+                string line = read_queue();
+                char[] charSeparator = new char[] { ' ' };
+                string[] name_line = line.Split(charSeparator, 5);
+                while (name_line.GetUpperBound(0) <= 3)
+                {
+                    line = read_queue();
+                    name_line = line.Split(charSeparator, 5);
+                }
+                while (bot_identified == false)
+                {
+                    if (name_line[3] == ":Password" && name_line[4].StartsWith("accepted"))
+                    {
+                        checkRegisterationTimer.Enabled = false;
+                        bot_identified = true;
+                    }
+                    else if (name_line[3] == ":Your" && name_line[4].StartsWith("nick"))
+                    {
+                        bot_identified = true;
+                    }
+                    else
+                    {
+                        line = read_queue();
+                        name_line = line.Split(charSeparator, 5);
+                        while (name_line.GetUpperBound(0) <= 3)
+                        {
+                            line = read_queue();
+                            name_line = line.Split(charSeparator, 5);
+                        }
+                    }
+                }
+            }
+        }
+
+        private void joinChannels()
+        {
+            // Joins all the channels in the channel list
+            if (conf.chans != "")
+            {
+                string[] channels = conf.chans.Split(',');
+                foreach (string channel in channels)
+                {
+                    bool chan_blocked = false;
+                    string[] channels_blacklist = conf.chan_blacklist.Split(',');
+                    for (int i = 0; i <= channels_blacklist.GetUpperBound(0); i++)
+                    {
+                        if (channel.Equals(channels_blacklist[i]))
+                        {
+                            chan_blocked = true;
+                        }
+                    }
+                    if (chan_blocked == false)
+                    {
+                        sendData("JOIN", channel);
+                        char[] charSeparator = new char[] { ':' };
+                        char[] Separator = new char[] { ' ' };
+                        bool channel_found = false;
+                        List<string> tmp_list = new List<string>();
+                        tmp_list.Add(channel.TrimStart(':'));
+                        string line = "";
+                        line = read_queue();
+                        while (line == "")
+                        {
+                            line = read_queue();
+                        }
+                        string[] name_line = line.Split(Separator, 5);
+                        while (name_line.GetUpperBound(0) <= 1)
+                        {
+                            line = read_queue();
+                            name_line = line.Split(Separator, 5);
+                        }
+                        while (name_line[1] != "JOIN" && !line.Contains("Cannot join channel"))
+                        {
+                            line = read_queue();
+                            name_line = line.Split(Separator, 5);
+                            while (name_line.GetUpperBound(0) <= 1)
+                            {
+                                line = read_queue();
+                                name_line = line.Split(Separator, 5);
+                            }
+                        }
+                        if (!line.Contains("Cannot join channel"))
+                        {
+                            name_line = line.Split(Separator, 5);
+                            while (name_line.GetUpperBound(0) <= 3)
+                            {
+                                line = read_queue();
+                                name_line = line.Split(Separator, 5);
+                            }
+                            while (name_line[3] != "=" && name_line[3] != "@" && name_line[3] != "*")
+                            {
+                                line = read_queue();
+                                name_line = line.Split(Separator, 5);
+                                while (name_line.GetUpperBound(0) <= 3)
+                                {
+                                    line = read_queue();
+                                    name_line = line.Split(Separator, 5);
+                                }
+                            }
+                            tmp_list.Add(name_line[3]);
+                            string[] names_list = name_line[4].Split(':');
+                            if (names_list.GetUpperBound(0) > 0)
+                            {
+                                string[] names = names_list[1].Split(' ');
+                                while (name_line[4] != ":End of /NAMES list.")
+                                {
+                                    channel_found = true;
+                                    names_list = name_line[4].Split(':');
+                                    if (names_list.GetUpperBound(0) > 0)
+                                    {
+                                        names = names_list[1].Split(Separator, StringSplitOptions.RemoveEmptyEntries);
+                                        for (int i = 0; i <= names.GetUpperBound(0); i++)
+                                        {
+                                            char[] arr = names[i].ToCharArray();
+                                            int user_access = conf.user_level;
+                                            foreach (char c in arr)
+                                            {
+                                                if (c.Equals('~') || c.Equals('&') || c.Equals('@') || c.Equals('%') || c.Equals('+'))
+                                                {
+                                                    int tmp_access = get_access_num(c.ToString(), false);
+                                                    if (tmp_access > user_access)
+                                                    {
+                                                        user_access = tmp_access;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    break;
+                                                }
+                                            }
+                                            tmp_list.Add(user_access + ":" + names[i].TrimStart('~').TrimStart('&').TrimStart('@').TrimStart('%').TrimStart('+').ToLower());
+                                        }
+                                    }
+                                    line = read_queue();
+                                    name_line = line.Split(Separator, 5);
+                                    while (name_line.GetUpperBound(0) <= 3)
+                                    {
+                                        line = read_queue();
+                                        name_line = line.Split(Separator, 5);
+                                    }
+                                }
+                                if (channel_found == true)
+                                {
+                                    nick_list.Add(tmp_list);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         public void parse_stream(string data_line)
         {
             string[] ex;
@@ -717,18 +915,6 @@ namespace IRCBot
             if (ex[0] == "PING")
             {
                 sendData("PONG", ex[1]);
-            }
-            else
-            {
-                string output = Environment.NewLine + server_name + ":" + data_line;
-                lock (ircbot.listLock)
-                {
-                    if (ircbot.queue_text.Count >= 1000)
-                    {
-                        ircbot.queue_text.RemoveAt(0);
-                    }
-                    ircbot.queue_text.Add(output);
-                }
             }
 
             string[] user_info = ex[0].Split('@');
@@ -886,7 +1072,7 @@ namespace IRCBot
                                             tmp_list.Add(user_access + ":" + names[i].TrimStart('~').TrimStart('&').TrimStart('@').TrimStart('%').TrimStart('+').ToLower());
                                         }
                                     }
-                                    line = sr.ReadLine();
+                                    line = read_queue();
                                     name_line = line.Split(charSeparator, 5);
                                     while (name_line.GetUpperBound(0) <= 3)
                                     {
@@ -1121,32 +1307,6 @@ namespace IRCBot
             module.control(this, ref conf, index, ex, command, nick_access, nick, channel, bot_command, type);
         }
 
-        private void joinChannels()
-        {
-            // Joins all the channels in the channel list
-            if (conf.chans != "")
-            {
-                string[] channels = conf.chans.Split(',');
-                foreach (string channel in channels)
-                {
-                    bool chan_blocked = false;
-                    string[] channels_blacklist = conf.chan_blacklist.Split(',');
-                    for (int i = 0; i <= channels_blacklist.GetUpperBound(0); i++)
-                    {
-                        if(channel.Equals(channels_blacklist[i]))
-                        {
-                            chan_blocked = true;
-                        }
-                    }
-                    if (chan_blocked == false)
-                    {
-                        Thread.Sleep(1000);
-                        sendData("JOIN", channel);
-                    }
-                }
-            }
-        }
-
         private void checkRegistration(object sender, EventArgs e)
         {
             if (connected == true)
@@ -1218,80 +1378,6 @@ namespace IRCBot
         private void register_nick(string nick, string password, string email)
         {
             sendData("PRIVMSG", "NickServ :register " + password + " " + email);
-        }
-
-        public void identify()
-        {
-            if (conf.pass != "")
-            {
-                sendData("PRIVMSG", "NickServ :Identify " + conf.pass);
-                string line = sr.ReadLine();
-                char[] charSeparator = new char[] { ' ' };
-                string[] name_line = line.Split(charSeparator, 5);
-                string output = Environment.NewLine + server_name + ":" + line;
-                lock (ircbot.listLock)
-                {
-                    if (ircbot.queue_text.Count >= 1000)
-                    {
-                        ircbot.queue_text.RemoveAt(0);
-                    }
-                    ircbot.queue_text.Add(output);
-                }
-                while (name_line.GetUpperBound(0) <= 3)
-                {
-                    line = sr.ReadLine();
-                    name_line = line.Split(charSeparator, 5);
-                    output = Environment.NewLine + server_name + ":" + line;
-                    lock (ircbot.listLock)
-                    {
-                        if (ircbot.queue_text.Count >= 1000)
-                        {
-                            ircbot.queue_text.RemoveAt(0);
-                        }
-                        ircbot.queue_text.Add(output);
-                    }
-                }
-                while(bot_identified == false)
-                {
-                    if (name_line[3] == ":Password" && name_line[4].StartsWith("accepted"))
-                    {
-                        checkRegisterationTimer.Enabled = false;
-                        bot_identified = true;
-                    }
-                    else if (name_line[3] == ":Your" && name_line[4].StartsWith("nick"))
-                    {
-                        bot_identified = true;
-                    }
-                    else
-                    {
-                        line = sr.ReadLine();
-                        name_line = line.Split(charSeparator, 5);
-                        output = Environment.NewLine + server_name + ":" + line;
-                        lock (ircbot.listLock)
-                        {
-                            if (ircbot.queue_text.Count >= 1000)
-                            {
-                                ircbot.queue_text.RemoveAt(0);
-                            }
-                            ircbot.queue_text.Add(output);
-                        }
-                        while (name_line.GetUpperBound(0) <= 3)
-                        {
-                            line = sr.ReadLine();
-                            name_line = line.Split(charSeparator, 5);
-                            output = Environment.NewLine + server_name + ":" + line;
-                            lock (ircbot.listLock)
-                            {
-                                if (ircbot.queue_text.Count >= 1000)
-                                {
-                                    ircbot.queue_text.RemoveAt(0);
-                                }
-                                ircbot.queue_text.Add(output);
-                            }
-                        }
-                    }
-                }
-            }
         }
 
         public string get_user_host(string nick)

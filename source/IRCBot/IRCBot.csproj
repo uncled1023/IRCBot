@@ -104,6 +104,7 @@
     <Compile Include="lib\json.cs" />
     <Compile Include="Modules\about.cs" />
     <Compile Include="Modules\alarm.cs" />
+    <Compile Include="Modules\check_connection.cs" />
     <Compile Include="Modules\github.cs" />
     <Compile Include="Modules\logging.cs" />
     <Compile Include="Modules\site_status.cs" />

@@ -21,6 +21,7 @@ using System.Management;
 struct IRCConfig
 {
     public string server;
+    public IPAddress[] server_ip;
     public string chans;
     public string chan_blacklist;
     public int port;
@@ -422,6 +423,15 @@ namespace IRCBot
                     }
                     else
                     {
+                    }
+
+                    try
+                    {
+                        conf.server_ip = Dns.GetHostAddresses(conf.server);
+                    }
+                    catch
+                    {
+                        conf.server_ip = null;
                     }
 
                     button1.Visible = true;
@@ -1335,8 +1345,6 @@ namespace IRCBot
                 bot_instances[index].sendData("PART", name);
             }
 
-            tabControl1.SelectedIndexChanged -= tab_changed;
-
             if (name.Equals(tmp_server))
             {
                 bool ended = false;
@@ -1373,7 +1381,7 @@ namespace IRCBot
                     output_box.Text = "No Server Connected";
                     control = tabControl1.TabPages[0];
                     TabPage tabpage = (TabPage)control;
-                    tabpage.Name = "No_Server_Specified";
+                    tabpage.Name = "tabPage1";
                     tabpage.Text = "System";
 
                     button1.Visible = false;
@@ -1411,7 +1419,7 @@ namespace IRCBot
                     output_box.Text = "No Server Connected";
                     control = tabControl1.TabPages[0];
                     TabPage tabpage = (TabPage)control;
-                    tabpage.Name = "No_Server_Specified";
+                    tabpage.Name = "tabPage1";
                     tabpage.Text = "System";
 
                     button1.Visible = false;
@@ -1426,10 +1434,12 @@ namespace IRCBot
                     {
                         tabControl1.SelectedIndex = tabControl1.TabPages.Count - 1;
                     }
+                    else
+                    {
+                        tabControl1.SelectedIndex = selected_tab;
+                    }
                 }
             }
-
-            tabControl1.SelectedIndexChanged += tab_changed;
         }
 
         private void connectToolStripMenuItem_Click(object sender, EventArgs e)

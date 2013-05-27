@@ -141,6 +141,7 @@ namespace IRCBot.Modules
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
             request.Method = "POST";
             request.Headers.Add("Authorization: Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes(ircbot.conf.module_config[module_id][3] + ":" + ircbot.conf.module_config[module_id][4])));
+            request.UserAgent = "IRCBot";
             byte[] postBytes = Encoding.ASCII.GetBytes(jsonString);
             // this is important - make sure you specify type this way
             request.ContentLength = postBytes.Length;

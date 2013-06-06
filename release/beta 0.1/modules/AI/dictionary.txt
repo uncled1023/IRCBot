@@ -1,0 +1,22 @@
+* good * how * you*:cool <nick>, I'm doin aiight.
+* where * you * from*:I'm from iceland.  Its pretty cold up there.
+* what * up *:Oh, nothing much. You?
+* how* it * going*:Pretty good myself, how about you?
+* doin* ok*:Glad to hear, <nick>.
+* this * boring *:Yea, this chan is fuckin' boring
+hello|hey|hi|sup|yo|hello*<me>*|hey*<me>*|hi*<me>*|sup*<me>*|yo*<me>*:Hey, hows it going?|Hello to you too|Hi|hey|Well hello there|Go away.
+*im * good *|*i'm * good *:Well thats good.|Good to hear|Yea? same here.|Well, I should make it shitty then.|I can make it better.  ;)|No one cares.
+bye|night|good*night|nn|bye*<me>*|night*<me>*|good*night*<me>*|nn*<me>*:Good bye|Hope to see you again soon|Already leaving?|Fine, go away|Your leaving me here with all these creeps?|No one cares.
+brb|bbl:Ill be waiting for your return|ORLY?|aw, ill miss you.|Fine, go away|Your leaving me here with all these creeps?|No one cares.
+*stupid*:Hey, thats not nice.|I have feelings too.|Oh shut up nub.|No, your stupid.|You A-hole.|<action>cries&<part>&<delay>10000&<join>&<delay>100&Sike! you wish I left.
+*retard*:Im not retarded|Like your mother?|Go die in a hole|No, your retarded.|just go away.|lol, what if I am?
+*idiot*:I am not an idiot <nick>|I'm smart.|Only you are good sir.|No. Just no.|Eat a nuke.|Um, no?
+*gay*:I'm not gay.|yes, I am a happy bot.|Only you are good sir.|STFU.|Are you a homophobe?|Do you want me to be gay?
+*stfu*:NOU|You STFU|...  :(|No one has to.|Um, how about you?&<kick>Get Out|Just go away. No one likes you.
+*fuck*you*:Thats not nice!|Yes please.  ;P|:(|NO|Um, how about you?|No one likes you.
+*hate*:I hate you too|Hate is a strong word...|Well... well...  I dislike you a lot.|Oh shut up <nick>.|No one likes you anyways.|Why are you always mean to me?
+*go * hell*:At least it wont be cold.|And your coming with me. MUAHA|no, you are!|Am not!|The devil scares me.|No, you go to hell.
+*shut*up*|*no*u*:Um, no?|Freedom of speech bitch!|NOU|Oh shut up <nick>.|Go eat a nuke.|Why are you always mean to me?
+*love*|*<3*:Really?&<action>blushes|I dnt love you though.|I love you too.|Love is a strong word...|But im married?!|Hehe, thanks.  :-P
+*rawr*:RAWR (I love you too)|<3 sexy.|I love you too.|RAWR!!!&<action>eats <nick>|ORLY now.  ;)|WTF was that?
+*cum*:<action>shoots himself&<part>&<delay>1000&<join>&<delay>100&<action>is now a zombie.|That's not my name!|>.> Shut up.|I am not a cum receptacle|Stop it you idiot.|Please say my name correctly|<kick>Get Out|Why are you so mean to me?|God your annoying...|Stop it...

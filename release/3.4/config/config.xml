@@ -1,0 +1,16 @@
+<bot_settings>
+  <server_list>
+  </server_list>
+  <global_settings>
+    <command_prefix>.</command_prefix>
+    <keep_logs>True</keep_logs>
+    <logs_path>
+    </logs_path>
+    <start_with_windows>False</start_with_windows>
+    <minimize_to_tray>True</minimize_to_tray>
+    <spam_count>5</spam_count>
+    <spam_threshold>1000</spam_threshold>
+    <spam_timeout>10000</spam_timeout>
+    <max_message_length>450</max_message_length>
+  </global_settings>
+</bot_settings>

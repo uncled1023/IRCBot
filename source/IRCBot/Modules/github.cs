@@ -81,7 +81,14 @@ namespace IRCBot.Modules
                                                 List<string> label = new List<string>() { "bug" };
                                                 string uri = "https://api.github.com/repos/" + ircbot.conf.module_config[module_id][3] + "/" + ircbot.conf.module_config[module_id][5] + "/issues";
                                                 string response = post_issue(ircbot, module_id, uri, title, description, ircbot.conf.module_config[module_id][3], label);
-                                                ircbot.sendData("NOTICE", nick + " :Issue Added Successfully");
+                                                if (response.Equals(""))
+                                                {
+                                                    ircbot.sendData("NOTICE", nick + " :Issue Added Successfully");
+                                                }
+                                                else
+                                                {
+                                                    ircbot.sendData("NOTICE", nick + " :" + response);
+                                                }
                                             }
                                             else
                                             {
@@ -113,7 +120,14 @@ namespace IRCBot.Modules
                                                 List<string> label = new List<string>() { "Feature Request" };
                                                 string uri = "https://api.github.com/repos/" + ircbot.conf.module_config[module_id][3] + "/" + ircbot.conf.module_config[module_id][5] + "/issues";
                                                 string response = post_issue(ircbot, module_id, uri, title, description, ircbot.conf.module_config[module_id][3], label);
-                                                ircbot.sendData("NOTICE", nick + " :Feature Request Added Successfully");
+                                                if (response.Equals(""))
+                                                {
+                                                    ircbot.sendData("NOTICE", nick + " :Feature Request Added Successfully");
+                                                }
+                                                else
+                                                {
+                                                    ircbot.sendData("NOTICE", nick + " :" + response);
+                                                }
                                             }
                                             else
                                             {
@@ -155,7 +169,7 @@ namespace IRCBot.Modules
             {
                 // grab te response and print it out to the console along with the status code
                 HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-                reply = new StreamReader(response.GetResponseStream()).ReadToEnd();
+                new StreamReader(response.GetResponseStream()).ReadToEnd();
             }
             catch (WebException ex)
             {

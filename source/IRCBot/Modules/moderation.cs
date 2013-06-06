@@ -596,7 +596,8 @@ namespace IRCBot.Modules
                                             {
                                                 string[] new_line = line[4].ToLower().Split(charS, 2);
                                                 string nicks = new_line[0].TrimStart(':');
-                                                string[] total_nicks = nicks.Split(',');
+                                                char[] charSep = new char[] { ',' };
+                                                string[] total_nicks = new_line[0].Split(charSep, StringSplitOptions.RemoveEmptyEntries);
                                                 int sent_nick_access = ircbot.get_user_access(total_nicks[0], line[2]);
 
                                                 bool tmp_me = false;
@@ -619,7 +620,7 @@ namespace IRCBot.Modules
                                                 {
                                                     if (nick_access >= sent_nick_access)
                                                     {
-                                                        string target_host = ircbot.get_user_host(new_line[0]);
+                                                        string target_host = ircbot.get_user_host(total_nicks[0]);
                                                         string ban = "*!*@" + target_host;
                                                         if (target_host.Equals(""))
                                                         {
@@ -660,11 +661,13 @@ namespace IRCBot.Modules
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 string[] new_line = line[4].ToLower().Split(charS, 2);
-                                                int sent_nick_access = ircbot.get_user_access(new_line[0].TrimStart(':'), line[2]);
+                                                char[] charSep = new char[] { ',' };
+                                                string[] total_nicks = new_line[0].Split(charSep, StringSplitOptions.RemoveEmptyEntries);
+                                                int sent_nick_access = ircbot.get_user_access(total_nicks[0].TrimStart(':'), line[2]);
 
                                                 if (nick_access >= sent_nick_access)
                                                 {
-                                                    string target_host = ircbot.get_user_host(new_line[0]);
+                                                    string target_host = ircbot.get_user_host(total_nicks[0]);
                                                     string ban = "*!*@" + target_host;
                                                     if (target_host.Equals(""))
                                                     {
@@ -719,7 +722,8 @@ namespace IRCBot.Modules
                                             {
                                                 string[] new_line = line[4].ToLower().Split(charS, 2);
                                                 string nicks = new_line[0].TrimStart(':');
-                                                string[] total_nicks = nicks.Split(',');
+                                                char[] charSep = new char[] { ',' };
+                                                string[] total_nicks = nicks.Split(charSep, StringSplitOptions.RemoveEmptyEntries);
                                                 int sent_nick_access = ircbot.get_user_access(total_nicks[0], line[2]);
 
                                                 bool tmp_me = false;
@@ -742,7 +746,7 @@ namespace IRCBot.Modules
                                                 {
                                                     if (nick_access >= sent_nick_access)
                                                     {
-                                                        string target_host = ircbot.get_user_host(new_line[0]);
+                                                        string target_host = ircbot.get_user_host(total_nicks[0]);
                                                         string ban = "*!*@" + target_host;
                                                         if (target_host.Equals(""))
                                                         {
@@ -751,12 +755,12 @@ namespace IRCBot.Modules
                                                         if (new_line.GetUpperBound(0) > 0)
                                                         {
                                                             ircbot.sendData("MODE", line[2] + " +b " + ban + " :" + new_line[1]);
-                                                            ircbot.sendData("KICK", line[2] + " " + new_line[0] + " :" + new_line[1]);
+                                                            ircbot.sendData("KICK", line[2] + " " + total_nicks[0] + " :" + new_line[1]);
                                                         }
                                                         else
                                                         {
                                                             ircbot.sendData("MODE", line[2] + " +b " + ban + " :No Reason");
-                                                            ircbot.sendData("KICK", line[2] + " " + new_line[0] + " :No Reason");
+                                                            ircbot.sendData("KICK", line[2] + " " + total_nicks[0] + " :No Reason");
                                                         }
                                                     }
                                                     else
@@ -789,8 +793,9 @@ namespace IRCBot.Modules
                                                 {
                                                     int time = Convert.ToInt32(new_line[0].TrimStart(':'));
                                                     string nicks = new_line[1];
-                                                    string target_host = ircbot.get_user_host(new_line[1]);
-                                                    string[] total_nicks = nicks.Split(',');
+                                                    char[] charSep = new char[] { ',' };
+                                                    string[] total_nicks = nicks.Split(charSep, StringSplitOptions.RemoveEmptyEntries);
+                                                    string target_host = ircbot.get_user_host(total_nicks[0]);
                                                     int sent_nick_access = ircbot.get_user_access(total_nicks[0], line[2]);
 
                                                     bool tmp_me = false;
@@ -816,7 +821,7 @@ namespace IRCBot.Modules
                                                             string ban = "*!*@" + target_host;
                                                             if (target_host.Equals(""))
                                                             {
-                                                                ban = new_line[1] + "!*@*";
+                                                                ban = total_nicks[0] + "!*@*";
                                                             }
                                                             if (new_line.GetUpperBound(0) > 1)
                                                             {
@@ -830,7 +835,7 @@ namespace IRCBot.Modules
                                                             unban_trigger.Interval = (Convert.ToInt32(new_line[0]) * 1000);
                                                             unban_trigger.Enabled = true;
                                                             unban_trigger.AutoReset = false;
-                                                            unban_trigger.Elapsed += (sender, e) => unban_nick(sender, e, new_line[1], target_host, line[2]);
+                                                            unban_trigger.Elapsed += (sender, e) => unban_nick(sender, e, total_nicks[0], target_host, line[2]);
                                                             unban_triggers.Add(unban_trigger);
                                                             main = ircbot;
                                                         }
@@ -869,9 +874,10 @@ namespace IRCBot.Modules
                                                 {
                                                     int time = Convert.ToInt32(new_line[0].TrimStart(':'));
                                                     string nicks = new_line[1];
-                                                    string target_host = ircbot.get_user_host(new_line[1]);
-                                                    string[] total_nicks = nicks.Split(',');
+                                                    char[] charSep = new char[] { ',' };
+                                                    string[] total_nicks = nicks.Split(charSep, StringSplitOptions.RemoveEmptyEntries);
                                                     int sent_nick_access = ircbot.get_user_access(total_nicks[0], line[2]);
+                                                    string target_host = ircbot.get_user_host(total_nicks[0]);
 
                                                     bool tmp_me = false;
                                                     for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
@@ -901,18 +907,18 @@ namespace IRCBot.Modules
                                                             if (new_line.GetUpperBound(0) > 1)
                                                             {
                                                                 ircbot.sendData("MODE", line[2] + " +b " + ban + " :" + new_line[2]);
-                                                                ircbot.sendData("KICK", line[2] + " " + new_line[1] + " :" + new_line[2]);
+                                                                ircbot.sendData("KICK", line[2] + " " + total_nicks[0] + " :" + new_line[2]);
                                                             }
                                                             else
                                                             {
                                                                 ircbot.sendData("MODE", line[2] + " +b " + ban + " :No Reason");
-                                                                ircbot.sendData("KICK", line[2] + " " + new_line[1] + " :No Reason");
+                                                                ircbot.sendData("KICK", line[2] + " " + total_nicks[0] + " :No Reason");
                                                             }
                                                             System.Timers.Timer unban_trigger = new System.Timers.Timer();
                                                             unban_trigger.Interval = (Convert.ToInt32(new_line[0]) * 1000);
                                                             unban_trigger.Enabled = true;
                                                             unban_trigger.AutoReset = false;
-                                                            unban_trigger.Elapsed += (sender, e) => unban_nick(sender, e, new_line[1], target_host, line[2]);
+                                                            unban_trigger.Elapsed += (sender, e) => unban_nick(sender, e, total_nicks[0], target_host, line[2]);
                                                             unban_triggers.Add(unban_trigger);
                                                             main = ircbot;
                                                         }
@@ -948,7 +954,8 @@ namespace IRCBot.Modules
                                             {
                                                 string[] new_line = line[4].ToLower().Split(charS, 2);
                                                 string nicks = new_line[0].TrimStart(':');
-                                                string[] total_nicks = nicks.Split(',');
+                                                char[] charSep = new char[] { ',' };
+                                                string[] total_nicks = nicks.Split(charSep, StringSplitOptions.RemoveEmptyEntries);
                                                 int sent_nick_access = ircbot.get_user_access(total_nicks[0], line[2]);
                                                 bool tmp_me = false;
                                                 for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
@@ -970,14 +977,14 @@ namespace IRCBot.Modules
                                                 {
                                                     if (nick_access >= sent_nick_access)
                                                     {
-                                                        string target_host = ircbot.get_user_host(new_line[0]);
+                                                        string target_host = ircbot.get_user_host(total_nicks[0]);
                                                         if (new_line.GetUpperBound(0) > 0)
                                                         {
-                                                            add_auto(new_line[0], line[2], target_host, "k", new_line[1], ircbot);
+                                                            add_auto(total_nicks[0], line[2], target_host, "k", new_line[1], ircbot);
                                                         }
                                                         else
                                                         {
-                                                            add_auto(new_line[0], line[2], target_host, "k", "No Reason", ircbot);
+                                                            add_auto(total_nicks[0], line[2], target_host, "k", "No Reason", ircbot);
                                                         }
                                                     }
                                                     else
@@ -1008,7 +1015,8 @@ namespace IRCBot.Modules
                                                 string[] new_line = line[4].ToLower().Split(charS, 2);
                                                 string target_host = ircbot.get_user_host(new_line[0]);
                                                 string nicks = new_line[0].TrimStart(':');
-                                                string[] total_nicks = nicks.Split(',');
+                                                char[] charSep = new char[] { ',' };
+                                                string[] total_nicks = nicks.Split(charSep, StringSplitOptions.RemoveEmptyEntries);
                                                 int sent_nick_access = ircbot.get_user_access(total_nicks[0], line[2]);
                                                 bool tmp_me = false;
                                                 for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
@@ -1032,11 +1040,11 @@ namespace IRCBot.Modules
                                                     {
                                                         if (new_line.GetUpperBound(0) > 0)
                                                         {
-                                                            add_auto(new_line[0], line[2], target_host, "b", new_line[1], ircbot);
+                                                            add_auto(total_nicks[0], line[2], target_host, "b", new_line[1], ircbot);
                                                         }
                                                         else
                                                         {
-                                                            add_auto(new_line[0], line[2], target_host, "b", "No Reason", ircbot);
+                                                            add_auto(total_nicks[0], line[2], target_host, "b", "No Reason", ircbot);
                                                         }
                                                     }
                                                     else
@@ -1067,7 +1075,8 @@ namespace IRCBot.Modules
                                                 string[] new_line = line[4].ToLower().Split(charS, 2);
                                                 string target_host = ircbot.get_user_host(new_line[0]);
                                                 string nicks = new_line[0].TrimStart(':');
-                                                string[] total_nicks = nicks.Split(',');
+                                                char[] charSep = new char[] { ',' };
+                                                string[] total_nicks = nicks.Split(charSep, StringSplitOptions.RemoveEmptyEntries);
                                                 int sent_nick_access = ircbot.get_user_access(total_nicks[0], line[2]);
                                                 bool tmp_me = false;
                                                 for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
@@ -1091,11 +1100,11 @@ namespace IRCBot.Modules
                                                     {
                                                         if (new_line.GetUpperBound(0) > 0)
                                                         {
-                                                            add_auto(new_line[0], line[2], target_host, "kb", new_line[1], ircbot);
+                                                            add_auto(total_nicks[0], line[2], target_host, "kb", new_line[1], ircbot);
                                                         }
                                                         else
                                                         {
-                                                            add_auto(new_line[0], line[2], target_host, "kb", "No Reason", ircbot);
+                                                            add_auto(total_nicks[0], line[2], target_host, "kb", "No Reason", ircbot);
                                                         }
                                                     }
                                                     else
@@ -1191,7 +1200,8 @@ namespace IRCBot.Modules
                                             {
                                                 string[] new_line = line[4].ToLower().Split(charS, 2);
                                                 string nicks = new_line[0].TrimStart(':');
-                                                string[] total_nicks = nicks.Split(',');
+                                                char[] charSep = new char[] { ',' };
+                                                string[] total_nicks = nicks.Split(charSep, StringSplitOptions.RemoveEmptyEntries);
                                                 int sent_nick_access = ircbot.get_user_access(total_nicks[0], line[2]);
                                                 bool tmp_me = false;
                                                 for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
@@ -1215,11 +1225,11 @@ namespace IRCBot.Modules
                                                     {
                                                         if (new_line.GetUpperBound(0) > 0)
                                                         {
-                                                            ircbot.sendData("KICK", line[2] + " " + new_line[0] + " :" + new_line[1]);
+                                                            ircbot.sendData("KICK", line[2] + " " + total_nicks[0] + " :" + new_line[1]);
                                                         }
                                                         else
                                                         {
-                                                            ircbot.sendData("KICK", line[2] + " " + new_line[0] + " :No Reason");
+                                                            ircbot.sendData("KICK", line[2] + " " + total_nicks[0] + " :No Reason");
                                                         }
                                                     }
                                                     else

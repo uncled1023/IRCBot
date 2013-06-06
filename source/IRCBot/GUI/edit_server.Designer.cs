@@ -48,6 +48,8 @@
             this.cancel_button = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.label27 = new System.Windows.Forms.Label();
+            this.sec_nicks = new System.Windows.Forms.TextBox();
             this.channel_blacklist_box = new System.Windows.Forms.TextBox();
             this.label16 = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
@@ -89,8 +91,6 @@
             this.label14 = new System.Windows.Forms.Label();
             this.user_level_box = new System.Windows.Forms.TextBox();
             this.label15 = new System.Windows.Forms.Label();
-            this.label27 = new System.Windows.Forms.Label();
-            this.sec_nicks = new System.Windows.Forms.TextBox();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -152,7 +152,7 @@
             this.email_box.Location = new System.Drawing.Point(165, 190);
             this.email_box.Name = "email_box";
             this.email_box.Size = new System.Drawing.Size(301, 20);
-            this.email_box.TabIndex = 7;
+            this.email_box.TabIndex = 8;
             // 
             // label8
             // 
@@ -168,7 +168,7 @@
             this.password_box.Location = new System.Drawing.Point(165, 164);
             this.password_box.Name = "password_box";
             this.password_box.Size = new System.Drawing.Size(301, 20);
-            this.password_box.TabIndex = 6;
+            this.password_box.TabIndex = 7;
             // 
             // label6
             // 
@@ -184,7 +184,7 @@
             this.owner_nicks_box.Location = new System.Drawing.Point(165, 216);
             this.owner_nicks_box.Name = "owner_nicks_box";
             this.owner_nicks_box.Size = new System.Drawing.Size(301, 20);
-            this.owner_nicks_box.TabIndex = 8;
+            this.owner_nicks_box.TabIndex = 9;
             // 
             // label5
             // 
@@ -289,12 +289,28 @@
             this.tabPage1.Text = "Server Configuration";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
+            // label27
+            // 
+            this.label27.AutoSize = true;
+            this.label27.Location = new System.Drawing.Point(18, 141);
+            this.label27.Name = "label27";
+            this.label27.Size = new System.Drawing.Size(125, 13);
+            this.label27.TabIndex = 24;
+            this.label27.Text = "Alt Nicks (Separate by \',\')";
+            // 
+            // sec_nicks
+            // 
+            this.sec_nicks.Location = new System.Drawing.Point(165, 138);
+            this.sec_nicks.Name = "sec_nicks";
+            this.sec_nicks.Size = new System.Drawing.Size(301, 20);
+            this.sec_nicks.TabIndex = 6;
+            // 
             // channel_blacklist_box
             // 
             this.channel_blacklist_box.Location = new System.Drawing.Point(165, 242);
             this.channel_blacklist_box.Name = "channel_blacklist_box";
             this.channel_blacklist_box.Size = new System.Drawing.Size(301, 20);
-            this.channel_blacklist_box.TabIndex = 9;
+            this.channel_blacklist_box.TabIndex = 10;
             // 
             // label16
             // 
@@ -341,6 +357,7 @@
             this.module_list.Location = new System.Drawing.Point(7, 29);
             this.module_list.Name = "module_list";
             this.module_list.Size = new System.Drawing.Size(122, 238);
+            this.module_list.Sorted = true;
             this.module_list.TabIndex = 3;
             this.module_list.SelectedIndexChanged += new System.EventHandler(this.module_list_SelectedIndexChanged);
             // 
@@ -530,6 +547,7 @@
             this.command_list.Location = new System.Drawing.Point(6, 26);
             this.command_list.Name = "command_list";
             this.command_list.Size = new System.Drawing.Size(120, 238);
+            this.command_list.Sorted = true;
             this.command_list.TabIndex = 1;
             this.command_list.SelectedIndexChanged += new System.EventHandler(this.command_list_change);
             // 
@@ -668,22 +686,6 @@
             this.label15.Size = new System.Drawing.Size(96, 13);
             this.label15.TabIndex = 27;
             this.label15.Text = "User Access Level";
-            // 
-            // label27
-            // 
-            this.label27.AutoSize = true;
-            this.label27.Location = new System.Drawing.Point(18, 141);
-            this.label27.Name = "label27";
-            this.label27.Size = new System.Drawing.Size(125, 13);
-            this.label27.TabIndex = 24;
-            this.label27.Text = "Alt Nicks (Separate by \',\')";
-            // 
-            // sec_nicks
-            // 
-            this.sec_nicks.Location = new System.Drawing.Point(165, 138);
-            this.sec_nicks.Name = "sec_nicks";
-            this.sec_nicks.Size = new System.Drawing.Size(301, 20);
-            this.sec_nicks.TabIndex = 23;
             // 
             // edit_server
             // 

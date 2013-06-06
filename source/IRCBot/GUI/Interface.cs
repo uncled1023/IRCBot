@@ -271,7 +271,6 @@ namespace IRCBot
                 MyNotifyIcon.Visible = false;
             }
 
-            conf.module_config.Clear();
             XmlNodeList xnList = xmlDoc.SelectNodes("/bot_settings/server_list/server");
             full_server_list = "";
             foreach (XmlNode xn in xnList)
@@ -290,6 +289,8 @@ namespace IRCBot
                 connectToolStripMenuItem.Enabled = true;
                 foreach (string server_name in tmp_server_list)
                 {
+                    conf.module_config.Clear();
+                    conf.command_list.Clear();
                     XmlNodeList ServerxnList = xmlDoc.SelectNodes("/bot_settings/server_list/server");
                     foreach (XmlNode xn in ServerxnList)
                     {
@@ -437,9 +438,11 @@ namespace IRCBot
                     button1.Visible = true;
                     button1.Enabled = true;
 
+                    IRCConfig server_conf = new IRCConfig();
+                    server_conf = conf;
                     bot bot_instance = new bot();
                     bot_instances.Add(bot_instance);
-                    bot_instances[index].start_bot(this, conf);
+                    bot_instances[index].start_bot(this, server_conf);
                     index++;
                 }
             }
@@ -454,31 +457,21 @@ namespace IRCBot
 
         private void tab_changed(object sender, EventArgs e)
         {
-            string[] server_list = full_server_list.Split(',');
-            foreach (string server_name in server_list)
-            {
-                string[] server = server_name.Split('.');
-                string tmp_server_name = "No_Server_Specified";
-                if (server.GetUpperBound(0) > 0)
-                {
-                    tmp_server_name = server[1];
-                }
-            }
             int index = 0;
-            string tmp_server = "No_Server_Specified";
-            foreach (string server_name in server_list)
+            string nick = "";
+            string server = "";
+            string chan = "";
+            string chan_name = "";
+            foreach (bot bot in bot_instances)
             {
-                string[] server = server_name.Split('.');
-                string tmp_server_name = "No_Server_Specified";
-                if (server.GetUpperBound(0) > 0)
-                {
-                    tmp_server_name = server[1];
-                }
                 char[] charSep = new char[] { ':' };
-                string[] tab_name = tabControl1.SelectedTab.Name.ToString().Split(charSep, 3);
-                if (tab_name[1].Equals(tmp_server_name))
+                string[] tab_name = tabControl1.SelectedTab.Name.ToString().Split(charSep, 4);
+                if (tab_name[1].Equals(bot.server_name))
                 {
-                    tmp_server = tmp_server_name;
+                    nick = bot.conf.nick;
+                    chan = tab_name[2];
+                    chan_name = tab_name[3];
+                    server = bot.server_name;
                     break;
                 }
                 else
@@ -486,17 +479,38 @@ namespace IRCBot
                     index++;
                 }
             }
-            if (bot_instances[index].connected == true)
+            if (index < bot_instances.Count())
             {
-                connectToolStripMenuItem.Text = "Disconnect";
-                input_box.Enabled = true;
-                send_button.Enabled = true;
-            }
-            else
-            {
-                connectToolStripMenuItem.Text = "Connect";
-                input_box.Enabled = false;
-                send_button.Enabled = false;
+                string title = "IRCBot: ";
+                if (chan.Equals("__"))
+                {
+                    title += nick + " @ " + server;
+                }
+                else if (chan.Equals("_chan_"))
+                {
+                    title += nick + " @ " + server + " / " + chan_name;
+                }
+                else if (chan.Equals("_user_"))
+                {
+                    title += "Dialog with " + chan_name + " @ " + server;
+                }
+                else
+                {
+                    title = "IRCBot";
+                }
+                this.Text = title;
+                if (bot_instances[index].connected == true)
+                {
+                    connectToolStripMenuItem.Text = "Disconnect";
+                    input_box.Enabled = true;
+                    send_button.Enabled = true;
+                }
+                else
+                {
+                    connectToolStripMenuItem.Text = "Connect";
+                    input_box.Enabled = false;
+                    send_button.Enabled = false;
+                }
             }
         }
 
@@ -507,22 +521,15 @@ namespace IRCBot
 
         private void send_button_Click(object sender, EventArgs e)
         {
-            string[] server_list = full_server_list.Split(',');
             int index = 0;
             string tmp_server = "No_Server_Specified";
-            foreach (string server_name in server_list)
+            foreach (bot bot in bot_instances)
             {
-                string[] server = server_name.Split('.');
-                string tmp_server_name = "No_Server_Specified";
-                if (server.GetUpperBound(0) > 0)
-                {
-                    tmp_server_name = server[1];
-                }
                 char[] charSep = new char[] { ':' };
                 string[] tab_name = tabControl1.SelectedTab.Name.ToString().Split(charSep, 3);
-                if (tab_name[1].Equals(tmp_server_name))
+                if (tab_name[1].Equals(bot.server_name))
                 {
-                    tmp_server = tmp_server_name;
+                    tmp_server = bot.server_name;
                     break;
                 }
                 else
@@ -949,7 +956,6 @@ namespace IRCBot
                             output_box.SelectionStart = output_box.Text.Length;
                             output_box.ScrollToCaret();
                         }
-                        this.Text = conf.name;
                         if (conf.keep_logs.Equals("True"))
                         {
                             string file_name = "";
@@ -1006,6 +1012,11 @@ namespace IRCBot
             }
             else
             {
+                // disable tab change events (screws up updating)
+                this.tabControl1.SelectedIndexChanged -= new System.EventHandler(this.tabControl1_MouseClick);
+                this.tabControl1.MouseClick -= new System.Windows.Forms.MouseEventHandler(this.tabControl1_MouseClick);
+                tabControl1.SelectedIndexChanged -= tab_changed;
+
                 char[] charSep = new char[] { ':' };
                 string[] channel = tab_name.Split(charSep, 2);
                 RichTextBox box = new RichTextBox();
@@ -1022,8 +1033,11 @@ namespace IRCBot
                 box.Size = new System.Drawing.Size(826, 347);
                 box.ReadOnly = true;
                 box.Text = "";
+                box.LinkClicked += new LinkClickedEventHandler(link_Click);
+
                 TabPage tabpage = new TabPage();
                 tabpage.Controls.Add(box);
+
                 tabpage.Location = new System.Drawing.Point(4, 22);
                 if (channel[1].StartsWith("#"))
                 {
@@ -1047,9 +1061,10 @@ namespace IRCBot
                 int index = 0;
                 foreach (TabPage tab in tabControl1.TabPages)
                 {
-                    string[] tmp = new string[2] {
+                    string[] tmp = new string[3] {
                         tab.Name,
-                        index.ToString()
+                        index.ToString(),
+                        tab.Text
                     };
                     tab_names[index] = tmp;
                     index++;
@@ -1057,26 +1072,25 @@ namespace IRCBot
 
                 Sort<string>(tab_names, 0);
 
-                index = 1;
-                for (int i = 0; i <= tab_names.GetUpperBound(0); i++)
+                TabControl tmp_tabcontrol = new TabControl();
+                foreach (Control page in tabControl1.TabPages)
                 {
-                    TabPage tmp = new TabPage();
-                    tmp = tabControl1.TabPages[Convert.ToInt32(tab_names[i][1])];
-                    tabControl1.TabPages.RemoveAt(Convert.ToInt32(tab_names[i][1]));
-                    tabControl1.Controls.Add(tmp);
-                    for (int x = index; x <= tab_names.GetUpperBound(0); x++)
-                    {
-                        if (Convert.ToInt32(tab_names[x][1]) > Convert.ToInt32(tab_names[i][1]))
-                        {
-                            tab_names[x][1] = (Convert.ToInt32(tab_names[x][1]) - 1).ToString();
-                        }
-                    }
-                    index++;
+                    tmp_tabcontrol.Controls.Add(page);
+                }
+
+                tabControl1.Controls.Clear();
+
+                foreach (string[] page in tab_names)
+                {
+                    tabControl1.Controls.Add(tmp_tabcontrol.Controls.Find(page[0], true)[0]);
                 }
 
                 tabControl1.Update();
 
-                box.LinkClicked += new LinkClickedEventHandler(link_Click);
+                // enable tab change events again.
+                this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_MouseClick);
+                this.tabControl1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.tabControl1_MouseClick);
+                tabControl1.SelectedIndexChanged += tab_changed;
 
                 tabControl1.SelectedIndex = tabControl1.Controls.Find(tabpage.Name, true)[0].TabIndex;
             }
@@ -1117,19 +1131,13 @@ namespace IRCBot
                 string[] server_list = full_server_list.Split(',');
                 int index = 0;
                 string tmp_server = "No_Server_Specified";
-                foreach (string server_name in server_list)
+                foreach (bot bot in bot_instances)
                 {
-                    string[] server = server_name.Split('.');
-                    string tmp_server_name = "No_Server_Specified";
-                    if (server.GetUpperBound(0) > 0)
-                    {
-                        tmp_server_name = server[1];
-                    }
                     char[] charSep = new char[] { ':' };
                     string[] tab_name = tabControl1.SelectedTab.Name.ToString().Split(charSep, 3);
-                    if (tab_name[1].Equals(tmp_server_name))
+                    if (tab_name[1].Equals(bot.server_name))
                     {
-                        tmp_server = tmp_server_name;
+                        tmp_server = bot.server_name;
                         break;
                     }
                     else
@@ -1142,6 +1150,7 @@ namespace IRCBot
                 string[] input = input_tmp.Split(charSeparator, 2);
                 if (input[0].StartsWith("/"))
                 {
+                    e.Handled = true;
                     if (input.GetUpperBound(0) > 0)
                     {
                         bot_instances[index].sendData(input[0].TrimStart('/'), input[1]);
@@ -1168,6 +1177,7 @@ namespace IRCBot
                     }
                     else
                     {
+                        e.Handled = true;
                         if (input.GetUpperBound(0) > 0)
                         {
                             bot_instances[index].sendData("PRIVMSG", tabControl1.SelectedTab.Text + " :" + input[0] + " " + input[1]);
@@ -1300,24 +1310,17 @@ namespace IRCBot
 
         private void button1_Click(object sender, EventArgs e)
         {
-            string[] server_list = full_server_list.Split(',');
             int index = 0;
             string tmp_server = "No_Server_Specified";
             string tmp_full_server = "No_Server_Specified";
-            foreach (string server_name in server_list)
+            foreach (bot bot in bot_instances)
             {
-                string[] server = server_name.Split('.');
-                string tmp_server_name = "No_Server_Specified";
-                if (server.GetUpperBound(0) > 0)
-                {
-                    tmp_server_name = server[1];
-                }
                 char[] charSep = new char[] { ':' };
                 string[] tab_name = tabControl1.SelectedTab.Name.ToString().Split(charSep, 3);
-                if (tab_name[1].Equals(tmp_server_name))
+                if (tab_name[1].Equals(bot.server_name))
                 {
-                    tmp_server = tmp_server_name;
-                    tmp_full_server = server_name;
+                    tmp_server = bot.server_name;
+                    tmp_full_server = bot.full_server_name;
                     break;
                 }
                 else
@@ -1329,14 +1332,17 @@ namespace IRCBot
             int selected_tab = tabControl1.SelectedIndex;
             bool chan_connected = false;
             int chan_index = 0;
-            foreach (string channel in bot_instances[index].channel_list)
+            if (index < bot_instances.Count())
             {
-                if (channel.Equals(name))
+                foreach (string channel in bot_instances[index].channel_list)
                 {
-                    chan_connected = true;
-                    break;
+                    if (channel.Equals(name))
+                    {
+                        chan_connected = true;
+                        break;
+                    }
+                    chan_index++;
                 }
-                chan_index++;
             }
             if (name.StartsWith("#") == true && bot_instances[index].connected == true && chan_connected == true)
             {
@@ -1366,13 +1372,14 @@ namespace IRCBot
                         }
                         else
                         {
-                            tabControl1.Controls.RemoveAt(x);
+                            tabControl1.TabPages.RemoveAt(x);
+                            tabControl1.Update();
                             x--;
                         }
                     }
                 }
 
-                if (tabControl1.TabPages.Count == 1)
+                if (tabControl1.TabPages.Count == 0)
                 {
                     tabControl1.SelectedIndex = 0;
                     Control control = tabControl1.TabPages[0].Controls[0];
@@ -1390,9 +1397,10 @@ namespace IRCBot
                     connectToolStripMenuItem.Enabled = false;
                 }
                 bool server_found = false;
-                foreach (string server_name in server_list)
+                index = 0;
+                foreach (bot bot in bot_instances)
                 {
-                    if (tmp_full_server.Equals(server_name))
+                    if (tmp_full_server.Equals(bot.full_server_name))
                     {
                         server_found = true;
                         break;
@@ -1445,23 +1453,12 @@ namespace IRCBot
         private void connectToolStripMenuItem_Click(object sender, EventArgs e)
         {
             int index = 0;
-            string tmp_server = "No_Server_Specified";
-            string tmp_min_server = "No_Server_Specified";
-            string[] server_list = full_server_list.Split(',');
-            foreach (string server_name in server_list)
+            foreach (bot bot in bot_instances)
             {
-                string[] server = server_name.Split('.');
-                string tmp_server_name = "No_Server_Specified";
-                if (server.GetUpperBound(0) > 0)
-                {
-                    tmp_server_name = server[1];
-                }
                 char[] charSep = new char[] { ':' };
                 string[] tab_name = tabControl1.SelectedTab.Name.ToString().Split(charSep, 3);
-                if (tab_name[1].Equals(tmp_server_name))
+                if (tab_name[1].Equals(bot.server_name))
                 {
-                    tmp_server = server_name;
-                    tmp_min_server = tmp_server_name;
                     break;
                 }
                 else
@@ -1498,31 +1495,23 @@ namespace IRCBot
         public bool start_connection(string start_server_name)
         {
             int index = 0;
-            string[] tmp_server_list = full_server_list.Split(',');
             bool server_found = false;
             bool server_initiated = false;
-            foreach (string server_name in tmp_server_list)
+            foreach (bot bot in bot_instances)
             {
-                if (start_server_name.Equals(server_name))
+                if (bot.connected == false && bot.full_server_name.Equals(start_server_name))
                 {
                     server_found = true;
                     break;
                 }
-                else
-                {
-                    server_found = false;
-                    index++;
-                }
+                index++;
             }
-            if (server_found == true && bot_instances.Count > index)
+            if (server_found == true)
             {
-                if (bot_instances[index].connected == false)
-                {
-                    server_initiated = true;
-                    bot_instances[index].worker.RunWorkerAsync(2000);
-                    send_button.Enabled = true;
-                    input_box.Enabled = true;
-                }
+                server_initiated = true;
+                bot_instances[index].worker.RunWorkerAsync(2000);
+                send_button.Enabled = true;
+                input_box.Enabled = true;
             }
             else
             {
@@ -1607,14 +1596,14 @@ namespace IRCBot
                 else
                 {
                 }
-                conf.command_list.Clear();
-                conf.module_config.Clear();
                 XmlNodeList ServerxnList = xmlDoc.SelectNodes("/bot_settings/server_list/server");
                 foreach (XmlNode xn in ServerxnList)
                 {
                     string tmp_server = xn["server_name"].InnerText;
                     if (tmp_server.Equals(start_server_name))
                     {
+                        conf.command_list.Clear();
+                        conf.module_config.Clear();
                         conf.name = xn["name"].InnerText;
                         conf.nick = xn["nick"].InnerText;
                         conf.secondary_nicks = xn["sec_nicks"].InnerText;
@@ -1718,30 +1707,14 @@ namespace IRCBot
 
         public bool end_connection(string start_server_name)
         {
-            int index = 0;
-            string[] tmp_server_list = full_server_list.Split(',');
-            bool server_found = false;
             bool server_initiated = false;
-            foreach (string server_name in tmp_server_list)
+            foreach (bot bot in bot_instances)
             {
-                if (start_server_name.Equals(server_name))
-                {
-                    server_found = true;
-                    break;
-                }
-                else
-                {
-                    server_found = false;
-                    index++;
-                }
-            }
-            if (server_found == true)
-            {
-                if (bot_instances[index].connected == true)
+                if (bot.connected == true && bot.full_server_name.Equals(start_server_name))
                 {
                     server_initiated = true;
-                    bot_instances[index].disconnected = true;
-                    bot_instances[index].worker.CancelAsync();
+                    bot.disconnected = true;
+                    bot.worker.CancelAsync();
                     input_box.Enabled = false;
                     send_button.Enabled = false;
                 }
@@ -1751,29 +1724,14 @@ namespace IRCBot
 
         public bool bot_connected(string input_server_name)
         {
-            string[] server_list = full_server_list.Split(',');
-            int index = 0;
-            bool bot_found = false;
-            foreach (string server_name in server_list)
+            foreach (bot bot in bot_instances)
             {
-                if (input_server_name.Equals(server_name))
+                if (bot.connected == true && bot.full_server_name.Equals(input_server_name))
                 {
-                    bot_found = true;
-                    break;
-                }
-                else
-                {
-                    index++;
+                    return bot.connected;
                 }
             }
-            if (bot_found == true && bot_instances.Count > index)
-            {
-                return bot_instances[index].connected;
-            }
-            else
-            {
-                return false;
-            }
+            return false;
         }
 
         private void tabControl1_MouseClick(object sender, MouseEventArgs e)

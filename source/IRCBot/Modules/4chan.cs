@@ -19,6 +19,7 @@ struct Board
     public string channel;
     public string cur_board;
     public string cur_thread;
+    public string cur_reply_thread;
     public int cur_OP_num;
     public int cur_reply_num;
 }
@@ -241,6 +242,7 @@ namespace IRCBot.Modules
                                                     chan_found = true;
                                                     board = Board_stats[x].cur_board;
                                                     thread = Board_stats[x].cur_thread;
+                                                    thread_id = true;
                                                     reply = (Board_stats[x].cur_reply_num + 1).ToString();
                                                 }
                                             }
@@ -316,7 +318,13 @@ namespace IRCBot.Modules
                 foreach (XmlNode post in post_list)
                 {
                     string tmp_post_num = post["no"].InnerText;
-                    if ((thread_id && tmp_post_num.Equals(thread)) || (!thread_id && index == Convert.ToInt32(thread)))
+                    string tmp_replies = "";
+                    try
+                    {
+                        tmp_replies = post["replies"].InnerText;
+                    }
+                    catch { }
+                    if (((thread_id && tmp_post_num.Equals(thread)) || (!thread_id && index == Convert.ToInt32(thread))) && !tmp_replies.Equals(string.Empty))
                     {
                         bool chan_found = false;
                         for (int x = 0; x < Board_stats.Count(); x++)
@@ -324,12 +332,15 @@ namespace IRCBot.Modules
                             if (Board_stats[x].channel.Equals(channel))
                             {
                                 chan_found = true;
-                                Board tmp_board = Board_stats[x];
+                                Board tmp_board = new Board();
                                 tmp_board.channel = channel;
                                 tmp_board.cur_board = board;
                                 tmp_board.cur_OP_num = index;
                                 tmp_board.cur_reply_num = 0;
+                                tmp_board.cur_reply_thread = tmp_post_num;
                                 tmp_board.cur_thread = tmp_post_num;
+                                Board_stats.RemoveAt(x);
+                                Board_stats.Add(tmp_board);
                                 break;
                             }
                         }
@@ -340,6 +351,7 @@ namespace IRCBot.Modules
                             tmp_board.cur_board = board;
                             tmp_board.cur_OP_num = index;
                             tmp_board.cur_reply_num = 0;
+                            tmp_board.cur_reply_thread = tmp_post_num;
                             tmp_board.cur_thread = tmp_post_num;
                             Board_stats.Add(tmp_board);
                         }
@@ -487,9 +499,13 @@ namespace IRCBot.Modules
                         {
                             ircbot.sendData("PRIVMSG", channel + " :" + Regex.Replace(post_message.Trim().TrimEnd('|').Trim(), re, "$1"));
                         }
+                        ircbot.sendData("PRIVMSG", channel + " :http://boards.4chan.org/" + board + "/res/" + tmp_post_num);
                         break;
                     }
-                    index++;
+                    if (!tmp_replies.Equals(string.Empty))
+                    {
+                        index++;
+                    }
                 }
                 if (thread_found)
                 {
@@ -554,7 +570,10 @@ namespace IRCBot.Modules
                                         tmp_board.cur_board = board;
                                         tmp_board.cur_OP_num = index;
                                         tmp_board.cur_reply_num = index_reply;
-                                        tmp_board.cur_thread = tmp_post_num;
+                                        tmp_board.cur_reply_thread = tmp_reply_num;
+                                        tmp_board.cur_thread = tmp_post_num; ;
+                                        Board_stats.RemoveAt(x);
+                                        Board_stats.Add(tmp_board);
                                         break;
                                     }
                                 }
@@ -565,6 +584,7 @@ namespace IRCBot.Modules
                                     tmp_board.cur_board = board;
                                     tmp_board.cur_OP_num = index;
                                     tmp_board.cur_reply_num = index_reply;
+                                    tmp_board.cur_reply_thread = tmp_reply_num;
                                     tmp_board.cur_thread = tmp_post_num;
                                     Board_stats.Add(tmp_board);
                                 }
@@ -712,6 +732,7 @@ namespace IRCBot.Modules
                                 {
                                     ircbot.sendData("PRIVMSG", channel + " :" + Regex.Replace(post_message.Trim().TrimEnd('|').Trim(), re, "$1"));
                                 }
+                                ircbot.sendData("PRIVMSG", channel + " :http://boards.4chan.org/" + board + "/res/" + tmp_post_num + "#p" + tmp_reply_num);
                                 break;
                             }
                             index_reply++;

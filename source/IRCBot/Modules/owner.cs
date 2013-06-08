@@ -1195,7 +1195,7 @@ namespace IRCBot.Modules
                     {
                         string old_ignore = xn["blacklist"].InnerText;
                         string new_ignore = old_ignore + "," + ignore_nick;
-                        xn["blacklist"].InnerText = new_ignore;
+                        xn["blacklist"].InnerText = new_ignore.TrimStart(',');
                         module_found_file = true;
                         break;
                     }
@@ -1284,7 +1284,7 @@ namespace IRCBot.Modules
                     if (tmp_server.Equals(conf.server))
                     {
                         string new_ignore = xn["ignore_list"].InnerText + "," + ignore_nick;
-                        xn["ignore_list"].InnerText = new_ignore;
+                        xn["ignore_list"].InnerText = new_ignore.TrimStart(',');
                         added = true;
                         break;
                     }

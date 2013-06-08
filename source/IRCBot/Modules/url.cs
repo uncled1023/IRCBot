@@ -33,7 +33,7 @@ namespace IRCBot.Modules
                 }
                 try
                 {
-                    Regex regex = new Regex("((http://|www\\.)([A-Z0-9.-:]{1,})\\.[0-9A-Z?;~&#=\\-_\\./]{2,})", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                    Regex regex = new Regex("(((https?|ftp|file)://|www\\.)([A-Z0-9.-:]{1,})\\.[0-9A-Z?;~&#=\\-_\\./]{2,})", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
                     //get the first match
                     MatchCollection matches = regex.Matches(text);
@@ -86,7 +86,7 @@ namespace IRCBot.Modules
                                         {
                                             total_duration += t.Seconds.ToString() + "s ";
                                         }
-                                        ircbot.sendData("PRIVMSG", channel + " :[Youtube] Title: " + HttpUtility.HtmlDecode(yt_title) + " | Length: " + total_duration.TrimEnd(' ') + " | Views: " + views.ToString() + " | Rated: " + Math.Round(rateavg, 2).ToString() + "/5.0 | Uploaded By: " + uploader + " on " + date.ToString("yyyy-MM-dd"));
+                                        ircbot.sendData("PRIVMSG", channel + " :[Youtube] Title: " + HttpUtility.HtmlDecode(yt_title) + " | Length: " + total_duration.TrimEnd(' ') + " | Views: " + string.Format("{0:#,###0}", views) + " | Rated: " + Math.Round(rateavg, 2).ToString() + "/5.0 | Uploaded By: " + uploader + " on " + date.ToString("yyyy-MM-dd"));
                                     }
                                     else if ((url.OriginalString.Contains("boards.4chan.org") && url.Segments.GetUpperBound(0) > 2) && ircbot.conf.module_config[module_id][5].Equals("True"))
                                     {

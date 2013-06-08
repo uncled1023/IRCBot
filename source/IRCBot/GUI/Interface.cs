@@ -24,6 +24,7 @@ struct IRCConfig
     public IPAddress[] server_ip;
     public string chans;
     public string chan_blacklist;
+    public string ignore_list;
     public int port;
     public string nick;
     public string secondary_nicks;
@@ -307,6 +308,7 @@ namespace IRCBot
                             conf.server = xn["server_name"].InnerText;
                             conf.chans = xn["chan_list"].InnerText;
                             conf.chan_blacklist = xn["chan_blacklist"].InnerText;
+                            conf.ignore_list = xn["ignore_list"].InnerText;
                             conf.user_level = Convert.ToInt32(xn["user_level"].InnerText);
                             conf.voice_level = Convert.ToInt32(xn["voice_level"].InnerText);
                             conf.hop_level = Convert.ToInt32(xn["hop_level"].InnerText);
@@ -972,8 +974,8 @@ namespace IRCBot
                             }
                             else
                             {
-                                Directory.CreateDirectory(conf.logs_path);
-                                StreamWriter log_file = File.AppendText(conf.logs_path + Path.DirectorySeparatorChar + file_name);
+                                Directory.CreateDirectory(cur_dir + Path.DirectorySeparatorChar + "logs");
+                                StreamWriter log_file = File.AppendText(cur_dir + Path.DirectorySeparatorChar + "logs" + Path.DirectorySeparatorChar + file_name);
                                 log_file.WriteLine("[" + date_stamp + " " + time_stamp + "] " + text);
                                 log_file.Close();
                             }
@@ -1228,6 +1230,7 @@ namespace IRCBot
                         bot_instance.conf.server = xn["server_name"].InnerText;
                         bot_instance.conf.chans = xn["chan_list"].InnerText;
                         bot_instance.conf.chan_blacklist = xn["chan_blacklist"].InnerText;
+                        bot_instance.conf.ignore_list = xn["ignore_list"].InnerText;
 
                         bot_instance.conf.command_list.Clear();
                         bot_instance.conf.module_config.Clear();
@@ -1614,6 +1617,7 @@ namespace IRCBot
                         conf.server = xn["server_name"].InnerText;
                         conf.chans = xn["chan_list"].InnerText;
                         conf.chan_blacklist = xn["chan_blacklist"].InnerText;
+                        conf.ignore_list = xn["ignore_list"].InnerText;
                         conf.user_level = Convert.ToInt32(xn["user_level"].InnerText);
                         conf.voice_level = Convert.ToInt32(xn["voice_level"].InnerText);
                         conf.hop_level = Convert.ToInt32(xn["hop_level"].InnerText);

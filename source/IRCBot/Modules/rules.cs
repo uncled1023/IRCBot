@@ -122,6 +122,10 @@ namespace IRCBot.Modules
         {
             string pattern = "[^a-zA-Z0-9]"; //regex pattern
             string tab_name = Regex.Replace(channel, pattern, "_");
+            if (!Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "rules"))
+            {
+                Directory.CreateDirectory(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "rules");
+            }
             if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "rules" + Path.DirectorySeparatorChar + ircbot.server_name + "_" + tab_name + "_rules.txt"))
             {
                 List<string> rules_file = System.IO.File.ReadAllLines(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "rules" + Path.DirectorySeparatorChar + ircbot.server_name + "_" + tab_name + "_rules.txt").ToList();

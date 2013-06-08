@@ -48,6 +48,8 @@
             this.cancel_button = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.ignore_list_box = new System.Windows.Forms.TextBox();
+            this.label28 = new System.Windows.Forms.Label();
             this.label27 = new System.Windows.Forms.Label();
             this.sec_nicks = new System.Windows.Forms.TextBox();
             this.channel_blacklist_box = new System.Windows.Forms.TextBox();
@@ -65,7 +67,6 @@
             this.label22 = new System.Windows.Forms.Label();
             this.channel_blacklist = new System.Windows.Forms.TextBox();
             this.command_triggers = new System.Windows.Forms.TextBox();
-            this.button3 = new System.Windows.Forms.Button();
             this.label21 = new System.Windows.Forms.Label();
             this.command_access_level = new System.Windows.Forms.TextBox();
             this.label20 = new System.Windows.Forms.Label();
@@ -91,6 +92,7 @@
             this.label14 = new System.Windows.Forms.Label();
             this.user_level_box = new System.Windows.Forms.TextBox();
             this.label15 = new System.Windows.Forms.Label();
+            this.command_label = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -229,7 +231,7 @@
             // 
             // save_server_button
             // 
-            this.save_server_button.Location = new System.Drawing.Point(336, 320);
+            this.save_server_button.Location = new System.Drawing.Point(336, 331);
             this.save_server_button.Name = "save_server_button";
             this.save_server_button.Size = new System.Drawing.Size(75, 23);
             this.save_server_button.TabIndex = 98;
@@ -239,7 +241,7 @@
             // 
             // cancel_button
             // 
-            this.cancel_button.Location = new System.Drawing.Point(417, 320);
+            this.cancel_button.Location = new System.Drawing.Point(417, 331);
             this.cancel_button.Name = "cancel_button";
             this.cancel_button.Size = new System.Drawing.Size(75, 23);
             this.cancel_button.TabIndex = 99;
@@ -256,11 +258,13 @@
             this.tabControl1.Location = new System.Drawing.Point(12, 1);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(480, 313);
+            this.tabControl1.Size = new System.Drawing.Size(480, 324);
             this.tabControl1.TabIndex = 0;
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.ignore_list_box);
+            this.tabPage1.Controls.Add(this.label28);
             this.tabPage1.Controls.Add(this.label27);
             this.tabPage1.Controls.Add(this.sec_nicks);
             this.tabPage1.Controls.Add(this.channel_blacklist_box);
@@ -284,10 +288,26 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(472, 287);
+            this.tabPage1.Size = new System.Drawing.Size(472, 298);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Server Configuration";
             this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // ignore_list_box
+            // 
+            this.ignore_list_box.Location = new System.Drawing.Point(165, 268);
+            this.ignore_list_box.Name = "ignore_list_box";
+            this.ignore_list_box.Size = new System.Drawing.Size(301, 20);
+            this.ignore_list_box.TabIndex = 11;
+            // 
+            // label28
+            // 
+            this.label28.AutoSize = true;
+            this.label28.Location = new System.Drawing.Point(18, 271);
+            this.label28.Name = "label28";
+            this.label28.Size = new System.Drawing.Size(79, 13);
+            this.label28.TabIndex = 28;
+            this.label28.Text = "Nicks to Ignore";
             // 
             // label27
             // 
@@ -329,7 +349,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(472, 287);
+            this.tabPage2.Size = new System.Drawing.Size(472, 298);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Module Configuration";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -338,7 +358,7 @@
             // 
             this.module_options.Location = new System.Drawing.Point(135, 6);
             this.module_options.Name = "module_options";
-            this.module_options.Size = new System.Drawing.Size(331, 261);
+            this.module_options.Size = new System.Drawing.Size(331, 274);
             this.module_options.TabIndex = 2;
             // 
             // label26
@@ -356,13 +376,14 @@
             this.module_list.HorizontalScrollbar = true;
             this.module_list.Location = new System.Drawing.Point(7, 29);
             this.module_list.Name = "module_list";
-            this.module_list.Size = new System.Drawing.Size(122, 238);
+            this.module_list.Size = new System.Drawing.Size(122, 251);
             this.module_list.Sorted = true;
             this.module_list.TabIndex = 1;
             this.module_list.SelectedIndexChanged += new System.EventHandler(this.module_list_SelectedIndexChanged);
             // 
             // tabPage3
             // 
+            this.tabPage3.Controls.Add(this.command_label);
             this.tabPage3.Controls.Add(this.label25);
             this.tabPage3.Controls.Add(this.spam_counter);
             this.tabPage3.Controls.Add(this.label24);
@@ -371,7 +392,6 @@
             this.tabPage3.Controls.Add(this.label22);
             this.tabPage3.Controls.Add(this.channel_blacklist);
             this.tabPage3.Controls.Add(this.command_triggers);
-            this.tabPage3.Controls.Add(this.button3);
             this.tabPage3.Controls.Add(this.label21);
             this.tabPage3.Controls.Add(this.command_access_level);
             this.tabPage3.Controls.Add(this.label20);
@@ -385,7 +405,7 @@
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(472, 287);
+            this.tabPage3.Size = new System.Drawing.Size(472, 298);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "Command Options";
             this.tabPage3.UseVisualStyleBackColor = true;
@@ -457,16 +477,6 @@
             this.command_triggers.Name = "command_triggers";
             this.command_triggers.Size = new System.Drawing.Size(232, 20);
             this.command_triggers.TabIndex = 4;
-            // 
-            // button3
-            // 
-            this.button3.Location = new System.Drawing.Point(135, 241);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(75, 23);
-            this.button3.TabIndex = 10;
-            this.button3.Text = "Save";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
             // label21
             // 
@@ -546,7 +556,7 @@
             this.command_list.FormattingEnabled = true;
             this.command_list.Location = new System.Drawing.Point(6, 26);
             this.command_list.Name = "command_list";
-            this.command_list.Size = new System.Drawing.Size(120, 238);
+            this.command_list.Size = new System.Drawing.Size(120, 251);
             this.command_list.Sorted = true;
             this.command_list.TabIndex = 1;
             this.command_list.SelectedIndexChanged += new System.EventHandler(this.command_list_change);
@@ -570,7 +580,7 @@
             this.tabPage4.Location = new System.Drawing.Point(4, 22);
             this.tabPage4.Name = "tabPage4";
             this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(472, 287);
+            this.tabPage4.Size = new System.Drawing.Size(472, 298);
             this.tabPage4.TabIndex = 3;
             this.tabPage4.Text = "Op Levels";
             this.tabPage4.UseVisualStyleBackColor = true;
@@ -687,12 +697,21 @@
             this.label15.TabIndex = 27;
             this.label15.Text = "User Access Level";
             // 
+            // command_label
+            // 
+            this.command_label.AutoSize = true;
+            this.command_label.Location = new System.Drawing.Point(132, 7);
+            this.command_label.Name = "command_label";
+            this.command_label.Size = new System.Drawing.Size(0, 13);
+            this.command_label.TabIndex = 39;
+            this.command_label.Visible = false;
+            // 
             // add_server
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(504, 355);
+            this.ClientSize = new System.Drawing.Size(504, 366);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.cancel_button);
             this.Controls.Add(this.save_server_button);
@@ -750,7 +769,6 @@
         private System.Windows.Forms.Label label22;
         private System.Windows.Forms.TextBox channel_blacklist;
         private System.Windows.Forms.TextBox command_triggers;
-        private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Label label21;
         private System.Windows.Forms.TextBox command_access_level;
         private System.Windows.Forms.Label label20;
@@ -779,5 +797,8 @@
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.Label label27;
         private System.Windows.Forms.TextBox sec_nicks;
+        private System.Windows.Forms.TextBox ignore_list_box;
+        private System.Windows.Forms.Label label28;
+        private System.Windows.Forms.Label command_label;
     }
 }

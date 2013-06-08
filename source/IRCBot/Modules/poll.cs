@@ -4,15 +4,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+struct poll_info
+{
+    public string channel;
+    public string owner;
+    public string question;
+    public List<List<string>> answers;
+    public List<List<string>> nick_responses;
+}
+
 namespace IRCBot.Modules
 {
     class poll : Module
     {
-        private bool poll_active = false;
-        private string poll_owner = "";
-        private string poll_question = "";
-        private List<List<string>> poll_answers = new List<List<string>>();
-        private List<List<string>> poll_nick_responses = new List<List<string>>();
+        private List<poll_info> poll_list = new List<poll_info>();
 
         public override void control(bot ircbot, ref IRCConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
@@ -65,27 +70,41 @@ namespace IRCBot.Modules
                                         }
                                         if (nick_access >= command_access)
                                         {
+                                            bool poll_active = false;
+                                            foreach (poll_info tmp_poll in poll_list)
+                                            {
+                                                if (tmp_poll.channel.Equals(channel))
+                                                {
+                                                    poll_active = true;
+                                                    break;
+                                                }
+                                            }
                                             if (poll_active == false)
                                             {
                                                 if (line.GetUpperBound(0) > 3)
                                                 {
+                                                    poll_info temp_poll = new poll_info();
                                                     poll_active = true;
                                                     string[] lines = line[4].Split('|');
-                                                    poll_question = lines[0];
-                                                    poll_owner = nick;
+                                                    temp_poll.question = lines[0];
+                                                    temp_poll.owner = nick;
+                                                    temp_poll.channel = channel;
+                                                    temp_poll.answers = new List<List<string>>();
+                                                    temp_poll.nick_responses = new List<List<string>>();
                                                     for (int x = 1; x <= lines.GetUpperBound(0); x++)
                                                     {
                                                         List<string> tmp_list = new List<string>();
                                                         tmp_list.Add(lines[x]);
                                                         tmp_list.Add("0");
-                                                        poll_answers.Add(tmp_list);
+                                                        temp_poll.answers.Add(tmp_list);
                                                     }
-                                                    ircbot.sendData("PRIVMSG", channel + " :Poll has been started by " + poll_owner + ": " + poll_question);
-                                                    for (int x = 0; x < poll_answers.Count(); x++)
+                                                    ircbot.sendData("PRIVMSG", channel + " :Poll has been started by " + temp_poll.owner + ": " + temp_poll.question);
+                                                    for (int x = 0; x < temp_poll.answers.Count(); x++)
                                                     {
-                                                        ircbot.sendData("PRIVMSG", channel + " :" + (x + 1).ToString() + ") " + poll_answers[x][0]);
+                                                        ircbot.sendData("PRIVMSG", channel + " :" + (x + 1).ToString() + ") " + temp_poll.answers[x][0]);
                                                     }
-                                                    ircbot.sendData("PRIVMSG", channel + " :To Vote, type .vote <answer_number>.  You may only vote once per poll.  You can change your vote by voting for a different answer.");
+                                                    ircbot.sendData("PRIVMSG", channel + " :To Vote, type " + conf.command + "vote <answer_number>.  You may only vote once per poll.  You can change your vote by voting for a different answer.");
+                                                    poll_list.Add(temp_poll);
                                                 }
                                                 else
                                                 {
@@ -94,7 +113,7 @@ namespace IRCBot.Modules
                                             }
                                             else
                                             {
-                                                ircbot.sendData("PRIVMSG", channel + " :There is currently a poll active right now");
+                                                ircbot.sendData("PRIVMSG", channel + " :There is currently a poll active right now.  To view the current results, type " + conf.command + "results");
                                             }
                                         }
                                         else
@@ -109,32 +128,43 @@ namespace IRCBot.Modules
                                         }
                                         if (nick_access >= command_access)
                                         {
-                                            if (poll_owner.Equals(nick))
+                                            bool poll_active = false;
+                                            poll_info cur_poll = new poll_info();
+                                            foreach (poll_info tmp_poll in poll_list)
                                             {
-                                                if (line.GetUpperBound(0) > 3)
+                                                if (tmp_poll.channel.Equals(channel))
                                                 {
-                                                    if (poll_active == true)
+                                                    cur_poll = tmp_poll;
+                                                    poll_active = true;
+                                                    break;
+                                                }
+                                            }
+                                            if (poll_active == true)
+                                            {
+                                                if (cur_poll.owner.Equals(nick))
+                                                {
+                                                    if (line.GetUpperBound(0) > 3)
                                                     {
-                                                        List<string> tmp_list = new List<string>();
-                                                        tmp_list.Add(line[4]);
-                                                        tmp_list.Add("0");
-                                                        poll_answers.Add(tmp_list);
-                                                        ircbot.sendData("PRIVMSG", channel + " :An Answer has been added to the poll.");
-                                                        ircbot.sendData("PRIVMSG", channel + " :" + poll_answers.Count().ToString() + ")" + line[4]);
+                                                            List<string> tmp_list = new List<string>();
+                                                            tmp_list.Add(line[4]);
+                                                            tmp_list.Add("0");
+                                                            cur_poll.answers.Add(tmp_list);
+                                                            ircbot.sendData("PRIVMSG", channel + " :An Answer has been added to the poll.");
+                                                            ircbot.sendData("PRIVMSG", channel + " :" + cur_poll.answers.Count().ToString() + ")" + line[4]);
                                                     }
                                                     else
                                                     {
-                                                        ircbot.sendData("PRIVMSG", channel + " :There is currently no poll active right now");
+                                                        ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
                                                     }
                                                 }
                                                 else
                                                 {
-                                                    ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                                                    ircbot.sendData("PRIVMSG", channel + " :You are not the poll owner.");
                                                 }
                                             }
                                             else
                                             {
-                                                ircbot.sendData("PRIVMSG", channel + " :You are not the poll owner.");
+                                                ircbot.sendData("PRIVMSG", channel + " :There is currently no poll active right now");
                                             }
                                         }
                                         else
@@ -149,35 +179,46 @@ namespace IRCBot.Modules
                                         }
                                         if (nick_access >= command_access)
                                         {
-                                            if (poll_owner.Equals(nick))
+                                            bool poll_active = false;
+                                            poll_info cur_poll = new poll_info();
+                                            foreach (poll_info tmp_poll in poll_list)
                                             {
-                                                if (line.GetUpperBound(0) > 3)
+                                                if (tmp_poll.channel.Equals(channel))
                                                 {
-                                                    if (poll_active == true)
+                                                    cur_poll = tmp_poll;
+                                                    poll_active = true;
+                                                    break;
+                                                }
+                                            }
+                                            if (poll_active == true)
+                                            {
+                                                if (cur_poll.owner.Equals(nick))
+                                                {
+                                                    if (line.GetUpperBound(0) > 3)
                                                     {
-                                                        for (int x = 0; x < poll_answers.Count(); x++)
+                                                        for (int x = 0; x < cur_poll.answers.Count(); x++)
                                                         {
                                                             if (x == Convert.ToInt32(line[4]))
                                                             {
                                                                 ircbot.sendData("PRIVMSG", channel + " :Answer " + x.ToString() + " has been removed.");
-                                                                poll_answers.RemoveAt(x);
+                                                                cur_poll.answers.RemoveAt(x);
                                                                 break;
                                                             }
                                                         }
                                                     }
                                                     else
                                                     {
-                                                        ircbot.sendData("PRIVMSG", channel + " :There is currently no poll active right now");
+                                                        ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
                                                     }
                                                 }
                                                 else
                                                 {
-                                                    ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                                                    ircbot.sendData("PRIVMSG", channel + " :You are not the poll owner.");
                                                 }
                                             }
                                             else
                                             {
-                                                ircbot.sendData("PRIVMSG", channel + " :You are not the poll owner.");
+                                                ircbot.sendData("PRIVMSG", channel + " :There is currently no poll active right now");
                                             }
                                         }
                                         else
@@ -192,19 +233,31 @@ namespace IRCBot.Modules
                                         }
                                         if (nick_access >= command_access)
                                         {
+                                            bool poll_active = false;
+                                            int index = 0;
+                                            poll_info cur_poll = new poll_info();
+                                            foreach (poll_info tmp_poll in poll_list)
+                                            {
+                                                if (tmp_poll.channel.Equals(channel))
+                                                {
+                                                    cur_poll = tmp_poll;
+                                                    poll_active = true;
+                                                    index++;
+                                                    break;
+                                                }
+                                            }
                                             if (poll_active == true)
                                             {
-                                                if (poll_owner.Equals(nick) || nick_access > Convert.ToInt32(ircbot.get_user_access(poll_owner, channel)))
+                                                if (cur_poll.owner.Equals(nick) || nick_access > Convert.ToInt32(ircbot.get_user_access(cur_poll.owner, channel)))
                                                 {
                                                     poll_active = false;
 
-                                                    ircbot.sendData("PRIVMSG", channel + " :Results of poll by " + poll_owner + ": " + poll_question);
-                                                    for (int x = 0; x < poll_answers.Count(); x++)
+                                                    ircbot.sendData("PRIVMSG", channel + " :Results of poll by " + cur_poll.owner + ": " + cur_poll.question);
+                                                    for (int x = 0; x < cur_poll.answers.Count(); x++)
                                                     {
-                                                        ircbot.sendData("PRIVMSG", channel + " :" + (x + 1).ToString() + ") " + poll_answers[x][0] + " | " + poll_answers[x][1] + " votes");
+                                                        ircbot.sendData("PRIVMSG", channel + " :" + (x + 1).ToString() + ") " + cur_poll.answers[x][0] + " | " + cur_poll.answers[x][1] + " votes");
                                                     }
-                                                    poll_answers.Clear();
-                                                    poll_nick_responses.Clear();
+                                                    poll_list.RemoveAt(index);
                                                 }
                                                 else
                                                 {
@@ -228,12 +281,23 @@ namespace IRCBot.Modules
                                         }
                                         if (nick_access >= command_access)
                                         {
+                                            bool poll_active = false;
+                                            poll_info cur_poll = new poll_info();
+                                            foreach (poll_info tmp_poll in poll_list)
+                                            {
+                                                if (tmp_poll.channel.Equals(channel))
+                                                {
+                                                    cur_poll = tmp_poll;
+                                                    poll_active = true;
+                                                    break;
+                                                }
+                                            }
                                             if (poll_active == true)
                                             {
-                                                ircbot.sendData("NOTICE", nick + " :Poll by " + poll_owner + ": " + poll_question);
-                                                for (int x = 0; x < poll_answers.Count(); x++)
+                                                ircbot.sendData("NOTICE", nick + " :Poll by " + cur_poll.owner + ": " + cur_poll.question);
+                                                for (int x = 0; x < cur_poll.answers.Count(); x++)
                                                 {
-                                                    ircbot.sendData("NOTICE", nick + " :" + (x + 1).ToString() + ") " + poll_answers[x][0] + " | " + poll_answers[x][1] + " votes");
+                                                    ircbot.sendData("NOTICE", nick + " :" + (x + 1).ToString() + ") " + cur_poll.answers[x][0] + " | " + cur_poll.answers[x][1] + " votes");
                                                 }
                                                 ircbot.sendData("NOTICE", nick + " :To Vote, type .vote <answer_number>.  You may only vote once per poll.  You can change your vote by voting for a different answer.");
                                             }
@@ -256,12 +320,23 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
+                                                bool poll_active = false;
+                                                poll_info cur_poll = new poll_info();
+                                                foreach (poll_info tmp_poll in poll_list)
+                                                {
+                                                    if (tmp_poll.channel.Equals(channel))
+                                                    {
+                                                        cur_poll = tmp_poll;
+                                                        poll_active = true;
+                                                        break;
+                                                    }
+                                                }
                                                 if (poll_active == true)
                                                 {
                                                     try
                                                     {
                                                         int vote = Convert.ToInt32(line[4]);
-                                                        if (vote > 0 && vote <= poll_answers.Count())
+                                                        if (vote > 0 && vote <= cur_poll.answers.Count())
                                                         {
                                                             bool nick_voted = false;
                                                             int index = 0;
@@ -270,15 +345,15 @@ namespace IRCBot.Modules
                                                             {
                                                                 nick_host = nick;
                                                             }
-                                                            for (int x = 0; x < poll_nick_responses.Count(); x++)
+                                                            for (int x = 0; x < cur_poll.nick_responses.Count(); x++)
                                                             {
-                                                                if (poll_nick_responses[x][0].Equals(nick_host))
+                                                                if (cur_poll.nick_responses[x][0].Equals(nick_host))
                                                                 {
                                                                     nick_voted = true;
-                                                                    index = Convert.ToInt32(poll_nick_responses[x][1]);
-                                                                    poll_nick_responses[x][1] = vote.ToString();
-                                                                    poll_answers[index - 1][1] = (Convert.ToInt32(poll_answers[index - 1][1]) - 1).ToString();
-                                                                    poll_answers[vote - 1][1] = (Convert.ToInt32(poll_answers[vote - 1][1]) + 1).ToString();
+                                                                    index = Convert.ToInt32(cur_poll.nick_responses[x][1]);
+                                                                    cur_poll.nick_responses[x][1] = vote.ToString();
+                                                                    cur_poll.answers[index - 1][1] = (Convert.ToInt32(cur_poll.answers[index - 1][1]) - 1).ToString();
+                                                                    cur_poll.answers[vote - 1][1] = (Convert.ToInt32(cur_poll.answers[vote - 1][1]) + 1).ToString();
                                                                     break;
                                                                 }
                                                             }
@@ -287,8 +362,8 @@ namespace IRCBot.Modules
                                                                 List<string> tmp_list = new List<string>();
                                                                 tmp_list.Add(nick_host);
                                                                 tmp_list.Add(vote.ToString());
-                                                                poll_nick_responses.Add(tmp_list);
-                                                                poll_answers[vote - 1][1] = (Convert.ToInt32(poll_answers[vote - 1][1]) + 1).ToString();
+                                                                cur_poll.nick_responses.Add(tmp_list);
+                                                                cur_poll.answers[vote - 1][1] = (Convert.ToInt32(cur_poll.answers[vote - 1][1]) + 1).ToString();
                                                             }
                                                             ircbot.sendData("PRIVMSG", channel + " :Thank you for voting for " + vote.ToString());
                                                         }

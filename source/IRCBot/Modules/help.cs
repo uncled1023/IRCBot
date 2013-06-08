@@ -79,47 +79,123 @@ namespace IRCBot.Modules
         {
             string search_term = "";
             string msg = "";
-            bool more_info = false;
-            foreach (List<string> tmp_command in conf.command_list)
+            if (line.GetUpperBound(0) > 3)
             {
-                string[] triggers = tmp_command[3].Split('|');
-                int command_access = Convert.ToInt32(tmp_command[5]);
-                bool show_help = Convert.ToBoolean(tmp_command[7]);
-                if (show_help == true)
+                string[] new_line = line[4].Split(' ');
+                if (new_line.GetUpperBound(0) > 0)
                 {
-                    foreach (string trigger in triggers)
+                    foreach (List<string> tmp_command in conf.command_list)
                     {
-                        if (access >= Convert.ToInt32(command_access))
+                        if (new_line[0].Equals(tmp_command[0]))
                         {
-                            if (line.GetUpperBound(0) > 3)
+                            string[] triggers = tmp_command[3].Split('|');
+                            int command_access = Convert.ToInt32(tmp_command[5]);
+                            bool show_help = Convert.ToBoolean(tmp_command[7]);
+                            if (show_help == true)
                             {
-                                more_info = true;
-                                search_term = line[4];
-                                if (search_term.ToLower().Equals(trigger.ToLower()))
+                                foreach (string trigger in triggers)
                                 {
-                                    ircbot.sendData("NOTICE", nick + " :" + tmp_command[1] + " | Usage: " + conf.command + trigger + " " + tmp_command[4] + " | Description: " + tmp_command[2]);
+                                    if (access >= Convert.ToInt32(command_access))
+                                    {
+                                        search_term = new_line[1];
+                                        if (search_term.ToLower().Equals(trigger.ToLower()))
+                                        {
+                                            ircbot.sendData("NOTICE", nick + " :" + tmp_command[1] + " | Usage: " + conf.command + trigger + " " + tmp_command[4] + " | Description: " + tmp_command[2]);
+                                        }
+                                    }
                                 }
-                            }
-                            else
-                            {
-                                msg += " " + conf.command + trigger + ",";
                             }
                         }
                     }
                 }
+                else
+                {
+                    string module_name = "";
+                    foreach (List<string> module in conf.module_config)
+                    {
+                        if (module[0].Equals(line[4]))
+                        {
+                            module_name = module[1];
+                        }
+                    }
+                    foreach (List<string> tmp_command in conf.command_list)
+                    {
+                        if (line[4].Equals(tmp_command[0]))
+                        {
+                            string[] triggers = tmp_command[3].Split('|');
+                            int command_access = Convert.ToInt32(tmp_command[5]);
+                            bool show_help = Convert.ToBoolean(tmp_command[7]);
+                            if (show_help == true)
+                            {
+                                foreach (string trigger in triggers)
+                                {
+                                    if (access >= Convert.ToInt32(command_access))
+                                    {
+                                        msg += " " + conf.command + trigger + ",";
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (msg != "")
+                    {
+                        ircbot.sendData("NOTICE", nick + " :Commands for " + line[4] + ":" + msg.TrimEnd(','));
+                        msg = "";
+                        ircbot.sendData("NOTICE", nick + " :For more information about a specific command, type " + conf.command + "help {module} {command name}");
+                    }
+                    else
+                    {
+                        ircbot.sendData("NOTICE", nick + " :There are no commands for " + line[4]);
+                    }
+                }
             }
-            if (more_info == false)
+            else
             {
+                msg += "Modules Available:";
+                foreach (List<string> tmp_module in conf.module_config)
+                {
+                    string module_name = tmp_module[0];
+                    int commands = 0;
+                    foreach (List<string> tmp_command in conf.command_list)
+                    {
+                        if (module_name.Equals(tmp_command[0]))
+                        {
+                            string[] triggers = tmp_command[3].Split('|');
+                            int command_access = Convert.ToInt32(tmp_command[5]);
+                            bool show_help = Convert.ToBoolean(tmp_command[7]);
+                            if (show_help == true)
+                            {
+                                foreach (string trigger in triggers)
+                                {
+                                    if (access >= Convert.ToInt32(command_access))
+                                    {
+                                        commands++;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (commands == 1)
+                    {
+                        msg += " " + module_name;
+                        msg += " [1 Cmd]" + ",";
+                    }
+                    else if (commands > 1)
+                    {
+                        msg += " " + module_name;
+                        msg += " [" + commands.ToString() + " Cmds]" + ",";
+                    }
+                }
                 if (msg != "")
                 {
                     ircbot.sendData("NOTICE", nick + " :" + msg.TrimEnd(','));
                     msg = "";
+                    ircbot.sendData("NOTICE", nick + " :To view the commands for a specific module, type " + conf.command + "help {module}");
                 }
                 else
                 {
                     ircbot.sendData("NOTICE", nick + " :No help information available.");
                 }
-                ircbot.sendData("NOTICE", nick + " :For more information about a specific command, type .help <command name>");
             }
         }
     }

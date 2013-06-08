@@ -139,6 +139,10 @@ namespace IRCBot.Modules
                 {
                     add_line += line[x] + " ";
                 }
+                if (!Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "intro"))
+                {
+                    Directory.CreateDirectory(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "intro");
+                }
                 if (File.Exists(list_file))
                 {
                     string[] old_file = System.IO.File.ReadAllLines(list_file);

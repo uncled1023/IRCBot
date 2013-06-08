@@ -1318,51 +1318,64 @@ namespace IRCBot
                 }
             }
 
-            //Run Enabled Modules
-            List<Modules.Module> tmp_module_list = new List<Modules.Module>();
-            tmp_module_list.AddRange(module_list);
-            foreach (Modules.Module module in tmp_module_list)
+            string[] ignored_nicks = conf.ignore_list.Split(',');
+            bool run_modules = true;
+            foreach (string ignore_nick in ignored_nicks)
             {
-                int index = 0;
-                bool module_found = false;
-                string module_blacklist = "";
-                foreach (List<string> conf_module in conf.module_config)
+                if (ignore_nick.ToLower().Equals(nick))
                 {
-                    if (module.ToString().Equals("IRCBot.Modules." + conf_module[0]))
-                    {
-                        module_blacklist = conf_module[2];
-                        module_found = true;
-                        break;
-                    }
-                    index++;
+                    run_modules = false;
+                    break;
                 }
-                if (module_found == true)
+            }
+            if (run_modules)
+            {
+                //Run Enabled Modules
+                List<Modules.Module> tmp_module_list = new List<Modules.Module>();
+                tmp_module_list.AddRange(module_list);
+                foreach (Modules.Module module in tmp_module_list)
                 {
-                    char[] sepComma = new char[] { ',' };
-                    char[] sepSpace = new char[] { ' ' };
-                    string[] blacklist = module_blacklist.Split(sepComma, StringSplitOptions.RemoveEmptyEntries);
-                    bool module_allowed = true;
-                    foreach (string blacklist_node in blacklist)
+                    int index = 0;
+                    bool module_found = false;
+                    string module_blacklist = "";
+                    foreach (List<string> conf_module in conf.module_config)
                     {
-                        string[] nodes = blacklist_node.Split(sepSpace, StringSplitOptions.RemoveEmptyEntries);
-                        foreach (string node in nodes)
+                        if (module.ToString().Equals("IRCBot.Modules." + conf_module[0]))
                         {
-                            if (node.ToLower().Equals(nick) || node.ToLower().TrimStart('#').Equals(channel.ToLower().TrimStart('#')))
+                            module_blacklist = conf_module[2];
+                            module_found = true;
+                            break;
+                        }
+                        index++;
+                    }
+                    if (module_found == true)
+                    {
+                        char[] sepComma = new char[] { ',' };
+                        char[] sepSpace = new char[] { ' ' };
+                        string[] blacklist = module_blacklist.Split(sepComma, StringSplitOptions.RemoveEmptyEntries);
+                        bool module_allowed = true;
+                        foreach (string blacklist_node in blacklist)
+                        {
+                            string[] nodes = blacklist_node.Split(sepSpace, StringSplitOptions.RemoveEmptyEntries);
+                            foreach (string node in nodes)
                             {
-                                module_allowed = false;
+                                if (node.ToLower().Equals(nick) || node.ToLower().TrimStart('#').Equals(channel.ToLower().TrimStart('#')))
+                                {
+                                    module_allowed = false;
+                                    break;
+                                }
+                            }
+                            if (module_allowed == false)
+                            {
                                 break;
                             }
                         }
-                        if (module_allowed == false)
+                        if (module_allowed == true)
                         {
-                            break;
+                            BackgroundWorker work = new BackgroundWorker();
+                            work.DoWork += (sender, e) => backgroundWorker_RunModule(sender, e, module, index, ex, command, nick_access, nick, channel, bot_command, type);
+                            work.RunWorkerAsync(2000);
                         }
-                    }
-                    if (module_allowed == true)
-                    {
-                        BackgroundWorker work = new BackgroundWorker();
-                        work.DoWork += (sender, e) => backgroundWorker_RunModule(sender, e, module, index, ex, command, nick_access, nick, channel, bot_command, type);
-                        work.RunWorkerAsync(2000);
                     }
                 }
             }

@@ -43,6 +43,7 @@ namespace IRCBot
                     server_module_folder = xn["server_folder"].InnerText;
                     channels_box.Text = xn["chan_list"].InnerText;
                     channel_blacklist_box.Text = xn["chan_blacklist"].InnerText;
+                    ignore_list_box.Text = xn["ignore_list"].InnerText;
                     user_level_box.Text = xn["user_level"].InnerText;
                     voice_level_box.Text = xn["voice_level"].InnerText;
                     hop_level_box.Text = xn["hop_level"].InnerText;
@@ -76,6 +77,34 @@ namespace IRCBot
                                 foreach (XmlNode options in Options)
                                 {
                                     command_list.Items.Add(options["name"].InnerText);
+                                }
+                            }
+                        }
+                    }
+                    xnList = xmlDocModules.SelectNodes("/modules/module");
+                    foreach (XmlNode xn_node in xnList)
+                    {
+                        XmlNodeList optionList = xn_node.ChildNodes;
+                        foreach (XmlNode option in optionList)
+                        {
+                            if (option.Name.Equals("commands"))
+                            {
+                                XmlNodeList Options = option.ChildNodes;
+                                foreach (XmlNode options in Options)
+                                {
+                                    if (options["name"].InnerText.Equals(command_list.Items[0]))
+                                    {
+                                        command_label.Text = options["name"].InnerText;
+                                        command_name.Text = options["name"].InnerText;
+                                        command_triggers.Text = options["triggers"].InnerText;
+                                        command_arguments.Text = options["syntax"].InnerText;
+                                        command_description.Text = options["description"].InnerText;
+                                        command_access_level.Text = options["access_level"].InnerText;
+                                        channel_blacklist.Text = options["blacklist"].InnerText;
+                                        show_in_help.Checked = Convert.ToBoolean(options["show_help"].InnerText);
+                                        spam_counter.Checked = Convert.ToBoolean(options["spam_check"].InnerText);
+                                        break;
+                                    }
                                 }
                             }
                         }
@@ -124,6 +153,7 @@ namespace IRCBot
                         xn["server_name"].InnerText = server_name_box.Text;
                         xn["chan_list"].InnerText = channels_box.Text;
                         xn["chan_blacklist"].InnerText = channel_blacklist_box.Text;
+                        xn["ignore_list"].InnerText = ignore_list_box.Text;
                         xn["user_level"].InnerText = user_level_box.Text;
                         xn["voice_level"].InnerText = voice_level_box.Text;
                         xn["hop_level"].InnerText = hop_level_box.Text;
@@ -177,6 +207,7 @@ namespace IRCBot
                     }
                 }
                 xmlDocModules.Save(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + server_module_folder + Path.DirectorySeparatorChar + "modules.xml");
+                m_parent.update_conf();
                 this.Close();
             }
         }
@@ -186,11 +217,9 @@ namespace IRCBot
             this.Close();
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        private void command_list_change(Object sender, EventArgs e)
         {
-            XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.Load(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + server_module_folder + Path.DirectorySeparatorChar + "modules.xml");
-            XmlNodeList xnList = xmlDoc.SelectNodes("/modules/module");
+            XmlNodeList xnList = xmlDocModules.SelectNodes("/modules/module");
             foreach (XmlNode xn in xnList)
             {
                 XmlNodeList optionList = xn.ChildNodes;
@@ -201,7 +230,7 @@ namespace IRCBot
                         XmlNodeList Options = option.ChildNodes;
                         foreach (XmlNode options in Options)
                         {
-                            if (options["name"].InnerText.Equals(command_list.SelectedItem))
+                            if (options["name"].InnerText.Equals(command_label.Text))
                             {
                                 options["name"].InnerText = command_name.Text;
                                 options["triggers"].InnerText = command_triggers.Text;
@@ -217,14 +246,7 @@ namespace IRCBot
                     }
                 }
             }
-            xmlDoc.Save(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + server_module_folder + Path.DirectorySeparatorChar + "modules.xml");
-        }
-
-        private void command_list_change(Object sender, EventArgs e)
-        {
-            XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.Load(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + server_module_folder + Path.DirectorySeparatorChar + "modules.xml");
-            XmlNodeList xnList = xmlDoc.SelectNodes("/modules/module");
+            xnList = xmlDocModules.SelectNodes("/modules/module");
             foreach (XmlNode xn in xnList)
             {
                 XmlNodeList optionList = xn.ChildNodes;
@@ -237,6 +259,7 @@ namespace IRCBot
                         {
                             if (options["name"].InnerText.Equals(command_list.SelectedItem))
                             {
+                                command_label.Text = options["name"].InnerText;
                                 command_name.Text = options["name"].InnerText;
                                 command_triggers.Text = options["triggers"].InnerText;
                                 command_arguments.Text = options["syntax"].InnerText;

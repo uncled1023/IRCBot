@@ -301,7 +301,7 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                ircbot.sendData("MODE", line[2] + " + " + line[4].ToLower());
+                                                ircbot.sendData("MODE", line[2] + " +h " + line[4].ToLower());
                                                 ircbot.sendData("PRIVMSG", "chanserv :HOP " + line[2] + " add " + line[4].ToLower());
                                                 access.set_access_list(line[4].ToLower(), line[2], conf.hop_level.ToString(), ircbot);
                                             }

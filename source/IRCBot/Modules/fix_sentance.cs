@@ -74,6 +74,14 @@ namespace IRCBot.Modules
                         {
                             result = line_reg.Replace(past_line, replace, 1);
                         }
+                        for (int x = 0; x < nick_logs.Count(); x++)
+                        {
+                            if (nick_logs[x][0].Equals(channel) && nick_logs[x][1].Equals(nick))
+                            {
+                                nick_logs[x][2] = full_line;
+                                break;
+                            }
+                        }
                         ircbot.sendData("PRIVMSG", channel + " :[" + nick + "] " + result);
                     }
                     else
@@ -89,6 +97,7 @@ namespace IRCBot.Modules
                         if (nick_logs[x][0].Equals(channel) && nick_logs[x][1].Equals(nick))
                         {
                             nick_found = true;
+                            nick_logs[x][2] = full_line;
                             break;
                         }
                     }

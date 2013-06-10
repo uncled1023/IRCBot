@@ -242,9 +242,9 @@ namespace IRCBot.Modules
                                                 {
                                                     cur_poll = tmp_poll;
                                                     poll_active = true;
-                                                    index++;
                                                     break;
                                                 }
+                                                index++;
                                             }
                                             if (poll_active == true)
                                             {

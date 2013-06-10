@@ -95,7 +95,7 @@ namespace IRCBot.Modules
                                                             ircbot.sendData("PRIVMSG", line[2] + " :No Results Found");
                                                         }
                                                     }
-                                                    catch (Exception ex)
+                                                    catch
                                                     {
                                                         ircbot.sendData("PRIVMSG", line[2] + " :I can't search atm.");
                                                     }

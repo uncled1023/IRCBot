@@ -97,7 +97,7 @@ namespace IRCBot.Modules
                 xmlDoc.LoadXml(results);
                 xnList = xmlDoc.SelectNodes("/queryresult/pod");
             }
-            catch (Exception ex)
+            catch
             {
                 ircbot.sendData("PRIVMSG", channel + " :Could not fetch results");
             }

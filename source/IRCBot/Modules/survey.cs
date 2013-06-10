@@ -81,7 +81,7 @@ namespace IRCBot.Modules
                                                     num_survey = Convert.ToInt32(line[4].Trim());
                                                     start_survey(nick, nick_access, num_survey - 1, ircbot, conf);
                                                 }
-                                                catch (Exception ex)
+                                                catch
                                                 {
                                                     ircbot.sendData("NOTICE", nick + " :You need to choose a valid survey.  To view all surveys, please type " + conf.command + "surveys");
                                                 }
@@ -237,10 +237,10 @@ namespace IRCBot.Modules
                                                         num_survey = Convert.ToInt32(new_line[0].Trim());
                                                         view_survey(num_survey - 1, nick_access, nick, new_line[1].ToLower(), ircbot, conf);
                                                     }
-                                                    catch (Exception ex)
+                                                    catch
                                                     {
                                                         ircbot.sendData("NOTICE", nick + " :You need to choose a valid survey.  To view all surveys, please type " + conf.command + "surveys");
-                                                    };
+                                                    }
                                                 }
                                                 else
                                                 {
@@ -249,7 +249,7 @@ namespace IRCBot.Modules
                                                         num_survey = Convert.ToInt32(new_line[0].Trim());
                                                         view_survey(num_survey - 1, nick_access, nick, null, ircbot, conf);
                                                     }
-                                                    catch (Exception ex)
+                                                    catch
                                                     {
                                                         ircbot.sendData("NOTICE", nick + " :You need to choose a valid survey.  To view all surveys, please type " + conf.command + "surveys");
                                                     }
@@ -281,7 +281,7 @@ namespace IRCBot.Modules
                                                     num_survey = Convert.ToInt32(new_line[0]);
                                                     add_survey_owner(num_survey - 1, nick, new_line[1].ToLower(), ircbot, conf);
                                                 }
-                                                catch (Exception ex)
+                                                catch
                                                 {
                                                     ircbot.sendData("NOTICE", nick + " :You need to choose a valid survey.  To view all surveys, please type " + conf.command + "surveys");
                                                 }
@@ -312,7 +312,7 @@ namespace IRCBot.Modules
                                                     num_survey = Convert.ToInt32(new_line[0]);
                                                     del_survey_owner(num_survey - 1, nick, new_line[1].ToLower(), ircbot, conf);
                                                 }
-                                                catch (Exception ex)
+                                                catch
                                                 {
                                                     ircbot.sendData("NOTICE", nick + " :You need to choose a valid survey.  To view all surveys, please type " + conf.command + "surveys");
                                                 }
@@ -346,7 +346,7 @@ namespace IRCBot.Modules
                                                     {
                                                         survey_access = Convert.ToInt32(new_line[0]);
                                                     }
-                                                    catch (Exception ex)
+                                                    catch
                                                     {
                                                         access_valid = false;
                                                         ircbot.sendData("NOTICE", nick + " :Please choose a valid access level.");
@@ -390,7 +390,7 @@ namespace IRCBot.Modules
                                                     num_survey = Convert.ToInt32(line[4].Trim());
                                                     del_survey(nick, num_survey - 1, ircbot, conf);
                                                 }
-                                                catch (Exception ex)
+                                                catch
                                                 {
                                                     ircbot.sendData("NOTICE", nick + " :You need to choose a valid survey.  To view all surveys, please type " + conf.command + "surveys");
                                                 }

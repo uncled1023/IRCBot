@@ -521,10 +521,12 @@ namespace IRCBot
             System.Diagnostics.Process.Start(e.LinkText);
         }
 
-        private void send_button_Click(object sender, EventArgs e)
+        private void gui_cmd_send()
         {
             int index = 0;
             string tmp_server = "No_Server_Specified";
+            string channel = "";
+            string msg = "";
             foreach (bot bot in bot_instances)
             {
                 char[] charSep = new char[] { ':' };
@@ -532,6 +534,7 @@ namespace IRCBot
                 if (tab_name[1].Equals(bot.server_name))
                 {
                     tmp_server = bot.server_name;
+
                     break;
                 }
                 else
@@ -544,13 +547,53 @@ namespace IRCBot
             string[] input = input_tmp.Split(charSeparator, 2);
             if (input[0].StartsWith("/"))
             {
+                bool bot_command = true;
+                char[] charSep = new char[] { ':' };
+                string[] tab_name = tabControl1.SelectedTab.Name.ToString().Split(charSep, 4);
+                channel = tab_name[3];
+                string type = "line";
+                if (tab_name[2].Equals("_chan_"))
+                {
+                    type = "channel";
+                }
+                else if (tab_name[2].Equals("_user_"))
+                {
+                    type = "query";
+                }
+
                 if (input.GetUpperBound(0) > 0)
                 {
-                    bot_instances[index].sendData(input[0].TrimStart('/'), input[1]);
+                    msg = conf.command + input[0].TrimStart('/') + " " + input[1];
                 }
                 else
                 {
-                    bot_instances[index].sendData(input[0].TrimStart('/'), null);
+                    msg = conf.command + input[0].TrimStart('/');
+                }
+                string line = ":" + conf.nick + " PRIVMSG " + channel + " :" + msg;
+                string[] ex = line.Split(charSeparator, 5);
+                //Run Enabled Modules
+                List<Modules.Module> tmp_module_list = new List<Modules.Module>();
+                tmp_module_list.AddRange(bot_instances[index].module_list);
+                int module_index = 0;
+                foreach (Modules.Module module in tmp_module_list)
+                {
+                    module_index = 0;
+                    bool module_found = false;
+                    string module_blacklist = "";
+                    foreach (List<string> conf_module in conf.module_config)
+                    {
+                        if (module.ToString().Equals("IRCBot.Modules." + conf_module[0]))
+                        {
+                            module_blacklist = conf_module[2];
+                            module_found = true;
+                            break;
+                        }
+                        module_index++;
+                    }
+                    if (module_found == true)
+                    {
+                        module.control(bot_instances[index], ref bot_instances[index].conf, module_index, ex, ex[3].TrimStart(':').TrimStart(Convert.ToChar(conf.command)), bot_instances[index].conf.owner_level, bot_instances[index].conf.nick, channel, bot_command, type);
+                    }
                 }
             }
             else
@@ -580,6 +623,11 @@ namespace IRCBot
                     }
                 }
             }
+        }
+
+        private void send_button_Click(object sender, EventArgs e)
+        {
+            gui_cmd_send();
             input_box.Text = "";
         }
 
@@ -1130,66 +1178,7 @@ namespace IRCBot
         {
             if (e.KeyChar == (char)13)
             {
-                string[] server_list = full_server_list.Split(',');
-                int index = 0;
-                string tmp_server = "No_Server_Specified";
-                foreach (bot bot in bot_instances)
-                {
-                    char[] charSep = new char[] { ':' };
-                    string[] tab_name = tabControl1.SelectedTab.Name.ToString().Split(charSep, 3);
-                    if (tab_name[1].Equals(bot.server_name))
-                    {
-                        tmp_server = bot.server_name;
-                        break;
-                    }
-                    else
-                    {
-                        index++;
-                    }
-                }
-                string input_tmp = input_box.Text;
-                char[] charSeparator = new char[] { ' ' };
-                string[] input = input_tmp.Split(charSeparator, 2);
-                if (input[0].StartsWith("/"))
-                {
-                    e.Handled = true;
-                    if (input.GetUpperBound(0) > 0)
-                    {
-                        bot_instances[index].sendData(input[0].TrimStart('/'), input[1]);
-                    }
-                    else
-                    {
-                        bot_instances[index].sendData(input[0].TrimStart('/'), null);
-                    }
-                }
-                else
-                {
-                    if (tabControl1.SelectedIndex == 0)
-                    {
-                        output = Environment.NewLine + tmp_server + ":" + "No channel joined. Try /join #<channel>";
-
-                        lock (listLock)
-                        {
-                            if (queue_text.Count >= 1000)
-                            {
-                                queue_text.RemoveAt(0);
-                            }
-                            queue_text.Add(output);
-                        }
-                    }
-                    else
-                    {
-                        e.Handled = true;
-                        if (input.GetUpperBound(0) > 0)
-                        {
-                            bot_instances[index].sendData("PRIVMSG", tabControl1.SelectedTab.Text + " :" + input[0] + " " + input[1]);
-                        }
-                        else
-                        {
-                            bot_instances[index].sendData("PRIVMSG", tabControl1.SelectedTab.Text + " :" + input[0]);
-                        }
-                    }
-                }
+                gui_cmd_send();
                 input_box.Text = "";
             }
         }

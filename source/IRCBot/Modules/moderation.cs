@@ -482,44 +482,78 @@ namespace IRCBot.Modules
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 string[] new_line = line[4].Split(charS, 2);
-                                                char[] arr = new_line[0].TrimStart('-').TrimStart('+').ToCharArray();
+                                                char[] arr = new_line[0].ToCharArray();
+
                                                 bool mode_allowed = true;
+                                                bool positive = true;
+                                                int mode_index = 0;
                                                 foreach (char c in arr)
                                                 {
-                                                    char[] modes_disallowed = disallowed_modes.ToCharArray();
-                                                    foreach (char m in modes_disallowed)
+                                                    if (!c.Equals('+') && !c.Equals('-'))
                                                     {
-                                                        if (m.Equals(c))
+                                                        char[] modes_disallowed = disallowed_modes.ToCharArray();
+                                                        foreach (char m in modes_disallowed)
                                                         {
-                                                            mode_allowed = false;
-                                                            break;
-                                                        }
-                                                    }
-                                                    if (mode_allowed == true)
-                                                    {
-                                                        if (c.Equals('q') || c.Equals('a') || c.Equals('o') || c.Equals('h') || c.Equals('v'))
-                                                        {
-                                                            int mode_access = ircbot.get_access_num(c.ToString(), true);
-                                                            if (nick_access < mode_access)
+                                                            if (m.Equals(c))
                                                             {
                                                                 mode_allowed = false;
                                                                 break;
                                                             }
                                                         }
+                                                        if (mode_allowed == true)
+                                                        {
+                                                            if (c.Equals('q') || c.Equals('a') || c.Equals('o') || c.Equals('h') || c.Equals('v'))
+                                                            {
+                                                                int mode_access = ircbot.get_access_num(c.ToString(), true);
+                                                                if (nick_access < mode_access)
+                                                                {
+                                                                    mode_allowed = false;
+                                                                    break;
+                                                                }
+                                                            }
+                                                        }
+                                                        if (mode_allowed)
+                                                        {
+                                                            string leading_cmd = "";
+                                                            if (positive)
+                                                            {
+                                                                leading_cmd = "+";
+                                                            }
+                                                            else
+                                                            {
+                                                                leading_cmd = "-";
+                                                            }
+                                                            bool nick_needed = false;
+                                                            if (new_line.GetUpperBound(0) > 0)
+                                                            {
+                                                                string[] nicks = new_line[1].Split(charS);
+                                                                if (nicks.GetUpperBound(0) >= mode_index)
+                                                                {
+                                                                    nick_needed = true;
+                                                                }
+                                                            }
+                                                            if (nick_needed)
+                                                            {
+                                                                string[] nicks = new_line[1].Split(charS);
+                                                                ircbot.sendData("MODE", line[2] + " " + leading_cmd + c.ToString() + " :" + nicks[mode_index]);
+                                                            }
+                                                            else
+                                                            {
+                                                                ircbot.sendData("MODE", line[2] + " " + leading_cmd + c.ToString());
+                                                            }
+                                                        }
+                                                        mode_index++;
+                                                    }
+                                                    else if (c.Equals('+'))
+                                                    {
+                                                        positive = true;
+                                                    }
+                                                    else if (c.Equals('-'))
+                                                    {
+                                                        positive = false;
                                                     }
                                                 }
-                                                if (mode_allowed == true)
-                                                {
-                                                    if (new_line.GetUpperBound(0) > 0)
-                                                    {
-                                                        ircbot.sendData("MODE", line[2] + " " + new_line[0] + " :" + new_line[1]);
-                                                    }
-                                                    else
-                                                    {
-                                                        ircbot.sendData("MODE", line[2] + " " + new_line[0]);
-                                                    }
-                                                }
-                                                else
+                                                if (!mode_allowed)
                                                 {
                                                     ircbot.sendData("PRIVMSG", line[2] + " :You do not have permission to use that command.");
                                                 }

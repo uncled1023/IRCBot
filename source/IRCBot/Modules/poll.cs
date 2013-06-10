@@ -372,7 +372,7 @@ namespace IRCBot.Modules
                                                             ircbot.sendData("PRIVMSG", channel + " :You need to vote for a valid answer.");
                                                         }
                                                     }
-                                                    catch (Exception ex)
+                                                    catch
                                                     {
                                                         ircbot.sendData("PRIVMSG", channel + " :You need to vote for a valid answer.");
                                                     }

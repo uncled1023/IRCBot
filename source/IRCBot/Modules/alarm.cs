@@ -87,7 +87,7 @@ namespace IRCBot.Modules
                                                             int_allowed = false;
                                                         }
                                                     }
-                                                    catch (Exception ex)
+                                                    catch
                                                     {
                                                         int_allowed = false;
                                                     }
@@ -192,23 +192,67 @@ namespace IRCBot.Modules
                 {
                     line = ":" + full_nick + " PRIVMSG " + conf.nick + " :" + msg;
                 }
+
                 char[] charSplit = new char[] { ' ' };
                 string[] ex = line.Split(charSplit, 5);
-                //Run Enabled Modules
-                List<Modules.Module> tmp_module_list = new List<Modules.Module>();
-                tmp_module_list.AddRange(ircbot.module_list);
-                foreach (Modules.Module module in tmp_module_list)
+                string[] ignored_nicks = conf.ignore_list.Split(',');
+                bool run_modules = true;
+                foreach (string ignore_nick in ignored_nicks)
                 {
-                    int index = 0;
-                    foreach (List<string> conf_module in conf.module_config)
+                    if (ignore_nick.ToLower().Equals(nick))
                     {
-                        if (module.ToString().Equals("IRCBot.Modules." + conf_module[0]))
-                        {
-                            break;
-                        }
-                        index++;
+                        run_modules = false;
+                        break;
                     }
-                    module.control(ircbot, ref conf, index, ex, ex[3].TrimStart(':').TrimStart(Convert.ToChar(conf.command)), nick_access, nick, channel, bot_command, type);
+                }
+                if (run_modules)
+                {
+                    //Run Enabled Modules
+                    List<Modules.Module> tmp_module_list = new List<Modules.Module>();
+                    tmp_module_list.AddRange(ircbot.module_list);
+                    foreach (Modules.Module module in tmp_module_list)
+                    {
+                        int index = 0;
+                        bool module_found = false;
+                        string module_blacklist = "";
+                        foreach (List<string> conf_module in conf.module_config)
+                        {
+                            if (module.ToString().Equals("IRCBot.Modules." + conf_module[0]))
+                            {
+                                module_blacklist = conf_module[2];
+                                module_found = true;
+                                break;
+                            }
+                            index++;
+                        }
+                        if (module_found == true)
+                        {
+                            char[] sepComma = new char[] { ',' };
+                            char[] sepSpace = new char[] { ' ' };
+                            string[] blacklist = module_blacklist.Split(sepComma, StringSplitOptions.RemoveEmptyEntries);
+                            bool module_allowed = true;
+                            foreach (string blacklist_node in blacklist)
+                            {
+                                string[] nodes = blacklist_node.Split(sepSpace, StringSplitOptions.RemoveEmptyEntries);
+                                foreach (string node in nodes)
+                                {
+                                    if (node.ToLower().Equals(nick) || node.ToLower().TrimStart('#').Equals(channel.ToLower().TrimStart('#')))
+                                    {
+                                        module_allowed = false;
+                                        break;
+                                    }
+                                }
+                                if (module_allowed == false)
+                                {
+                                    break;
+                                }
+                            }
+                            if (module_allowed == true)
+                            {
+                                module.control(ircbot, ref conf, index, ex, ex[3].TrimStart(':').TrimStart(Convert.ToChar(conf.command)), nick_access, nick, channel, bot_command, type);
+                            }
+                        }
+                    }
                 }
             }
             else

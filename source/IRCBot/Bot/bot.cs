@@ -187,7 +187,7 @@ namespace IRCBot
             {
                 s.Connect(conf.server_ip[0], conf.port);
             }
-            catch (Exception ex)
+            catch
             {
                 conn_open = false;
             }
@@ -1668,7 +1668,16 @@ namespace IRCBot
                     {
                         if (conf.module_config[x][0].Equals("access"))
                         {
-                            if (conf.module_config[x][2].Equals("True"))
+                            bool chan_allowed = true;
+                            foreach (string blacklist in conf.module_config[x][2].Split(','))
+                            {
+                                if (blacklist.Equals(channel))
+                                {
+                                    chan_allowed = false;
+                                    break;
+                                }
+                            }
+                            if (chan_allowed)
                             {
                                 if (channel != null)
                                 {

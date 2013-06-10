@@ -62,7 +62,7 @@ namespace IRCBot.Modules
                                     if (url.OriginalString.Contains("youtube.com/watch?") && ircbot.conf.module_config[module_id][4].Equals("True"))
                                     {
                                         string YouTubeVideoID = ExtractYouTubeVideoIDFromUrl(url.OriginalString);
-                                        Uri videoEntryUrl = new Uri(string.Format("http://gdata.youtube.com/feeds/api/videos/{0}", YouTubeVideoID));
+                                        Uri videoEntryUrl = new Uri(string.Format("https://gdata.youtube.com/feeds/api/videos/{0}", YouTubeVideoID));
                                         YouTubeRequestSettings settings = new YouTubeRequestSettings("YouTube Video Duration Sample App", developerKey);
                                         YouTubeRequest yt_request = new YouTubeRequest(settings);
                                         Video video = yt_request.Retrieve<Video>(videoEntryUrl);
@@ -377,7 +377,7 @@ namespace IRCBot.Modules
 
         private string ExtractYouTubeVideoIDFromUrl(string youTubeUrl)
         {
-            return Regex.Match(youTubeUrl, @"http://www\.youtube\.com.*v=(?'VideoID'[^&]*)")
+            return Regex.Match(youTubeUrl, @"https?://www\.youtube\.com.*v=(?'VideoID'[^&]*)")
                 .Groups["VideoID"]
                 .Value;
         }

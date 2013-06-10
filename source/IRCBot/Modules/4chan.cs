@@ -106,7 +106,7 @@ namespace IRCBot.Modules
                                                             ircbot.sendData("PRIVMSG", channel + " :Could not find the thread specified");
                                                         }
                                                     }
-                                                    catch (Exception ex)
+                                                    catch
                                                     {
                                                         ircbot.sendData("PRIVMSG", channel + " :Could not find the thread specified");
                                                     }
@@ -127,7 +127,7 @@ namespace IRCBot.Modules
                                                             ircbot.sendData("PRIVMSG", channel + " :Could not find the thread specified");
                                                         }
                                                     }
-                                                    catch (Exception ex)
+                                                    catch
                                                     {
                                                         ircbot.sendData("PRIVMSG", channel + " :Could not find the thread specified");
                                                     }

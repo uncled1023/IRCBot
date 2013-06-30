@@ -780,6 +780,7 @@ namespace IRCBot
             connected = true;
             disconnected = false;
             restart_attempts = 0;
+            DateTime last_disconnect = DateTime.Now;
             while (shouldRun)
             {
                 Thread.Sleep(30);
@@ -791,7 +792,7 @@ namespace IRCBot
                 if (bw.CancellationPending == false)
                 {
                     bool is_connected = check_connection();
-                    if (is_connected == false)
+                    if (is_connected == false && (last_disconnect - DateTime.Now) > TimeSpan.FromSeconds(30))
                     {
                         connected = false;
                         if (sr != null)
@@ -804,6 +805,10 @@ namespace IRCBot
                             IRCConnection.Close();
                         shouldRun = false;
                         restart = true;
+                    }
+                    else if (is_connected == true)
+                    {
+                        last_disconnect = DateTime.Now;
                     }
                 }
             }

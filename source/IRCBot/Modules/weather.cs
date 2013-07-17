@@ -35,10 +35,7 @@ namespace IRCBot.Modules
                         }
                         if (spam_check == true)
                         {
-                            if (ircbot.spam_activated == true)
-                            {
-                                blocked = true;
-                            }
+                            blocked = ircbot.get_spam_status(channel, nick);
                         }
                         foreach (string trigger in triggers)
                         {
@@ -48,6 +45,10 @@ namespace IRCBot.Modules
                                 break;
                             }
                         }
+                        if (blocked == true && cmd_found == true)
+                        {
+                            ircbot.sendData("NOTICE", nick + " :I am currently too busy to process that.");
+                        }
                         if (blocked == false && cmd_found == true)
                         {
                             foreach (string trigger in triggers)
@@ -55,13 +56,37 @@ namespace IRCBot.Modules
                                 switch (trigger)
                                 {
                                     case "weather":
-                                        if (spam_check == true)
-                                        {
-                                            ircbot.spam_count++;
-                                        }
                                         if (conf.module_config[module_id][3].Equals("True"))
                                         {
-                                            ircbot.spam_count++;
+                                            if (spam_check == true)
+                                            {
+                                                lock (ircbot.spamlock)
+                                                {
+                                                    bool spam_added = false;
+                                                    int index = 0;
+                                                    foreach (spam_info spam in conf.spam_check)
+                                                    {
+                                                        if (spam.spam_channel.Equals(channel))
+                                                        {
+                                                            spam_added = true;
+                                                            index++;
+                                                            break;
+                                                        }
+                                                    }
+                                                    if (spam_added)
+                                                    {
+                                                        conf.spam_check[index].spam_count++;
+                                                    }
+                                                    else
+                                                    {
+                                                        spam_info new_spam = new spam_info();
+                                                        new_spam.spam_channel = channel;
+                                                        new_spam.spam_activated = false;
+                                                        new_spam.spam_count = 1;
+                                                        conf.spam_check.Add(new_spam);
+                                                    }
+                                                }
+                                            }
                                             if (nick_access >= command_access)
                                             {
                                                 if (line.GetUpperBound(0) > 3)
@@ -81,13 +106,37 @@ namespace IRCBot.Modules
                                         }
                                         break;
                                     case "forecast":
-                                        if (spam_check == true)
-                                        {
-                                            ircbot.spam_count++;
-                                        }
                                         if (conf.module_config[module_id][4].Equals("True"))
                                         {
-                                            ircbot.spam_count++;
+                                            if (spam_check == true)
+                                            {
+                                                lock (ircbot.spamlock)
+                                                {
+                                                    bool spam_added = false;
+                                                    int index = 0;
+                                                    foreach (spam_info spam in conf.spam_check)
+                                                    {
+                                                        if (spam.spam_channel.Equals(channel))
+                                                        {
+                                                            spam_added = true;
+                                                            index++;
+                                                            break;
+                                                        }
+                                                    }
+                                                    if (spam_added)
+                                                    {
+                                                        conf.spam_check[index].spam_count++;
+                                                    }
+                                                    else
+                                                    {
+                                                        spam_info new_spam = new spam_info();
+                                                        new_spam.spam_channel = channel;
+                                                        new_spam.spam_activated = false;
+                                                        new_spam.spam_count = 1;
+                                                        conf.spam_check.Add(new_spam);
+                                                    }
+                                                }
+                                            }
                                             if (nick_access >= command_access)
                                             {
                                                 if (line.GetUpperBound(0) > 3)

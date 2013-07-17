@@ -49,13 +49,13 @@ struct IRCConfig
     public int owner_level;
     public List<List<string>> module_config;
     public List<List<string>> command_list;
+    public List<spam_info> spam_check;
 }
 
 namespace IRCBot
 {
     public partial class Interface : Form
     {
-
         private string output = "";
         public string full_server_list = "";
         public string cur_dir = "";
@@ -66,6 +66,7 @@ namespace IRCBot
         public readonly object listLock = new object();
 
         private IRCConfig conf = new IRCConfig();
+        private spam_info spam_list = new spam_info();
         private System.Windows.Forms.NotifyIcon MyNotifyIcon;
         delegate void SetTextCallback(string text);
 
@@ -135,9 +136,10 @@ namespace IRCBot
 
             conf.module_config = new List<List<string>>();
             conf.command_list = new List<List<string>>();
-            
+            conf.spam_check = new List<spam_info>();
+
             cur_dir = Directory.GetCurrentDirectory();
-            
+
             button1.Enabled = false;
             button1.Visible = false;
 
@@ -202,7 +204,7 @@ namespace IRCBot
 
             updateOutput.Interval = 100;
             updateOutput.Start();
-            
+
             queue_text.Capacity = 1000;
             queue_text.Clear();
 
@@ -648,7 +650,7 @@ namespace IRCBot
 
         private void UpdateOutput_final(string text)
         {
-            
+
             RichTextBox output_box = new RichTextBox();
             output_box = output_box_system;
             if (output_box.InvokeRequired)
@@ -1741,4 +1743,17 @@ namespace IRCBot
             input_box.Focus();
         }
     }
+}
+
+public class spam_info
+{
+    public string spam_channel { get; set; }
+    public int spam_count { get; set; }
+    public bool spam_activated { get; set; }
+}
+
+public class timer_info
+{
+    public string spam_channel { get; set; }
+    public System.Windows.Forms.Timer spam_timer { get; set; }
 }

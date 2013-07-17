@@ -33,10 +33,7 @@ namespace IRCBot.Modules
                         }
                         if (spam_check == true)
                         {
-                            if (ircbot.spam_activated == true)
-                            {
-                                blocked = true;
-                            }
+                            blocked = ircbot.get_spam_status(channel, nick);
                         }
                         foreach (string trigger in triggers)
                         {
@@ -45,6 +42,10 @@ namespace IRCBot.Modules
                                 cmd_found = true;
                                 break;
                             }
+                        }
+                        if (blocked == true && cmd_found == true)
+                        {
+                            ircbot.sendData("NOTICE", nick + " :I am currently too busy to process that.");
                         }
                         if (blocked == false && cmd_found == true)
                         {
@@ -55,7 +56,7 @@ namespace IRCBot.Modules
                                     case "rollcall":
                                         if (spam_check == true)
                                         {
-                                            ircbot.spam_count++;
+                                            ircbot.add_spam_count(channel);
                                         }
                                         if (nick_access >= command_access)
                                         {

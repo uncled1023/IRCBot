@@ -42,10 +42,7 @@ namespace IRCBot.Modules
                         }
                         if (spam_check == true)
                         {
-                            if (ircbot.spam_activated == true)
-                            {
-                                blocked = true;
-                            }
+                            blocked = ircbot.get_spam_status(channel, nick);
                         }
                         foreach (string trigger in triggers)
                         {
@@ -54,6 +51,10 @@ namespace IRCBot.Modules
                                 cmd_found = true;
                                 break;
                             }
+                        }
+                        if (blocked == true && cmd_found == true)
+                        {
+                            ircbot.sendData("NOTICE", nick + " :I am currently too busy to process that.");
                         }
                         if (blocked == false && cmd_found == true)
                         {
@@ -64,7 +65,7 @@ namespace IRCBot.Modules
                                     case "owner":
                                         if (spam_check == true)
                                         {
-                                            ircbot.spam_count++;
+                                            ircbot.add_spam_count(channel);
                                         }
                                         if (nick_access >= command_access)
                                         {
@@ -93,7 +94,7 @@ namespace IRCBot.Modules
                                     case "addowner":
                                         if (spam_check == true)
                                         {
-                                            ircbot.spam_count++;
+                                            ircbot.add_spam_count(channel);
                                         }
                                         if (nick_access >= command_access)
                                         {
@@ -115,7 +116,7 @@ namespace IRCBot.Modules
                                     case "delowner":
                                         if (spam_check == true)
                                         {
-                                            ircbot.spam_count++;
+                                            ircbot.add_spam_count(channel);
                                         }
                                         if (nick_access >= command_access)
                                         {
@@ -137,7 +138,7 @@ namespace IRCBot.Modules
                                     case "nick":
                                         if (spam_check == true)
                                         {
-                                            ircbot.spam_count++;
+                                            ircbot.add_spam_count(channel);
                                         }
                                         if (nick_access >= command_access)
                                         {
@@ -159,7 +160,7 @@ namespace IRCBot.Modules
                                     case "id":
                                         if (spam_check == true)
                                         {
-                                            ircbot.spam_count++;
+                                            ircbot.add_spam_count(channel);
                                         }
                                         if (nick_access >= command_access)
                                         {
@@ -174,7 +175,7 @@ namespace IRCBot.Modules
                                     case "join":
                                         if (spam_check == true)
                                         {
-                                            ircbot.spam_count++;
+                                            ircbot.add_spam_count(channel);
                                         }
                                         if (nick_access >= command_access)
                                         {
@@ -199,7 +200,7 @@ namespace IRCBot.Modules
                                     case "part":
                                         if (spam_check == true)
                                         {
-                                            ircbot.spam_count++;
+                                            ircbot.add_spam_count(channel);
                                         }
                                         if (nick_access >= command_access)
                                         {
@@ -270,7 +271,7 @@ namespace IRCBot.Modules
                                     case "say":
                                         if (spam_check == true)
                                         {
-                                            ircbot.spam_count++;
+                                            ircbot.add_spam_count(channel);
                                         }
                                         if (nick_access >= command_access)
                                         {
@@ -299,7 +300,7 @@ namespace IRCBot.Modules
                                     case "action":
                                         if (spam_check == true)
                                         {
-                                            ircbot.spam_count++;
+                                            ircbot.add_spam_count(channel);
                                         }
                                         if (nick_access >= command_access)
                                         {
@@ -328,7 +329,7 @@ namespace IRCBot.Modules
                                     case "quit":
                                         if (spam_check == true)
                                         {
-                                            ircbot.spam_count++;
+                                            ircbot.add_spam_count(channel);
                                         }
                                         if (nick_access >= command_access)
                                         {
@@ -350,7 +351,7 @@ namespace IRCBot.Modules
                                     case "ignore":
                                         if (spam_check == true)
                                         {
-                                            ircbot.spam_count++;
+                                            ircbot.add_spam_count(channel);
                                         }
                                         if (nick_access >= command_access)
                                         {
@@ -371,7 +372,7 @@ namespace IRCBot.Modules
                                     case "unignore":
                                         if (spam_check == true)
                                         {
-                                            ircbot.spam_count++;
+                                            ircbot.add_spam_count(channel);
                                         }
                                         if (nick_access >= command_access)
                                         {
@@ -392,7 +393,7 @@ namespace IRCBot.Modules
                                     case "ignorecmd":
                                         if (spam_check == true)
                                         {
-                                            ircbot.spam_count++;
+                                            ircbot.add_spam_count(channel);
                                         }
                                         if (nick_access >= command_access)
                                         {
@@ -421,7 +422,7 @@ namespace IRCBot.Modules
                                     case "unignorecmd":
                                         if (spam_check == true)
                                         {
-                                            ircbot.spam_count++;
+                                            ircbot.add_spam_count(channel);
                                         }
                                         if (nick_access >= command_access)
                                         {
@@ -450,7 +451,7 @@ namespace IRCBot.Modules
                                     case "ignoremodule":
                                         if (spam_check == true)
                                         {
-                                            ircbot.spam_count++;
+                                            ircbot.add_spam_count(channel);
                                         }
                                         if (nick_access >= command_access)
                                         {
@@ -479,7 +480,7 @@ namespace IRCBot.Modules
                                     case "unignoremodule":
                                         if (spam_check == true)
                                         {
-                                            ircbot.spam_count++;
+                                            ircbot.add_spam_count(channel);
                                         }
                                         if (nick_access >= command_access)
                                         {
@@ -508,7 +509,7 @@ namespace IRCBot.Modules
                                     case "blacklist":
                                         if (spam_check == true)
                                         {
-                                            ircbot.spam_count++;
+                                            ircbot.add_spam_count(channel);
                                         }
                                         if (nick_access >= command_access)
                                         {
@@ -529,7 +530,7 @@ namespace IRCBot.Modules
                                     case "unblacklist":
                                         if (spam_check == true)
                                         {
-                                            ircbot.spam_count++;
+                                            ircbot.add_spam_count(channel);
                                         }
                                         if (nick_access >= command_access)
                                         {
@@ -550,7 +551,7 @@ namespace IRCBot.Modules
                                     case "update":
                                         if (spam_check == true)
                                         {
-                                            ircbot.spam_count++;
+                                            ircbot.add_spam_count(channel);
                                         }
                                         if (nick_access >= command_access)
                                         {
@@ -564,7 +565,7 @@ namespace IRCBot.Modules
                                     case "modules":
                                         if (spam_check == true)
                                         {
-                                            ircbot.spam_count++;
+                                            ircbot.add_spam_count(channel);
                                         }
                                         if (nick_access >= command_access)
                                         {
@@ -604,7 +605,7 @@ namespace IRCBot.Modules
                                     case "loadmodule":
                                         if (spam_check == true)
                                         {
-                                            ircbot.spam_count++;
+                                            ircbot.add_spam_count(channel);
                                         }
                                         if (nick_access >= command_access)
                                         {
@@ -654,7 +655,7 @@ namespace IRCBot.Modules
                                     case "delmodule":
                                         if (spam_check == true)
                                         {
-                                            ircbot.spam_count++;
+                                            ircbot.add_spam_count(channel);
                                         }
                                         if (nick_access >= command_access)
                                         {
@@ -705,7 +706,7 @@ namespace IRCBot.Modules
                                     case "addchan":
                                         if (spam_check == true)
                                         {
-                                            ircbot.spam_count++;
+                                            ircbot.add_spam_count(channel);
                                         }
                                         if (nick_access >= command_access)
                                         {
@@ -740,7 +741,7 @@ namespace IRCBot.Modules
                                                             foreach (string owner_nick in owners)
                                                             {
                                                                 ircbot.sendData("NOTICE", owner_nick + " :" + nick + " has invited me to join " + line[4]);
-                                                                ircbot.sendData("NOTICE", owner_nick + " :If you would like to permanently add this channel, please type " + conf.command + "addchanlist " + channel);
+                                                                ircbot.sendData("NOTICE", owner_nick + " :If you would like to permanently add this channel, please type " + conf.command + "addchanlist " + line[4]);
                                                             }
                                                         }
                                                         ircbot.sendData("JOIN", line[4]);
@@ -764,7 +765,7 @@ namespace IRCBot.Modules
                                     case "addchanlist":
                                         if (spam_check == true)
                                         {
-                                            ircbot.spam_count++;
+                                            ircbot.add_spam_count(channel);
                                         }
                                         if (nick_access >= command_access)
                                         {
@@ -799,7 +800,7 @@ namespace IRCBot.Modules
                                     case "delchanlist":
                                         if (spam_check == true)
                                         {
-                                            ircbot.spam_count++;
+                                            ircbot.add_spam_count(channel);
                                         }
                                         if (nick_access >= command_access)
                                         {
@@ -821,7 +822,7 @@ namespace IRCBot.Modules
                                     case "channels":
                                         if (spam_check == true)
                                         {
-                                            ircbot.spam_count++;
+                                            ircbot.add_spam_count(channel);
                                         }
                                         if (nick_access >= command_access)
                                         {
@@ -887,7 +888,7 @@ namespace IRCBot.Modules
                                     case "servers":
                                         if (spam_check == true)
                                         {
-                                            ircbot.spam_count++;
+                                            ircbot.add_spam_count(channel);
                                         }
                                         if (nick_access >= command_access)
                                         {
@@ -908,7 +909,7 @@ namespace IRCBot.Modules
                                     case "clear":
                                         if (spam_check == true)
                                         {
-                                            ircbot.spam_count++;
+                                            ircbot.add_spam_count(channel);
                                         }
                                         if (nick_access >= command_access)
                                         {

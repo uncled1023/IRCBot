@@ -56,12 +56,43 @@ namespace IRCBot.Modules
                                 case "text":
                                     WebClient x = new WebClient();
                                     string source = x.DownloadString(url.OriginalString);
-                                    string title_regex = @"(?<=<title.*>)([\s\S]*)(?=</title>)";
+                                    string title_regex = @"(?<=<title.*>)(.*?)(?=</title>)";
                                     Regex title_ex = new Regex(title_regex, RegexOptions.IgnoreCase);
-                                    string title = title_ex.Match(source).Value.Trim();
+                                    MatchCollection title_matches = title_ex.Matches(source);
+                                    string title = title_matches[0].Value.Trim();
                                     if (url.OriginalString.Contains("youtube.com/watch?") && ircbot.conf.module_config[module_id][4].Equals("True"))
                                     {
                                         string YouTubeVideoID = ExtractYouTubeVideoIDFromUrl(url.OriginalString);
+                                        Uri videoEntryUrl = new Uri(string.Format("https://gdata.youtube.com/feeds/api/videos/{0}", YouTubeVideoID));
+                                        YouTubeRequestSettings settings = new YouTubeRequestSettings("YouTube Video Duration Sample App", developerKey);
+                                        YouTubeRequest yt_request = new YouTubeRequest(settings);
+                                        Video video = yt_request.Retrieve<Video>(videoEntryUrl);
+                                        int duration = int.Parse(video.Contents.First().Duration);
+                                        string yt_title = video.Title;
+                                        int views = video.ViewCount;
+                                        double rateavg = video.RatingAverage;
+                                        string uploader = video.Uploader;
+                                        DateTime date = video.Updated;
+                                        string total_duration = "";
+                                        TimeSpan t = TimeSpan.FromSeconds(duration);
+                                        if (t.Hours > 0)
+                                        {
+                                            total_duration += t.Hours.ToString() + "h ";
+                                        }
+                                        if (t.Minutes > 0)
+                                        {
+                                            total_duration += t.Minutes.ToString() + "m ";
+                                        }
+                                        if (t.Seconds > 0)
+                                        {
+                                            total_duration += t.Seconds.ToString() + "s ";
+                                        }
+                                        ircbot.sendData("PRIVMSG", channel + " :[Youtube] Title: " + HttpUtility.HtmlDecode(yt_title) + " | Length: " + total_duration.TrimEnd(' ') + " | Views: " + string.Format("{0:#,###0}", views) + " | Rated: " + Math.Round(rateavg, 2).ToString() + "/5.0 | Uploaded By: " + uploader + " on " + date.ToString("yyyy-MM-dd"));
+                                    }
+                                    else if (url.OriginalString.Contains("youtu.be") && ircbot.conf.module_config[module_id][4].Equals("True"))
+                                    {
+                                        string[] url_parsed = url.OriginalString.Split('/');
+                                        string YouTubeVideoID = url_parsed[url_parsed.GetUpperBound(0)];
                                         Uri videoEntryUrl = new Uri(string.Format("https://gdata.youtube.com/feeds/api/videos/{0}", YouTubeVideoID));
                                         YouTubeRequestSettings settings = new YouTubeRequestSettings("YouTube Video Duration Sample App", developerKey);
                                         YouTubeRequest yt_request = new YouTubeRequest(settings);

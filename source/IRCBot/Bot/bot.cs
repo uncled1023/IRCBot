@@ -33,7 +33,8 @@ namespace IRCBot
 
         public System.Windows.Forms.Timer checkRegisterationTimer = new System.Windows.Forms.Timer();
         private System.Windows.Forms.Timer Spam_Check_Timer;
-        private System.Windows.Forms.Timer Spam_Timer;
+        private System.Windows.Forms.Timer Spam_Threshold_Check;
+        private List<timer_info> Spam_Timers;
         private System.Windows.Forms.Timer check_cancel;
         private bool restart;
         private int restart_attempts;
@@ -50,8 +51,6 @@ namespace IRCBot
         public bool disconnected;
         public bool shouldRun;
         public bool first_run;
-        public int spam_count;
-        public bool spam_activated;
         public List<List<string>> nick_list;
         public List<string> channel_list;
         public string cur_dir;
@@ -64,6 +63,9 @@ namespace IRCBot
         public Interface ircbot;
         public IRCConfig conf;
 
+        public readonly object timerlock = new object();
+        public readonly object spamlock = new object();
+
         public bot()
         {
             IRCConnection = null;
@@ -74,11 +76,11 @@ namespace IRCBot
             bot_identified = false;
             checkRegisterationTimer = new System.Windows.Forms.Timer();
             Spam_Check_Timer = new System.Windows.Forms.Timer();
-            Spam_Timer = new System.Windows.Forms.Timer();
+            Spam_Threshold_Check = new System.Windows.Forms.Timer();
+            Spam_Timers = new List<timer_info>();
             check_cancel = new System.Windows.Forms.Timer();
             connected = false;
             disconnected = true;
-            spam_activated = false;
             restart = false;
             restart_attempts = 0;
             server_name = "No_Server_Specified";
@@ -87,7 +89,6 @@ namespace IRCBot
 
             shouldRun = true;
             first_run = true;
-            spam_count = 0;
             nick_list = new List<List<string>>();
             channel_list = new List<string>();
         }
@@ -111,11 +112,13 @@ namespace IRCBot
             Spam_Check_Timer.Interval = conf.spam_threshold;
             Spam_Check_Timer.Start();
 
+            Spam_Threshold_Check.Tick += new EventHandler(spam_check);
+            Spam_Threshold_Check.Interval = 100;
+            Spam_Threshold_Check.Start();
+
             checkRegisterationTimer.Tick += new EventHandler(checkRegistration);
             checkRegisterationTimer.Interval = 120000;
             checkRegisterationTimer.Enabled = true;
-
-            Spam_Timer.Tick += new EventHandler(spam_deactivate);
 
             check_cancel.Tick += new EventHandler(cancel_tick);
             check_cancel.Interval = 500;
@@ -308,7 +311,6 @@ namespace IRCBot
         {
             BackgroundWorker bw = sender as BackgroundWorker;
 
-            Spam_Timer.Interval = conf.spam_timout;
             nick_list.Clear();
             channel_list.Clear();
             first_run = true;
@@ -780,7 +782,6 @@ namespace IRCBot
             connected = true;
             disconnected = false;
             restart_attempts = 0;
-            DateTime last_disconnect = DateTime.Now;
             while (shouldRun)
             {
                 Thread.Sleep(30);
@@ -792,7 +793,7 @@ namespace IRCBot
                 if (bw.CancellationPending == false)
                 {
                     bool is_connected = check_connection();
-                    if (is_connected == false && (last_disconnect - DateTime.Now) > TimeSpan.FromSeconds(30))
+                    if (is_connected == false)
                     {
                         connected = false;
                         if (sr != null)
@@ -805,10 +806,6 @@ namespace IRCBot
                             IRCConnection.Close();
                         shouldRun = false;
                         restart = true;
-                    }
-                    else if (is_connected == true)
-                    {
-                        last_disconnect = DateTime.Now;
                     }
                 }
             }
@@ -1447,18 +1444,139 @@ namespace IRCBot
 
         private void spam_tick(object sender, EventArgs e)
         {
-            if (spam_count > conf.spam_count_max)
+            lock (spamlock)
             {
-                spam_count = 0;
-                spam_activated = true;
-                Spam_Timer.Start();
+                List<int> spam_index = new List<int>();
+                int index = 0;
+                foreach (spam_info spam in conf.spam_check)
+                {
+                    if (spam.spam_count < conf.spam_count_max)
+                    {
+                        spam_index.Add(index);
+                    }
+                    index++;
+                }
+                foreach (int x in spam_index)
+                {
+                    conf.spam_check.RemoveAt(x);
+                }
             }
         }
 
-        private void spam_deactivate(object sender, EventArgs e)
+        private void spam_check(object sender, EventArgs e)
         {
-            spam_activated = false;
-            Spam_Timer.Stop();
+            lock (spamlock)
+            {
+                foreach (spam_info spam in conf.spam_check)
+                {
+                    if (spam.spam_count > conf.spam_count_max)
+                    {
+                        if (!spam.spam_activated)
+                        {
+                            System.Windows.Forms.Timer new_timer = new System.Windows.Forms.Timer();
+                            new_timer.Interval = conf.spam_timout;
+                            new_timer.Tick += (new_sender, new_e) => spam_deactivate(new_sender, new_e, spam.spam_channel);
+                            new_timer.Enabled = true;
+                            timer_info tmp_timer = new timer_info();
+                            tmp_timer.spam_channel = spam.spam_channel;
+                            tmp_timer.spam_timer = new_timer;
+                            lock (timerlock)
+                            {
+                                Spam_Timers.Add(tmp_timer);
+                            }
+                            spam.spam_activated = true;
+                            spam.spam_count++;
+                            Spam_Timers[Spam_Timers.Count - 1].spam_timer.Start();
+                        }
+                    }
+                }
+            }
+        }
+
+        public void spam_deactivate(object sender, EventArgs e, string channel)
+        {
+            lock (spamlock)
+            {
+                int index = 0;
+                foreach (spam_info spam in conf.spam_check)
+                {
+                    if (spam.spam_activated && spam.spam_channel.Equals(channel))
+                    {
+                        break;
+                    }
+                    index++;
+                }
+                conf.spam_check.RemoveAt(index);
+            }
+            lock (timerlock)
+            {
+                int index = 0;
+                foreach (timer_info spam in Spam_Timers)
+                {
+                    if (spam.spam_channel.Equals(channel))
+                    {
+                        break;
+                    }
+                    index++;
+                }
+                Spam_Timers[index].spam_timer.Stop();
+                Spam_Timers.RemoveAt(index);
+            }
+        }
+
+        public void add_spam_count(string channel)
+        {
+            lock (spamlock)
+            {
+                bool spam_added = false;
+                bool spam_found = false;
+                int index = 0;
+                foreach (spam_info spam in conf.spam_check)
+                {
+                    if (spam.spam_channel.Equals(channel))
+                    {
+                        if (spam.spam_count > conf.spam_count_max + 1)
+                        {
+                            spam_added = true;
+                        }
+                        spam_found = true;
+                        break;
+                    }
+                    index++;
+                }
+                if (!spam_added && spam_found)
+                {
+                    conf.spam_check[index].spam_count++;
+                }
+                else if (!spam_found)
+                {
+                    spam_info new_spam = new spam_info();
+                    new_spam.spam_channel = channel;
+                    new_spam.spam_activated = false;
+                    new_spam.spam_count = 1;
+                    conf.spam_check.Add(new_spam);
+                }
+            }
+        }
+
+        public bool get_spam_status(string channel, string nick)
+        {
+            bool active = false;
+            lock (spamlock)
+            {
+                foreach (spam_info spam in conf.spam_check)
+                {
+                    if (spam.spam_channel.Equals(channel))
+                    {
+                        if (spam.spam_activated)
+                        {
+                            active = true;
+                        }
+                        break;
+                    }
+                }
+            }
+            return active;
         }
 
         private void register_nick(string nick, string password, string email)
@@ -1661,7 +1779,7 @@ namespace IRCBot
 
         public int get_user_access(string nick, string channel)
         {
-            int access_num = 0;
+            int access_num = conf.user_level;
             try
             {
                 string access = "0";
@@ -1733,6 +1851,37 @@ namespace IRCBot
                         if (Convert.ToInt32(access_line) > access_num)
                         {
                             access_num = Convert.ToInt32(access_line);
+                        }
+                    }
+                }
+                if (access_num == conf.user_level && user_identified)
+                {
+                    access_num = get_user_op(nick, channel);
+                    if (access_num != conf.user_level)
+                    {
+                        for (int x = 0; x < nick_list.Count(); x++)
+                        {
+                            if (nick_list[x][0].Equals(channel) || channel == null)
+                            {
+                                for (int i = 2; i < nick_list[x].Count(); i++)
+                                {
+                                    string[] lists = nick_list[x][i].Split(':');
+                                    if (lists.GetUpperBound(0) > 0)
+                                    {
+                                        if (lists[1].ToLower().Equals(nick))
+                                        {
+                                            string new_nick = access_num.ToString();
+                                            for (int z = 1; z < lists.Count(); z++)
+                                            {
+                                                new_nick += ":" + lists[z];
+                                            }
+                                            nick_list[x][i] = new_nick;
+                                            break;
+                                        }
+                                    }
+                                }
+                                break;
+                            }
                         }
                     }
                 }

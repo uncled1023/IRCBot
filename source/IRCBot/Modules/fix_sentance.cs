@@ -78,7 +78,7 @@ namespace IRCBot.Modules
                         {
                             if (nick_logs[x][0].Equals(channel) && nick_logs[x][1].Equals(nick))
                             {
-                                nick_logs[x][2] = full_line;
+                                nick_logs[x][2] = result;
                                 break;
                             }
                         }

@@ -125,7 +125,6 @@
     <Compile Include="Modules\fix_sentance.cs" />
     <Compile Include="Modules\github.cs" />
     <Compile Include="Modules\logging.cs" />
-    <Compile Include="Modules\site_status.cs" />
     <Compile Include="Modules\survey.cs" />
     <Compile Include="Modules\url.cs" />
     <Compile Include="Modules\wolfram_alpha.cs" />

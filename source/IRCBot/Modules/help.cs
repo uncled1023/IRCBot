@@ -176,15 +176,10 @@ namespace IRCBot.Modules
                             }
                         }
                     }
-                    if (commands == 1)
+                    if (commands >= 1)
                     {
                         msg += " " + module_name;
-                        msg += " [1 Cmd]" + ",";
-                    }
-                    else if (commands > 1)
-                    {
-                        msg += " " + module_name;
-                        msg += " [" + commands.ToString() + " Cmds]" + ",";
+                        msg += " [" + commands.ToString() + "]" + ",";
                     }
                 }
                 if (msg != "")

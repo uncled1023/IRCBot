@@ -40,6 +40,7 @@ struct IRCConfig
     public int spam_threshold;
     public int spam_timout;
     public int max_message_length;
+    public int default_level;
     public int user_level;
     public int voice_level;
     public int hop_level;
@@ -318,6 +319,7 @@ namespace IRCBot
                             conf.sop_level = Convert.ToInt32(xn["sop_level"].InnerText);
                             conf.founder_level = Convert.ToInt32(xn["founder_level"].InnerText);
                             conf.owner_level = Convert.ToInt32(xn["owner_level"].InnerText);
+                            conf.default_level = Math.Min(conf.user_level, Math.Min(conf.voice_level, Math.Min(conf.hop_level, Math.Min(conf.op_level, Math.Min(conf.sop_level, Math.Min(conf.founder_level, conf.owner_level)))))) - 1;
 
 
                             XmlDocument xmlDocModules = new XmlDocument();

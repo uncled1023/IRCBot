@@ -677,17 +677,18 @@ namespace IRCBot
                             {
                                 break;
                             }
-                            else if (line.Contains("Found your hostname"))
+                            else if (line.Contains("End of /MOTD command."))
                             {
                                 nick_accepted = true;
                                 ident = true;
                                 conf.nick = nick;
+                                config.nick = nick;
                                 break;
                             }
                         }
                     }
                 }
-                else if (line.Contains("Found your hostname"))
+                else if (line.Contains("End of /MOTD command."))
                 {
                     ident = true;
                     nick_accepted = true;
@@ -713,11 +714,12 @@ namespace IRCBot
                         {
                             break;
                         }
-                        else if (line.Contains("Found your hostname"))
+                        else if (line.Contains("End of /MOTD command."))
                         {
                             nick_accepted = true;
                             ident = true;
                             conf.nick = nick_rand;
+                            config.nick = nick_rand;
                         }
                     }
                 }
@@ -743,32 +745,6 @@ namespace IRCBot
             Thread.Sleep(100);
 
             initiate_nick();
-
-            bool tmp_connected = false;
-            while (tmp_connected == false)
-            {
-                Thread.Sleep(30);
-                string line = read_queue();
-                char[] charSeparator = new char[] { ' ' };
-                string[] ex = line.Split(charSeparator, 5, StringSplitOptions.RemoveEmptyEntries);
-
-                if (ex.GetUpperBound(0) >= 0)
-                {
-                    if (ex[0] == "PING")
-                    {
-                        sendData("PONG", ex[1]);
-                    }
-                }
-
-                string[] new_line = line.Split(charSeparator, 5);
-                if (new_line.GetUpperBound(0) > 3)
-                {
-                    if (new_line[3] == ":End" && new_line[4] == "of /MOTD command.")
-                    {
-                        tmp_connected = true;
-                    }
-                }
-            }
 
             Thread.Sleep(100);
 

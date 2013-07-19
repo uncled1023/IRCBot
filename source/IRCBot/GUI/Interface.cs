@@ -447,6 +447,7 @@ namespace IRCBot
                     IRCConfig server_conf = new IRCConfig();
                     server_conf = conf;
                     bot bot_instance = new bot();
+                    bot_instance.worker.WorkerSupportsCancellation = true;
                     bot_instances.Add(bot_instance);
                     bot_instances[index].start_bot(this, server_conf);
                     index++;
@@ -1592,32 +1593,53 @@ namespace IRCBot
                 else
                 {
                 }
+                IRCConfig tmp_conf = new IRCConfig();
+                tmp_conf.module_config = new List<List<string>>();
+                tmp_conf.spam_check = new List<spam_info>();
+                tmp_conf.command_list = new List<List<string>>();
+                XmlNode list = xmlDoc.SelectSingleNode("/bot_settings/global_settings");
+
+                tmp_conf.command = list["command_prefix"].InnerText;
+                tmp_conf.keep_logs = list["keep_logs"].InnerText;
+                if (Directory.Exists(list["logs_path"].InnerText))
+                {
+                    tmp_conf.logs_path = list["logs_path"].InnerText;
+                }
+                else
+                {
+                    tmp_conf.logs_path = cur_dir + Path.DirectorySeparatorChar + "logs";
+                }
+                tmp_conf.spam_count_max = Convert.ToInt32(list["spam_count"].InnerText);
+                tmp_conf.spam_threshold = Convert.ToInt32(list["spam_threshold"].InnerText);
+                tmp_conf.spam_timout = Convert.ToInt32(list["spam_timeout"].InnerText);
+                tmp_conf.max_message_length = Convert.ToInt32(list["max_message_length"].InnerText);
+                tmp_conf.minimize_to_tray = Convert.ToBoolean(list["minimize_to_tray"].InnerText);
+
                 XmlNodeList ServerxnList = xmlDoc.SelectNodes("/bot_settings/server_list/server");
                 foreach (XmlNode xn in ServerxnList)
                 {
                     string tmp_server = xn["server_name"].InnerText;
                     if (tmp_server.Equals(start_server_name))
                     {
-                        conf.command_list.Clear();
-                        conf.module_config.Clear();
-                        conf.name = xn["name"].InnerText;
-                        conf.nick = xn["nick"].InnerText;
-                        conf.secondary_nicks = xn["sec_nicks"].InnerText;
-                        conf.pass = xn["password"].InnerText;
-                        conf.email = xn["email"].InnerText;
-                        conf.owner = xn["owner"].InnerText;
-                        conf.port = Convert.ToInt32(xn["port"].InnerText);
-                        conf.server = xn["server_name"].InnerText;
-                        conf.chans = xn["chan_list"].InnerText;
-                        conf.chan_blacklist = xn["chan_blacklist"].InnerText;
-                        conf.ignore_list = xn["ignore_list"].InnerText;
-                        conf.user_level = Convert.ToInt32(xn["user_level"].InnerText);
-                        conf.voice_level = Convert.ToInt32(xn["voice_level"].InnerText);
-                        conf.hop_level = Convert.ToInt32(xn["hop_level"].InnerText);
-                        conf.op_level = Convert.ToInt32(xn["op_level"].InnerText);
-                        conf.sop_level = Convert.ToInt32(xn["sop_level"].InnerText);
-                        conf.founder_level = Convert.ToInt32(xn["founder_level"].InnerText);
-                        conf.owner_level = Convert.ToInt32(xn["owner_level"].InnerText);
+                        tmp_conf.name = xn["name"].InnerText;
+                        tmp_conf.nick = xn["nick"].InnerText;
+                        tmp_conf.secondary_nicks = xn["sec_nicks"].InnerText;
+                        tmp_conf.pass = xn["password"].InnerText;
+                        tmp_conf.email = xn["email"].InnerText;
+                        tmp_conf.owner = xn["owner"].InnerText;
+                        tmp_conf.port = Convert.ToInt32(xn["port"].InnerText);
+                        tmp_conf.server = xn["server_name"].InnerText;
+                        tmp_conf.chans = xn["chan_list"].InnerText;
+                        tmp_conf.chan_blacklist = xn["chan_blacklist"].InnerText;
+                        tmp_conf.ignore_list = xn["ignore_list"].InnerText;
+                        tmp_conf.user_level = Convert.ToInt32(xn["user_level"].InnerText);
+                        tmp_conf.voice_level = Convert.ToInt32(xn["voice_level"].InnerText);
+                        tmp_conf.hop_level = Convert.ToInt32(xn["hop_level"].InnerText);
+                        tmp_conf.op_level = Convert.ToInt32(xn["op_level"].InnerText);
+                        tmp_conf.sop_level = Convert.ToInt32(xn["sop_level"].InnerText);
+                        tmp_conf.founder_level = Convert.ToInt32(xn["founder_level"].InnerText);
+                        tmp_conf.owner_level = Convert.ToInt32(xn["owner_level"].InnerText);
+                        tmp_conf.default_level = Math.Min(conf.user_level, Math.Min(conf.voice_level, Math.Min(conf.hop_level, Math.Min(conf.op_level, Math.Min(conf.sop_level, Math.Min(conf.founder_level, conf.owner_level)))))) - 1;
 
 
                         XmlDocument xmlDocModules = new XmlDocument();
@@ -1661,7 +1683,7 @@ namespace IRCBot
                                             tmp2_list.Add(options["blacklist"].InnerText);
                                             tmp2_list.Add(options["show_help"].InnerText);
                                             tmp2_list.Add(options["spam_check"].InnerText);
-                                            conf.command_list.Add(tmp2_list);
+                                            tmp_conf.command_list.Add(tmp2_list);
                                         }
                                     }
                                     if (option.Name.Equals("options"))
@@ -1681,42 +1703,61 @@ namespace IRCBot
                                         }
                                     }
                                 }
-                                conf.module_config.Add(tmp_list);
+                                tmp_conf.module_config.Add(tmp_list);
                             }
                         }
+                        server_initiated = true;
                         break;
                     }
                 }
+                if (server_initiated)
+                {
+                    button1.Visible = true;
+                    button1.Enabled = true;
 
-                button1.Visible = true;
-                button1.Enabled = true;
+                    try
+                    {
+                        tmp_conf.server_ip = Dns.GetHostAddresses(tmp_conf.server);
+                    }
+                    catch
+                    {
+                        tmp_conf.server_ip = null;
+                    }
 
-                bot bot_instance = new bot();
-                bot_instances.Add(bot_instance);
-                bot_instances[bot_instances.Count - 1].start_bot(this, conf);
-                server_initiated = true;
-                connectToolStripMenuItem.Enabled = true;
-                connectToolStripMenuItem.Text = "Disconnect";
-                tabControl1.SelectedIndex = tabControl1.TabPages.IndexOfKey("tabPage:" + tmp_server_name + ":__:system");
+                    bot bot_instance = new bot();
+                    bot_instance.worker.WorkerSupportsCancellation = true;
+                    bot_instances.Add(bot_instance);
+                    bot_instances[bot_instances.Count - 1].start_bot(this, tmp_conf);
+                    connectToolStripMenuItem.Enabled = true;
+                    connectToolStripMenuItem.Text = "Disconnect";
+                    tabControl1.SelectedIndex = tabControl1.TabPages.IndexOfKey("tabPage:" + tmp_server_name + ":__:system");
+                }
             }
             return server_initiated;
         }
 
         public bool end_connection(string start_server_name)
         {
-            bool server_initiated = false;
+            bool server_terminated = false;
+            int index = 0;
             foreach (bot bot in bot_instances)
             {
                 if (bot.connected == true && bot.full_server_name.Equals(start_server_name))
                 {
-                    server_initiated = true;
+                    server_terminated = true;
                     bot.disconnected = true;
                     bot.worker.CancelAsync();
                     input_box.Enabled = false;
                     send_button.Enabled = false;
+                    while (bot.worker.CancellationPending)
+                    {
+                        bot.worker.CancelAsync();
+                    }
+                    break;
                 }
+                index++;
             }
-            return server_initiated;
+            return server_terminated;
         }
 
         public bool bot_connected(string input_server_name)

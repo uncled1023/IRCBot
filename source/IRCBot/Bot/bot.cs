@@ -677,7 +677,7 @@ namespace IRCBot
                             {
                                 break;
                             }
-                            else if (line.Contains("Your host is masked"))
+                            else if (line.Contains("Found your hostname"))
                             {
                                 nick_accepted = true;
                                 ident = true;
@@ -687,7 +687,7 @@ namespace IRCBot
                         }
                     }
                 }
-                else if (line.Contains("Your host is masked"))
+                else if (line.Contains("Found your hostname"))
                 {
                     ident = true;
                     nick_accepted = true;
@@ -713,7 +713,7 @@ namespace IRCBot
                         {
                             break;
                         }
-                        else if (line.Contains("Your host is masked"))
+                        else if (line.Contains("Found your hostname"))
                         {
                             nick_accepted = true;
                             ident = true;
@@ -1844,7 +1844,7 @@ namespace IRCBot
                         }
                     }
                 }
-                if (access_num == conf.default_level && user_identified && channel != null)
+                if (access_num == conf.default_level && channel != null)
                 {
                     bool nick_found = false;
                     access_num = get_user_op(nick, channel);

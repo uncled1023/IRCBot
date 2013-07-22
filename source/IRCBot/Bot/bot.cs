@@ -23,7 +23,7 @@ using System.Reflection;
 
 namespace IRCBot
 {
-    class bot
+    public class bot
     {
         TcpClient IRCConnection;
         IRCConfig config;
@@ -36,15 +36,15 @@ namespace IRCBot
         private System.Windows.Forms.Timer Spam_Threshold_Check;
         private List<timer_info> Spam_Timers;
         private System.Windows.Forms.Timer check_cancel;
-        private bool restart;
-        private int restart_attempts;
         private bool bot_identified;
         private List<string> data_queue = new List<string>();
         private List<string> stream_queue = new List<string>();
 
         public readonly object queuelock = new object();
         public readonly object streamlock = new object();
-
+        
+        public bool restart;
+        public int restart_attempts;
         public string server_name;
         public string full_server_name;
         public bool connected;
@@ -380,20 +380,15 @@ namespace IRCBot
                 connected = true;
                 IRCConnection = new TcpClient(conf.server, conf.port);
             }
-            catch
+            catch (Exception ex)
             {
                 restart = true;
                 restart_attempts++;
                 connected = false;
-                string output = Environment.NewLine + server_name + ":" + "Connection Error";
 
-                lock (ircbot.listLock)
+                lock (ircbot.errorlock)
                 {
-                    if (ircbot.queue_text.Count >= 1000)
-                    {
-                        ircbot.queue_text.RemoveAt(0);
-                    }
-                    ircbot.queue_text.Add(output);
+                    ircbot.log_error(ex);
                 }
             }
 
@@ -424,15 +419,10 @@ namespace IRCBot
                 {
                     restart = true;
                     restart_attempts++;
-                    string output =  Environment.NewLine + server_name + ":" + ex.ToString().Replace("\r\n", " ");
 
-                    lock (ircbot.listLock)
+                    lock (ircbot.errorlock)
                     {
-                        if (ircbot.queue_text.Count >= 1000)
-                        {
-                            ircbot.queue_text.RemoveAt(0);
-                        }
-                        ircbot.queue_text.Add(output);
+                        ircbot.log_error(ex);
                     }
                 }
                 finally
@@ -590,9 +580,9 @@ namespace IRCBot
                 }
                 catch (Exception ex)
                 {
-                    lock (streamlock)
+                    lock (ircbot.errorlock)
                     {
-                        stream_queue.Add(ex.Message);
+                        ircbot.log_error(ex);
                     }
                     shouldRun = false;
                 }
@@ -795,12 +785,12 @@ namespace IRCBot
                 string line = read_queue();
                 char[] charSeparator = new char[] { ' ' };
                 string[] name_line = line.Split(charSeparator, 5);
-                while (name_line.GetUpperBound(0) <= 3)
+                while (name_line.GetUpperBound(0) <= 3 && line != "")
                 {
                     line = read_queue();
                     name_line = line.Split(charSeparator, 5);
                 }
-                while (bot_identified == false)
+                while (bot_identified == false && line != "")
                 {
                     if (name_line[3] == ":Password" && name_line[4].StartsWith("accepted"))
                     {
@@ -815,7 +805,7 @@ namespace IRCBot
                     {
                         line = read_queue();
                         name_line = line.Split(charSeparator, 5);
-                        while (name_line.GetUpperBound(0) <= 3)
+                        while (name_line.GetUpperBound(0) <= 3 && line != "")
                         {
                             line = read_queue();
                             name_line = line.Split(charSeparator, 5);
@@ -1569,7 +1559,8 @@ namespace IRCBot
                 }
                 char[] charSeparator = new char[] { ' ' };
                 string[] name_line = line.Split(charSeparator);
-                while (name_line[2] != conf.nick || name_line.GetUpperBound(0) < 3)
+
+                while (name_line.GetUpperBound(0) < 3 || name_line[2] != conf.nick)
                 {
                     line = read_queue();
                     name_line = line.Split(charSeparator);
@@ -1860,14 +1851,9 @@ namespace IRCBot
             }
             catch (Exception ex)
             {
-                string output = Environment.NewLine + server_name + ":" + ex.ToString();
-                lock (ircbot.listLock)
+                lock (ircbot.errorlock)
                 {
-                    if (ircbot.queue_text.Count >= 1000)
-                    {
-                        ircbot.queue_text.RemoveAt(0);
-                    }
-                    ircbot.queue_text.Add(output);
+                    ircbot.log_error(ex);
                 }
             }
             return access_num;

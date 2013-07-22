@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Timers;
 
 namespace IRCBot.Modules
 {
@@ -34,15 +35,11 @@ namespace IRCBot.Modules
                     }
                     index++;
                 }
-                if (cur_lines > max_lines)
+                if (cur_lines >= max_lines)
                 {
                     if (warn)
                     {
                         ircbot.sendData("PRIVMSG", channel + " :" + warn_msg);
-                    }
-                    if (kick)
-                    {
-                        ircbot.sendData("KICK", channel + " " + nick + " :" + kick_msg);
                     }
                     if (ban)
                     {
@@ -54,7 +51,11 @@ namespace IRCBot.Modules
                         }
                         ircbot.sendData("MODE", line[2] + " +b " + tmp_ban + " :" + ban_msg);
                     }
-                    spam_logs[index].timer.Stop();
+                    if (kick)
+                    {
+                        ircbot.sendData("KICK", channel + " " + nick + " :" + kick_msg);
+                    }
+                    spam_logs[index].timer.Enabled = false;
                     spam_logs.RemoveAt(index);
                 }
                 else
@@ -69,11 +70,12 @@ namespace IRCBot.Modules
                         tmp_spam.channel = channel;
                         tmp_spam.nick = nick;
                         tmp_spam.lines = 1;
-                        tmp_spam.timer = new System.Windows.Forms.Timer();
-                        tmp_spam.timer.Interval = check_timeout;
-                        tmp_spam.timer.Tick += (sender, e) => spam_tick(sender, e, channel, nick);
-                        tmp_spam.timer.Enabled = true;
-                        tmp_spam.timer.Start();
+                        Timer tmp_timer = new Timer();
+                        tmp_timer.Interval = check_timeout;
+                        tmp_timer.Elapsed += (sender, e) => spam_tick(sender, e, channel, nick);
+                        tmp_timer.Enabled = true;
+                        tmp_timer.AutoReset = false;
+                        tmp_spam.timer = tmp_timer;
                         spam_logs.Add(tmp_spam);
                     }
                 }
@@ -95,7 +97,7 @@ namespace IRCBot.Modules
             }
             if (nick_found)
             {
-                spam_logs[index].timer.Stop();
+                spam_logs[index].timer.Enabled = false;
                 spam_logs.RemoveAt(index);
             }
         }
@@ -106,6 +108,6 @@ namespace IRCBot.Modules
         public string channel;
         public string nick;
         public int lines;
-        public System.Windows.Forms.Timer timer;
+        public Timer timer;
     }
 }

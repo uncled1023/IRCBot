@@ -608,7 +608,14 @@ namespace IRCBot.Modules
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 string[] new_line = line[4].ToLower().Split(charS, 2);
-                                                ircbot.sendData("INVITE", new_line[0] + " " + line[2]);
+                                                if (new_line.GetUpperBound(0) > 0)
+                                                {
+                                                    ircbot.sendData("INVITE", new_line[0] + " " + new_line[1]);
+                                                }
+                                                else
+                                                {
+                                                    ircbot.sendData("INVITE", new_line[0] + " " + line[2]);
+                                                }
                                             }
                                             else
                                             {

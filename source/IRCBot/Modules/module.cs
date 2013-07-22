@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace IRCBot.Modules
 {
-    class Module
+    public class Module
     {
         public virtual void control(bot ircbot, ref IRCConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type) { }
     }

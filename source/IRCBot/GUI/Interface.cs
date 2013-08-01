@@ -560,25 +560,21 @@ namespace IRCBot
                 char[] charSep = new char[] { ':' };
                 string[] tab_name = tabControl1.SelectedTab.Name.ToString().Split(charSep, 4);
                 channel = tab_name[3];
-                string type = "line";
-                if (tab_name[2].Equals("_chan_"))
-                {
-                    type = "channel";
-                }
-                else if (tab_name[2].Equals("_user_"))
+                string type = "channel";
+                if (tab_name[2].Equals("_user_"))
                 {
                     type = "query";
                 }
 
                 if (input.GetUpperBound(0) > 0)
                 {
-                    msg = conf.command + input[0].TrimStart('/') + " " + input[1];
+                    msg = conf.bot_instances[index].conf.command + input[0].TrimStart('/') + " " + input[1];
                 }
                 else
                 {
-                    msg = conf.command + input[0].TrimStart('/');
+                    msg = conf.bot_instances[index].conf.command + input[0].TrimStart('/');
                 }
-                string line = ":" + conf.nick + " PRIVMSG " + channel + " :" + msg;
+                string line = ":" + conf.bot_instances[index].conf.nick + " PRIVMSG " + channel + " :" + msg;
                 string[] ex = line.Split(charSeparator, 5);
                 //Run Enabled Modules
                 List<Modules.Module> tmp_module_list = new List<Modules.Module>();
@@ -589,7 +585,7 @@ namespace IRCBot
                     module_index = 0;
                     bool module_found = false;
                     string module_blacklist = "";
-                    foreach (List<string> conf_module in conf.module_config)
+                    foreach (List<string> conf_module in conf.bot_instances[index].conf.module_config)
                     {
                         if (module.ToString().Equals("IRCBot.Modules." + conf_module[0]))
                         {
@@ -706,28 +702,27 @@ namespace IRCBot
                             if (channel.StartsWith("#"))
                             {
                                 tab_name = tmp_msg[0].TrimStart('#').TrimEnd(']');
-                                channel = "#" + tab_name;
                                 if (tmp_msg.GetUpperBound(0) > 0)
                                 {
-                                    message = tmp_msg[1];
+                                    message = "[#" + tab_name + "] " + tmp_msg[1];
                                 }
                                 else
                                 {
-                                    message = tmp_msg[0];
+                                    message = "[#" + tab_name + "] " + tmp_msg[0];
                                 }
                             }
                             else
                             {
-                                channel = "System";
                                 if (tmp_msg.GetUpperBound(0) > 0)
                                 {
-                                    message = tmp_msg[0] + " " + tmp_msg[1];
+                                    message = "[" + tab_name + "] " + tmp_msg[0] + " " + tmp_msg[1];
                                 }
                                 else
                                 {
-                                    message = tmp_msg[0];
+                                    message = "[" + tab_name + "] " + tmp_msg[0];
                                 }
                             }
+                            channel = "System";
                             nickname = "--<" + tmp_lines[0].TrimStart(':').Split('!')[0] + ">--  ";
                             font_color = "#B037B0";
                         }
@@ -990,6 +985,15 @@ namespace IRCBot
                         output_box = (RichTextBox)control;
                         if (nickname != "" || message != "")
                         {
+                            if (output_box.Lines.Length > 500)
+                            {
+                                Regex reg = new Regex(@"(\[\\cf1)(.*?)(\n)", RegexOptions.IgnoreCase);
+                                MatchCollection matches = reg.Matches(output_box.Rtf);
+                                if (matches.Count > 0)
+                                {
+                                    output_box.Rtf = output_box.Rtf.Replace(matches[0].Value, "");
+                                }
+                            }
                             int before_length = output_box.Text.Length + 1;
                             int nickname_length = nickname.Length;
                             int message_length = message.Length;
@@ -1119,7 +1123,6 @@ namespace IRCBot
                 tabControl1.Update();
 
                 string[][] tab_names = new string[tabControl1.TabPages.Count][];
-
                 int index = 0;
                 foreach (TabPage tab in tabControl1.TabPages)
                 {
@@ -1142,9 +1145,16 @@ namespace IRCBot
 
                 tabControl1.Controls.Clear();
 
+                int tab_index = 0;
+                index = 0;
                 foreach (string[] page in tab_names)
                 {
                     tabControl1.Controls.Add(tmp_tabcontrol.Controls.Find(page[0], true)[0]);
+                    if (page[0].Equals(tabpage.Name))
+                    {
+                        tab_index = index;
+                    }
+                    index++;
                 }
 
                 tabControl1.Update();
@@ -1154,7 +1164,7 @@ namespace IRCBot
                 this.tabControl1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.tabControl1_MouseClick);
                 tabControl1.SelectedIndexChanged += tab_changed;
 
-                tabControl1.SelectedIndex = tabControl1.Controls.Find(tabpage.Name, true)[0].TabIndex;
+                tabControl1.SelectedIndex = tab_index;
             }
         }
 
@@ -1182,7 +1192,6 @@ namespace IRCBot
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            throw new InvalidOperationException("Invalid operation.");
             AboutBox1 about = new AboutBox1();
             about.ShowDialog();
         }
@@ -1191,6 +1200,7 @@ namespace IRCBot
         {
             if (e.KeyChar == (char)13)
             {
+                e.Handled = true;
                 gui_cmd_send();
                 input_box.Text = "";
             }
@@ -1650,7 +1660,7 @@ namespace IRCBot
                         tmp_conf.sop_level = Convert.ToInt32(xn["sop_level"].InnerText);
                         tmp_conf.founder_level = Convert.ToInt32(xn["founder_level"].InnerText);
                         tmp_conf.owner_level = Convert.ToInt32(xn["owner_level"].InnerText);
-                        tmp_conf.default_level = Math.Min(conf.user_level, Math.Min(conf.voice_level, Math.Min(conf.hop_level, Math.Min(conf.op_level, Math.Min(conf.sop_level, Math.Min(conf.founder_level, conf.owner_level)))))) - 1;
+                        tmp_conf.default_level = Math.Min(tmp_conf.user_level, Math.Min(tmp_conf.voice_level, Math.Min(tmp_conf.hop_level, Math.Min(tmp_conf.op_level, Math.Min(tmp_conf.sop_level, Math.Min(tmp_conf.founder_level, tmp_conf.owner_level)))))) - 1;
 
 
                         XmlDocument xmlDocModules = new XmlDocument();

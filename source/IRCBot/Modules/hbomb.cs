@@ -137,7 +137,7 @@ namespace IRCBot.Modules
                                                     tmp_info.previous_bomb_holder = nick;
                                                     tmp_info.bomb_holder = nick;
 
-                                                    ircbot.sendData("PRIVMSG", channel + " :" + nick + " has started the timer!  If the bomb get's passed to you, type " + conf.command + "pass <nick> to pass it to someone else, or type " + conf.command + "defuse <color> to try to defuse it.");
+                                                    ircbot.sendData("PRIVMSG", channel + " :" + nick + " has started the timer!  If the bomb gets passed to you, type " + conf.command + "pass <nick> to pass it to someone else, or type " + conf.command + "defuse <color> to try to defuse it.");
                                                     string colors = "";
                                                     foreach (string wire in tmp_info.wire_colors)
                                                     {
@@ -663,13 +663,13 @@ namespace IRCBot.Modules
                         string[] new_line = file_line.Split(sep, 4);
                         if (new_line.GetUpperBound(0) > 0)
                         {
-                            if (new_line[0].Equals(nick) && new_line[1].Equals(channel))
+                            if (new_line[0].Equals(pass_nick) && new_line[1].Equals(channel))
                             {
                                 DateTime current_date = DateTime.Now;
                                 DateTime past_date = DateTime.Parse(new_line[2]);
                                 double difference_second = 0;
                                 difference_second = current_date.Subtract(past_date).TotalSeconds;
-                                if (difference_second <= 500)
+                                if (difference_second <= 600)
                                 {
                                     nick_idle = false;
                                 }

@@ -135,7 +135,6 @@ namespace IRCBot
 
         public void restart_server()
         {
-            start_time = DateTime.Now;
             string[] tmp_server = conf.server.Split('.');
             if (tmp_server.GetUpperBound(0) > 0)
             {
@@ -632,7 +631,6 @@ namespace IRCBot
             bool ident = false;
             while (!ident)
             {
-                Thread.Sleep(30);
                 string line = read_queue();
                 char[] charSeparator = new char[] { ' ' };
                 string[] ex = line.Split(charSeparator, 5, StringSplitOptions.RemoveEmptyEntries);
@@ -653,7 +651,6 @@ namespace IRCBot
                         sendData("NICK", nick);
                         while (!ident)
                         {
-                            Thread.Sleep(30);
                             line = read_queue();
                             string[] new_ex = line.Split(charSeparator, 5, StringSplitOptions.RemoveEmptyEntries);
                             if (new_ex.GetUpperBound(0) >= 0)
@@ -690,7 +687,6 @@ namespace IRCBot
                     sendData("NICK", nick_rand);
                     while (!ident)
                     {
-                        Thread.Sleep(30);
                         line = read_queue();
                         string[] new_ex = line.Split(charSeparator, 5, StringSplitOptions.RemoveEmptyEntries);
                         if (new_ex.GetUpperBound(0) >= 0)
@@ -750,7 +746,7 @@ namespace IRCBot
             restart_attempts = 0;
             while (shouldRun)
             {
-                Thread.Sleep(30);
+                Thread.Sleep(10);
                 data = read_stream_queue();
                 if (data != "")
                 {
@@ -1416,7 +1412,10 @@ namespace IRCBot
                 }
                 foreach (int x in spam_index)
                 {
-                    conf.spam_check.RemoveAt(x);
+                    if (conf.spam_check.Count() <= x)
+                    {
+                        conf.spam_check.RemoveAt(x);
+                    }
                 }
             }
         }
@@ -1741,6 +1740,10 @@ namespace IRCBot
             {
                 string access = access_num.ToString();
                 string tmp_custom_access = "";
+                if (nick.Equals(conf.nick))
+                {
+                    access = conf.owner_level.ToString();
+                }
                 bool user_identified = get_user_ident(nick);
                 if (user_identified == true)
                 {

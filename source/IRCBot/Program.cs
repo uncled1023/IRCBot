@@ -39,23 +39,51 @@ namespace IRCBot
             try
             {
                 // Exit the program if the user clicks Abort.
-                DialogResult result = ShowThreadExceptionDialog(sender, e.Exception);
-
-                if (result == DialogResult.Abort)
-                    Application.Exit();
+                Exception result = ShowThreadExceptionDialog(sender, e.Exception);
+                if (result.GetType() != typeof(OutOfMemoryException))
+                {
+                    System.Diagnostics.Process.Start(Application.ExecutablePath); // to start new instance of application
+                }
+                Application.Exit();
             }
             catch
             {
                 // Fatal error, terminate program
                 try
                 {
-                    MessageBox.Show("Fatal Error",
-                        "Fatal Error",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Stop);
+                    string logs_path = "";
+                    string file_name = "Errors.log";
+                    string time_stamp = DateTime.Now.ToString("hh:mm tt");
+                    string date_stamp = DateTime.Now.ToString("yyyy-MM-dd");
+                    string cur_dir = Directory.GetCurrentDirectory();
+                    XmlDocument xmlDoc = new XmlDocument();
+                    xmlDoc.Load(cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
+                    XmlNode list = xmlDoc.SelectSingleNode("/bot_settings/global_settings");
+                    if (Directory.Exists(list["logs_path"].InnerText))
+                    {
+                        logs_path = list["logs_path"].InnerText;
+                    }
+                    else
+                    {
+                        logs_path = cur_dir + Path.DirectorySeparatorChar + "logs";
+                    }
+                    if (Directory.Exists(logs_path + Path.DirectorySeparatorChar + "errors"))
+                    {
+                        StreamWriter log_file = File.AppendText(logs_path + Path.DirectorySeparatorChar + "errors" + Path.DirectorySeparatorChar + file_name);
+                        log_file.WriteLine("[" + date_stamp + " " + time_stamp + "] " + "Fatal Error");
+                        log_file.Close();
+                    }
+                    else
+                    {
+                        Directory.CreateDirectory(logs_path + Path.DirectorySeparatorChar + "errors");
+                        StreamWriter log_file = File.AppendText(logs_path + Path.DirectorySeparatorChar + "errors" + Path.DirectorySeparatorChar + file_name);
+                        log_file.WriteLine("[" + date_stamp + " " + time_stamp + "] " + "Fatal Error");
+                        log_file.Close();
+                    }
                 }
                 finally
                 {
+                    System.Diagnostics.Process.Start(Application.ExecutablePath); // to start new instance of application
                     Application.Exit();
                 }
             }
@@ -64,7 +92,7 @@ namespace IRCBot
         /// 
         /// Creates and displays the error message.
         /// 
-        private DialogResult ShowThreadExceptionDialog(object sender, Exception ex)
+        private Exception ShowThreadExceptionDialog(object sender, Exception ex)
         {
             string errorMessage =
                 "Unhandled Exception:\n\n" +
@@ -73,9 +101,8 @@ namespace IRCBot
                 "\n\nStack Trace:\n" +
                 ex.StackTrace;
 
-            string file_name = "";
+            string file_name = "Errors.log";
             string logs_path = "";
-            file_name = "Errors.log";
             string time_stamp = DateTime.Now.ToString("hh:mm tt");
             string date_stamp = DateTime.Now.ToString("yyyy-MM-dd");
             string cur_dir = Directory.GetCurrentDirectory();
@@ -104,10 +131,7 @@ namespace IRCBot
                 log_file.Close();
             }
 
-            return MessageBox.Show(errorMessage,
-                "Application Error",
-                MessageBoxButtons.AbortRetryIgnore,
-                MessageBoxIcon.Stop);
+            return ex;
         }
     } // End ThreadExceptionHandler
 }

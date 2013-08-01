@@ -140,7 +140,7 @@ namespace IRCBot
             RegistryKey rkApp = Registry.CurrentUser.OpenSubKey("SOFTWARE" + Path.DirectorySeparatorChar + "Microsoft" + Path.DirectorySeparatorChar + "Windows" + Path.DirectorySeparatorChar + "CurrentVersion" + Path.DirectorySeparatorChar + "Run", true);
             if (windows_start_box.Checked.ToString() == "True")
             {
-                rkApp.SetValue("IRCBot", Application.ExecutablePath.ToString());
+                rkApp.SetValue("IRCBot", "\"" + Application.ExecutablePath.ToString() + "\"");
             }
             else
             {

@@ -48,6 +48,7 @@ namespace IRCBot
         public string server_name;
         public string full_server_name;
         public bool connected;
+        public bool connecting;
         public bool disconnected;
         public bool shouldRun;
         public bool first_run;
@@ -80,6 +81,7 @@ namespace IRCBot
             Spam_Timers = new List<timer_info>();
             check_cancel = new System.Windows.Forms.Timer();
             connected = false;
+            connecting = false;
             disconnected = true;
             restart = false;
             restart_attempts = 0;
@@ -95,6 +97,7 @@ namespace IRCBot
 
         public void start_bot(Interface main, IRCConfig tmp_conf)
         {
+            connecting = true;
             start_time = DateTime.Now;
             ircbot = main;
             conf = tmp_conf;
@@ -135,6 +138,7 @@ namespace IRCBot
 
         public void restart_server()
         {
+            connecting = true;
             string[] tmp_server = conf.server.Split('.');
             if (tmp_server.GetUpperBound(0) > 0)
             {
@@ -325,6 +329,7 @@ namespace IRCBot
         {
             disconnected = true;
             connected = false;
+            connecting = false;
             if (sr != null)
                 sr.Close();
             if (sw != null)
@@ -377,6 +382,7 @@ namespace IRCBot
             try
             {
                 connected = true;
+                connecting = false;
                 IRCConnection = new TcpClient(conf.server, conf.port);
             }
             catch (Exception ex)
@@ -384,6 +390,7 @@ namespace IRCBot
                 restart = true;
                 restart_attempts++;
                 connected = false;
+                connecting = false;
 
                 lock (ircbot.errorlock)
                 {
@@ -426,6 +433,7 @@ namespace IRCBot
                 }
                 finally
                 {
+                    connecting = false;
                     connected = false;
                     if (sr != null)
                         sr.Close();
@@ -716,6 +724,7 @@ namespace IRCBot
         {
             shouldRun = true;
             connected = true;
+            connecting = false;
             disconnected = false;
 
             BackgroundWorker work = new BackgroundWorker();
@@ -758,6 +767,7 @@ namespace IRCBot
                     if (is_connected == false)
                     {
                         connected = false;
+                        connecting = false;
                         if (sr != null)
                             sr.Close();
                         if (sw != null)
@@ -769,6 +779,10 @@ namespace IRCBot
                         shouldRun = false;
                         restart = true;
                     }
+                }
+                else
+                {
+                    shouldRun = false;
                 }
             }
         }
@@ -1373,7 +1387,9 @@ namespace IRCBot
         {
             if (worker.CancellationPending == true)
             {
+                shouldRun = false;
                 connected = false;
+                connecting = false;
                 if (sr != null)
                     sr.Close();
                 if (sw != null)
@@ -1393,6 +1409,7 @@ namespace IRCBot
                     }
                     ircbot.queue_text.Add(output);
                 }
+                check_cancel.Stop();
             }
         }
 

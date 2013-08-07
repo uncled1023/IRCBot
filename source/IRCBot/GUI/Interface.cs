@@ -702,27 +702,28 @@ namespace IRCBot
                             if (channel.StartsWith("#"))
                             {
                                 tab_name = tmp_msg[0].TrimStart('#').TrimEnd(']');
+                                channel = "#" + tab_name;
                                 if (tmp_msg.GetUpperBound(0) > 0)
                                 {
-                                    message = "[#" + tab_name + "] " + tmp_msg[1];
+                                    message = tmp_msg[1];
                                 }
                                 else
                                 {
-                                    message = "[#" + tab_name + "] " + tmp_msg[0];
+                                    message = tmp_msg[0];
                                 }
                             }
                             else
                             {
+                                channel = "System";
                                 if (tmp_msg.GetUpperBound(0) > 0)
                                 {
-                                    message = "[" + tab_name + "] " + tmp_msg[0] + " " + tmp_msg[1];
+                                    message = tmp_msg[0] + " " + tmp_msg[1];
                                 }
                                 else
                                 {
-                                    message = "[" + tab_name + "] " + tmp_msg[0];
+                                    message = tmp_msg[0];
                                 }
                             }
-                            channel = "System";
                             nickname = "--<" + tmp_lines[0].TrimStart(':').Split('!')[0] + ">--  ";
                             font_color = "#B037B0";
                         }
@@ -885,6 +886,13 @@ namespace IRCBot
                             message = nickname + " has kicked " + tmp_lines[3].Replace(':', '(') + ")";
                             nickname = "";
                             font_color = "#C73232";
+                        }
+                        else if (tmp_lines[1].Equals("352"))
+                        {
+                            channel = "System";
+                            message = "";
+                            nickname = "";
+                            font_color = "#B037B0";
                         }
                         else
                         {
@@ -1370,9 +1378,12 @@ namespace IRCBot
             {
                 bool ended = false;
 
-                while (!ended)
+                if (chan_connected == true)
                 {
-                    ended = end_connection(tmp_full_server);
+                    while (!ended)
+                    {
+                        ended = end_connection(tmp_full_server);
+                    }
                 }
 
                 char[] charSep = new char[] { ':' };
@@ -1483,6 +1494,7 @@ namespace IRCBot
             }
             if (connectToolStripMenuItem.Text.Equals("Disconnect"))
             {
+                conf.bot_instances[index].shouldRun = false;
                 conf.bot_instances[index].worker.CancelAsync();
                 connectToolStripMenuItem.Text = "Connect";
                 send_button.Enabled = false;
@@ -1763,7 +1775,7 @@ namespace IRCBot
             int index = 0;
             foreach (bot bot in conf.bot_instances)
             {
-                if (bot.connected == true && bot.full_server_name.Equals(start_server_name))
+                if ((bot.connected == true || bot.connecting == true) && bot.full_server_name.Equals(start_server_name))
                 {
                     server_terminated = true;
                     bot.disconnected = true;

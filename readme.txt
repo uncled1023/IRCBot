@@ -18,8 +18,8 @@ Installation - Linux (Beta)
 ---------------------
 1) Install mono and libgdiplus packages
 1) Copy all of the contents from the newest build in the release folder to a directory on your local machine
-3) Open a terminal and direct it to the folder with the IRCBot.exe.
-4) Type: mono IRCBot.exe
+3) Open a terminal emulator and cd it to the directory with the IRCBot.exe.
+4) Type: 'mono IRCBot.exe'
 3) Click Tools>Configuration and configure your bot's settings
 4) Select the Server you added from the server list and click Connect, or restart the Bot application.
 

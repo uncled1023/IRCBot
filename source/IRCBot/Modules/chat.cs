@@ -63,7 +63,7 @@ namespace IRCBot.Modules
                         }
                         if (spam_check == true)
                         {
-                            blocked = ircbot.get_spam_status(channel, nick);
+                            blocked = ircbot.get_spam_status(channel);
                         }
                         foreach (string trigger in triggers)
                         {
@@ -92,7 +92,7 @@ namespace IRCBot.Modules
                                         {
                                             foreach (string chat_nick in chatting_nick)
                                             {
-                                                if (chat_nick.Equals(nick))
+                                                if (chat_nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase))
                                                 {
                                                     still_chatting = false;
                                                     chatting_nick.Clear();
@@ -147,7 +147,7 @@ namespace IRCBot.Modules
                         bool nick_found = false;
                         for (int x = 0; x < chatting_nick.Count(); x++)
                         {
-                            if (chatting_nick[x].Equals(nick))
+                            if (chatting_nick[x].Equals(nick, StringComparison.InvariantCultureIgnoreCase))
                             {
                                 nick_found = true;
                             }

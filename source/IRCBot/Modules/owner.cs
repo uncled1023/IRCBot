@@ -42,7 +42,7 @@ namespace IRCBot.Modules
                         }
                         if (spam_check == true)
                         {
-                            blocked = ircbot.get_spam_status(channel, nick);
+                            blocked = ircbot.get_spam_status(channel);
                         }
                         foreach (string trigger in triggers)
                         {
@@ -1071,7 +1071,7 @@ namespace IRCBot.Modules
                                                             string[] split = tmp_nick[i].Split(':');
                                                             if (split.GetUpperBound(0) > 0)
                                                             {
-                                                                if (split[1].Equals(nick) || split[1].Equals(conf.nick))
+                                                                if (split[1].Equals(nick, StringComparison.InvariantCultureIgnoreCase) || split[1].Equals(conf.nick, StringComparison.InvariantCultureIgnoreCase))
                                                                 {
                                                                 }
                                                                 else
@@ -1097,7 +1097,7 @@ namespace IRCBot.Modules
                                                                 string[] split = tmp_nick[i].Split(':');
                                                                 if (split.GetUpperBound(0) > 0)
                                                                 {
-                                                                    if (split[1].Equals(nick) || split[1].Equals(conf.nick))
+                                                                    if (split[1].Equals(nick, StringComparison.InvariantCultureIgnoreCase) || split[1].Equals(conf.nick, StringComparison.InvariantCultureIgnoreCase))
                                                                     {
                                                                     }
                                                                     else
@@ -1285,7 +1285,7 @@ namespace IRCBot.Modules
                                 string new_ignore = "";
                                 foreach (string list_ignore in cmd_node["blacklist"].InnerText.Split(','))
                                 {
-                                    if (!list_ignore.Equals(ignore_nick))
+                                    if (!list_ignore.Equals(ignore_nick, StringComparison.InvariantCultureIgnoreCase))
                                     {
                                         new_ignore += list_ignore + ",";
                                     }
@@ -1308,7 +1308,7 @@ namespace IRCBot.Modules
                             string new_ignore = "";
                             foreach (string list_ignore in tmp_command[6].Split(','))
                             {
-                                if (!list_ignore.Equals(ignore_nick))
+                                if (!list_ignore.Equals(ignore_nick, StringComparison.InvariantCultureIgnoreCase))
                                 {
                                     new_ignore += list_ignore + ",";
                                 }
@@ -1390,7 +1390,7 @@ namespace IRCBot.Modules
                         string new_ignore = "";
                         foreach (string list_ignore in xn["blacklist"].InnerText.Split(','))
                         {
-                            if (!list_ignore.Equals(ignore_nick))
+                            if (!list_ignore.Equals(ignore_nick, StringComparison.InvariantCultureIgnoreCase))
                             {
                                 new_ignore += list_ignore + ",";
                             }
@@ -1472,7 +1472,7 @@ namespace IRCBot.Modules
                         conf.ignore_list = "";
                         foreach (string list_ignore in xn["ignore_list"].InnerText.Split(','))
                         {
-                            if (!list_ignore.Equals(ignore_nick))
+                            if (!list_ignore.Equals(ignore_nick, StringComparison.InvariantCultureIgnoreCase))
                             {
                                 new_ignore += list_ignore + ",";
                                 conf.ignore_list += list_ignore + ",";
@@ -1591,7 +1591,7 @@ namespace IRCBot.Modules
                         string[] new_owner_tmp = xn["owner"].InnerText.Split(',');
                         for (int x = 0; x <= new_owner_tmp.GetUpperBound(0); x++)
                         {
-                            if (new_owner_tmp[x].Equals(nick))
+                            if (new_owner_tmp[x].Equals(nick, StringComparison.InvariantCultureIgnoreCase))
                             {
                             }
                             else

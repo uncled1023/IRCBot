@@ -34,7 +34,7 @@ namespace IRCBot.Modules
                         }
                         if (spam_check == true)
                         {
-                            blocked = ircbot.get_spam_status(channel, nick);
+                            blocked = ircbot.get_spam_status(channel);
                         }
                         foreach (string trigger in triggers)
                         {
@@ -103,7 +103,7 @@ namespace IRCBot.Modules
                     {
                         for (int x = 0; x < version_list.Count(); x++)
                         {
-                            if (version_list[x][0].Equals(nick))
+                            if (version_list[x][0].Equals(nick, StringComparison.InvariantCultureIgnoreCase))
                             {
                                 string response = "[" + nick + "] Using version: " + line[4].Replace("\u0001", "");
                                 ircbot.sendData("PRIVMSG", version_list[x][1] + " :" + response);

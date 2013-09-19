@@ -34,7 +34,7 @@ namespace IRCBot.Modules
                         }
                         if (spam_check == true)
                         {
-                            blocked = ircbot.get_spam_status(channel, nick);
+                            blocked = ircbot.get_spam_status(channel);
                         }
                         foreach (string trigger in triggers)
                         {
@@ -288,7 +288,7 @@ namespace IRCBot.Modules
                         string[] new_line = lines.Split(sep, 3);
                         if (new_line.GetUpperBound(0) > 0)
                         {
-                            if (new_line[0].Trim().Equals(nick) && new_line[1].Trim().Equals(channel))
+                            if (new_line[0].Trim().Equals(nick, StringComparison.InvariantCultureIgnoreCase) && new_line[1].Trim().Equals(channel))
                             {
                                 string[] tmp_line = new_line[2].Trim().Split(',');
                                 bool access_found = false;
@@ -303,11 +303,11 @@ namespace IRCBot.Modules
                                 {
                                     if (new_line[2].Trim().Equals(""))
                                     {
-                                        new_file.Add(new_line[0].Trim() + "*" + new_line[1].Trim() + "*" + access.Trim());
+                                        new_file.Add(new_line[0].Trim() + "*" + new_line[1].Trim() + "*" + access);
                                     }
                                     else
                                     {
-                                        new_file.Add(new_line[0].Trim() + "*" + new_line[1].Trim() + "*" + new_line[2].Trim() + "," + access.Trim());
+                                        new_file.Add(new_line[0].Trim() + "*" + new_line[1].Trim() + "*" + new_line[2].Trim() + "," + access);
                                     }
                                 }
                                 nick_found = true;
@@ -322,7 +322,7 @@ namespace IRCBot.Modules
                     if (nick_found == false)
                     {
                         StreamWriter log = File.AppendText(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "access" + Path.DirectorySeparatorChar + file_name);
-                        log.WriteLine(nick.Trim() + "*" + channel + "*" + access.Trim());
+                        log.WriteLine(nick + "*" + channel + "*" + access);
                         log.Close();
                     }
                     else
@@ -333,7 +333,7 @@ namespace IRCBot.Modules
                 else
                 {
                     StreamWriter log = File.AppendText(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "access" + Path.DirectorySeparatorChar + file_name);
-                    log.WriteLine(nick.Trim() + "*" + channel + "*" + access.Trim());
+                    log.WriteLine(nick + "*" + channel + "*" + access);
                     log.Close();
                 }
             }
@@ -384,7 +384,7 @@ namespace IRCBot.Modules
                         string[] new_line = line.Split(sep, 3);
                         if (new_line.GetUpperBound(0) > 1)
                         {
-                            if (new_line[0].Trim().Equals(nick.Trim()) && new_line[1].Trim().Equals(channel))
+                            if (new_line[0].Trim().Equals(nick, StringComparison.InvariantCultureIgnoreCase) && new_line[1].Trim().Equals(channel))
                             {
                                 access = new_line[2];
                                 break;
@@ -418,7 +418,7 @@ namespace IRCBot.Modules
                         string[] new_line = lines.Split(sep, 3);
                         if (new_line.GetUpperBound(0) > 0)
                         {
-                            if (new_line[0].Trim().Equals(nick) && new_line[1].Trim().Equals(channel))
+                            if (new_line[0].Trim().Equals(nick, StringComparison.InvariantCultureIgnoreCase) && new_line[1].Trim().Equals(channel))
                             {
                                 string[] tmp_line = new_line[2].Trim().Split(',');
                                 string new_access = "";
@@ -454,7 +454,7 @@ namespace IRCBot.Modules
                     for (int i = 2; i < ircbot.nick_list[x].Count(); i++)
                     {
                         string[] split = ircbot.nick_list[x][i].Split(':');
-                        if (split[1].Equals(nick))
+                        if (split[1].Equals(nick, StringComparison.InvariantCultureIgnoreCase))
                         {
                             int new_access = ircbot.get_user_op(nick, channel);
                             ircbot.nick_list[x][i] = new_access.ToString() + ":" + nick;

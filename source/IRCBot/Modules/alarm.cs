@@ -46,7 +46,7 @@ namespace IRCBot.Modules
                         }
                         if (spam_check == true)
                         {
-                            blocked = ircbot.get_spam_status(channel, nick);
+                            blocked = ircbot.get_spam_status(channel);
                         }
                         foreach (string trigger in triggers)
                         {
@@ -200,7 +200,7 @@ namespace IRCBot.Modules
                 bool run_modules = true;
                 foreach (string ignore_nick in ignored_nicks)
                 {
-                    if (ignore_nick.ToLower().Equals(nick))
+                    if (ignore_nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase))
                     {
                         run_modules = false;
                         break;
@@ -237,7 +237,7 @@ namespace IRCBot.Modules
                                 string[] nodes = blacklist_node.Split(sepSpace, StringSplitOptions.RemoveEmptyEntries);
                                 foreach (string node in nodes)
                                 {
-                                    if (node.ToLower().Equals(nick) || node.ToLower().TrimStart('#').Equals(channel.ToLower().TrimStart('#')))
+                                    if (node.Equals(nick, StringComparison.InvariantCultureIgnoreCase) || node.ToLower().TrimStart('#').Equals(channel.ToLower().TrimStart('#')))
                                     {
                                         module_allowed = false;
                                         break;

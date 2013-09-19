@@ -49,7 +49,7 @@ namespace IRCBot.Modules
                         }
                         if (spam_check == true)
                         {
-                            blocked = ircbot.get_spam_status(channel, nick);
+                            blocked = ircbot.get_spam_status(channel);
                         }
                         foreach (string trigger in triggers)
                         {
@@ -771,7 +771,7 @@ namespace IRCBot.Modules
                                                 bool tmp_me = false;
                                                 for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
                                                 {
-                                                    if (total_nicks[y].Equals(conf.name, StringComparison.OrdinalIgnoreCase))
+                                                    if (total_nicks[y].Equals(conf.name, StringComparison.InvariantCultureIgnoreCase))
                                                     {
                                                         tmp_me = true;
                                                     }
@@ -843,7 +843,7 @@ namespace IRCBot.Modules
                                                     bool tmp_me = false;
                                                     for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
                                                     {
-                                                        if (total_nicks[y].Equals(conf.name, StringComparison.OrdinalIgnoreCase))
+                                                        if (total_nicks[y].Equals(conf.name, StringComparison.InvariantCultureIgnoreCase))
                                                         {
                                                             tmp_me = true;
                                                         }
@@ -924,7 +924,7 @@ namespace IRCBot.Modules
                                                     bool tmp_me = false;
                                                     for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
                                                     {
-                                                        if (total_nicks[y].Equals(conf.name, StringComparison.OrdinalIgnoreCase))
+                                                        if (total_nicks[y].Trim().Equals(conf.name, StringComparison.InvariantCultureIgnoreCase))
                                                         {
                                                             tmp_me = true;
                                                         }
@@ -1002,7 +1002,7 @@ namespace IRCBot.Modules
                                                 bool tmp_me = false;
                                                 for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
                                                 {
-                                                    if (total_nicks[y].Equals(conf.name, StringComparison.OrdinalIgnoreCase))
+                                                    if (total_nicks[y].Trim().Equals(conf.name, StringComparison.InvariantCultureIgnoreCase))
                                                     {
                                                         tmp_me = true;
                                                     }
@@ -1054,7 +1054,7 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                string[] new_line = line[4].ToLower().Split(charS, 2);
+                                                string[] new_line = line[4].Split(charS, 2);
                                                 string target_host = ircbot.get_user_host(new_line[0]);
                                                 string nicks = new_line[0].TrimStart(':');
                                                 char[] charSep = new char[] { ',' };
@@ -1063,7 +1063,7 @@ namespace IRCBot.Modules
                                                 bool tmp_me = false;
                                                 for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
                                                 {
-                                                    if (total_nicks[y].Equals(conf.name, StringComparison.OrdinalIgnoreCase))
+                                                    if (total_nicks[y].Trim().Equals(conf.name, StringComparison.InvariantCultureIgnoreCase))
                                                     {
                                                         tmp_me = true;
                                                     }
@@ -1114,7 +1114,7 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                string[] new_line = line[4].ToLower().Split(charS, 2);
+                                                string[] new_line = line[4].Split(charS, 2);
                                                 string target_host = ircbot.get_user_host(new_line[0]);
                                                 string nicks = new_line[0].TrimStart(':');
                                                 char[] charSep = new char[] { ',' };
@@ -1123,7 +1123,7 @@ namespace IRCBot.Modules
                                                 bool tmp_me = false;
                                                 for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
                                                 {
-                                                    if (total_nicks[y].Equals(conf.name, StringComparison.OrdinalIgnoreCase))
+                                                    if (total_nicks[y].Trim().Equals(conf.name, StringComparison.InvariantCultureIgnoreCase))
                                                     {
                                                         tmp_me = true;
                                                     }
@@ -1174,8 +1174,8 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                string target_host = ircbot.get_user_host(line[4].ToLower());
-                                                del_auto(line[4].ToLower(), line[2], target_host, "k", ircbot);
+                                                string target_host = ircbot.get_user_host(line[4]);
+                                                del_auto(line[4], line[2], target_host, "k", ircbot);
                                             }
                                             else
                                             {
@@ -1196,8 +1196,8 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                string target_host = ircbot.get_user_host(line[4].ToLower());
-                                                del_auto(line[4].ToLower(), line[2], target_host, "b", ircbot);
+                                                string target_host = ircbot.get_user_host(line[4]);
+                                                del_auto(line[4], line[2], target_host, "b", ircbot);
                                             }
                                             else
                                             {
@@ -1218,8 +1218,8 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                string target_host = ircbot.get_user_host(line[4].ToLower());
-                                                del_auto(line[4].ToLower(), line[2], target_host, "kb", ircbot);
+                                                string target_host = ircbot.get_user_host(line[4]);
+                                                del_auto(line[4], line[2], target_host, "kb", ircbot);
                                             }
                                             else
                                             {
@@ -1240,7 +1240,7 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                string[] new_line = line[4].ToLower().Split(charS, 2);
+                                                string[] new_line = line[4].Split(charS, 2);
                                                 string nicks = new_line[0].TrimStart(':');
                                                 char[] charSep = new char[] { ',' };
                                                 string[] total_nicks = nicks.Split(charSep, StringSplitOptions.RemoveEmptyEntries);
@@ -1248,7 +1248,7 @@ namespace IRCBot.Modules
                                                 bool tmp_me = false;
                                                 for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
                                                 {
-                                                    if (total_nicks[y].Equals(conf.name, StringComparison.OrdinalIgnoreCase))
+                                                    if (total_nicks[y].Trim().Equals(conf.name, StringComparison.InvariantCultureIgnoreCase))
                                                     {
                                                         tmp_me = true;
                                                     }
@@ -1335,7 +1335,7 @@ namespace IRCBot.Modules
                     string[] auto_nick = file_line.Split(charSeparator, 6);
                     if (auto_nick.GetUpperBound(0) > 0)
                     {
-                        if ((nick.Equals(auto_nick[0]) == true || hostname.Equals(auto_nick[1])) && channel.Equals(auto_nick[2]))
+                        if ((nick.Equals(auto_nick[0], StringComparison.InvariantCultureIgnoreCase) == true || hostname.Equals(auto_nick[1])) && channel.Equals(auto_nick[2]))
                         {
                             string ban = "*!*@" + hostname;
                             if (hostname.Equals(""))
@@ -1398,7 +1398,7 @@ namespace IRCBot.Modules
                 {
                     char[] charSeparator = new char[] { '*' };
                     string[] auto_nick = file_line.Split(charSeparator, 5);
-                    if (nick.Equals(auto_nick[0]) && hostname.Equals(auto_nick[1]) && channel.Equals(auto_nick[2]) && type.Equals(auto_nick[3]))
+                    if (nick.Equals(auto_nick[0], StringComparison.InvariantCultureIgnoreCase) && hostname.Equals(auto_nick[1]) && channel.Equals(auto_nick[2]) && type.Equals(auto_nick[3]))
                     {
                         new_file.Add(add_line);
                         found_nick = true;
@@ -1454,7 +1454,7 @@ namespace IRCBot.Modules
                 {
                     char[] charSeparator = new char[] { '*' };
                     string[] auto_nick = file_line.Split(charSeparator, 5);
-                    if (nick.Equals(auto_nick[0]) && hostname.Equals(auto_nick[1]) && channel.Equals(auto_nick[2]) && type.Equals(auto_nick[3]))
+                    if (nick.Equals(auto_nick[0], StringComparison.InvariantCultureIgnoreCase) && hostname.Equals(auto_nick[1]) && channel.Equals(auto_nick[2]) && type.Equals(auto_nick[3]))
                     {
                         found_nick = true;
                     }

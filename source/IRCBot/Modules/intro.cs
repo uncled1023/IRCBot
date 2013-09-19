@@ -34,7 +34,7 @@ namespace IRCBot.Modules
                         }
                         if (spam_check == true)
                         {
-                            blocked = ircbot.get_spam_status(channel, nick);
+                            blocked = ircbot.get_spam_status(channel);
                         }
                         foreach (string trigger in triggers)
                         {
@@ -117,7 +117,7 @@ namespace IRCBot.Modules
                 {
                     char[] charSeparator = new char[] { ':' };
                     string[] intro_nick = line.Split(charSeparator, 3);
-                    if (nick.Equals(intro_nick[0]) && channel.Equals(intro_nick[1]))
+                    if (nick.Equals(intro_nick[0], StringComparison.InvariantCultureIgnoreCase) && channel.Equals(intro_nick[1]))
                     {
                         string[] intro_line = intro_nick[2].Split('|');
                         int number_of_responses = intro_line.GetUpperBound(0) + 1;
@@ -153,7 +153,7 @@ namespace IRCBot.Modules
                         {
                             char[] charSeparator = new char[] { ':' };
                             string[] intro_nick = file_line.Split(charSeparator, 3);
-                            if (nick.Equals(intro_nick[0]) && channel.Equals(intro_nick[1]))
+                            if (nick.Equals(intro_nick[0], StringComparison.InvariantCultureIgnoreCase) && channel.Equals(intro_nick[1]))
                             {
                                 new_file.Add(add_line);
                                 found_nick = true;
@@ -193,7 +193,7 @@ namespace IRCBot.Modules
                 {
                     char[] charSeparator = new char[] { ':' };
                     string[] intro_nick = file_line.Split(charSeparator, 3);
-                    if (nick.Equals(intro_nick[0]) && channel.Equals(intro_nick[1]))
+                    if (nick.Equals(intro_nick[0], StringComparison.InvariantCultureIgnoreCase) && channel.Equals(intro_nick[1]))
                     {
                     }
                     else

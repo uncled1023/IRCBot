@@ -31,7 +31,7 @@ namespace IRCBot.Modules
                     string past_line = "";
                     foreach (List<string> nick_log in nick_logs)
                     {
-                        if (nick_log[0].Equals(channel) && nick_log[1].Equals(nick))
+                        if (nick_log[0].Equals(channel) && nick_log[1].Equals(nick, StringComparison.InvariantCultureIgnoreCase))
                         {
                             nick_found = true;
                             past_line = nick_log[2];
@@ -76,7 +76,7 @@ namespace IRCBot.Modules
                         }
                         for (int x = 0; x < nick_logs.Count(); x++)
                         {
-                            if (nick_logs[x][0].Equals(channel) && nick_logs[x][1].Equals(nick))
+                            if (nick_logs[x][0].Equals(channel) && nick_logs[x][1].Equals(nick, StringComparison.InvariantCultureIgnoreCase))
                             {
                                 nick_logs[x][2] = result;
                                 break;
@@ -94,7 +94,7 @@ namespace IRCBot.Modules
                     bool nick_found = false;
                     for (int x = 0; x < nick_logs.Count(); x++)
                     {
-                        if (nick_logs[x][0].Equals(channel) && nick_logs[x][1].Equals(nick))
+                        if (nick_logs[x][0].Equals(channel) && nick_logs[x][1].Equals(nick, StringComparison.InvariantCultureIgnoreCase))
                         {
                             nick_found = true;
                             nick_logs[x][2] = full_line;

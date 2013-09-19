@@ -45,12 +45,12 @@ namespace IRCBot.Modules
                         {
                             testMatch = "http://" + testMatch;
                         }
-                        Uri url = new Uri(testMatch);
-                        var request = WebRequest.Create(url);
-                        request.Timeout = 5000;
-                        using (var response = request.GetResponse())
+                        Uri url = new Uri(testMatch);                        
+                        System.Net.WebRequest req = System.Net.HttpWebRequest.Create(url);
+                        req.Method = "HEAD";
+                        using (System.Net.WebResponse resp = req.GetResponse())
                         {
-                            string[] content_type = response.ContentType.Split('/');
+                            string[] content_type = resp.ContentType.Split('/');
                             switch (content_type[0])
                             {
                                 case "text":
@@ -297,36 +297,31 @@ namespace IRCBot.Modules
                                 case "image":
                                     if (ircbot.conf.module_config[module_id][6].Equals("True"))
                                     {
-                                        Image _image = null;
-                                        _image = DownloadImage(url.OriginalString);
-                                        if (_image != null)
-                                        {
-                                            ircbot.sendData("PRIVMSG", channel + " :[" + response.ContentType + "] Size: " + ToFileSize(response.ContentLength) + " | Width: " + _image.Width.ToString() + "px | Height: " + _image.Height.ToString() + "px");
-                                        }
+                                        ircbot.sendData("PRIVMSG", channel + " :[" + resp.ContentType + "] Size: " + ToFileSize(resp.ContentLength));
                                     }
                                     break;
                                 case "video":
                                     if (ircbot.conf.module_config[module_id][7].Equals("True"))
                                     {
-                                        ircbot.sendData("PRIVMSG", channel + " :[Video] Type: " + content_type[1] + " | Size: " + ToFileSize(response.ContentLength));
+                                        ircbot.sendData("PRIVMSG", channel + " :[Video] Type: " + content_type[1] + " | Size: " + ToFileSize(resp.ContentLength));
                                     }
                                     break;
                                 case "application":
                                     if (ircbot.conf.module_config[module_id][8].Equals("True"))
                                     {
-                                        ircbot.sendData("PRIVMSG", channel + " :[Application] Type: " + content_type[1] + " | Size: " + ToFileSize(response.ContentLength));
+                                        ircbot.sendData("PRIVMSG", channel + " :[Application] Type: " + content_type[1] + " | Size: " + ToFileSize(resp.ContentLength));
                                     }
                                     break;
                                 case "audio":
                                     if (ircbot.conf.module_config[module_id][9].Equals("True"))
                                     {
-                                        ircbot.sendData("PRIVMSG", channel + " :[Audio] Type: " + content_type[1] + " | Size: " + ToFileSize(response.ContentLength));
+                                        ircbot.sendData("PRIVMSG", channel + " :[Audio] Type: " + content_type[1] + " | Size: " + ToFileSize(resp.ContentLength));
                                     }
                                     break;
                                 default:
                                     if (ircbot.conf.module_config[module_id][10].Equals("True"))
                                     {
-                                        ircbot.sendData("PRIVMSG", channel + " :[URL] " + HttpUtility.HtmlDecode(response.ContentType) + " (" + url.Host.ToLower() + ")");
+                                        ircbot.sendData("PRIVMSG", channel + " :[URL] " + HttpUtility.HtmlDecode(resp.ContentType) + " (" + url.Host.ToLower() + ")");
                                     }
                                     break;
                             }

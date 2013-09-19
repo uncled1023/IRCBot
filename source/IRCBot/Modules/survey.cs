@@ -47,7 +47,7 @@ namespace IRCBot.Modules
                         }
                         if (spam_check == true)
                         {
-                            blocked = ircbot.get_spam_status(channel, nick);
+                            blocked = ircbot.get_spam_status(channel);
                         }
                         foreach (string trigger in triggers)
                         {
@@ -121,7 +121,7 @@ namespace IRCBot.Modules
                                             int index = 0;
                                             foreach (survey_info survey in active_surveys)
                                             {
-                                                if (nick.Equals(survey.nick) && survey.user_submission == false)
+                                                if (nick.Equals(survey.nick, StringComparison.InvariantCultureIgnoreCase) && survey.user_submission == false)
                                                 {
                                                     if (Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + ""))
                                                     {
@@ -170,7 +170,7 @@ namespace IRCBot.Modules
                                             int index = 0;
                                             foreach (survey_info survey in active_surveys)
                                             {
-                                                if (nick.Equals(survey.nick) && survey.user_submission == false)
+                                                if (nick.Equals(survey.nick, StringComparison.InvariantCultureIgnoreCase) && survey.user_submission == false)
                                                 {
                                                     if (Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + ""))
                                                     {
@@ -198,7 +198,7 @@ namespace IRCBot.Modules
                                                     }
                                                     break;
                                                 }
-                                                else if(nick.Equals(survey.nick) && survey.user_submission == true)
+                                                else if(nick.Equals(survey.nick, StringComparison.InvariantCultureIgnoreCase) && survey.user_submission == true)
                                                 {
                                                     if (Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "answers" + Path.DirectorySeparatorChar + survey.name + Path.DirectorySeparatorChar + nick))
                                                     {
@@ -416,7 +416,7 @@ namespace IRCBot.Modules
             {
                 foreach (survey_info survey in active_surveys)
                 {
-                    if (nick.Equals(survey.nick))
+                    if (nick.Equals(survey.nick, StringComparison.InvariantCultureIgnoreCase))
                     {
                         string answer = "";
                         if (line.GetUpperBound(0) > 3)
@@ -470,7 +470,7 @@ namespace IRCBot.Modules
                                 bool survey_owner = false;
                                 foreach (string owner in owners)
                                 {
-                                    if (nick.Equals(owner))
+                                    if (nick.Equals(owner, StringComparison.InvariantCultureIgnoreCase))
                                     {
                                         survey_owner = true;
                                         break;
@@ -515,7 +515,7 @@ namespace IRCBot.Modules
                                 bool survey_owner = false;
                                 foreach (string owner in owners)
                                 {
-                                    if (nick.Equals(owner))
+                                    if (nick.Equals(owner, StringComparison.InvariantCultureIgnoreCase))
                                     {
                                         survey_owner = true;
                                         break;
@@ -601,7 +601,7 @@ namespace IRCBot.Modules
                         string owners = questions[2];
                         foreach (string owner in owners.Split(','))
                         {
-                            if (nick.Equals(owner))
+                            if (nick.Equals(owner, StringComparison.InvariantCultureIgnoreCase))
                             {
                                 survey_found = true;
                                 break;
@@ -649,7 +649,7 @@ namespace IRCBot.Modules
                         string owners = questions[2];
                         foreach (string owner in owners.Split(','))
                         {
-                            if (nick.Equals(owner))
+                            if (nick.Equals(owner, StringComparison.InvariantCultureIgnoreCase))
                             {
                                 survey_found = true;
                                 break;
@@ -664,7 +664,7 @@ namespace IRCBot.Modules
                                 bool owner_loop = false;
                                 foreach (string old_owner in del_owner.Split(','))
                                 {
-                                    if (del_owner.Equals(owner))
+                                    if (del_owner.Equals(owner, StringComparison.InvariantCultureIgnoreCase))
                                     {
                                         owner_loop = true;
                                         owner_found = true;
@@ -712,7 +712,7 @@ namespace IRCBot.Modules
             
             foreach (survey_info survey in active_surveys)
             {
-                if (nick.Equals(survey.nick))
+                if (nick.Equals(survey.nick, StringComparison.InvariantCultureIgnoreCase))
                 {
                     survey_found = true;
                     break;
@@ -793,7 +793,7 @@ namespace IRCBot.Modules
             new_survey = active_surveys;
             foreach (survey_info tmp_survey in new_survey)
             {
-                if (nick.Equals(tmp_survey.nick))
+                if (nick.Equals(tmp_survey.nick, StringComparison.InvariantCultureIgnoreCase))
                 {
                     survey_info this_survey = active_surveys[cur_survey];
                     FileInfo fi = new FileInfo(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + "");
@@ -870,7 +870,7 @@ namespace IRCBot.Modules
                 {
                     foreach (survey_info survey in active_surveys)
                     {
-                        if (nick.Equals(survey.nick))
+                        if (nick.Equals(survey.nick, StringComparison.InvariantCultureIgnoreCase))
                         {
                             survey_found = true;
                             break;

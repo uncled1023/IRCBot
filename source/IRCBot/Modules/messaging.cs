@@ -34,7 +34,7 @@ namespace IRCBot.Modules
                         }
                         if (spam_check == true)
                         {
-                            blocked = ircbot.get_spam_status(channel, nick);
+                            blocked = ircbot.get_spam_status(channel);
                         }
                         foreach (string trigger in triggers)
                         {
@@ -112,7 +112,7 @@ namespace IRCBot.Modules
                     {
                         char[] charSeparator = new char[] { '*' };
                         string[] intro_nick = file_line.Split(charSeparator, 4);
-                        if (nick.Equals(intro_nick[0]) && to_nick.Equals(intro_nick[1]))
+                        if (nick.Equals(intro_nick[0], StringComparison.InvariantCultureIgnoreCase) && to_nick.Equals(intro_nick[1], StringComparison.InvariantCultureIgnoreCase))
                         {
                             new_file.Add(add_line);
                             found_nick = true;
@@ -156,7 +156,7 @@ namespace IRCBot.Modules
                     string[] intro_nick = file_line.Split(charSeparator, 4);
                     if (intro_nick.GetUpperBound(0) > 0)
                     {
-                        if (nick.Equals(intro_nick[1]))
+                        if (nick.Equals(intro_nick[1], StringComparison.InvariantCultureIgnoreCase))
                         {
                             ircbot.sendData("PRIVMSG", nick + " :" + intro_nick[0] + " has left you a message on: " + intro_nick[2]);
                             ircbot.sendData("PRIVMSG", nick + " :\"" + intro_nick[3] + "\"");

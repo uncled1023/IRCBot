@@ -35,7 +35,7 @@ namespace IRCBot.Modules
                         }
                         if (spam_check == true)
                         {
-                            blocked = ircbot.get_spam_status(channel, nick);
+                            blocked = ircbot.get_spam_status(channel);
                         }
                         foreach (string trigger in triggers)
                         {
@@ -65,7 +65,7 @@ namespace IRCBot.Modules
                                             bool nick_found = false;
                                             foreach (string idle_nick in idle_list)
                                             {
-                                                if (idle_nick.Equals(nick))
+                                                if (idle_nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase))
                                                 {
                                                     nick_found = true;
                                                     break;
@@ -96,7 +96,7 @@ namespace IRCBot.Modules
                                             bool nick_found = false;
                                             foreach (string idle_nick in idle_list)
                                             {
-                                                if (idle_nick.Equals(nick))
+                                                if (idle_nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase))
                                                 {
                                                     nick_found = true;
                                                     break;
@@ -130,7 +130,7 @@ namespace IRCBot.Modules
             bool nick_found = false;
             foreach (string idle_nick in idle_list)
             {
-                if (idle_nick.Equals(nick))
+                if (idle_nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase))
                 {
                     nick_found = true;
                     break;

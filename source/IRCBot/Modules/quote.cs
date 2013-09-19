@@ -35,7 +35,7 @@ namespace IRCBot.Modules
                         }
                         if (spam_check == true)
                         {
-                            blocked = ircbot.get_spam_status(channel, nick);
+                            blocked = ircbot.get_spam_status(channel);
                         }
                         foreach (string trigger in triggers)
                         {
@@ -89,7 +89,7 @@ namespace IRCBot.Modules
                     }
                 }
             }
-            if (type.Equals("channel") && bot_command == false && nick != conf.nick)
+            if (type.Equals("channel") && bot_command == false && !nick.Equals(conf.nick, StringComparison.InvariantCultureIgnoreCase))
             {
                 add_quote(nick, channel, line, ircbot, conf);
             }
@@ -172,7 +172,7 @@ namespace IRCBot.Modules
                         char[] charSep = new char[] { '*' };
                         string[] tmp_line = file_line.Split(charSep, 2);
                         line_nick = tmp_line[0];
-                        if (nick.Trim().ToLower().Equals(line_nick.Trim().ToLower()))
+                        if (nick.Equals(line_nick.Trim(), StringComparison.InvariantCultureIgnoreCase))
                         {
                             nick_found = true;
                             quote_list.Add(file_line);

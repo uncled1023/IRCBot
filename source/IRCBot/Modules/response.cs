@@ -35,7 +35,7 @@ namespace IRCBot.Modules
                         }
                         if (spam_check == true)
                         {
-                            blocked = ircbot.get_spam_status(channel, nick);
+                            blocked = ircbot.get_spam_status(channel);
                         }
                         foreach (string trigger in triggers)
                         {
@@ -101,7 +101,7 @@ namespace IRCBot.Modules
             }
             if (type.Equals("channel") && bot_command == false)
             {
-                if (nick != conf.nick)
+                if (!nick.Equals(conf.nick, StringComparison.InvariantCultureIgnoreCase))
                 {
                     try
                     {

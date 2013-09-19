@@ -34,7 +34,7 @@ namespace IRCBot.Modules
                         }
                         if (spam_check == true)
                         {
-                            blocked = ircbot.get_spam_status(channel, nick);
+                            blocked = ircbot.get_spam_status(channel);
                         }
                         foreach (string trigger in triggers)
                         {
@@ -112,11 +112,27 @@ namespace IRCBot.Modules
                 else
                 {
                     string module_name = "";
-                    foreach (List<string> module in conf.module_config)
+                    int index = 0;
+                    try
                     {
-                        if (module[0].Equals(line[4]))
+                        int mod_num = Convert.ToInt32(line[4]);
+                        foreach (List<string> module in conf.module_config)
                         {
-                            module_name = module[1];
+                            if (index == mod_num)
+                            {
+                                module_name = module[1];
+                            }
+                            index++;
+                        }
+                    }
+                    catch
+                    {
+                        foreach (List<string> module in conf.module_config)
+                        {
+                            if (module[0].Equals(line[4]))
+                            {
+                                module_name = module[1];
+                            }
                         }
                     }
                     foreach (List<string> tmp_command in conf.command_list)
@@ -153,6 +169,7 @@ namespace IRCBot.Modules
             else
             {
                 msg += "Modules Available:";
+                int index = 0;
                 foreach (List<string> tmp_module in conf.module_config)
                 {
                     string module_name = tmp_module[0];
@@ -178,15 +195,15 @@ namespace IRCBot.Modules
                     }
                     if (commands >= 1)
                     {
-                        msg += " " + module_name;
-                        msg += " [" + commands.ToString() + "]" + ",";
+                        msg += " [" + index + "]" + module_name + ",";
+                        index++;
                     }
                 }
                 if (msg != "")
                 {
                     ircbot.sendData("NOTICE", nick + " :" + msg.TrimEnd(','));
                     msg = "";
-                    ircbot.sendData("NOTICE", nick + " :To view the commands for a specific module, type " + conf.command + "help {module}");
+                    ircbot.sendData("NOTICE", nick + " :To view the commands for a specific module, type " + conf.command + "help {module_name or module_number}");
                 }
                 else
                 {

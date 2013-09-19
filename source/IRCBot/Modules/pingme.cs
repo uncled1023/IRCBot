@@ -34,7 +34,7 @@ namespace IRCBot.Modules
                         }
                         if (spam_check == true)
                         {
-                            blocked = ircbot.get_spam_status(channel, nick);
+                            blocked = ircbot.get_spam_status(channel);
                         }
                         foreach (string trigger in triggers)
                         {
@@ -95,7 +95,7 @@ namespace IRCBot.Modules
                 {
                     for (int x = 0; x < ping_list.Count(); x++)
                     {
-                        if (ping_list[x][0].Equals(nick))
+                        if (ping_list[x][0].Equals(nick, StringComparison.InvariantCultureIgnoreCase))
                         {
                             DateTime current_time = DateTime.Now;
                             DateTime ping_time = Convert.ToDateTime(ping_list[x][2]);

@@ -632,94 +632,6 @@ namespace IRCBot
             return response;
         }
 
-        public void initiate_nick()
-        {
-            sendData("NICK", config.nick);
-            bool nick_accepted = true;
-            bool ident = false;
-            while (!ident)
-            {
-                string line = read_queue();
-                char[] charSeparator = new char[] { ' ' };
-                string[] ex = line.Split(charSeparator, 5, StringSplitOptions.RemoveEmptyEntries);
-                if (ex.GetUpperBound(0) >= 0)
-                {
-                    if (ex[0] == "PING")
-                    {
-                        sendData("PONG", ex[1]);
-                    }
-                }
-                if (line.Contains("Nickname is already in use."))
-                {
-                    nick_accepted = false;
-                    char[] sep = new char[] { ',' };
-                    string[] nicks = conf.secondary_nicks.Split(sep, StringSplitOptions.RemoveEmptyEntries);
-                    foreach (string nick in nicks)
-                    {
-                        sendData("NICK", nick);
-                        while (!ident)
-                        {
-                            line = read_queue();
-                            string[] new_ex = line.Split(charSeparator, 5, StringSplitOptions.RemoveEmptyEntries);
-                            if (new_ex.GetUpperBound(0) >= 0)
-                            {
-                                if (new_ex[0] == "PING")
-                                {
-                                    sendData("PONG", new_ex[1]);
-                                }
-                            }
-                            if (line.Contains("Nickname is already in use."))
-                            {
-                                break;
-                            }
-                            else if (line.Contains("End of /MOTD command."))
-                            {
-                                nick_accepted = true;
-                                ident = true;
-                                conf.nick = nick;
-                                config.nick = nick;
-                                break;
-                            }
-                        }
-                    }
-                }
-                else if (line.Contains("End of /MOTD command."))
-                {
-                    ident = true;
-                    nick_accepted = true;
-                }
-                while (nick_accepted == false)
-                {
-                    Random rand = new Random();
-                    string nick_rand = "Guest" + rand.Next(100000).ToString();
-                    sendData("NICK", nick_rand);
-                    while (!ident)
-                    {
-                        line = read_queue();
-                        string[] new_ex = line.Split(charSeparator, 5, StringSplitOptions.RemoveEmptyEntries);
-                        if (new_ex.GetUpperBound(0) >= 0)
-                        {
-                            if (new_ex[0] == "PING")
-                            {
-                                sendData("PONG", new_ex[1]);
-                            }
-                        }
-                        if (line.Contains("Nickname is already in use."))
-                        {
-                            break;
-                        }
-                        else if (line.Contains("End of /MOTD command."))
-                        {
-                            nick_accepted = true;
-                            ident = true;
-                            conf.nick = nick_rand;
-                            config.nick = nick_rand;
-                        }
-                    }
-                }
-            }
-        }
-
         public void IRCWork(BackgroundWorker bw)
         {
             shouldRun = true;
@@ -731,25 +643,55 @@ namespace IRCBot
             work.DoWork += (sender, e) => save_stream(sender, e);
             work.RunWorkerAsync(2000);
 
-            Thread.Sleep(100);
-
             string data = "";
 
             checkRegisterationTimer.Enabled = true;
 
-            Thread.Sleep(100);
+            Thread.Sleep(1000);
 
-            initiate_nick();
+            bool nick_passed = false;
+            string main_nick = config.nick;
+            int cur_alt_nick = 0;
+            char[] sep = new char[] { ',' };
+            string[] nicks = conf.secondary_nicks.Split(sep, StringSplitOptions.RemoveEmptyEntries);
 
-            Thread.Sleep(100);
+            config.nick = main_nick;
+            sendData("NICK", main_nick);
+            nick_passed = true;
 
-            identify();
-
-            Thread.Sleep(100);
+            while (first_run)
+            {
+                string line = read_queue(); 
+                if (!nick_passed)
+                {
+                    if (main_nick.Equals(config.nick) || (!main_nick.Equals(config.nick) && nicks.GetUpperBound(0) <= cur_alt_nick))
+                    {
+                        config.nick = nicks[cur_alt_nick];
+                        sendData("NICK", nicks[cur_alt_nick]);
+                        cur_alt_nick++;
+                        nick_passed = true;
+                    }
+                    else
+                    {
+                        Random rand = new Random();
+                        string nick_rand = "Guest" + rand.Next(100000).ToString();
+                        config.nick = nick_rand;
+                        sendData("NICK", nick_rand);
+                        nick_passed = true;
+                    }
+                }
+                if (line.Contains("Nickname is already in use."))
+                {
+                    nick_passed = false;
+                }
+                if (line.Contains("End of /MOTD") || line.Contains("End of message of the day."))
+                {
+                    first_run = false;
+                }
+            }
 
             joinChannels();
 
-            first_run = false;
             connected = true;
             disconnected = false;
             restart_attempts = 0;
@@ -757,8 +699,35 @@ namespace IRCBot
             {
                 Thread.Sleep(10);
                 data = read_stream_queue();
+                string line = read_queue();
+                if (!nick_passed)
+                {
+                    if (!main_nick.Equals(config.nick) && nicks.GetUpperBound(0) < cur_alt_nick)
+                    {
+                        config.nick = nicks[cur_alt_nick];
+                        sendData("NICK", nicks[cur_alt_nick]);
+                        cur_alt_nick++;
+                        nick_passed = true;
+                    }
+                    else
+                    {
+                        Random rand = new Random();
+                        string nick_rand = "Guest" + rand.Next(100000).ToString();
+                        config.nick = nick_rand;
+                        sendData("NICK", nick_rand);
+                        nick_passed = true;
+                    }
+                }
                 if (data != "")
                 {
+                    if (line.Contains("Nickname is already in use."))
+                    {
+                        nick_passed = false;
+                    }
+                    if (line.Contains("This nickname is registered and protected."))
+                    {
+                        identify();
+                    }
                     parse_stream(data);
                 }
                 if (bw.CancellationPending == false)
@@ -1029,7 +998,7 @@ namespace IRCBot
                                 string[] split = nick_list[x][i].Split(':');
                                 if (split.GetUpperBound(0) > 0)
                                 {
-                                    if (split[1].Equals(nick))
+                                    if (split[1].Equals(nick, StringComparison.InvariantCultureIgnoreCase))
                                     {
                                         nick_found = true;
                                         int old_access = Convert.ToInt32(split[0]);
@@ -1194,7 +1163,7 @@ namespace IRCBot
                             string[] split = nick_list[x][i].Split(':');
                             if (split.GetUpperBound(0) > 0)
                             {
-                                if (split[1].Equals(nick))
+                                if (split[1].Equals(nick, StringComparison.InvariantCultureIgnoreCase))
                                 {
                                     nick_list[x][i] = split[0] + ":" + ex[2].TrimStart(':').ToLower();
                                     break;
@@ -1292,7 +1261,7 @@ namespace IRCBot
             bool run_modules = true;
             foreach (string ignore_nick in ignored_nicks)
             {
-                if (ignore_nick.ToLower().Equals(nick))
+                if (ignore_nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase))
                 {
                     run_modules = false;
                     break;
@@ -1365,7 +1334,7 @@ namespace IRCBot
                 checkRegisterationTimer.Enabled = false;
                 if (conf.nick != "" && conf.pass != "" && conf.email != "")
                 {
-                    register_nick(conf.nick, conf.pass, conf.email);
+                    register_nick(conf.pass, conf.email);
                 }
                 else
                 {
@@ -1533,7 +1502,7 @@ namespace IRCBot
             }
         }
 
-        public bool get_spam_status(string channel, string nick)
+        public bool get_spam_status(string channel)
         {
             bool active = false;
             lock (spamlock)
@@ -1553,7 +1522,7 @@ namespace IRCBot
             return active;
         }
 
-        private void register_nick(string nick, string password, string email)
+        private void register_nick(string password, string email)
         {
             sendData("PRIVMSG", "NickServ :register " + password + " " + email);
         }
@@ -1657,7 +1626,7 @@ namespace IRCBot
                         name_line = line.Split(charSeparator, 5);
                     }
                 }
-                if (name_line[4].ToLower().StartsWith(nick + " 3"))
+                if (name_line[4].ToLower().StartsWith(nick + " 3", StringComparison.InvariantCultureIgnoreCase))
                 {
                     identified = true;
                 }
@@ -1705,7 +1674,7 @@ namespace IRCBot
                     {
                         if (info.GetUpperBound(0) - 1 >= 0)
                         {
-                            if (info[info.GetUpperBound(0) - 1].ToLower().TrimStart('~') == nick)
+                            if (info[info.GetUpperBound(0) - 1].TrimStart('~').Equals(nick, StringComparison.InvariantCultureIgnoreCase))
                             {
                                 bool char_found = false;
                                 char[] arr = info[info.GetUpperBound(0)].ToCharArray();
@@ -1799,7 +1768,7 @@ namespace IRCBot
                             string[] lists = nick_list[x][i].Split(':');
                             if (lists.GetUpperBound(0) > 0)
                             {
-                                if (lists[1].ToLower().Equals(nick))
+                                if (lists[1].Equals(nick, StringComparison.InvariantCultureIgnoreCase))
                                 {
                                     access += "," + lists[0];
                                     break;
@@ -1814,7 +1783,7 @@ namespace IRCBot
                     string[] owners = conf.owner.Split(','); // Get list of owners
                     for (int x = 0; x <= owners.GetUpperBound(0); x++)
                     {
-                        if (nick.Equals(owners[x].ToLower()))
+                        if (nick.Equals(owners[x], StringComparison.InvariantCultureIgnoreCase))
                         {
                             access += "," + conf.owner_level.ToString();
                         }
@@ -1846,7 +1815,7 @@ namespace IRCBot
                                     string[] lists = nick_list[x][i].Split(':');
                                     if (lists.GetUpperBound(0) > 0)
                                     {
-                                        if (lists[1].ToLower().Equals(nick))
+                                        if (lists[1].Equals(nick, StringComparison.InvariantCultureIgnoreCase))
                                         {
                                             nick_found = true;
                                             string new_nick = access_num.ToString();

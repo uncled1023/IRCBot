@@ -35,7 +35,7 @@ namespace IRCBot.Modules
                         }
                         if (spam_check == true)
                         {
-                            blocked = ircbot.get_spam_status(channel, nick);
+                            blocked = ircbot.get_spam_status(channel);
                         }
                         foreach (string trigger in triggers)
                         {
@@ -64,7 +64,7 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                display_seen(line[4].ToLower(), line[2], ircbot);
+                                                display_seen(line[4].Trim(), line[2], ircbot);
                                             }
                                             else
                                             {
@@ -84,7 +84,7 @@ namespace IRCBot.Modules
             }
             if (type.Equals("line") || type.Equals("channel") || type.Equals("join") || type.Equals("mode") || type.Equals("part") || type.Equals("quit") || type.Equals("nick"))
             {
-                add_seen(nick, channel, line, ircbot);
+                add_seen(nick.Trim(), channel, line, ircbot);
             }
         }
 
@@ -107,7 +107,7 @@ namespace IRCBot.Modules
                         string[] new_line = line.Split(sep, 4);
                         if (new_line.GetUpperBound(0) > 0)
                         {
-                            if (new_line[0].ToLower().Equals(nick) && new_line[1].Equals(channel))
+                            if (new_line[0].Equals(nick, StringComparison.InvariantCultureIgnoreCase) && new_line[1].Equals(channel))
                             {
                                 DateTime current_date = DateTime.Now;
                                 DateTime past_date = DateTime.Parse(new_line[2]);
@@ -223,7 +223,7 @@ namespace IRCBot.Modules
                             string[] new_line = lines.Split(sep, 4);
                             if (new_line.GetUpperBound(0) > 0)
                             {
-                                if (new_line[0].Equals(nick) && new_line[1].Equals(channel))
+                                if (new_line[0].Equals(nick, StringComparison.InvariantCultureIgnoreCase) && new_line[1].Equals(channel))
                                 {
                                     new_file.Add(new_line[0] + "*" + new_line[1] + "*" + current_date.ToString("yyyy-MM-dd HH:mm:ss") + "*" + msg);
                                     nick_found = true;

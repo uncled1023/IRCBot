@@ -44,7 +44,7 @@ namespace IRCBot.Modules
                         }
                         if (spam_check == true)
                         {
-                            blocked = ircbot.get_spam_status(channel, nick);
+                            blocked = ircbot.get_spam_status(channel);
                         }
                         foreach (string trigger in triggers)
                         {
@@ -142,7 +142,7 @@ namespace IRCBot.Modules
                                             }
                                             if (poll_active == true)
                                             {
-                                                if (cur_poll.owner.Equals(nick))
+                                                if (cur_poll.owner.Equals(nick, StringComparison.InvariantCultureIgnoreCase))
                                                 {
                                                     if (line.GetUpperBound(0) > 3)
                                                     {
@@ -193,13 +193,13 @@ namespace IRCBot.Modules
                                             }
                                             if (poll_active == true)
                                             {
-                                                if (cur_poll.owner.Equals(nick))
+                                                if (cur_poll.owner.Equals(nick, StringComparison.InvariantCultureIgnoreCase))
                                                 {
                                                     if (line.GetUpperBound(0) > 3)
                                                     {
                                                         for (int x = 0; x < cur_poll.answers.Count(); x++)
                                                         {
-                                                            if (x == Convert.ToInt32(line[4]))
+                                                            if (x == (Convert.ToInt32(line[4]) - 1))
                                                             {
                                                                 ircbot.sendData("PRIVMSG", channel + " :Answer " + x.ToString() + " has been removed.");
                                                                 cur_poll.answers.RemoveAt(x);
@@ -249,7 +249,7 @@ namespace IRCBot.Modules
                                             }
                                             if (poll_active == true)
                                             {
-                                                if (cur_poll.owner.Equals(nick) || nick_access > Convert.ToInt32(ircbot.get_user_access(cur_poll.owner, channel)))
+                                                if (cur_poll.owner.Equals(nick, StringComparison.InvariantCultureIgnoreCase) || nick_access > Convert.ToInt32(ircbot.get_user_access(cur_poll.owner, channel)))
                                                 {
                                                     poll_active = false;
 

@@ -27,7 +27,7 @@ namespace IRCBot.Modules
                 int index = 0;
                 foreach (spam_check spam_log in spam_logs)
                 {
-                    if (spam_log.channel.Equals(channel) && spam_log.nick.Equals(nick))
+                    if (spam_log.channel.Equals(channel) && spam_log.nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase))
                     {
                         nick_found = true;
                         cur_lines = spam_log.lines;
@@ -88,7 +88,7 @@ namespace IRCBot.Modules
             bool nick_found = false;
             foreach (spam_check spam_log in spam_logs)
             {
-                if (spam_log.channel.Equals(channel) && spam_log.nick.Equals(nick))
+                if (spam_log.channel.Equals(channel) && spam_log.nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase))
                 {
                     nick_found = true;
                     break;

@@ -59,6 +59,7 @@
             this.label26 = new System.Windows.Forms.Label();
             this.module_list = new System.Windows.Forms.ListBox();
             this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.command_label = new System.Windows.Forms.Label();
             this.label25 = new System.Windows.Forms.Label();
             this.spam_counter = new System.Windows.Forms.CheckBox();
             this.label24 = new System.Windows.Forms.Label();
@@ -92,7 +93,10 @@
             this.label14 = new System.Windows.Forms.Label();
             this.user_level_box = new System.Windows.Forms.TextBox();
             this.label15 = new System.Windows.Forms.Label();
-            this.command_label = new System.Windows.Forms.Label();
+            this.label29 = new System.Windows.Forms.Label();
+            this.server_address_box = new System.Windows.Forms.TextBox();
+            this.auto_connect = new System.Windows.Forms.CheckBox();
+            this.label30 = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -102,16 +106,16 @@
             // 
             // port_box
             // 
-            this.port_box.Location = new System.Drawing.Point(165, 34);
+            this.port_box.Location = new System.Drawing.Point(165, 60);
             this.port_box.Name = "port_box";
             this.port_box.Size = new System.Drawing.Size(301, 20);
-            this.port_box.TabIndex = 2;
+            this.port_box.TabIndex = 3;
             this.port_box.Text = "6667";
             // 
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(18, 37);
+            this.label7.Location = new System.Drawing.Point(18, 63);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(66, 13);
             this.label7.TabIndex = 10;
@@ -119,15 +123,15 @@
             // 
             // channels_box
             // 
-            this.channels_box.Location = new System.Drawing.Point(165, 60);
+            this.channels_box.Location = new System.Drawing.Point(165, 86);
             this.channels_box.Name = "channels_box";
             this.channels_box.Size = new System.Drawing.Size(301, 20);
-            this.channels_box.TabIndex = 3;
+            this.channels_box.TabIndex = 4;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(18, 63);
+            this.label2.Location = new System.Drawing.Point(18, 89);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(117, 13);
             this.label2.TabIndex = 8;
@@ -151,15 +155,15 @@
             // 
             // email_box
             // 
-            this.email_box.Location = new System.Drawing.Point(165, 190);
+            this.email_box.Location = new System.Drawing.Point(165, 216);
             this.email_box.Name = "email_box";
             this.email_box.Size = new System.Drawing.Size(301, 20);
-            this.email_box.TabIndex = 8;
+            this.email_box.TabIndex = 9;
             // 
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(18, 193);
+            this.label8.Location = new System.Drawing.Point(18, 219);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(32, 13);
             this.label8.TabIndex = 20;
@@ -167,15 +171,15 @@
             // 
             // password_box
             // 
-            this.password_box.Location = new System.Drawing.Point(165, 164);
+            this.password_box.Location = new System.Drawing.Point(165, 190);
             this.password_box.Name = "password_box";
             this.password_box.Size = new System.Drawing.Size(301, 20);
-            this.password_box.TabIndex = 7;
+            this.password_box.TabIndex = 8;
             // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(18, 167);
+            this.label6.Location = new System.Drawing.Point(18, 193);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(53, 13);
             this.label6.TabIndex = 18;
@@ -183,15 +187,15 @@
             // 
             // owner_nicks_box
             // 
-            this.owner_nicks_box.Location = new System.Drawing.Point(165, 216);
+            this.owner_nicks_box.Location = new System.Drawing.Point(165, 242);
             this.owner_nicks_box.Name = "owner_nicks_box";
             this.owner_nicks_box.Size = new System.Drawing.Size(301, 20);
-            this.owner_nicks_box.TabIndex = 9;
+            this.owner_nicks_box.TabIndex = 10;
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(18, 219);
+            this.label5.Location = new System.Drawing.Point(18, 245);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(75, 13);
             this.label5.TabIndex = 16;
@@ -199,15 +203,15 @@
             // 
             // bot_nick_box
             // 
-            this.bot_nick_box.Location = new System.Drawing.Point(165, 112);
+            this.bot_nick_box.Location = new System.Drawing.Point(165, 138);
             this.bot_nick_box.Name = "bot_nick_box";
             this.bot_nick_box.Size = new System.Drawing.Size(301, 20);
-            this.bot_nick_box.TabIndex = 5;
+            this.bot_nick_box.TabIndex = 6;
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(18, 115);
+            this.label4.Location = new System.Drawing.Point(18, 141);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(29, 13);
             this.label4.TabIndex = 14;
@@ -215,15 +219,15 @@
             // 
             // bot_name_box
             // 
-            this.bot_name_box.Location = new System.Drawing.Point(165, 86);
+            this.bot_name_box.Location = new System.Drawing.Point(165, 112);
             this.bot_name_box.Name = "bot_name_box";
             this.bot_name_box.Size = new System.Drawing.Size(301, 20);
-            this.bot_name_box.TabIndex = 4;
+            this.bot_name_box.TabIndex = 5;
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(18, 89);
+            this.label3.Location = new System.Drawing.Point(18, 115);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(35, 13);
             this.label3.TabIndex = 12;
@@ -231,7 +235,7 @@
             // 
             // save_server_button
             // 
-            this.save_server_button.Location = new System.Drawing.Point(336, 331);
+            this.save_server_button.Location = new System.Drawing.Point(336, 379);
             this.save_server_button.Name = "save_server_button";
             this.save_server_button.Size = new System.Drawing.Size(75, 23);
             this.save_server_button.TabIndex = 98;
@@ -241,7 +245,7 @@
             // 
             // cancel_button
             // 
-            this.cancel_button.Location = new System.Drawing.Point(417, 331);
+            this.cancel_button.Location = new System.Drawing.Point(417, 379);
             this.cancel_button.Name = "cancel_button";
             this.cancel_button.Size = new System.Drawing.Size(75, 23);
             this.cancel_button.TabIndex = 99;
@@ -258,11 +262,15 @@
             this.tabControl1.Location = new System.Drawing.Point(12, 1);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(480, 324);
+            this.tabControl1.Size = new System.Drawing.Size(480, 372);
             this.tabControl1.TabIndex = 0;
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.label30);
+            this.tabPage1.Controls.Add(this.auto_connect);
+            this.tabPage1.Controls.Add(this.label29);
+            this.tabPage1.Controls.Add(this.server_address_box);
             this.tabPage1.Controls.Add(this.ignore_list_box);
             this.tabPage1.Controls.Add(this.label28);
             this.tabPage1.Controls.Add(this.label27);
@@ -288,22 +296,22 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(472, 298);
+            this.tabPage1.Size = new System.Drawing.Size(472, 346);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Server Configuration";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
             // ignore_list_box
             // 
-            this.ignore_list_box.Location = new System.Drawing.Point(165, 268);
+            this.ignore_list_box.Location = new System.Drawing.Point(165, 294);
             this.ignore_list_box.Name = "ignore_list_box";
             this.ignore_list_box.Size = new System.Drawing.Size(301, 20);
-            this.ignore_list_box.TabIndex = 11;
+            this.ignore_list_box.TabIndex = 12;
             // 
             // label28
             // 
             this.label28.AutoSize = true;
-            this.label28.Location = new System.Drawing.Point(18, 271);
+            this.label28.Location = new System.Drawing.Point(18, 297);
             this.label28.Name = "label28";
             this.label28.Size = new System.Drawing.Size(79, 13);
             this.label28.TabIndex = 28;
@@ -312,7 +320,7 @@
             // label27
             // 
             this.label27.AutoSize = true;
-            this.label27.Location = new System.Drawing.Point(18, 141);
+            this.label27.Location = new System.Drawing.Point(18, 167);
             this.label27.Name = "label27";
             this.label27.Size = new System.Drawing.Size(125, 13);
             this.label27.TabIndex = 26;
@@ -320,22 +328,22 @@
             // 
             // sec_nicks
             // 
-            this.sec_nicks.Location = new System.Drawing.Point(165, 138);
+            this.sec_nicks.Location = new System.Drawing.Point(165, 164);
             this.sec_nicks.Name = "sec_nicks";
             this.sec_nicks.Size = new System.Drawing.Size(301, 20);
-            this.sec_nicks.TabIndex = 6;
+            this.sec_nicks.TabIndex = 7;
             // 
             // channel_blacklist_box
             // 
-            this.channel_blacklist_box.Location = new System.Drawing.Point(165, 242);
+            this.channel_blacklist_box.Location = new System.Drawing.Point(165, 268);
             this.channel_blacklist_box.Name = "channel_blacklist_box";
             this.channel_blacklist_box.Size = new System.Drawing.Size(301, 20);
-            this.channel_blacklist_box.TabIndex = 10;
+            this.channel_blacklist_box.TabIndex = 11;
             // 
             // label16
             // 
             this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(18, 245);
+            this.label16.Location = new System.Drawing.Point(18, 271);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(88, 13);
             this.label16.TabIndex = 22;
@@ -349,7 +357,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(472, 298);
+            this.tabPage2.Size = new System.Drawing.Size(472, 346);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Module Configuration";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -358,13 +366,13 @@
             // 
             this.module_options.Location = new System.Drawing.Point(135, 6);
             this.module_options.Name = "module_options";
-            this.module_options.Size = new System.Drawing.Size(331, 274);
+            this.module_options.Size = new System.Drawing.Size(331, 329);
             this.module_options.TabIndex = 2;
             // 
             // label26
             // 
             this.label26.AutoSize = true;
-            this.label26.Location = new System.Drawing.Point(4, 10);
+            this.label26.Location = new System.Drawing.Point(6, 3);
             this.label26.Name = "label26";
             this.label26.Size = new System.Drawing.Size(47, 13);
             this.label26.TabIndex = 4;
@@ -374,9 +382,9 @@
             // 
             this.module_list.FormattingEnabled = true;
             this.module_list.HorizontalScrollbar = true;
-            this.module_list.Location = new System.Drawing.Point(7, 29);
+            this.module_list.Location = new System.Drawing.Point(9, 19);
             this.module_list.Name = "module_list";
-            this.module_list.Size = new System.Drawing.Size(122, 251);
+            this.module_list.Size = new System.Drawing.Size(120, 316);
             this.module_list.Sorted = true;
             this.module_list.TabIndex = 1;
             this.module_list.SelectedIndexChanged += new System.EventHandler(this.module_list_SelectedIndexChanged);
@@ -405,10 +413,19 @@
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(472, 298);
+            this.tabPage3.Size = new System.Drawing.Size(472, 346);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "Command Options";
             this.tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // command_label
+            // 
+            this.command_label.AutoSize = true;
+            this.command_label.Location = new System.Drawing.Point(132, 7);
+            this.command_label.Name = "command_label";
+            this.command_label.Size = new System.Drawing.Size(0, 13);
+            this.command_label.TabIndex = 39;
+            this.command_label.Visible = false;
             // 
             // label25
             // 
@@ -545,7 +562,7 @@
             // label17
             // 
             this.label17.AutoSize = true;
-            this.label17.Location = new System.Drawing.Point(3, 7);
+            this.label17.Location = new System.Drawing.Point(6, 3);
             this.label17.Name = "label17";
             this.label17.Size = new System.Drawing.Size(73, 13);
             this.label17.TabIndex = 20;
@@ -554,9 +571,9 @@
             // command_list
             // 
             this.command_list.FormattingEnabled = true;
-            this.command_list.Location = new System.Drawing.Point(6, 26);
+            this.command_list.Location = new System.Drawing.Point(9, 19);
             this.command_list.Name = "command_list";
-            this.command_list.Size = new System.Drawing.Size(120, 251);
+            this.command_list.Size = new System.Drawing.Size(120, 316);
             this.command_list.Sorted = true;
             this.command_list.TabIndex = 1;
             this.command_list.SelectedIndexChanged += new System.EventHandler(this.command_list_change);
@@ -580,7 +597,7 @@
             this.tabPage4.Location = new System.Drawing.Point(4, 22);
             this.tabPage4.Name = "tabPage4";
             this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(472, 298);
+            this.tabPage4.Size = new System.Drawing.Size(472, 348);
             this.tabPage4.TabIndex = 3;
             this.tabPage4.Text = "Op Levels";
             this.tabPage4.UseVisualStyleBackColor = true;
@@ -697,21 +714,46 @@
             this.label15.TabIndex = 27;
             this.label15.Text = "User Access Level";
             // 
-            // command_label
+            // label29
             // 
-            this.command_label.AutoSize = true;
-            this.command_label.Location = new System.Drawing.Point(132, 7);
-            this.command_label.Name = "command_label";
-            this.command_label.Size = new System.Drawing.Size(0, 13);
-            this.command_label.TabIndex = 39;
-            this.command_label.Visible = false;
+            this.label29.AutoSize = true;
+            this.label29.Location = new System.Drawing.Point(18, 37);
+            this.label29.Name = "label29";
+            this.label29.Size = new System.Drawing.Size(79, 13);
+            this.label29.TabIndex = 30;
+            this.label29.Text = "Server Address";
+            // 
+            // server_address_box
+            // 
+            this.server_address_box.Location = new System.Drawing.Point(165, 34);
+            this.server_address_box.Name = "server_address_box";
+            this.server_address_box.Size = new System.Drawing.Size(301, 20);
+            this.server_address_box.TabIndex = 2;
+            // 
+            // auto_connect
+            // 
+            this.auto_connect.AutoSize = true;
+            this.auto_connect.Location = new System.Drawing.Point(165, 320);
+            this.auto_connect.Name = "auto_connect";
+            this.auto_connect.Size = new System.Drawing.Size(15, 14);
+            this.auto_connect.TabIndex = 13;
+            this.auto_connect.UseVisualStyleBackColor = true;
+            // 
+            // label30
+            // 
+            this.label30.AutoSize = true;
+            this.label30.Location = new System.Drawing.Point(18, 321);
+            this.label30.Name = "label30";
+            this.label30.Size = new System.Drawing.Size(99, 13);
+            this.label30.TabIndex = 32;
+            this.label30.Text = "Connect on Startup";
             // 
             // add_server
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(504, 366);
+            this.ClientSize = new System.Drawing.Size(504, 409);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.cancel_button);
             this.Controls.Add(this.save_server_button);
@@ -800,5 +842,9 @@
         private System.Windows.Forms.TextBox ignore_list_box;
         private System.Windows.Forms.Label label28;
         private System.Windows.Forms.Label command_label;
+        private System.Windows.Forms.Label label29;
+        private System.Windows.Forms.TextBox server_address_box;
+        private System.Windows.Forms.Label label30;
+        private System.Windows.Forms.CheckBox auto_connect;
     }
 }

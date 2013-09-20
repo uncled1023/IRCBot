@@ -136,7 +136,7 @@ namespace IRCBot.Modules
                                 {
                                     difference += " " + difference_second + " seconds,";
                                 }
-                                ircbot.sendData("PRIVMSG", channel + " :I last saw " + nick + " " + difference.TrimEnd(',') + " ago " + new_line[3]);
+                                ircbot.sendData("PRIVMSG", channel + " :I last saw " + nick + " " + difference.Trim().TrimEnd(',') + " ago " + new_line[3]);
                                 nick_found = true;
                                 break;
                             }

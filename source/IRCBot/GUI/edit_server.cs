@@ -17,6 +17,7 @@ namespace IRCBot
     {
         private Interface m_parent;
         private string server_name;
+        private string old_server_name;
         private string server_module_folder;
         private XmlDocument xmlDocModules = new XmlDocument();
         public edit_server(Interface frmctrl, string tmp_server_name)
@@ -24,6 +25,7 @@ namespace IRCBot
             InitializeComponent();
             m_parent = frmctrl;
             server_name = tmp_server_name;
+            old_server_name = tmp_server_name;
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.Load(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
             XmlNodeList ServerxnList = xmlDoc.SelectNodes("/bot_settings/server_list/server");
@@ -40,10 +42,12 @@ namespace IRCBot
                     owner_nicks_box.Text = xn["owner"].InnerText;
                     port_box.Text = xn["port"].InnerText;
                     server_name_box.Text = xn["server_name"].InnerText;
+                    server_address_box.Text = xn["server_address"].InnerText;
                     server_module_folder = xn["server_folder"].InnerText;
                     channels_box.Text = xn["chan_list"].InnerText;
                     channel_blacklist_box.Text = xn["chan_blacklist"].InnerText;
                     ignore_list_box.Text = xn["ignore_list"].InnerText;
+                    auto_connect.Checked = Convert.ToBoolean(xn["auto_connect"].InnerText);
                     user_level_box.Text = xn["user_level"].InnerText;
                     voice_level_box.Text = xn["voice_level"].InnerText;
                     hop_level_box.Text = xn["hop_level"].InnerText;
@@ -121,6 +125,10 @@ namespace IRCBot
             {
                 MessageBox.Show("A Server must be specified");
             }
+            else if (server_address_box.Text == "")
+            {
+                MessageBox.Show("A Server Address must be specified");
+            }
             else if (port_box.Text == "")
             {
                 MessageBox.Show("A port number must be specified");
@@ -138,77 +146,95 @@ namespace IRCBot
                 XmlDocument xmlDoc = new XmlDocument();
                 xmlDoc.Load(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
                 XmlNodeList ServerxnList = xmlDoc.SelectNodes("/bot_settings/server_list/server");
-                foreach (XmlNode xn in ServerxnList)
+                bool server_found = false;
+                if (!server_name.Equals(old_server_name, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    string tmp_server = xn["server_name"].InnerText;
-                    if (tmp_server.Equals(server_name))
+                    XmlNodeList xnServerList = xmlDoc.SelectNodes("/bot_settings/server_list/server");
+                    foreach (XmlNode xn in xnServerList)
                     {
-                        xn["name"].InnerText = bot_name_box.Text;
-                        xn["nick"].InnerText = bot_nick_box.Text;
-                        xn["sec_nicks"].InnerText = sec_nicks.Text;
-                        xn["password"].InnerText = password_box.Text;
-                        xn["email"].InnerText = email_box.Text;
-                        xn["owner"].InnerText = owner_nicks_box.Text;
-                        xn["port"].InnerText = port_box.Text;
-                        xn["server_name"].InnerText = server_name_box.Text;
-                        xn["chan_list"].InnerText = channels_box.Text;
-                        xn["chan_blacklist"].InnerText = channel_blacklist_box.Text;
-                        xn["ignore_list"].InnerText = ignore_list_box.Text;
-                        xn["user_level"].InnerText = user_level_box.Text;
-                        xn["voice_level"].InnerText = voice_level_box.Text;
-                        xn["hop_level"].InnerText = hop_level_box.Text;
-                        xn["op_level"].InnerText = op_level_box.Text;
-                        xn["sop_level"].InnerText = sop_level_box.Text;
-                        xn["founder_level"].InnerText = founder_level_box.Text;
-                        xn["owner_level"].InnerText = owner_level_box.Text;
-                        break;
+                        if (server_name.Equals(xn["server_name"].InnerText, StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            server_found = true;
+                            break;
+                        }
                     }
                 }
-                xmlDoc.Save(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
-
-                XmlNodeList xnList = xmlDocModules.SelectNodes("/modules/module");
-                foreach (XmlNode xn in xnList)
+                if (!server_found)
                 {
-                    int element_num = 0;
-                    String module_name = xn["name"].InnerText;
-
-                    if (module_list.SelectedItem.Equals(module_name))
+                    foreach (XmlNode xn in ServerxnList)
                     {
-                        CheckBox myCheckboxEnabled = (CheckBox)module_options.Controls.Find("checkBox_" + module_name + "_enabled", true)[0];
-                        xn["enabled"].InnerText = myCheckboxEnabled.Checked.ToString();
-                        element_num++;
-                        xn["blacklist"].InnerText = module_options.Controls.Find("textBox_" + module_name + "_blacklist", true)[0].Text;
-
-                        element_num++;
-                        XmlNodeList optionList = xn.ChildNodes;
-                        foreach (XmlNode option in optionList)
+                        string tmp_server = xn["server_name"].InnerText;
+                        if (tmp_server.Equals(server_name))
                         {
-                            if (option.Name.Equals("options"))
+                            xn["name"].InnerText = bot_name_box.Text;
+                            xn["nick"].InnerText = bot_nick_box.Text;
+                            xn["sec_nicks"].InnerText = sec_nicks.Text;
+                            xn["password"].InnerText = password_box.Text;
+                            xn["email"].InnerText = email_box.Text;
+                            xn["owner"].InnerText = owner_nicks_box.Text;
+                            xn["port"].InnerText = port_box.Text;
+                            xn["server_name"].InnerText = server_name_box.Text;
+                            xn["server_address"].InnerText = server_address_box.Text;
+                            xn["chan_list"].InnerText = channels_box.Text;
+                            xn["chan_blacklist"].InnerText = channel_blacklist_box.Text;
+                            xn["ignore_list"].InnerText = ignore_list_box.Text;
+                            xn["auto_connect"].InnerText = auto_connect.Checked.ToString();
+                            xn["user_level"].InnerText = user_level_box.Text;
+                            xn["voice_level"].InnerText = voice_level_box.Text;
+                            xn["hop_level"].InnerText = hop_level_box.Text;
+                            xn["op_level"].InnerText = op_level_box.Text;
+                            xn["sop_level"].InnerText = sop_level_box.Text;
+                            xn["founder_level"].InnerText = founder_level_box.Text;
+                            xn["owner_level"].InnerText = owner_level_box.Text;
+                            break;
+                        }
+                    }
+                    xmlDoc.Save(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
+
+                    XmlNodeList xnList = xmlDocModules.SelectNodes("/modules/module");
+                    foreach (XmlNode xn in xnList)
+                    {
+                        int element_num = 0;
+                        String module_name = xn["name"].InnerText;
+
+                        if (module_list.SelectedItem.Equals(module_name))
+                        {
+                            CheckBox myCheckboxEnabled = (CheckBox)module_options.Controls.Find("checkBox_" + module_name + "_enabled", true)[0];
+                            xn["enabled"].InnerText = myCheckboxEnabled.Checked.ToString();
+                            element_num++;
+                            xn["blacklist"].InnerText = module_options.Controls.Find("textBox_" + module_name + "_blacklist", true)[0].Text;
+
+                            element_num++;
+                            XmlNodeList optionList = xn.ChildNodes;
+                            foreach (XmlNode option in optionList)
                             {
-                                XmlNodeList Options = option.ChildNodes;
-                                foreach (XmlNode options in Options)
+                                if (option.Name.Equals("options"))
                                 {
-                                    switch (options["type"].InnerText)
+                                    XmlNodeList Options = option.ChildNodes;
+                                    foreach (XmlNode options in Options)
                                     {
-                                        case "textbox":
-                                            TextBox myTextBox = (TextBox)module_options.Controls.Find("textBox_" + module_name + "_" + options.Name + "_" + element_num.ToString(), true)[0];
-                                            options["value"].InnerText = myTextBox.Text;
-                                            element_num++;
-                                            break;
-                                        case "checkbox":
-                                            CheckBox myCheckbox = (CheckBox)module_options.Controls.Find("checkBox_" + module_name + "_" + options.Name + "_" + element_num.ToString(), true)[0];
-                                            options["checked"].InnerText = myCheckbox.Checked.ToString();
-                                            element_num++;
-                                            break;
+                                        switch (options["type"].InnerText)
+                                        {
+                                            case "textbox":
+                                                TextBox myTextBox = (TextBox)module_options.Controls.Find("textBox_" + module_name + "_" + options.Name + "_" + element_num.ToString(), true)[0];
+                                                options["value"].InnerText = myTextBox.Text;
+                                                element_num++;
+                                                break;
+                                            case "checkbox":
+                                                CheckBox myCheckbox = (CheckBox)module_options.Controls.Find("checkBox_" + module_name + "_" + options.Name + "_" + element_num.ToString(), true)[0];
+                                                options["checked"].InnerText = myCheckbox.Checked.ToString();
+                                                element_num++;
+                                                break;
+                                        }
                                     }
                                 }
                             }
                         }
                     }
+                    xmlDocModules.Save(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + server_module_folder + Path.DirectorySeparatorChar + "modules.xml");
+                    m_parent.update_conf();
+                    this.Close();
                 }
-                xmlDocModules.Save(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + server_module_folder + Path.DirectorySeparatorChar + "modules.xml");
-                m_parent.update_conf();
-                this.Close();
             }
         }
 

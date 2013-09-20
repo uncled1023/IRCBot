@@ -17,7 +17,6 @@ namespace IRCBot
     {
         private Interface m_parent;
         private string server_name;
-        private string server_module_folder;
         private configuration old_configeration;
         private XmlDocument xmlDocModules = new XmlDocument();
         public add_server(Interface frmctrl, configuration config)
@@ -88,7 +87,11 @@ namespace IRCBot
         {
             if (server_name_box.Text == "")
             {
-                MessageBox.Show("A Server must be specified");
+                MessageBox.Show("A Server Name must be specified");
+            }
+            else if (server_address_box.Text == "")
+            {
+                MessageBox.Show("A Server Address must be specified");
             }
             else if (port_box.Text == "")
             {
@@ -105,117 +108,138 @@ namespace IRCBot
             else
             {
                 server_name = server_name_box.Text;
-                string[] server = server_name_box.Text.Split('.');
-                server_module_folder = server[1];
                 XmlDocument xmlDoc = new XmlDocument();
                 xmlDoc.Load(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
-                XmlNode Serverxn = xmlDoc.SelectSingleNode("/bot_settings/server_list");
-                XmlNode node = xmlDoc.CreateElement("server");
-                XmlNode nodeName = xmlDoc.CreateElement("name");
-                nodeName.InnerText = bot_name_box.Text;
-                node.AppendChild(nodeName);
-                XmlNode nodeNick = xmlDoc.CreateElement("nick");
-                nodeNick.InnerText = bot_nick_box.Text;
-                node.AppendChild(nodeNick);
-                XmlNode nodeSecNick = xmlDoc.CreateElement("sec_nicks");
-                nodeSecNick.InnerText = sec_nicks.Text;
-                node.AppendChild(nodeSecNick);
-                XmlNode nodePassword = xmlDoc.CreateElement("password");
-                nodePassword.InnerText = password_box.Text;
-                node.AppendChild(nodePassword);
-                XmlNode nodeEmail = xmlDoc.CreateElement("email");
-                nodeEmail.InnerText = email_box.Text;
-                node.AppendChild(nodeEmail);
-                XmlNode nodeOwner = xmlDoc.CreateElement("owner");
-                nodeOwner.InnerText = owner_nicks_box.Text;
-                node.AppendChild(nodeOwner);
-                XmlNode nodePort = xmlDoc.CreateElement("port");
-                nodePort.InnerText = port_box.Text;
-                node.AppendChild(nodePort);
-                XmlNode nodeServer_Name = xmlDoc.CreateElement("server_name");
-                nodeServer_Name.InnerText = server_name_box.Text;
-                node.AppendChild(nodeServer_Name);
-                XmlNode nodeServer_Folder = xmlDoc.CreateElement("server_folder");
-                nodeServer_Folder.InnerText = server_module_folder;
-                node.AppendChild(nodeServer_Folder);
-                XmlNode nodeChanList = xmlDoc.CreateElement("chan_list");
-                nodeChanList.InnerText = channels_box.Text;
-                node.AppendChild(nodeChanList);
-                XmlNode nodeChanBlacklist = xmlDoc.CreateElement("chan_blacklist");
-                nodeChanBlacklist.InnerText = channel_blacklist_box.Text;
-                node.AppendChild(nodeChanBlacklist);
-                XmlNode nodeignore_list = xmlDoc.CreateElement("ignore_list");
-                nodeignore_list.InnerText = ignore_list_box.Text;
-                node.AppendChild(nodeignore_list);
-                XmlNode nodeuser_level = xmlDoc.CreateElement("user_level");
-                nodeuser_level.InnerText = user_level_box.Text;
-                node.AppendChild(nodeuser_level);
-                XmlNode nodevoice_level = xmlDoc.CreateElement("voice_level");
-                nodevoice_level.InnerText = voice_level_box.Text;
-                node.AppendChild(nodevoice_level);
-                XmlNode nodehop_level = xmlDoc.CreateElement("hop_level");
-                nodehop_level.InnerText = hop_level_box.Text;
-                node.AppendChild(nodehop_level);
-                XmlNode nodeop_level = xmlDoc.CreateElement("op_level");
-                nodeop_level.InnerText = op_level_box.Text;
-                node.AppendChild(nodeop_level);
-                XmlNode nodesop_level = xmlDoc.CreateElement("sop_level");
-                nodesop_level.InnerText = sop_level_box.Text;
-                node.AppendChild(nodesop_level);
-                XmlNode nodefounder_level = xmlDoc.CreateElement("founder_level");
-                nodefounder_level.InnerText = founder_level_box.Text;
-                node.AppendChild(nodefounder_level);
-                XmlNode nodeowner_level = xmlDoc.CreateElement("owner_level");
-                nodeowner_level.InnerText = owner_level_box.Text;
-                node.AppendChild(nodeowner_level);
-                Serverxn.AppendChild(node);
-                xmlDoc.Save(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
-
-                Directory.CreateDirectory(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + server[1]);
-
-                XmlNodeList xnList = xmlDocModules.SelectNodes("/modules/module");
-                foreach (XmlNode xn in xnList)
+                XmlNodeList xnServerList = xmlDoc.SelectNodes("/bot_settings/server_list/server");
+                bool server_found = false;
+                foreach (XmlNode xn in xnServerList)
                 {
-                    int element_num = 0;
-                    String module_name = xn["name"].InnerText;
-
-                    if (module_list.SelectedItem.Equals(module_name))
+                    if (server_name.Equals(xn["server_name"].InnerText, StringComparison.InvariantCultureIgnoreCase))
                     {
-                        CheckBox myCheckboxEnabled = (CheckBox)module_options.Controls.Find("checkBox_" + module_name + "_enabled", true)[0];
-                        xn["enabled"].InnerText = myCheckboxEnabled.Checked.ToString();
-                        element_num++;
-                        xn["blacklist"].InnerText = module_options.Controls.Find("textBox_" + module_name + "_blacklist", true)[0].Text;
+                        server_found = true;
+                        break;
+                    }
+                }
+                if (!server_found)
+                {
+                    XmlNode Serverxn = xmlDoc.SelectSingleNode("/bot_settings/server_list");
+                    XmlNode node = xmlDoc.CreateElement("server");
+                    XmlNode nodeName = xmlDoc.CreateElement("name");
+                    nodeName.InnerText = bot_name_box.Text;
+                    node.AppendChild(nodeName);
+                    XmlNode nodeNick = xmlDoc.CreateElement("nick");
+                    nodeNick.InnerText = bot_nick_box.Text;
+                    node.AppendChild(nodeNick);
+                    XmlNode nodeSecNick = xmlDoc.CreateElement("sec_nicks");
+                    nodeSecNick.InnerText = sec_nicks.Text;
+                    node.AppendChild(nodeSecNick);
+                    XmlNode nodePassword = xmlDoc.CreateElement("password");
+                    nodePassword.InnerText = password_box.Text;
+                    node.AppendChild(nodePassword);
+                    XmlNode nodeEmail = xmlDoc.CreateElement("email");
+                    nodeEmail.InnerText = email_box.Text;
+                    node.AppendChild(nodeEmail);
+                    XmlNode nodeOwner = xmlDoc.CreateElement("owner");
+                    nodeOwner.InnerText = owner_nicks_box.Text;
+                    node.AppendChild(nodeOwner);
+                    XmlNode nodePort = xmlDoc.CreateElement("port");
+                    nodePort.InnerText = port_box.Text;
+                    node.AppendChild(nodePort);
+                    XmlNode nodeServer_Name = xmlDoc.CreateElement("server_name");
+                    nodeServer_Name.InnerText = server_name_box.Text;
+                    node.AppendChild(nodeServer_Name);
+                    XmlNode nodeServer_Address = xmlDoc.CreateElement("server_address");
+                    nodeServer_Address.InnerText = server_address_box.Text;
+                    node.AppendChild(nodeServer_Address);
+                    XmlNode nodeServer_Folder = xmlDoc.CreateElement("server_folder");
+                    nodeServer_Folder.InnerText = server_name;
+                    node.AppendChild(nodeServer_Folder);
+                    XmlNode nodeChanList = xmlDoc.CreateElement("chan_list");
+                    nodeChanList.InnerText = channels_box.Text;
+                    node.AppendChild(nodeChanList);
+                    XmlNode nodeChanBlacklist = xmlDoc.CreateElement("chan_blacklist");
+                    nodeChanBlacklist.InnerText = channel_blacklist_box.Text;
+                    node.AppendChild(nodeChanBlacklist);
+                    XmlNode nodeignore_list = xmlDoc.CreateElement("ignore_list");
+                    nodeignore_list.InnerText = ignore_list_box.Text;
+                    node.AppendChild(nodeignore_list);
+                    XmlNode nodeauto_connect = xmlDoc.CreateElement("auto_connect");
+                    nodeauto_connect.InnerText = auto_connect.ToString();
+                    node.AppendChild(nodeauto_connect);
+                    XmlNode nodeuser_level = xmlDoc.CreateElement("user_level");
+                    nodeuser_level.InnerText = user_level_box.Text;
+                    node.AppendChild(nodeuser_level);
+                    XmlNode nodevoice_level = xmlDoc.CreateElement("voice_level");
+                    nodevoice_level.InnerText = voice_level_box.Text;
+                    node.AppendChild(nodevoice_level);
+                    XmlNode nodehop_level = xmlDoc.CreateElement("hop_level");
+                    nodehop_level.InnerText = hop_level_box.Text;
+                    node.AppendChild(nodehop_level);
+                    XmlNode nodeop_level = xmlDoc.CreateElement("op_level");
+                    nodeop_level.InnerText = op_level_box.Text;
+                    node.AppendChild(nodeop_level);
+                    XmlNode nodesop_level = xmlDoc.CreateElement("sop_level");
+                    nodesop_level.InnerText = sop_level_box.Text;
+                    node.AppendChild(nodesop_level);
+                    XmlNode nodefounder_level = xmlDoc.CreateElement("founder_level");
+                    nodefounder_level.InnerText = founder_level_box.Text;
+                    node.AppendChild(nodefounder_level);
+                    XmlNode nodeowner_level = xmlDoc.CreateElement("owner_level");
+                    nodeowner_level.InnerText = owner_level_box.Text;
+                    node.AppendChild(nodeowner_level);
+                    Serverxn.AppendChild(node);
+                    xmlDoc.Save(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
 
-                        element_num++;
-                        XmlNodeList optionList = xn.ChildNodes;
-                        foreach (XmlNode option in optionList)
+                    Directory.CreateDirectory(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + server_name);
+
+                    XmlNodeList xnList = xmlDocModules.SelectNodes("/modules/module");
+                    foreach (XmlNode xn in xnList)
+                    {
+                        int element_num = 0;
+                        String module_name = xn["name"].InnerText;
+
+                        if (module_list.SelectedItem.Equals(module_name))
                         {
-                            if (option.Name.Equals("options"))
+                            CheckBox myCheckboxEnabled = (CheckBox)module_options.Controls.Find("checkBox_" + module_name + "_enabled", true)[0];
+                            xn["enabled"].InnerText = myCheckboxEnabled.Checked.ToString();
+                            element_num++;
+                            xn["blacklist"].InnerText = module_options.Controls.Find("textBox_" + module_name + "_blacklist", true)[0].Text;
+
+                            element_num++;
+                            XmlNodeList optionList = xn.ChildNodes;
+                            foreach (XmlNode option in optionList)
                             {
-                                XmlNodeList Options = option.ChildNodes;
-                                foreach (XmlNode options in Options)
+                                if (option.Name.Equals("options"))
                                 {
-                                    switch (options["type"].InnerText)
+                                    XmlNodeList Options = option.ChildNodes;
+                                    foreach (XmlNode options in Options)
                                     {
-                                        case "textbox":
-                                            TextBox myTextBox = (TextBox)module_options.Controls.Find("textBox_" + module_name + "_" + options.Name + "_" + element_num.ToString(), true)[0];
-                                            options["value"].InnerText = myTextBox.Text;
-                                            element_num++;
-                                            break;
-                                        case "checkbox":
-                                            CheckBox myCheckbox = (CheckBox)module_options.Controls.Find("checkBox_" + module_name + "_" + options.Name + "_" + element_num.ToString(), true)[0];
-                                            options["checked"].InnerText = myCheckbox.Checked.ToString();
-                                            element_num++;
-                                            break;
+                                        switch (options["type"].InnerText)
+                                        {
+                                            case "textbox":
+                                                TextBox myTextBox = (TextBox)module_options.Controls.Find("textBox_" + module_name + "_" + options.Name + "_" + element_num.ToString(), true)[0];
+                                                options["value"].InnerText = myTextBox.Text;
+                                                element_num++;
+                                                break;
+                                            case "checkbox":
+                                                CheckBox myCheckbox = (CheckBox)module_options.Controls.Find("checkBox_" + module_name + "_" + options.Name + "_" + element_num.ToString(), true)[0];
+                                                options["checked"].InnerText = myCheckbox.Checked.ToString();
+                                                element_num++;
+                                                break;
+                                        }
                                     }
                                 }
                             }
                         }
                     }
+                    xmlDocModules.Save(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + server_name + Path.DirectorySeparatorChar + "modules.xml");
+                    old_configeration.add_to_list(server_name);
+                    this.Close();
                 }
-                xmlDocModules.Save(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + server_module_folder + Path.DirectorySeparatorChar + "modules.xml");
-                old_configeration.add_to_list(server_name);
-                this.Close();
+                else
+                {
+                    MessageBox.Show("You must use a unique Server Name.");
+                }
             }
         }
 

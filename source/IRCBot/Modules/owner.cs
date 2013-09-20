@@ -164,7 +164,7 @@ namespace IRCBot.Modules
                                         }
                                         if (nick_access >= command_access)
                                         {
-                                            ircbot.identify();
+                                            ircbot.sendData("PRIVMSG", "NickServ :Identify " + conf.pass);
                                             ircbot.sendData("NOTICE", nick + " :I have identified.");
                                         }
                                         else
@@ -1071,10 +1071,7 @@ namespace IRCBot.Modules
                                                             string[] split = tmp_nick[i].Split(':');
                                                             if (split.GetUpperBound(0) > 0)
                                                             {
-                                                                if (split[1].Equals(nick, StringComparison.InvariantCultureIgnoreCase) || split[1].Equals(conf.nick, StringComparison.InvariantCultureIgnoreCase))
-                                                                {
-                                                                }
-                                                                else
+                                                                if (!split[1].Equals(nick, StringComparison.InvariantCultureIgnoreCase) && !split[1].Equals(conf.nick, StringComparison.InvariantCultureIgnoreCase))
                                                                 {
                                                                     ircbot.sendData("KICK", channel + " :" + split[1]);
                                                                 }

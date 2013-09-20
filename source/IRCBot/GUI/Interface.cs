@@ -23,6 +23,7 @@ namespace IRCBot
     public struct IRCConfig
     {
         public string server;
+        public string server_address;
         public IPAddress[] server_ip;
         public string chans;
         public string chan_blacklist;
@@ -50,6 +51,7 @@ namespace IRCBot
         public int sop_level;
         public int founder_level;
         public int owner_level;
+        public bool auto_connect;
         public List<List<string>> module_config;
         public List<List<string>> command_list;
         public List<spam_info> spam_check;
@@ -216,245 +218,223 @@ namespace IRCBot
             if (File.Exists(cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml"))
             {
                 xmlDoc.Load(cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
-            }
-            else
-            {
-                XmlNode node = xmlDoc.CreateNode(XmlNodeType.Element, "global_settings", null);
-                XmlNode nodeCommand = xmlDoc.CreateElement("command_prefix");
-                nodeCommand.InnerText = ".";
-                node.AppendChild(nodeCommand);
-                XmlNode nodeKeep = xmlDoc.CreateElement("keep_logs");
-                nodeKeep.InnerText = "True";
-                node.AppendChild(nodeKeep);
-                XmlNode nodeLogs = xmlDoc.CreateElement("logs_path");
-                nodeLogs.InnerText = cur_dir + Path.DirectorySeparatorChar + "logs" + Path.DirectorySeparatorChar + "";
-                node.AppendChild(nodeLogs);
-                XmlNode nodeStart = xmlDoc.CreateElement("start_with_windows");
-                nodeStart.InnerText = "False";
-                node.AppendChild(nodeStart);
-                XmlNode nodeTray = xmlDoc.CreateElement("minimize_to_tray");
-                nodeTray.InnerText = "False";
-                node.AppendChild(nodeTray);
-                XmlNode nodeSpamCount = xmlDoc.CreateElement("spam_count");
-                nodeSpamCount.InnerText = "5";
-                node.AppendChild(nodeSpamCount);
-                XmlNode nodeSpamThreshold = xmlDoc.CreateElement("spam_threshold");
-                nodeSpamThreshold.InnerText = "1000";
-                node.AppendChild(nodeSpamThreshold);
-                XmlNode nodeSpamTime = xmlDoc.CreateElement("spam_timeout");
-                nodeSpamTime.InnerText = "10000";
-                node.AppendChild(nodeSpamTime);
-                XmlNode nodeSpamMaxMsgLength = xmlDoc.CreateElement("max_message_length");
-                nodeSpamMaxMsgLength.InnerText = "450";
-                node.AppendChild(nodeSpamMaxMsgLength);
-                xmlDoc.AppendChild(node);
-                xmlDoc.Save(cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
-                xmlDoc.Load(cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
-            }
-            XmlNode list = xmlDoc.SelectSingleNode("/bot_settings/global_settings");
-            conf.command = list["command_prefix"].InnerText;
-            conf.keep_logs = list["keep_logs"].InnerText;
-            if (Directory.Exists(list["logs_path"].InnerText))
-            {
-                conf.logs_path = list["logs_path"].InnerText;
-            }
-            else
-            {
-                conf.logs_path = cur_dir + Path.DirectorySeparatorChar + "logs";
-            }
-            conf.spam_count_max = Convert.ToInt32(list["spam_count"].InnerText);
-            conf.spam_threshold = Convert.ToInt32(list["spam_threshold"].InnerText);
-            conf.spam_timout = Convert.ToInt32(list["spam_timeout"].InnerText);
-            conf.max_message_length = Convert.ToInt32(list["max_message_length"].InnerText);
-            conf.minimize_to_tray = Convert.ToBoolean(list["minimize_to_tray"].InnerText);
-            if (conf.minimize_to_tray == true)
-            {
-                MyNotifyIcon.Visible = true;
-            }
-            else
-            {
-                MyNotifyIcon.Visible = false;
-            }
-
-            XmlNodeList xnList = xmlDoc.SelectNodes("/bot_settings/server_list/server");
-            full_server_list = "";
-            foreach (XmlNode xn in xnList)
-            {
-                full_server_list += xn["server_name"].InnerText + ",";
-            }
-            full_server_list = full_server_list.TrimEnd(',');
-
-            string[] tmp_server_list = full_server_list.Split(',');
-            conf.bot_instances = new List<bot>();
-            int index = 0;
-            connectToolStripMenuItem.Enabled = false;
-            if (full_server_list != "")
-            {
-                connectToolStripMenuItem.Text = "Disconnect";
-                connectToolStripMenuItem.Enabled = true;
-                foreach (string server_name in tmp_server_list)
+                XmlNode list = xmlDoc.SelectSingleNode("/bot_settings/global_settings");
+                conf.command = list["command_prefix"].InnerText;
+                conf.keep_logs = list["keep_logs"].InnerText;
+                if (Directory.Exists(list["logs_path"].InnerText))
                 {
-                    IRCConfig tmp_conf = new IRCConfig();
-                    tmp_conf = conf;
-                    tmp_conf.module_config = new List<List<string>>();
-                    tmp_conf.command_list = new List<List<string>>();
-                    tmp_conf.spam_check = new List<spam_info>();
-                    tmp_conf.module_config.Clear();
-                    tmp_conf.command_list.Clear();
-                    XmlNodeList ServerxnList = xmlDoc.SelectNodes("/bot_settings/server_list/server");
-                    foreach (XmlNode xn in ServerxnList)
+                    conf.logs_path = list["logs_path"].InnerText;
+                }
+                else
+                {
+                    conf.logs_path = cur_dir + Path.DirectorySeparatorChar + "logs";
+                }
+                conf.spam_count_max = Convert.ToInt32(list["spam_count"].InnerText);
+                conf.spam_threshold = Convert.ToInt32(list["spam_threshold"].InnerText);
+                conf.spam_timout = Convert.ToInt32(list["spam_timeout"].InnerText);
+                conf.max_message_length = Convert.ToInt32(list["max_message_length"].InnerText);
+                conf.minimize_to_tray = Convert.ToBoolean(list["minimize_to_tray"].InnerText);
+                if (conf.minimize_to_tray == true)
+                {
+                    MyNotifyIcon.Visible = true;
+                }
+                else
+                {
+                    MyNotifyIcon.Visible = false;
+                }
+
+                XmlNodeList xnList = xmlDoc.SelectNodes("/bot_settings/server_list/server");
+                full_server_list = "";
+                foreach (XmlNode xn in xnList)
+                {
+                    full_server_list += xn["server_name"].InnerText + ",";
+                }
+                full_server_list = full_server_list.TrimEnd(',');
+
+                string[] tmp_server_list = full_server_list.Split(',');
+                conf.bot_instances = new List<bot>();
+                int index = 0;
+                connectToolStripMenuItem.Enabled = false;
+                if (full_server_list != "")
+                {
+                    connectToolStripMenuItem.Text = "Disconnect";
+                    connectToolStripMenuItem.Enabled = true;
+                    foreach (string server_name in tmp_server_list)
                     {
-                        string tmp_server = xn["server_name"].InnerText;
-                        if (tmp_server.Equals(server_name))
+                        IRCConfig tmp_conf = new IRCConfig();
+                        tmp_conf = conf;
+                        tmp_conf.module_config = new List<List<string>>();
+                        tmp_conf.command_list = new List<List<string>>();
+                        tmp_conf.spam_check = new List<spam_info>();
+                        tmp_conf.module_config.Clear();
+                        tmp_conf.command_list.Clear();
+                        XmlNodeList ServerxnList = xmlDoc.SelectNodes("/bot_settings/server_list/server");
+                        foreach (XmlNode xn in ServerxnList)
                         {
-                            tmp_conf.name = xn["name"].InnerText;
-                            tmp_conf.nick = xn["nick"].InnerText;
-                            tmp_conf.secondary_nicks = xn["sec_nicks"].InnerText;
-                            tmp_conf.pass = xn["password"].InnerText;
-                            tmp_conf.email = xn["email"].InnerText;
-                            tmp_conf.owner = xn["owner"].InnerText;
-                            tmp_conf.port = Convert.ToInt32(xn["port"].InnerText);
-                            tmp_conf.server = xn["server_name"].InnerText;
-                            tmp_conf.chans = xn["chan_list"].InnerText;
-                            tmp_conf.chan_blacklist = xn["chan_blacklist"].InnerText;
-                            tmp_conf.ignore_list = xn["ignore_list"].InnerText;
-                            tmp_conf.user_level = Convert.ToInt32(xn["user_level"].InnerText);
-                            tmp_conf.voice_level = Convert.ToInt32(xn["voice_level"].InnerText);
-                            tmp_conf.hop_level = Convert.ToInt32(xn["hop_level"].InnerText);
-                            tmp_conf.op_level = Convert.ToInt32(xn["op_level"].InnerText);
-                            tmp_conf.sop_level = Convert.ToInt32(xn["sop_level"].InnerText);
-                            tmp_conf.founder_level = Convert.ToInt32(xn["founder_level"].InnerText);
-                            tmp_conf.owner_level = Convert.ToInt32(xn["owner_level"].InnerText);
-                            tmp_conf.default_level = Math.Min(tmp_conf.user_level, Math.Min(tmp_conf.voice_level, Math.Min(tmp_conf.hop_level, Math.Min(tmp_conf.op_level, Math.Min(tmp_conf.sop_level, Math.Min(tmp_conf.founder_level, tmp_conf.owner_level)))))) - 1;
+                            string tmp_server = xn["server_name"].InnerText;
+                            if (tmp_server.Equals(server_name))
+                            {
+                                tmp_conf.name = xn["name"].InnerText;
+                                tmp_conf.nick = xn["nick"].InnerText;
+                                tmp_conf.secondary_nicks = xn["sec_nicks"].InnerText;
+                                tmp_conf.pass = xn["password"].InnerText;
+                                tmp_conf.email = xn["email"].InnerText;
+                                tmp_conf.owner = xn["owner"].InnerText;
+                                tmp_conf.port = Convert.ToInt32(xn["port"].InnerText);
+                                tmp_conf.server = xn["server_name"].InnerText;
+                                tmp_conf.server_address = xn["server_address"].InnerText;
+                                tmp_conf.chans = xn["chan_list"].InnerText;
+                                tmp_conf.chan_blacklist = xn["chan_blacklist"].InnerText;
+                                tmp_conf.ignore_list = xn["ignore_list"].InnerText;
+                                tmp_conf.user_level = Convert.ToInt32(xn["user_level"].InnerText);
+                                tmp_conf.voice_level = Convert.ToInt32(xn["voice_level"].InnerText);
+                                tmp_conf.hop_level = Convert.ToInt32(xn["hop_level"].InnerText);
+                                tmp_conf.op_level = Convert.ToInt32(xn["op_level"].InnerText);
+                                tmp_conf.sop_level = Convert.ToInt32(xn["sop_level"].InnerText);
+                                tmp_conf.founder_level = Convert.ToInt32(xn["founder_level"].InnerText);
+                                tmp_conf.owner_level = Convert.ToInt32(xn["owner_level"].InnerText);
+                                tmp_conf.auto_connect = Convert.ToBoolean(xn["auto_connect"].InnerText);
+                                tmp_conf.default_level = Math.Min(tmp_conf.user_level, Math.Min(tmp_conf.voice_level, Math.Min(tmp_conf.hop_level, Math.Min(tmp_conf.op_level, Math.Min(tmp_conf.sop_level, Math.Min(tmp_conf.founder_level, tmp_conf.owner_level)))))) - 1;
 
-
-                            XmlDocument xmlDocModules = new XmlDocument();
-                            if (File.Exists(cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + xn["server_folder"].InnerText + Path.DirectorySeparatorChar + "modules.xml"))
-                            {
-                                xmlDocModules.Load(cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + xn["server_folder"].InnerText + Path.DirectorySeparatorChar + "modules.xml");
-                            }
-                            else
-                            {
-                                Directory.CreateDirectory(cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + xn["server_folder"]);
-                                File.Copy(cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + "Default" + Path.DirectorySeparatorChar + "modules.xml", cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + xn["server_folder"] + Path.DirectorySeparatorChar + "modules.xml");
-                                xmlDocModules.Load(cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + xn["server_folder"].InnerText + Path.DirectorySeparatorChar + "modules.xml");
-                            }
-                            xnList = xmlDocModules.SelectNodes("/modules/module");
-                            foreach (XmlNode xn_module in xnList)
-                            {
-                                if (xn_module["enabled"].InnerText == "True")
+                                XmlDocument xmlDocModules = new XmlDocument();
+                                if (File.Exists(cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + xn["server_folder"].InnerText + Path.DirectorySeparatorChar + "modules.xml"))
                                 {
-                                    List<string> tmp_list = new List<string>();
-                                    String module_name = xn_module["name"].InnerText;
-                                    String class_name = xn_module["class_name"].InnerText;
-                                    tmp_list.Add(class_name);
-                                    tmp_list.Add(module_name);
-                                    tmp_list.Add(xn_module["blacklist"].InnerText);
-
-                                    XmlNodeList optionList = xn_module.ChildNodes;
-                                    foreach (XmlNode option in optionList)
+                                    xmlDocModules.Load(cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + xn["server_folder"].InnerText + Path.DirectorySeparatorChar + "modules.xml");
+                                }
+                                else
+                                {
+                                    Directory.CreateDirectory(cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + xn["server_folder"]);
+                                    File.Copy(cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + "Default" + Path.DirectorySeparatorChar + "modules.xml", cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + xn["server_folder"] + Path.DirectorySeparatorChar + "modules.xml");
+                                    xmlDocModules.Load(cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + xn["server_folder"].InnerText + Path.DirectorySeparatorChar + "modules.xml");
+                                }
+                                xnList = xmlDocModules.SelectNodes("/modules/module");
+                                foreach (XmlNode xn_module in xnList)
+                                {
+                                    if (xn_module["enabled"].InnerText == "True")
                                     {
-                                        if (option.Name.Equals("commands"))
+                                        List<string> tmp_list = new List<string>();
+                                        String module_name = xn_module["name"].InnerText;
+                                        String class_name = xn_module["class_name"].InnerText;
+                                        tmp_list.Add(class_name);
+                                        tmp_list.Add(module_name);
+                                        tmp_list.Add(xn_module["blacklist"].InnerText);
+
+                                        XmlNodeList optionList = xn_module.ChildNodes;
+                                        foreach (XmlNode option in optionList)
                                         {
-                                            XmlNodeList Options = option.ChildNodes;
-                                            foreach (XmlNode options in Options)
+                                            if (option.Name.Equals("commands"))
                                             {
-                                                List<string> tmp2_list = new List<string>();
-                                                tmp2_list.Add(class_name);
-                                                tmp2_list.Add(options["name"].InnerText);
-                                                tmp2_list.Add(options["description"].InnerText);
-                                                tmp2_list.Add(options["triggers"].InnerText);
-                                                tmp2_list.Add(options["syntax"].InnerText);
-                                                tmp2_list.Add(options["access_level"].InnerText);
-                                                tmp2_list.Add(options["blacklist"].InnerText);
-                                                tmp2_list.Add(options["show_help"].InnerText);
-                                                tmp2_list.Add(options["spam_check"].InnerText);
-                                                tmp_conf.command_list.Add(tmp2_list);
-                                            }
-                                        }
-                                        if (option.Name.Equals("options"))
-                                        {
-                                            XmlNodeList Options = option.ChildNodes;
-                                            foreach (XmlNode options in Options)
-                                            {
-                                                switch (options["type"].InnerText)
+                                                XmlNodeList Options = option.ChildNodes;
+                                                foreach (XmlNode options in Options)
                                                 {
-                                                    case "textbox":
-                                                        tmp_list.Add(options["value"].InnerText);
-                                                        break;
-                                                    case "checkbox":
-                                                        tmp_list.Add(options["checked"].InnerText);
-                                                        break;
+                                                    List<string> tmp2_list = new List<string>();
+                                                    tmp2_list.Add(class_name);
+                                                    tmp2_list.Add(options["name"].InnerText);
+                                                    tmp2_list.Add(options["description"].InnerText);
+                                                    tmp2_list.Add(options["triggers"].InnerText);
+                                                    tmp2_list.Add(options["syntax"].InnerText);
+                                                    tmp2_list.Add(options["access_level"].InnerText);
+                                                    tmp2_list.Add(options["blacklist"].InnerText);
+                                                    tmp2_list.Add(options["show_help"].InnerText);
+                                                    tmp2_list.Add(options["spam_check"].InnerText);
+                                                    tmp_conf.command_list.Add(tmp2_list);
+                                                }
+                                            }
+                                            if (option.Name.Equals("options"))
+                                            {
+                                                XmlNodeList Options = option.ChildNodes;
+                                                foreach (XmlNode options in Options)
+                                                {
+                                                    switch (options["type"].InnerText)
+                                                    {
+                                                        case "textbox":
+                                                            tmp_list.Add(options["value"].InnerText);
+                                                            break;
+                                                        case "checkbox":
+                                                            tmp_list.Add(options["checked"].InnerText);
+                                                            break;
+                                                    }
                                                 }
                                             }
                                         }
+                                        tmp_conf.module_config.Add(tmp_list);
                                     }
-                                    tmp_conf.module_config.Add(tmp_list);
                                 }
+                                break;
                             }
-                            break;
+                        }
+                        if (tmp_conf.auto_connect)
+                        {
+                            Control control = new Control();
+                            if (tabControl1.Controls.Find("output_box_system", true).GetUpperBound(0) >= 0)
+                            {
+                                control = tabControl1.Controls.Find("output_box_system", true)[0];
+                                RichTextBox output_box = (RichTextBox)control;
+                                output_box.Name = "output_box_" + server_name + ":system";
+                                control = tabControl1.Controls.Find("tabPage1", true)[0];
+                                TabPage tabpage = (TabPage)control;
+                                tabpage.Name = "tabPage:" + server_name + ":__:system";
+                                tabpage.Text = server_name;
+                            }
+                            else if (tabControl1.Controls.Find("output_box_" + server_name + ":system", true).GetUpperBound(0) < 0)
+                            {
+                                RichTextBox box = new RichTextBox();
+                                box.Dock = System.Windows.Forms.DockStyle.Fill;
+                                box.Location = new System.Drawing.Point(3, 3);
+                                box.Name = "output_box_" + server_name + ":system";
+                                box.Size = new System.Drawing.Size(826, 347);
+                                box.ReadOnly = true;
+                                box.Text = "";
+                                TabPage tabpage = new TabPage();
+                                tabpage.Controls.Add(box);
+                                tabpage.Location = new System.Drawing.Point(4, 22);
+                                tabpage.Name = "tabPage:" + server_name + ":__:system";
+                                tabpage.Padding = new System.Windows.Forms.Padding(3);
+                                tabpage.Size = new System.Drawing.Size(832, 353);
+                                tabpage.Text = server_name;
+                                tabpage.UseVisualStyleBackColor = true;
+                                tabControl1.Controls.Add(tabpage);
+                                tabControl1.GetControl(index).TabIndex = index;
+                                tabControl1.Update();
+                                box.LinkClicked += new LinkClickedEventHandler(link_Click);
+                            }
+                            else
+                            {
+                            }
+
+                            try
+                            {
+                                tmp_conf.server_ip = Dns.GetHostAddresses(tmp_conf.server_address);
+                            }
+                            catch
+                            {
+                                tmp_conf.server_ip = null;
+                            }
+
+                            button1.Visible = true;
+                            button1.Enabled = true;
+
+                            bot bot_instance = new bot();
+                            bot_instance.worker.WorkerSupportsCancellation = true;
+                            conf.bot_instances.Add(bot_instance);
+                            conf.bot_instances[index].start_bot(this, tmp_conf);
+                            index++;
                         }
                     }
-                    Control control = new Control();
-                    string[] server = server_name.Split('.');
-                    string tmp_server_name = "No_Server_Specified";
-                    if (server.GetUpperBound(0) > 0)
+                    if (index == 0)
                     {
-                        tmp_server_name = server[1];
-                    }
-                    if (tabControl1.Controls.Find("output_box_system", true).GetUpperBound(0) >= 0)
-                    {
+                        Control control = new Control();
                         control = tabControl1.Controls.Find("output_box_system", true)[0];
                         RichTextBox output_box = (RichTextBox)control;
-                        output_box.Name = "output_box_" + tmp_server_name + ":system";
-                        control = tabControl1.Controls.Find("tabPage1", true)[0];
-                        TabPage tabpage = (TabPage)control;
-                        tabpage.Name = "tabPage:" + tmp_server_name + ":__:system";
-                        tabpage.Text = tmp_server_name;
+                        output_box.AppendText("No Servers Started");
                     }
-                    else if (tabControl1.Controls.Find("output_box_" + tmp_server_name + ":system", true).GetUpperBound(0) < 0)
-                    {
-                        RichTextBox box = new RichTextBox();
-                        box.Dock = System.Windows.Forms.DockStyle.Fill;
-                        box.Location = new System.Drawing.Point(3, 3);
-                        box.Name = "output_box_" + tmp_server_name + ":system";
-                        box.Size = new System.Drawing.Size(826, 347);
-                        box.ReadOnly = true;
-                        box.Text = "";
-                        TabPage tabpage = new TabPage();
-                        tabpage.Controls.Add(box);
-                        tabpage.Location = new System.Drawing.Point(4, 22);
-                        tabpage.Name = "tabPage:" + tmp_server_name + ":__:system";
-                        tabpage.Padding = new System.Windows.Forms.Padding(3);
-                        tabpage.Size = new System.Drawing.Size(832, 353);
-                        tabpage.Text = tmp_server_name;
-                        tabpage.UseVisualStyleBackColor = true;
-                        tabControl1.Controls.Add(tabpage);
-                        tabControl1.GetControl(index).TabIndex = index;
-                        tabControl1.Update();
-                        box.LinkClicked += new LinkClickedEventHandler(link_Click);
-                    }
-                    else
-                    {
-                    }
-
-                    try
-                    {
-                        tmp_conf.server_ip = Dns.GetHostAddresses(tmp_conf.server);
-                    }
-                    catch
-                    {
-                        tmp_conf.server_ip = null;
-                    }
-
-                    button1.Visible = true;
-                    button1.Enabled = true;
-
-                    bot bot_instance = new bot();
-                    bot_instance.worker.WorkerSupportsCancellation = true;
-                    conf.bot_instances.Add(bot_instance);
-                    conf.bot_instances[index].start_bot(this, tmp_conf);
-                    index++;
+                }
+                else
+                {
+                    Control control = new Control();
+                    control = tabControl1.Controls.Find("output_box_system", true)[0];
+                    RichTextBox output_box = (RichTextBox)control;
+                    output_box.AppendText("No Servers Specified");
                 }
             }
             else
@@ -462,7 +442,7 @@ namespace IRCBot
                 Control control = new Control();
                 control = tabControl1.Controls.Find("output_box_system", true)[0];
                 RichTextBox output_box = (RichTextBox)control;
-                output_box.AppendText("No Servers Specified");
+                output_box.AppendText("Missing Config File.");
             }
         }
 
@@ -780,24 +760,28 @@ namespace IRCBot
                             foreach (bot bot_instance in conf.bot_instances)
                             {
                                 int index = 0;
-                                foreach (List<string> nicks in bot_instance.nick_list)
+                                if (bot_instance.server_name.Equals(tmp_server_name))
                                 {
-                                    int nick_index = 0;
-                                    foreach (string nick in nicks)
+                                    foreach (List<string> nicks in bot_instance.nick_list)
                                     {
-                                        string[] sep_nick = nick.Split(':');
-                                        if (sep_nick.GetUpperBound(0) > 0)
+                                        int nick_index = 0;
+                                        foreach (string nick in nicks)
                                         {
-                                            if (sep_nick[1].Equals(nickname.ToLower()))
+                                            string[] sep_nick = nick.Split(':');
+                                            if (sep_nick.GetUpperBound(0) > 0)
                                             {
-                                                channel += "," + nicks[0];
-                                                bot_instance.nick_list[index].RemoveAt(nick_index);
-                                                break;
+                                                if (sep_nick[1].Equals(nickname, StringComparison.InvariantCultureIgnoreCase))
+                                                {
+                                                    channel += "," + nicks[0];
+                                                    bot_instance.nick_list[index].RemoveAt(nick_index);
+                                                    break;
+                                                }
                                             }
+                                            nick_index++;
                                         }
-                                        nick_index++;
+                                        index++;
                                     }
-                                    index++;
+                                    break;
                                 }
                             }
                             channel = channel.TrimStart(',');
@@ -819,21 +803,25 @@ namespace IRCBot
                             foreach (bot bot_instance in conf.bot_instances)
                             {
                                 int index = 0;
-                                foreach (List<string> nicks in bot_instance.nick_list)
+                                if (bot_instance.server_name.Equals(tmp_server_name))
                                 {
-                                    foreach (string nick in nicks)
+                                    foreach (List<string> nicks in bot_instance.nick_list)
                                     {
-                                        string[] sep_nick = nick.Split(':');
-                                        if (sep_nick.GetUpperBound(0) > 0)
+                                        foreach (string nick in nicks)
                                         {
-                                            if (sep_nick[1].Equals(nickname.ToLower()))
+                                            string[] sep_nick = nick.Split(':');
+                                            if (sep_nick.GetUpperBound(0) > 0)
                                             {
-                                                channel += "," + nicks[0];
-                                                break;
+                                                if (sep_nick[1].Equals(nickname.ToLower()))
+                                                {
+                                                    channel += "," + nicks[0];
+                                                    break;
+                                                }
                                             }
                                         }
+                                        index++;
                                     }
-                                    index++;
+                                    break;
                                 }
                             }
                             channel = channel.TrimStart(',');
@@ -1248,6 +1236,7 @@ namespace IRCBot
                         bot_instance.conf.owner = xn["owner"].InnerText;
                         bot_instance.conf.port = Convert.ToInt32(xn["port"].InnerText);
                         bot_instance.conf.server = xn["server_name"].InnerText;
+                        bot_instance.conf.server_address = xn["server_address"].InnerText;
                         bot_instance.conf.chans = xn["chan_list"].InnerText;
                         bot_instance.conf.chan_blacklist = xn["chan_blacklist"].InnerText;
                         bot_instance.conf.ignore_list = xn["ignore_list"].InnerText;
@@ -1335,7 +1324,6 @@ namespace IRCBot
         {
             int index = 0;
             string tmp_server = "No_Server_Specified";
-            string tmp_full_server = "No_Server_Specified";
             foreach (bot bot in conf.bot_instances)
             {
                 char[] charSep = new char[] { ':' };
@@ -1343,7 +1331,6 @@ namespace IRCBot
                 if (tab_name[1].Equals(bot.server_name))
                 {
                     tmp_server = bot.server_name;
-                    tmp_full_server = bot.full_server_name;
                     break;
                 }
                 else
@@ -1382,7 +1369,7 @@ namespace IRCBot
                 {
                     while (!ended)
                     {
-                        ended = end_connection(tmp_full_server);
+                        ended = end_connection(tmp_server);
                     }
                 }
 
@@ -1426,7 +1413,7 @@ namespace IRCBot
                 index = 0;
                 foreach (bot bot in conf.bot_instances)
                 {
-                    if (tmp_full_server.Equals(bot.full_server_name))
+                    if (tmp_server.Equals(bot.server_name))
                     {
                         server_found = true;
                         break;
@@ -1529,7 +1516,7 @@ namespace IRCBot
             bool server_initiated = false;
             foreach (bot bot in conf.bot_instances)
             {
-                if (bot.connected == false && bot.full_server_name.Equals(start_server_name))
+                if (bot.connected == false && bot.server_name.Equals(start_server_name))
                 {
                     server_found = true;
                     break;
@@ -1549,221 +1536,183 @@ namespace IRCBot
                 if (File.Exists(cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml"))
                 {
                     xmlDoc.Load(cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
-                }
-                else
-                {
-                    XmlNode node = xmlDoc.CreateNode(XmlNodeType.Element, "global_settings", null);
-                    XmlNode nodeCommand = xmlDoc.CreateElement("command_prefix");
-                    nodeCommand.InnerText = ".";
-                    node.AppendChild(nodeCommand);
-                    XmlNode nodeKeep = xmlDoc.CreateElement("keep_logs");
-                    nodeKeep.InnerText = "True";
-                    node.AppendChild(nodeKeep);
-                    XmlNode nodeLogs = xmlDoc.CreateElement("logs_path");
-                    nodeLogs.InnerText = cur_dir + Path.DirectorySeparatorChar + "logs" + Path.DirectorySeparatorChar + "";
-                    node.AppendChild(nodeLogs);
-                    XmlNode nodeStart = xmlDoc.CreateElement("start_with_windows");
-                    nodeStart.InnerText = "False";
-                    node.AppendChild(nodeStart);
-                    XmlNode nodeTray = xmlDoc.CreateElement("minimize_to_tray");
-                    nodeTray.InnerText = "False";
-                    node.AppendChild(nodeTray);
-                    XmlNode nodeSpamCount = xmlDoc.CreateElement("spam_count");
-                    nodeSpamCount.InnerText = "5";
-                    node.AppendChild(nodeSpamCount);
-                    XmlNode nodeSpamThreshold = xmlDoc.CreateElement("spam_threshold");
-                    nodeSpamThreshold.InnerText = "1000";
-                    node.AppendChild(nodeSpamThreshold);
-                    XmlNode nodeSpamTime = xmlDoc.CreateElement("spam_timeout");
-                    nodeSpamTime.InnerText = "10000";
-                    node.AppendChild(nodeSpamTime);
-                    XmlNode nodeSpamMaxMsgLength = xmlDoc.CreateElement("max_message_length");
-                    nodeSpamMaxMsgLength.InnerText = "450";
-                    node.AppendChild(nodeSpamMaxMsgLength);
-                    xmlDoc.AppendChild(node);
-                    xmlDoc.Save(cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
-                    xmlDoc.Load(cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
-                }
-                Control control = new Control();
-                string[] server = start_server_name.Split('.');
-                string tmp_server_name = "No_Server_Specified";
-                if (server.GetUpperBound(0) > 0)
-                {
-                    tmp_server_name = server[1];
-                }
-                if (tabControl1.Controls.Find("output_box_system", true).GetUpperBound(0) >= 0)
-                {
-                    control = tabControl1.Controls.Find("output_box_system", true)[0];
-                    RichTextBox output_box = (RichTextBox)control;
-                    output_box.Name = "output_box_" + tmp_server_name + ":system";
-                    control = tabControl1.Controls.Find("tabPage1", true)[0];
-                    TabPage tabpage = (TabPage)control;
-                    tabpage.Name = "tabPage:" + tmp_server_name + ":__:system";
-                    tabpage.Text = tmp_server_name;
-                }
-                else if (tabControl1.Controls.Find("output_box_" + tmp_server_name + ":system", true).GetUpperBound(0) < 0)
-                {
-                    RichTextBox box = new RichTextBox();
-                    box.Dock = System.Windows.Forms.DockStyle.Fill;
-                    box.Location = new System.Drawing.Point(3, 3);
-                    box.Name = "output_box_" + tmp_server_name + ":system";
-                    box.Size = new System.Drawing.Size(826, 347);
-                    box.ReadOnly = true;
-                    box.Text = "";
-                    TabPage tabpage = new TabPage();
-                    tabpage.Controls.Add(box);
-                    tabpage.Location = new System.Drawing.Point(4, 22);
-                    tabpage.Name = "tabPage:" + tmp_server_name + ":__:system";
-                    tabpage.Padding = new System.Windows.Forms.Padding(3);
-                    tabpage.Size = new System.Drawing.Size(832, 353);
-                    tabpage.Text = tmp_server_name;
-                    tabpage.UseVisualStyleBackColor = true;
-                    tabControl1.Controls.Add(tabpage);
-                    tabControl1.GetControl(index).TabIndex = index;
-                    tabControl1.Update();
-                    box.LinkClicked += new LinkClickedEventHandler(link_Click);
-                }
-                else
-                {
-                }
-                IRCConfig tmp_conf = new IRCConfig();
-                tmp_conf.module_config = new List<List<string>>();
-                tmp_conf.spam_check = new List<spam_info>();
-                tmp_conf.command_list = new List<List<string>>();
-                XmlNode list = xmlDoc.SelectSingleNode("/bot_settings/global_settings");
-
-                tmp_conf.command = list["command_prefix"].InnerText;
-                tmp_conf.keep_logs = list["keep_logs"].InnerText;
-                if (Directory.Exists(list["logs_path"].InnerText))
-                {
-                    tmp_conf.logs_path = list["logs_path"].InnerText;
-                }
-                else
-                {
-                    tmp_conf.logs_path = cur_dir + Path.DirectorySeparatorChar + "logs";
-                }
-                tmp_conf.spam_count_max = Convert.ToInt32(list["spam_count"].InnerText);
-                tmp_conf.spam_threshold = Convert.ToInt32(list["spam_threshold"].InnerText);
-                tmp_conf.spam_timout = Convert.ToInt32(list["spam_timeout"].InnerText);
-                tmp_conf.max_message_length = Convert.ToInt32(list["max_message_length"].InnerText);
-                tmp_conf.minimize_to_tray = Convert.ToBoolean(list["minimize_to_tray"].InnerText);
-
-                XmlNodeList ServerxnList = xmlDoc.SelectNodes("/bot_settings/server_list/server");
-                foreach (XmlNode xn in ServerxnList)
-                {
-                    string tmp_server = xn["server_name"].InnerText;
-                    if (tmp_server.Equals(start_server_name))
+                    Control control = new Control();
+                    string tmp_server_name = start_server_name;
+                    if (tabControl1.Controls.Find("output_box_system", true).GetUpperBound(0) >= 0)
                     {
-                        tmp_conf.name = xn["name"].InnerText;
-                        tmp_conf.nick = xn["nick"].InnerText;
-                        tmp_conf.secondary_nicks = xn["sec_nicks"].InnerText;
-                        tmp_conf.pass = xn["password"].InnerText;
-                        tmp_conf.email = xn["email"].InnerText;
-                        tmp_conf.owner = xn["owner"].InnerText;
-                        tmp_conf.port = Convert.ToInt32(xn["port"].InnerText);
-                        tmp_conf.server = xn["server_name"].InnerText;
-                        tmp_conf.chans = xn["chan_list"].InnerText;
-                        tmp_conf.chan_blacklist = xn["chan_blacklist"].InnerText;
-                        tmp_conf.ignore_list = xn["ignore_list"].InnerText;
-                        tmp_conf.user_level = Convert.ToInt32(xn["user_level"].InnerText);
-                        tmp_conf.voice_level = Convert.ToInt32(xn["voice_level"].InnerText);
-                        tmp_conf.hop_level = Convert.ToInt32(xn["hop_level"].InnerText);
-                        tmp_conf.op_level = Convert.ToInt32(xn["op_level"].InnerText);
-                        tmp_conf.sop_level = Convert.ToInt32(xn["sop_level"].InnerText);
-                        tmp_conf.founder_level = Convert.ToInt32(xn["founder_level"].InnerText);
-                        tmp_conf.owner_level = Convert.ToInt32(xn["owner_level"].InnerText);
-                        tmp_conf.default_level = Math.Min(tmp_conf.user_level, Math.Min(tmp_conf.voice_level, Math.Min(tmp_conf.hop_level, Math.Min(tmp_conf.op_level, Math.Min(tmp_conf.sop_level, Math.Min(tmp_conf.founder_level, tmp_conf.owner_level)))))) - 1;
+                        control = tabControl1.Controls.Find("output_box_system", true)[0];
+                        RichTextBox output_box = (RichTextBox)control;
+                        output_box.Name = "output_box_" + tmp_server_name + ":system";
+                        control = tabControl1.Controls.Find("tabPage1", true)[0];
+                        TabPage tabpage = (TabPage)control;
+                        tabpage.Name = "tabPage:" + tmp_server_name + ":__:system";
+                        tabpage.Text = tmp_server_name;
+                    }
+                    else if (tabControl1.Controls.Find("output_box_" + tmp_server_name + ":system", true).GetUpperBound(0) < 0)
+                    {
+                        RichTextBox box = new RichTextBox();
+                        box.Dock = System.Windows.Forms.DockStyle.Fill;
+                        box.Location = new System.Drawing.Point(3, 3);
+                        box.Name = "output_box_" + tmp_server_name + ":system";
+                        box.Size = new System.Drawing.Size(826, 347);
+                        box.ReadOnly = true;
+                        box.Text = "";
+                        TabPage tabpage = new TabPage();
+                        tabpage.Controls.Add(box);
+                        tabpage.Location = new System.Drawing.Point(4, 22);
+                        tabpage.Name = "tabPage:" + tmp_server_name + ":__:system";
+                        tabpage.Padding = new System.Windows.Forms.Padding(3);
+                        tabpage.Size = new System.Drawing.Size(832, 353);
+                        tabpage.Text = tmp_server_name;
+                        tabpage.UseVisualStyleBackColor = true;
+                        tabControl1.Controls.Add(tabpage);
+                        tabControl1.GetControl(index).TabIndex = index;
+                        tabControl1.Update();
+                        box.LinkClicked += new LinkClickedEventHandler(link_Click);
+                    }
+                    else
+                    {
+                    }
+                    IRCConfig tmp_conf = new IRCConfig();
+                    tmp_conf.module_config = new List<List<string>>();
+                    tmp_conf.spam_check = new List<spam_info>();
+                    tmp_conf.command_list = new List<List<string>>();
+                    XmlNode list = xmlDoc.SelectSingleNode("/bot_settings/global_settings");
+
+                    tmp_conf.command = list["command_prefix"].InnerText;
+                    tmp_conf.keep_logs = list["keep_logs"].InnerText;
+                    if (Directory.Exists(list["logs_path"].InnerText))
+                    {
+                        tmp_conf.logs_path = list["logs_path"].InnerText;
+                    }
+                    else
+                    {
+                        tmp_conf.logs_path = cur_dir + Path.DirectorySeparatorChar + "logs";
+                    }
+                    tmp_conf.spam_count_max = Convert.ToInt32(list["spam_count"].InnerText);
+                    tmp_conf.spam_threshold = Convert.ToInt32(list["spam_threshold"].InnerText);
+                    tmp_conf.spam_timout = Convert.ToInt32(list["spam_timeout"].InnerText);
+                    tmp_conf.max_message_length = Convert.ToInt32(list["max_message_length"].InnerText);
+                    tmp_conf.minimize_to_tray = Convert.ToBoolean(list["minimize_to_tray"].InnerText);
+
+                    XmlNodeList ServerxnList = xmlDoc.SelectNodes("/bot_settings/server_list/server");
+                    foreach (XmlNode xn in ServerxnList)
+                    {
+                        string tmp_server = xn["server_name"].InnerText;
+                        if (tmp_server.Equals(start_server_name))
+                        {
+                            tmp_conf.name = xn["name"].InnerText;
+                            tmp_conf.nick = xn["nick"].InnerText;
+                            tmp_conf.secondary_nicks = xn["sec_nicks"].InnerText;
+                            tmp_conf.pass = xn["password"].InnerText;
+                            tmp_conf.email = xn["email"].InnerText;
+                            tmp_conf.owner = xn["owner"].InnerText;
+                            tmp_conf.port = Convert.ToInt32(xn["port"].InnerText);
+                            tmp_conf.server = xn["server_name"].InnerText;
+                            tmp_conf.server_address = xn["server_address"].InnerText;
+                            tmp_conf.chans = xn["chan_list"].InnerText;
+                            tmp_conf.chan_blacklist = xn["chan_blacklist"].InnerText;
+                            tmp_conf.ignore_list = xn["ignore_list"].InnerText;
+                            tmp_conf.user_level = Convert.ToInt32(xn["user_level"].InnerText);
+                            tmp_conf.voice_level = Convert.ToInt32(xn["voice_level"].InnerText);
+                            tmp_conf.hop_level = Convert.ToInt32(xn["hop_level"].InnerText);
+                            tmp_conf.op_level = Convert.ToInt32(xn["op_level"].InnerText);
+                            tmp_conf.sop_level = Convert.ToInt32(xn["sop_level"].InnerText);
+                            tmp_conf.founder_level = Convert.ToInt32(xn["founder_level"].InnerText);
+                            tmp_conf.owner_level = Convert.ToInt32(xn["owner_level"].InnerText);
+                            tmp_conf.default_level = Math.Min(tmp_conf.user_level, Math.Min(tmp_conf.voice_level, Math.Min(tmp_conf.hop_level, Math.Min(tmp_conf.op_level, Math.Min(tmp_conf.sop_level, Math.Min(tmp_conf.founder_level, tmp_conf.owner_level)))))) - 1;
 
 
-                        XmlDocument xmlDocModules = new XmlDocument();
-                        if (File.Exists(cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + xn["server_folder"].InnerText + Path.DirectorySeparatorChar + "modules.xml"))
-                        {
-                            xmlDocModules.Load(cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + xn["server_folder"].InnerText + Path.DirectorySeparatorChar + "modules.xml");
-                        }
-                        else
-                        {
-                            Directory.CreateDirectory(cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + xn["server_folder"]);
-                            File.Copy(cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + "Default" + Path.DirectorySeparatorChar + "modules.xml", cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + xn["server_folder"] + Path.DirectorySeparatorChar + "modules.xml");
-                            xmlDocModules.Load(cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + xn["server_folder"].InnerText + Path.DirectorySeparatorChar + "modules.xml");
-                        }
-                        XmlNodeList xnList = xmlDocModules.SelectNodes("/modules/module");
-                        foreach (XmlNode xn_module in xnList)
-                        {
-                            if (xn_module["enabled"].InnerText == "True")
+                            XmlDocument xmlDocModules = new XmlDocument();
+                            if (File.Exists(cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + xn["server_folder"].InnerText + Path.DirectorySeparatorChar + "modules.xml"))
                             {
-                                List<string> tmp_list = new List<string>();
-                                String module_name = xn_module["name"].InnerText;
-                                String class_name = xn_module["class_name"].InnerText;
-                                tmp_list.Add(class_name);
-                                tmp_list.Add(module_name);
-                                tmp_list.Add(xn_module["blacklist"].InnerText);
-
-                                XmlNodeList optionList = xn_module.ChildNodes;
-                                foreach (XmlNode option in optionList)
+                                xmlDocModules.Load(cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + xn["server_folder"].InnerText + Path.DirectorySeparatorChar + "modules.xml");
+                            }
+                            else
+                            {
+                                Directory.CreateDirectory(cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + xn["server_folder"]);
+                                File.Copy(cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + "Default" + Path.DirectorySeparatorChar + "modules.xml", cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + xn["server_folder"] + Path.DirectorySeparatorChar + "modules.xml");
+                                xmlDocModules.Load(cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + xn["server_folder"].InnerText + Path.DirectorySeparatorChar + "modules.xml");
+                            }
+                            XmlNodeList xnList = xmlDocModules.SelectNodes("/modules/module");
+                            foreach (XmlNode xn_module in xnList)
+                            {
+                                if (xn_module["enabled"].InnerText == "True")
                                 {
-                                    if (option.Name.Equals("commands"))
+                                    List<string> tmp_list = new List<string>();
+                                    String module_name = xn_module["name"].InnerText;
+                                    String class_name = xn_module["class_name"].InnerText;
+                                    tmp_list.Add(class_name);
+                                    tmp_list.Add(module_name);
+                                    tmp_list.Add(xn_module["blacklist"].InnerText);
+
+                                    XmlNodeList optionList = xn_module.ChildNodes;
+                                    foreach (XmlNode option in optionList)
                                     {
-                                        XmlNodeList Options = option.ChildNodes;
-                                        foreach (XmlNode options in Options)
+                                        if (option.Name.Equals("commands"))
                                         {
-                                            List<string> tmp2_list = new List<string>();
-                                            tmp2_list.Add(class_name);
-                                            tmp2_list.Add(options["name"].InnerText);
-                                            tmp2_list.Add(options["description"].InnerText);
-                                            tmp2_list.Add(options["triggers"].InnerText);
-                                            tmp2_list.Add(options["syntax"].InnerText);
-                                            tmp2_list.Add(options["access_level"].InnerText);
-                                            tmp2_list.Add(options["blacklist"].InnerText);
-                                            tmp2_list.Add(options["show_help"].InnerText);
-                                            tmp2_list.Add(options["spam_check"].InnerText);
-                                            tmp_conf.command_list.Add(tmp2_list);
-                                        }
-                                    }
-                                    if (option.Name.Equals("options"))
-                                    {
-                                        XmlNodeList Options = option.ChildNodes;
-                                        foreach (XmlNode options in Options)
-                                        {
-                                            switch (options["type"].InnerText)
+                                            XmlNodeList Options = option.ChildNodes;
+                                            foreach (XmlNode options in Options)
                                             {
-                                                case "textbox":
-                                                    tmp_list.Add(options["value"].InnerText);
-                                                    break;
-                                                case "checkbox":
-                                                    tmp_list.Add(options["checked"].InnerText);
-                                                    break;
+                                                List<string> tmp2_list = new List<string>();
+                                                tmp2_list.Add(class_name);
+                                                tmp2_list.Add(options["name"].InnerText);
+                                                tmp2_list.Add(options["description"].InnerText);
+                                                tmp2_list.Add(options["triggers"].InnerText);
+                                                tmp2_list.Add(options["syntax"].InnerText);
+                                                tmp2_list.Add(options["access_level"].InnerText);
+                                                tmp2_list.Add(options["blacklist"].InnerText);
+                                                tmp2_list.Add(options["show_help"].InnerText);
+                                                tmp2_list.Add(options["spam_check"].InnerText);
+                                                tmp_conf.command_list.Add(tmp2_list);
+                                            }
+                                        }
+                                        if (option.Name.Equals("options"))
+                                        {
+                                            XmlNodeList Options = option.ChildNodes;
+                                            foreach (XmlNode options in Options)
+                                            {
+                                                switch (options["type"].InnerText)
+                                                {
+                                                    case "textbox":
+                                                        tmp_list.Add(options["value"].InnerText);
+                                                        break;
+                                                    case "checkbox":
+                                                        tmp_list.Add(options["checked"].InnerText);
+                                                        break;
+                                                }
                                             }
                                         }
                                     }
+                                    tmp_conf.module_config.Add(tmp_list);
                                 }
-                                tmp_conf.module_config.Add(tmp_list);
                             }
+                            server_initiated = true;
+                            break;
                         }
-                        server_initiated = true;
-                        break;
                     }
-                }
-                if (server_initiated)
-                {
-                    button1.Visible = true;
-                    button1.Enabled = true;
-
-                    try
+                    if (server_initiated)
                     {
-                        tmp_conf.server_ip = Dns.GetHostAddresses(tmp_conf.server);
-                    }
-                    catch
-                    {
-                        tmp_conf.server_ip = null;
-                    }
+                        button1.Visible = true;
+                        button1.Enabled = true;
 
-                    bot bot_instance = new bot();
-                    bot_instance.worker.WorkerSupportsCancellation = true;
-                    conf.bot_instances.Add(bot_instance);
-                    conf.bot_instances[conf.bot_instances.Count - 1].start_bot(this, tmp_conf);
-                    connectToolStripMenuItem.Enabled = true;
-                    connectToolStripMenuItem.Text = "Disconnect";
-                    tabControl1.SelectedIndex = tabControl1.TabPages.IndexOfKey("tabPage:" + tmp_server_name + ":__:system");
+                        try
+                        {
+                            tmp_conf.server_ip = Dns.GetHostAddresses(tmp_conf.server);
+                        }
+                        catch
+                        {
+                            tmp_conf.server_ip = null;
+                        }
+
+                        bot bot_instance = new bot();
+                        bot_instance.worker.WorkerSupportsCancellation = true;
+                        conf.bot_instances.Add(bot_instance);
+                        conf.bot_instances[conf.bot_instances.Count - 1].start_bot(this, tmp_conf);
+                        connectToolStripMenuItem.Enabled = true;
+                        connectToolStripMenuItem.Text = "Disconnect";
+                        tabControl1.SelectedIndex = tabControl1.TabPages.IndexOfKey("tabPage:" + tmp_server_name + ":__:system");
+                    }
                 }
             }
             return server_initiated;
@@ -1775,11 +1724,11 @@ namespace IRCBot
             int index = 0;
             foreach (bot bot in conf.bot_instances)
             {
-                if ((bot.connected == true || bot.connecting == true) && bot.full_server_name.Equals(start_server_name))
+                if ((bot.connected == true || bot.connecting == true) && bot.server_name.Equals(start_server_name))
                 {
                     server_terminated = true;
                     bot.disconnected = true;
-                    bot.worker.CancelAsync();
+                    bot.restart = false;
                     input_box.Enabled = false;
                     send_button.Enabled = false;
                     bot.worker.CancelAsync();
@@ -1794,7 +1743,7 @@ namespace IRCBot
         {
             foreach (bot bot in conf.bot_instances)
             {
-                if (bot.connected == true && bot.full_server_name.Equals(input_server_name))
+                if (bot.connected == true && bot.server_name.Equals(input_server_name))
                 {
                     return bot.connected;
                 }

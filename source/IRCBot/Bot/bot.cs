@@ -730,9 +730,17 @@ namespace IRCBot
                         bot_state = pre_state;
                         break;
                     case 4: // identify state
-                        sendData("PRIVMSG", "NickServ :Identify " + conf.pass);
-                        pre_state = bot_state;
-                        bot_state = 5;
+                        if (!conf.pass.Equals(string.Empty))
+                        {
+                            sendData("PRIVMSG", "NickServ :Identify " + conf.pass);
+                            pre_state = bot_state;
+                            bot_state = 5;
+                        }
+                        else
+                        {
+                            pre_state = bot_state;
+                            bot_state = 6;
+                        }
                         break;
                     case 5: // wait 
                         line = read_queue();

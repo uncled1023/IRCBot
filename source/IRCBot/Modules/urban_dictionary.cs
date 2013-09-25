@@ -10,7 +10,7 @@ namespace IRCBot.Modules
 {
     class urban_dictionary : Module
     {
-        public override void control(bot ircbot, ref IRCConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, ref BotConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
             string module_name = ircbot.conf.module_config[module_id][0];
             if (type.Equals("channel") && bot_command == true)
@@ -85,7 +85,7 @@ namespace IRCBot.Modules
             }
         }
 
-        private void get_ud(string search, string channel, bot ircbot, IRCConfig conf, int conf_id)
+        private void get_ud(string search, string channel, bot ircbot, BotConfig conf, int conf_id)
         {
             string URL = "http://www.urbandictionary.com/define.php?term=";
             List<KeyValuePair<string, string>> ret = new List<KeyValuePair<string, string>>();

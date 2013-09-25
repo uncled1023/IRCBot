@@ -54,14 +54,14 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.input_box.Location = new System.Drawing.Point(12, 412);
             this.input_box.Name = "input_box";
-            this.input_box.Size = new System.Drawing.Size(763, 20);
+            this.input_box.Size = new System.Drawing.Size(806, 20);
             this.input_box.TabIndex = 1;
             this.input_box.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.input_box_KeyPress);
             // 
             // send_button
             // 
             this.send_button.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.send_button.Location = new System.Drawing.Point(781, 412);
+            this.send_button.Location = new System.Drawing.Point(824, 412);
             this.send_button.Name = "send_button";
             this.send_button.Size = new System.Drawing.Size(71, 20);
             this.send_button.TabIndex = 2;
@@ -78,7 +78,7 @@
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.menuStrip1.Size = new System.Drawing.Size(864, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(907, 24);
             this.menuStrip1.TabIndex = 3;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -141,18 +141,19 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(832, 353);
+            this.tabPage1.Size = new System.Drawing.Size(875, 353);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "System";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
             // output_box_system
             // 
+            this.output_box_system.BackColor = System.Drawing.Color.White;
             this.output_box_system.Dock = System.Windows.Forms.DockStyle.Fill;
             this.output_box_system.Location = new System.Drawing.Point(3, 3);
             this.output_box_system.Name = "output_box_system";
             this.output_box_system.ReadOnly = true;
-            this.output_box_system.Size = new System.Drawing.Size(826, 347);
+            this.output_box_system.Size = new System.Drawing.Size(869, 347);
             this.output_box_system.TabIndex = 0;
             this.output_box_system.Text = "";
             // 
@@ -165,7 +166,7 @@
             this.tabControl1.Location = new System.Drawing.Point(12, 27);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(840, 379);
+            this.tabControl1.Size = new System.Drawing.Size(883, 379);
             this.tabControl1.TabIndex = 4;
             this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_MouseClick);
             this.tabControl1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.tabControl1_MouseClick);
@@ -174,7 +175,7 @@
             // 
             this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.button1.Image = ((System.Drawing.Image)(resources.GetObject("button1.Image")));
-            this.button1.Location = new System.Drawing.Point(832, 1);
+            this.button1.Location = new System.Drawing.Point(875, 1);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(20, 20);
             this.button1.TabIndex = 1;
@@ -185,7 +186,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(864, 444);
+            this.ClientSize = new System.Drawing.Size(907, 444);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.send_button);

@@ -14,7 +14,7 @@ namespace IRCBot.Modules
 {
     class google : Module
     {
-        public override void control(bot ircbot, ref IRCConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, ref BotConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
             string module_name = ircbot.conf.module_config[module_id][0];
             if (type.Equals("channel") && bot_command == true)
@@ -86,7 +86,7 @@ namespace IRCBot.Modules
 
                                                                 if (conf.module_config[module_id][3].Equals("True"))
                                                                 {
-                                                                    ircbot.sendData("PRIVMSG", line[2] + " :" + searchType.url);
+                                                                    ircbot.sendData("PRIVMSG", line[2] + " :" + HttpUtility.UrlDecode(searchType.url));
                                                                 }
                                                                 break;
                                                             }

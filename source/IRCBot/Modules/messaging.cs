@@ -9,7 +9,7 @@ namespace IRCBot.Modules
 {
     class messaging : Module
     {
-        public override void control(bot ircbot, ref IRCConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, ref BotConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
             string module_name = ircbot.conf.module_config[module_id][0];
             if (type.Equals("channel") || type.Equals("query") && bot_command == true)
@@ -95,15 +95,19 @@ namespace IRCBot.Modules
         }
         private void add_message(string nick, string[] line, string channel, bot ircbot)
         {
-            string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "messaging" + Path.DirectorySeparatorChar + ircbot.server_name + "_messages.txt";
+            string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "messaging" + Path.DirectorySeparatorChar + ircbot.conf.server + "_messages.txt";
             char[] charS = new char[] { ' ' };
             string[] tmp = line[4].Split(charS, 2);
-            string to_nick = tmp[0].ToLower();
+            string to_nick = tmp[0];
             string add_line = nick + "*" + to_nick + "*" + DateTime.Now.ToString("MMMM d, yyyy h:mm:ss tt") + "*";
             bool found_nick = false;
             if (tmp.GetUpperBound(0) >= 1)
             {
                 add_line += tmp[1];
+                if (!Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "messaging"))
+                {
+                    Directory.CreateDirectory(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "messaging");
+                }
                 if (File.Exists(list_file))
                 {
                     string[] old_file = System.IO.File.ReadAllLines(list_file);
@@ -145,7 +149,7 @@ namespace IRCBot.Modules
 
         public void find_message(string nick, bot ircbot)
         {
-            string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "messaging" + Path.DirectorySeparatorChar + ircbot.server_name + "_messages.txt";
+            string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "messaging" + Path.DirectorySeparatorChar + ircbot.conf.server + "_messages.txt";
             if (File.Exists(list_file))
             {
                 string[] old_file = System.IO.File.ReadAllLines(list_file);

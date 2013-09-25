@@ -26,7 +26,7 @@ namespace IRCBot.Modules
         private bot main;
         public List<hbomb_info> hbombs = new List<hbomb_info>();
 
-        public override void control(bot ircbot, ref IRCConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, ref BotConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
             string module_name = ircbot.conf.module_config[module_id][0];
             if (type.Equals("channel") && bot_command == true)
@@ -137,7 +137,7 @@ namespace IRCBot.Modules
                                                     tmp_info.previous_bomb_holder = nick;
                                                     tmp_info.bomb_holder = nick;
 
-                                                    ircbot.sendData("PRIVMSG", channel + " :" + nick + " has started the timer!  If the bomb gets passed to you, type " + conf.command + "pass <nick> to pass it to someone else, or type " + conf.command + "defuse <color> to try to defuse it.");
+                                                    ircbot.sendData("PRIVMSG", channel + " :" + nick + " has started the timer!  If the bomb gets passed to you, type " + ircbot.ircbot.irc_conf.command + "pass <nick> to pass it to someone else, or type " + ircbot.ircbot.irc_conf.command + "defuse <color> to try to defuse it.");
                                                     string colors = "";
                                                     foreach (string wire in tmp_info.wire_colors)
                                                     {
@@ -220,7 +220,7 @@ namespace IRCBot.Modules
                                                         {
                                                             if (line.GetUpperBound(0) > 3)
                                                             {
-                                                                if (line[4].Trim().Equals(conf.nick, StringComparison.InvariantCultureIgnoreCase))
+                                                                if (line[4].Trim().Equals(ircbot.nick, StringComparison.InvariantCultureIgnoreCase))
                                                                 {
                                                                     ircbot.sendData("PRIVMSG", channel + " :" + nick + ", you can't pass it to me!");
                                                                 }
@@ -291,7 +291,7 @@ namespace IRCBot.Modules
                                             {
                                                 if (line.GetUpperBound(0) > 3)
                                                 {
-                                                    if (line[4].Trim().Equals(conf.nick, StringComparison.InvariantCultureIgnoreCase))
+                                                    if (line[4].Trim().Equals(ircbot.nick, StringComparison.InvariantCultureIgnoreCase))
                                                     {
                                                         ircbot.sendData("PRIVMSG", channel + " :" + nick + ", you can't pass it to me!");
                                                     }
@@ -348,7 +348,7 @@ namespace IRCBot.Modules
                                             {
                                                 if (line.GetUpperBound(0) > 3)
                                                 {
-                                                    if (line[4].Trim().Equals(conf.nick, StringComparison.InvariantCultureIgnoreCase))
+                                                    if (line[4].Trim().Equals(ircbot.nick, StringComparison.InvariantCultureIgnoreCase))
                                                     {
                                                         ircbot.sendData("PRIVMSG", channel + " :" + nick + ", you can't pass it to me!");
                                                     }
@@ -370,7 +370,7 @@ namespace IRCBot.Modules
                                                 {
                                                     tmp_info.bomb_locked = true;
                                                 }
-
+                                                hbombs[index] = tmp_info;
                                             }
                                             else
                                             {
@@ -643,12 +643,12 @@ namespace IRCBot.Modules
             }
         }
 
-        private void pass_hbomb(string pass_nick, string channel, string nick, bot ircbot, IRCConfig conf, ref hbomb_info tmp_info, int index)
+        private void pass_hbomb(string pass_nick, string channel, string nick, bot ircbot, BotConfig conf, ref hbomb_info tmp_info, int index)
         {
             string tab_name = channel.TrimStart('#');
             string pattern = "[^a-zA-Z0-9]"; //regex pattern
             tab_name = Regex.Replace(tab_name, pattern, "_");
-            string file_name = ircbot.server_name + "_#" + tab_name + ".log";
+            string file_name = ircbot.conf.server + "_#" + tab_name + ".log";
             bool nick_idle = true;
 
             if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "seen" + Path.DirectorySeparatorChar + file_name))
@@ -685,7 +685,7 @@ namespace IRCBot.Modules
                 tmp_info.previous_bomb_holder = nick;
                 hbombs[index] = tmp_info;
                 ircbot.sendData("PRIVMSG", channel + " :" + nick + " passed the bomb to " + pass_nick);
-                ircbot.sendData("NOTICE", pass_nick + " :You now have the bomb!  Type " + conf.command + "pass <nick> to pass it to someone else, or type " + conf.command + "defuse <color> to try to defuse it.");
+                ircbot.sendData("NOTICE", pass_nick + " :You now have the bomb!  Type " + ircbot.ircbot.irc_conf.command + "pass <nick> to pass it to someone else, or type " + ircbot.ircbot.irc_conf.command + "defuse <color> to try to defuse it.");
                 string colors = "";
                 foreach (string wire in tmp_info.wire_colors)
                 {

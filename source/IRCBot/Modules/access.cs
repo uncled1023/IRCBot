@@ -9,7 +9,7 @@ namespace IRCBot.Modules
 {
     class access : Module
     {
-        public override void control(bot ircbot, ref IRCConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, ref BotConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
             string module_name = ircbot.conf.module_config[module_id][0];
             if ((type.Equals("channel") || type.Equals("query")) && bot_command == true)
@@ -68,7 +68,7 @@ namespace IRCBot.Modules
                                                 {
                                                     if (Convert.ToInt32(parse[2]) <= nick_access)
                                                     {
-                                                        set_access_list(parse[0].Trim().ToLower(), parse[1], parse[2], ircbot);
+                                                        set_access_list(parse[0].Trim(), parse[1], parse[2], ircbot);
                                                         ircbot.sendData("NOTICE", nick + " :" + parse[0].Trim() + " has been added to access level " + parse[2]);
                                                     }
                                                     else
@@ -80,7 +80,7 @@ namespace IRCBot.Modules
                                                 {
                                                     if (Convert.ToInt32(parse[1]) <= nick_access)
                                                     {
-                                                        set_access_list(parse[0].Trim().ToLower(), line[2], parse[1], ircbot);
+                                                        set_access_list(parse[0].Trim(), line[2], parse[1], ircbot);
                                                         ircbot.sendData("NOTICE", nick + " :" + parse[0].Trim() + " has been added to access level " + parse[1]);
                                                     }
                                                     else
@@ -117,7 +117,7 @@ namespace IRCBot.Modules
                                                 {
                                                     if (Convert.ToInt32(parse[2]) <= nick_access)
                                                     {
-                                                        del_access_list(parse[0].Trim().ToLower(), parse[1], parse[2], ircbot);
+                                                        del_access_list(parse[0].Trim(), parse[1], parse[2], ircbot);
                                                         ircbot.sendData("NOTICE", nick + " :" + parse[0].Trim() + " has been removed from access level " + parse[2]);
                                                     }
                                                     else
@@ -129,7 +129,7 @@ namespace IRCBot.Modules
                                                 {
                                                     if (Convert.ToInt32(parse[1]) <= nick_access)
                                                     {
-                                                        del_access_list(parse[0].Trim().ToLower(), line[2], parse[1], ircbot);
+                                                        del_access_list(parse[0].Trim(), line[2], parse[1], ircbot);
                                                         ircbot.sendData("NOTICE", nick + " :" + parse[0].Trim() + " has been removed from access level " + parse[1]);
                                                     }
                                                     else
@@ -186,15 +186,15 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                string[] new_line = line[4].ToLower().Split(' ');
+                                                string[] new_line = line[4].Split(' ');
                                                 if (new_line.GetUpperBound(0) > 0 && new_line[0].StartsWith("#"))
                                                 {
-                                                    int viewed_access = ircbot.get_user_access(new_line[1].Trim().ToLower(), new_line[0].Trim());
+                                                    int viewed_access = ircbot.get_user_access(new_line[1].Trim(), new_line[0].Trim());
                                                     ircbot.sendData("NOTICE", nick + " :" + new_line[1].Trim() + " has access level " + viewed_access.ToString());
                                                 }
                                                 else if (type.Equals("channel"))
                                                 {
-                                                    int viewed_access = ircbot.get_user_access(line[4].Trim().ToLower(), channel);
+                                                    int viewed_access = ircbot.get_user_access(line[4].Trim(), channel);
                                                     ircbot.sendData("NOTICE", nick + " :" + line[4].Trim() + " has access level " + viewed_access.ToString());
                                                 }
                                                 else
@@ -222,7 +222,7 @@ namespace IRCBot.Modules
 
         public void list_access_list(string nick, string channel, bot ircbot)
         {
-            string file_name = ircbot.server_name + "_list.txt";
+            string file_name = ircbot.conf.server + "_list.txt";
 
             if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "access" + Path.DirectorySeparatorChar + file_name))
             {
@@ -266,7 +266,7 @@ namespace IRCBot.Modules
 
         public void set_access_list(string nick, string channel, string access, bot ircbot)
         {
-            string file_name = ircbot.server_name + "_list.txt";
+            string file_name = ircbot.conf.server + "_list.txt";
             DateTime current_date = DateTime.Now;
 
             if (Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "access" + Path.DirectorySeparatorChar + "") == false)
@@ -369,7 +369,7 @@ namespace IRCBot.Modules
 
         public string get_access_list(string nick, string channel, bot ircbot)
         {
-            string file_name = ircbot.server_name + "_list.txt";
+            string file_name = ircbot.conf.server + "_list.txt";
             string access = "";
 
             if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "access" + Path.DirectorySeparatorChar + file_name))
@@ -398,7 +398,7 @@ namespace IRCBot.Modules
 
         public void del_access_list(string nick, string channel, string access, bot ircbot)
         {
-            string file_name = ircbot.server_name + "_list.txt";
+            string file_name = ircbot.conf.server + "_list.txt";
             DateTime current_date = DateTime.Now;
 
             if (Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "access" + Path.DirectorySeparatorChar + "") == false)

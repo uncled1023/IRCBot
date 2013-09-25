@@ -12,7 +12,7 @@ namespace IRCBot.Modules
 {
     class wolfram_alpha : Module
     {
-        public override void control(bot ircbot, ref IRCConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, ref BotConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
             string module_name = ircbot.conf.module_config[module_id][0];
             if (type.Equals("channel") && bot_command == true)
@@ -87,7 +87,7 @@ namespace IRCBot.Modules
             }
         }
 
-        private void get_wa(string search, string channel, bot ircbot, IRCConfig conf, int conf_id)
+        private void get_wa(string search, string channel, bot ircbot, BotConfig conf, int conf_id)
         {
             string URL = "http://api.wolframalpha.com/v2/query?input=" + System.Web.HttpUtility.UrlEncode(search) + "&appid=" + conf.module_config[conf_id][3] + "&format=plaintext";
             XmlNodeList xnList = null;

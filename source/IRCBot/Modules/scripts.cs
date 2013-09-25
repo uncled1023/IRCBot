@@ -17,7 +17,7 @@ namespace IRCBot.Modules
         private ScriptRuntime pyRuntime = null;
         private ScriptScope pyScope = null;
 
-        public void scripts_control(string[] line, bot ircbot, IRCConfig conf, int conf_id, int nick_access, string nick, string channel, string event_type)
+        public void scripts_control(string[] line, bot ircbot, BotConfig conf, int conf_id, int nick_access, string nick, string channel, string event_type)
         {
             if (pyEngine == null)
             {

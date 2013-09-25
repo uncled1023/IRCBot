@@ -10,7 +10,7 @@ namespace IRCBot.Modules
 {
     class seen : Module
     {
-        public override void control(bot ircbot, ref IRCConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, ref BotConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
             string module_name = ircbot.conf.module_config[module_id][0];
             if (type.Equals("channel") && bot_command == true)
@@ -93,7 +93,7 @@ namespace IRCBot.Modules
             string tab_name = channel.TrimStart('#');
             string pattern = "[^a-zA-Z0-9]"; //regex pattern
             tab_name = Regex.Replace(tab_name, pattern, "_");
-            string file_name = ircbot.server_name + "_#" + tab_name + ".log";
+            string file_name = ircbot.conf.server + "_#" + tab_name + ".log";
             bool nick_found = false;
             if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "seen" + Path.DirectorySeparatorChar + file_name))
             {
@@ -107,7 +107,7 @@ namespace IRCBot.Modules
                         string[] new_line = line.Split(sep, 4);
                         if (new_line.GetUpperBound(0) > 0)
                         {
-                            if (new_line[0].Equals(nick, StringComparison.InvariantCultureIgnoreCase) && new_line[1].Equals(channel))
+                            if (new_line[0].Equals(nick, StringComparison.InvariantCultureIgnoreCase) && new_line[1].Equals(channel, StringComparison.InvariantCultureIgnoreCase))
                             {
                                 DateTime current_date = DateTime.Now;
                                 DateTime past_date = DateTime.Parse(new_line[2]);
@@ -166,31 +166,31 @@ namespace IRCBot.Modules
             string file_name = "";
             if (channel.StartsWith("#"))
             {
-                file_name = ircbot.server_name + "_#" + tab_name + ".log";
+                file_name = ircbot.conf.server + "_#" + tab_name + ".log";
                 DateTime current_date = DateTime.Now;
                 string msg = "";
-                line[1] = line[1].ToLower();
-                if (line[1].Equals("quit"))
+                line[1] = line[1];
+                if (line[1].Equals("quit", StringComparison.InvariantCultureIgnoreCase))
                 {
                     msg = "quitting";
                 }
-                else if (line[1].Equals("join"))
+                else if (line[1].Equals("join", StringComparison.InvariantCultureIgnoreCase))
                 {
                     msg = "joining " + channel;
                 }
-                else if (line[1].Equals("part"))
+                else if (line[1].Equals("part", StringComparison.InvariantCultureIgnoreCase))
                 {
                     msg = "leaving " + channel;
                 }
-                else if (line[1].Equals("kick"))
+                else if (line[1].Equals("kick", StringComparison.InvariantCultureIgnoreCase))
                 {
                     msg = "getting kicked from " + channel;
                 }
-                else if (line[1].Equals("mode"))
+                else if (line[1].Equals("mode", StringComparison.InvariantCultureIgnoreCase))
                 {
                     msg = "setting mode " + " in " + channel;
                 }
-                else if (line[1].Equals("privmsg"))
+                else if (line[1].Equals("privmsg", StringComparison.InvariantCultureIgnoreCase))
                 {
                     if (line.GetUpperBound(0) > 3)
                     {
@@ -223,7 +223,7 @@ namespace IRCBot.Modules
                             string[] new_line = lines.Split(sep, 4);
                             if (new_line.GetUpperBound(0) > 0)
                             {
-                                if (new_line[0].Equals(nick, StringComparison.InvariantCultureIgnoreCase) && new_line[1].Equals(channel))
+                                if (new_line[0].Equals(nick, StringComparison.InvariantCultureIgnoreCase) && new_line[1].Equals(channel, StringComparison.InvariantCultureIgnoreCase))
                                 {
                                     new_file.Add(new_line[0] + "*" + new_line[1] + "*" + current_date.ToString("yyyy-MM-dd HH:mm:ss") + "*" + msg);
                                     nick_found = true;

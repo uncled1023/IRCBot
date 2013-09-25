@@ -11,14 +11,14 @@ namespace IRCBot.Modules
     class alarm : Module
     {
         private List<System.Timers.Timer> alarms;
-        private IRCConfig tmp_conf;
+        private BotConfig tmp_conf;
 
         public alarm()
         {
             alarms = new List<System.Timers.Timer>();
         }
 
-        public override void control(bot ircbot, ref IRCConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, ref BotConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
             access access = new access();
 
@@ -96,7 +96,7 @@ namespace IRCBot.Modules
                                                     {
                                                         char[] charSplit = new char[] { ' ' };
                                                         string[] ex = new_line[1].Split(charSplit);
-                                                        if (ex[0].TrimStart(Convert.ToChar(conf.command)).Equals("alarm"))
+                                                        if (ex[0].TrimStart(Convert.ToChar(ircbot.ircbot.irc_conf.command)).Equals("alarm"))
                                                         {
                                                             if (type.Equals("channel"))
                                                             {
@@ -178,10 +178,10 @@ namespace IRCBot.Modules
 
         public void ring_alarm(object sender, EventArgs e, bot ircbot, string nick, string full_nick, int nick_access, string channel, string type, string msg)
         {
-            IRCConfig conf = tmp_conf;
+            BotConfig conf = tmp_conf;
             System.Timers.Timer alarm_trigger = (System.Timers.Timer)sender;
             alarm_trigger.Enabled = false;
-            if (msg.StartsWith(conf.command))
+            if (msg.StartsWith(ircbot.ircbot.irc_conf.command))
             {
                 bool bot_command = true;
                 string line = "";
@@ -237,7 +237,7 @@ namespace IRCBot.Modules
                                 string[] nodes = blacklist_node.Split(sepSpace, StringSplitOptions.RemoveEmptyEntries);
                                 foreach (string node in nodes)
                                 {
-                                    if (node.Equals(nick, StringComparison.InvariantCultureIgnoreCase) || node.ToLower().TrimStart('#').Equals(channel.ToLower().TrimStart('#')))
+                                    if (node.Equals(nick, StringComparison.InvariantCultureIgnoreCase) || node.TrimStart('#').Equals(channel.TrimStart('#')))
                                     {
                                         module_allowed = false;
                                         break;
@@ -250,7 +250,7 @@ namespace IRCBot.Modules
                             }
                             if (module_allowed == true)
                             {
-                                module.control(ircbot, ref conf, index, ex, ex[3].TrimStart(':').TrimStart(Convert.ToChar(conf.command)), nick_access, nick, channel, bot_command, type);
+                                module.control(ircbot, ref conf, index, ex, ex[3].TrimStart(':').TrimStart(Convert.ToChar(ircbot.ircbot.irc_conf.command)), nick_access, nick, channel, bot_command, type);
                             }
                         }
                     }

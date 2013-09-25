@@ -38,7 +38,7 @@ namespace IRCBot.Modules
             myBot.isAcceptingUserInput = true;
         }
 
-        public override void control(bot ircbot, ref IRCConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, ref BotConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
             string module_name = ircbot.conf.module_config[module_id][0];
             if (type.Equals("channel") && bot_command == true)
@@ -136,7 +136,7 @@ namespace IRCBot.Modules
                     bool me_in = false;
                     foreach (string word in words)
                     {
-                        if (word.ToLower().Contains(conf.nick.ToLower()))
+                        if (word.Contains(conf.nick))
                         {
                             me_in = true;
                             break;

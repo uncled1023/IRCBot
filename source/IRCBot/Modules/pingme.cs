@@ -9,7 +9,7 @@ namespace IRCBot.Modules
     class pingme : Module
     {
         private List<List<string>> ping_list = new List<List<string>>();
-        public override void control(bot ircbot, ref IRCConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, ref BotConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
             string module_name = ircbot.conf.module_config[module_id][0];
             if (type.Equals("channel") && bot_command == true)
@@ -99,8 +99,29 @@ namespace IRCBot.Modules
                         {
                             DateTime current_time = DateTime.Now;
                             DateTime ping_time = Convert.ToDateTime(ping_list[x][2]);
-                            string dif_time = current_time.Subtract(ping_time).ToString();
-                            ircbot.sendData("PRIVMSG", ping_list[x][1] + " :" + nick + ", your ping is " + dif_time);
+                            TimeSpan dif_time = current_time.Subtract(ping_time);
+                            string time_string = "";
+                            if (dif_time.Days > 0)
+                            {
+                                time_string += dif_time.Days.ToString() + " Days, ";
+                            }
+                            if (dif_time.Hours > 0)
+                            {
+                                time_string += dif_time.Hours.ToString() + " Hours, ";
+                            }
+                            if (dif_time.Minutes > 0)
+                            {
+                                time_string += dif_time.Minutes.ToString() + " Minutes, ";
+                            }
+                            if (dif_time.Seconds > 0)
+                            {
+                                time_string += dif_time.Seconds.ToString() + " Seconds, ";
+                            }
+                            if (dif_time.Milliseconds > 0)
+                            {
+                                time_string += dif_time.Milliseconds.ToString() + " Milliseconds";
+                            }
+                            ircbot.sendData("PRIVMSG", ping_list[x][1] + " :" + nick + ", your ping is " + time_string.Trim().TrimEnd(','));
                             ping_list.RemoveAt(x);
                             break;
                         }

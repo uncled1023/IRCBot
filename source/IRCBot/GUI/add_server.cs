@@ -164,7 +164,7 @@ namespace IRCBot
                     nodeignore_list.InnerText = ignore_list_box.Text;
                     node.AppendChild(nodeignore_list);
                     XmlNode nodeauto_connect = xmlDoc.CreateElement("auto_connect");
-                    nodeauto_connect.InnerText = auto_connect.ToString();
+                    nodeauto_connect.InnerText = auto_connect.Checked.ToString();
                     node.AppendChild(nodeauto_connect);
                     XmlNode nodeuser_level = xmlDoc.CreateElement("user_level");
                     nodeuser_level.InnerText = user_level_box.Text;

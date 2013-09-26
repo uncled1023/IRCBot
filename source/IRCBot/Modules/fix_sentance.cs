@@ -66,23 +66,27 @@ namespace IRCBot.Modules
 
                         Regex line_reg = new Regex(pattern, reg_options);
                         string result = "";
-                        if (recurse)
+                        bool found = line_reg.IsMatch(past_line);
+                        if (found)
                         {
-                            result = line_reg.Replace(past_line, replace);
-                        }
-                        else
-                        {
-                            result = line_reg.Replace(past_line, replace, 1);
-                        }
-                        for (int x = 0; x < nick_logs.Count(); x++)
-                        {
-                            if (nick_logs[x][0].Equals(channel) && nick_logs[x][1].Equals(nick, StringComparison.InvariantCultureIgnoreCase))
+                            if (recurse)
                             {
-                                nick_logs[x][2] = result;
-                                break;
+                                result = line_reg.Replace(past_line, replace);
                             }
+                            else
+                            {
+                                result = line_reg.Replace(past_line, replace, 1);
+                            }
+                            for (int x = 0; x < nick_logs.Count(); x++)
+                            {
+                                if (nick_logs[x][0].Equals(channel) && nick_logs[x][1].Equals(nick, StringComparison.InvariantCultureIgnoreCase))
+                                {
+                                    nick_logs[x][2] = result;
+                                    break;
+                                }
+                            }
+                            ircbot.sendData("PRIVMSG", channel + " :[" + nick + "] " + result);
                         }
-                        ircbot.sendData("PRIVMSG", channel + " :[" + nick + "] " + result);
                     }
                     else
                     {

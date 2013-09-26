@@ -127,16 +127,39 @@ namespace IRCBot
 
         public void restart_server()
         {
+            checkRegisterationTimer = new System.Windows.Forms.Timer();
+            Spam_Check_Timer = new System.Windows.Forms.Timer();
+            Spam_Threshold_Check = new System.Windows.Forms.Timer();
+            Spam_Timers = new List<timer_info>();
+            check_cancel = new System.Windows.Forms.Timer();
+            connected = false;
+            connecting = true;
+            disconnected = true;
+            worker = new BackgroundWorker();
+            worker.WorkerSupportsCancellation = true;
+
+            shouldRun = true;
+            first_run = true;
+            nick_list = new List<List<string>>();
+            channel_list = new List<string>();
+
             connecting = true;
             cur_dir = ircbot.cur_dir;
             nick = conf.nick;
 
+            Spam_Check_Timer.Tick += new EventHandler(spam_tick);
             Spam_Check_Timer.Interval = ircbot.irc_conf.spam_threshold;
             Spam_Check_Timer.Start();
 
+            Spam_Threshold_Check.Tick += new EventHandler(spam_check);
+            Spam_Threshold_Check.Interval = 100;
+            Spam_Threshold_Check.Start();
+
+            checkRegisterationTimer.Tick += new EventHandler(checkRegistration);
             checkRegisterationTimer.Interval = 120000;
             checkRegisterationTimer.Enabled = true;
 
+            check_cancel.Tick += new EventHandler(cancel_tick);
             check_cancel.Interval = 500;
             check_cancel.Start();
 
@@ -149,40 +172,55 @@ namespace IRCBot
             worker.RunWorkerAsync(2000);
         }
 
-        public bool check_connection()
+        [DllImport("wininet.dll")]
+        private extern static bool InternetGetConnectedState(out int Description, int ReservedValue);
+        bool IsConnectedToInternet()
         {
-            bool conn_open = true;
-            if (IRCConnection.Client.Connected == true)
+            bool a;
+            int xs;
+            a = InternetGetConnectedState(out xs, 0);
+            return a;
+        }
+
+        public void check_connection(object sender, DoWorkEventArgs e)
+        {
+            bool is_connected = true;
+            while (shouldRun && is_connected)
             {
-                if (IRCConnection.Client.Poll(0, SelectMode.SelectRead))
+                Thread.Sleep(1000);
+                is_connected = IsConnectedToInternet();
+
+                if (is_connected && shouldRun)
                 {
-                    byte[] buff = new byte[1];
-                    if (IRCConnection.Client.Receive(buff, SocketFlags.Peek) == 0)
+                    Socket s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                    try
                     {
-                        // Client disconnected
-                        conn_open = false;
+                        s.Connect(conf.server_address, conf.port);
+                    }
+                    catch
+                    {
+                        is_connected = false;
                     }
                 }
-            }
-            else
-            {
-                conn_open = false;
-            }
 
-            Socket s = new Socket(AddressFamily.InterNetwork,
-            SocketType.Stream,
-            ProtocolType.Tcp);
-
-            try
-            {
-                s.Connect(conf.server_ip[0], conf.port);
+                if (!is_connected || !shouldRun)
+                {
+                    check_cancel.Stop();
+                    connected = false;
+                    connecting = false;
+                    if (sr != null)
+                        sr.Close();
+                    if (sw != null)
+                        sw.Close();
+                    if (ns != null)
+                        ns.Close();
+                    if (IRCConnection != null)
+                        IRCConnection.Close();
+                    restart = true;
+                    restart_attempts++;
+                    shouldRun = false;
+                }
             }
-            catch
-            {
-                conn_open = false;
-            }
-
-            return conn_open;
         }
        
         public void load_modules()
@@ -322,7 +360,11 @@ namespace IRCBot
                 ns.Close();
             if (IRCConnection != null)
                 IRCConnection.Close();
+
             checkRegisterationTimer.Stop();
+            Spam_Check_Timer.Stop();
+            Spam_Threshold_Check.Stop();
+            check_cancel.Stop();
 
             if (restart == true)
             {
@@ -383,12 +425,22 @@ namespace IRCBot
 
             if (restart == false)
             {
+                BackgroundWorker work = new BackgroundWorker();
+                work.WorkerSupportsCancellation = true;
+                work.DoWork += (sender, e) => save_stream(sender, e);
+
+                BackgroundWorker check_connect = new BackgroundWorker();
+                check_connect.WorkerSupportsCancellation = true;
+                check_connect.DoWork += (sender, e) => check_connection(sender, e);
+
                 try
                 {
+                    IRCConnection.NoDelay = true;
                     ns = IRCConnection.GetStream();
                     sr = new StreamReader(ns);
                     sw = new StreamWriter(ns);
                     sw.AutoFlush = true;
+                    
                     if (conf.pass != "")
                     {
                         sendData("PASS", conf.pass);
@@ -401,6 +453,9 @@ namespace IRCBot
                     {
                         sendData("USER", nick + " default_host default_server :" + conf.name);
                     }
+
+                    work.RunWorkerAsync(2000);
+                    check_connect.RunWorkerAsync(2000);
 
                     IRCWork(bw);
                 }
@@ -416,6 +471,8 @@ namespace IRCBot
                 }
                 finally
                 {
+                    work.CancelAsync();
+                    check_connect.CancelAsync();
                     connecting = false;
                     connected = false;
                     if (sr != null)
@@ -598,6 +655,8 @@ namespace IRCBot
                     {
                         ircbot.log_error(ex);
                     }
+                    restart = true;
+                    restart_attempts++;
                     shouldRun = false;
                 }
             }
@@ -646,10 +705,6 @@ namespace IRCBot
             connecting = false;
             disconnected = false;
 
-            BackgroundWorker work = new BackgroundWorker();
-            work.DoWork += (sender, e) => save_stream(sender, e);
-            work.RunWorkerAsync(2000);
-
             string data = "";
 
             checkRegisterationTimer.Enabled = true;
@@ -663,8 +718,11 @@ namespace IRCBot
             int pre_state = 0;
             int next_state = 1;
             string line = "";
+            char[] charSeparator = new char[] { ' ' };
+            string[] ex = new string[2];
             while (shouldRun)
             {
+                Thread.Sleep(30);
                 switch (bot_state)
                 {
                     case 0: // set nick state
@@ -700,6 +758,14 @@ namespace IRCBot
                         }
                         else
                         {
+                        }
+                        ex = line.Split(charSeparator, 2, StringSplitOptions.RemoveEmptyEntries);
+                        if (ex.GetUpperBound(0) > 0)
+                        {
+                            if (ex[0] == "PING")
+                            {
+                                sendData("PONG", ex[1]);
+                            }
                         }
                         break;
                     case 2: // nick taken state
@@ -770,6 +836,11 @@ namespace IRCBot
                             checkRegisterationTimer.Enabled = true;
                             bot_state = 6;
                         }
+                        else if (line.Contains("No such nick/channel"))
+                        {
+                            checkRegisterationTimer.Enabled = true;
+                            bot_state = 6;
+                        }
                         else if (line.Contains("This nick is awaiting an e-mail verification code before completing registration."))
                         {
                             checkRegisterationTimer.Enabled = false;
@@ -777,6 +848,14 @@ namespace IRCBot
                         }
                         else
                         {
+                        }
+                        ex = line.Split(charSeparator, 2, StringSplitOptions.RemoveEmptyEntries);
+                        if (ex.GetUpperBound(0) > 1)
+                        {
+                            if (ex[0] == "PING")
+                            {
+                                sendData("PONG", ex[1]);
+                            }
                         }
                         break;
                     case 6:
@@ -794,27 +873,7 @@ namespace IRCBot
                         }
                         break;
                 }
-                if (bw.CancellationPending == false)
-                {
-                    bool is_connected = check_connection();
-                    if (is_connected == false)
-                    {
-                        connected = false;
-                        connecting = false;
-                        if (sr != null)
-                            sr.Close();
-                        if (sw != null)
-                            sw.Close();
-                        if (ns != null)
-                            ns.Close();
-                        if (IRCConnection != null)
-                            IRCConnection.Close();
-                        shouldRun = false;
-                        restart = true;
-                        restart_attempts++;
-                    }
-                }
-                else
+                if (bw.CancellationPending)
                 {
                     shouldRun = false;
                 }

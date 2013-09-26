@@ -1010,14 +1010,14 @@ namespace IRCBot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                Type myObjectType = typeof(BotConfig);
-                                                System.Reflection.FieldInfo[] fieldInfo = myObjectType.GetFields();
+                                                BotConfig myObjectType = new BotConfig();
+                                                var fields = myObjectType.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
                                                 switch (line[4])
                                                 {
                                                     case "module_config":
-                                                        foreach (System.Reflection.FieldInfo info in fieldInfo)
+                                                        foreach (System.Reflection.FieldInfo info in fields)
                                                         {
-                                                            if (info.Name.Equals("module_config"))
+                                                            if (info.Name.Replace("k__BackingField", "").Equals("<module_config>"))
                                                             {
                                                                 List<List<string>> tmp_list = (List<List<string>>)info.GetValue(conf);
                                                                 int index = 0;
@@ -1037,21 +1037,6 @@ namespace IRCBot.Modules
                                                             }
                                                         }
                                                         break;
-                                                    case "bot_instances":
-                                                        foreach (System.Reflection.FieldInfo info in fieldInfo)
-                                                        {
-                                                            if (info.Name.Equals("bot_instances"))
-                                                            {
-                                                                List<bot> tmp_list = (List<bot>)info.GetValue(conf);
-                                                                int index = 0;
-                                                                foreach (bot list in tmp_list)
-                                                                {
-                                                                    ircbot.sendData("NOTICE", nick + " :" + info.Name + "[" + index.ToString() + "]: " + list.conf.server);
-                                                                    index++;
-                                                                }
-                                                            }
-                                                        }
-                                                        break;
                                                     default:
                                                         ircbot.sendData("NOTICE", nick + " :" + nick + ", I do not understand your request.");
                                                         break;
@@ -1059,9 +1044,9 @@ namespace IRCBot.Modules
                                             }
                                             else
                                             {
-                                                Type myObjectType = typeof(BotConfig);
-                                                System.Reflection.FieldInfo[] fieldInfo = myObjectType.GetFields();
-                                                foreach (System.Reflection.FieldInfo info in fieldInfo)
+                                                BotConfig myObjectType = new BotConfig();
+                                                var fields = myObjectType.GetType().GetFields(BindingFlags.NonPublic| BindingFlags.Public | BindingFlags.Instance);
+                                                foreach (var info in fields)
                                                 {
                                                     if (info.GetValue(conf).ToString().Equals("System.Net.IPAddress[]"))
                                                     {
@@ -1069,18 +1054,23 @@ namespace IRCBot.Modules
                                                         int index = 0;
                                                         foreach (System.Net.IPAddress list in tmp_list)
                                                         {
-                                                            ircbot.sendData("NOTICE", nick + " :" + info.Name + "[" + index.ToString() + "]: " + list.ToString());
+                                                            ircbot.sendData("NOTICE", nick + " :" + info.Name.Replace("k__BackingField", "") + "[" + index.ToString() + "]: " + list.ToString());
                                                             index++;
                                                         }
                                                     }
-                                                    else if (info.Name.Equals("command_list"))
+                                                    else if (info.Name.Replace("k__BackingField", "").Equals("<command_list>"))
                                                     {
                                                         List<List<string>> tmp_list = (List<List<string>>)info.GetValue(conf);
-                                                        ircbot.sendData("NOTICE", nick + " :" + info.Name + ": " + tmp_list.Count().ToString());
+                                                        ircbot.sendData("NOTICE", nick + " :" + info.Name.Replace("k__BackingField", "") + ": " + tmp_list.Count().ToString());
+                                                    }
+                                                    else if (info.Name.Replace("k__BackingField", "").Equals("<module_config>"))
+                                                    {
+                                                        List<List<string>> tmp_list = (List<List<string>>)info.GetValue(conf);
+                                                        ircbot.sendData("NOTICE", nick + " :" + info.Name.Replace("k__BackingField", "") + ": " + tmp_list.Count().ToString());
                                                     }
                                                     else
                                                     {
-                                                        ircbot.sendData("NOTICE", nick + " :" + info.Name + ": " + info.GetValue(conf).ToString());
+                                                        ircbot.sendData("NOTICE", nick + " :" + info.Name.Replace("k__BackingField", "") + ": " + info.GetValue(conf).ToString());
                                                     }
                                                 }
                                             }

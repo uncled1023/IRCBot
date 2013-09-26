@@ -155,6 +155,7 @@ namespace IRCBot
             {
                 ShowInTaskbar = true;
                 this.WindowState = FormWindowState.Normal;
+                MyNotifyIcon.Visible = true;
             }
         }
 
@@ -208,7 +209,7 @@ namespace IRCBot
                 XmlNodeList xnList = xmlDoc.SelectNodes("/bot_settings/server_list/server");
                 foreach (XmlNode xn in xnList)
                 {
-                    server_started = connect(xn["server_name"].InnerText);
+                    server_started = connect(xn["server_name"].InnerText, false);
                     if (server_started)
                     {
                         index++;
@@ -219,14 +220,7 @@ namespace IRCBot
                     Control control = new Control();
                     control = tabControl1.Controls.Find("output_box_system", true)[0];
                     RichTextBox output_box = (RichTextBox)control;
-                    output_box.AppendText("No Servers Specified");
-                }
-                if (!server_started)
-                {
-                    Control control = new Control();
-                    control = tabControl1.Controls.Find("output_box_system", true)[0];
-                    RichTextBox output_box = (RichTextBox)control;
-                    output_box.AppendText("No Servers Specified");
+                    output_box.AppendText("No Servers Specified for Auto Start");
                 }
             }
             else
@@ -238,7 +232,7 @@ namespace IRCBot
             }
         }
 
-        public bool connect(string server_name)
+        public bool connect(string server_name, bool manual)
         {
             bool server_initiated = false;
             int index = 0;
@@ -343,7 +337,7 @@ namespace IRCBot
                                 bot_conf.module_config.Add(tmp_list);
                             }
                         }
-                        if (bot_conf.auto_connect)
+                        if (bot_conf.auto_connect || manual)
                         {
                             Control control = new Control();
                             if (tabControl1.Controls.Find("output_box_system", true).GetUpperBound(0) >= 0)
@@ -629,7 +623,7 @@ namespace IRCBot
                     Control control = tabControl1.Controls.Find("output_box_" + tmp_server_name + ":system", true)[0];
                     char[] charSeparator = new char[] { ' ' };
                     string[] tmp_lines = text.Split(charSeparator, 4);
-                    string time_stamp = DateTime.Now.ToString("hh:mm tt");
+                    string time_stamp = DateTime.Now.ToString("hh:mm:ss tt");
                     string date_stamp = DateTime.Now.ToString("yyyy-MM-dd");
                     string font_color = "#000000";
                     if (tmp_lines.GetUpperBound(0) > 1)
@@ -1443,10 +1437,10 @@ namespace IRCBot
         private void connectToolStripMenuItem_Click(object sender, EventArgs e)
         {
             int index = 0;
+            char[] charSep = new char[] { ':' };
+            string[] tab_name = tabControl1.SelectedTab.Name.ToString().Split(charSep, 3);
             foreach (bot bot in irc_conf.bot_instances)
             {
-                char[] charSep = new char[] { ':' };
-                string[] tab_name = tabControl1.SelectedTab.Name.ToString().Split(charSep, 3);
                 if (tab_name[1].Equals(bot.conf.server))
                 {
                     break;
@@ -1458,20 +1452,28 @@ namespace IRCBot
             }
             if (connectToolStripMenuItem.Text.Equals("Disconnect"))
             {
-                irc_conf.bot_instances[index].shouldRun = false;
-                irc_conf.bot_instances[index].worker.CancelAsync();
-                connectToolStripMenuItem.Text = "Connect";
-                send_button.Enabled = false;
-                input_box.Enabled = false;
+                if (irc_conf.bot_instances[index].worker.IsBusy)
+                {
+                    bool closed = end_connection(tab_name[1]);
+                    if (closed)
+                    {
+                        connectToolStripMenuItem.Text = "Connect";
+                        send_button.Enabled = false;
+                        input_box.Enabled = false;
+                    }
+                }
             }
             else
             {
                 if (!irc_conf.bot_instances[index].worker.IsBusy)
                 {
-                    irc_conf.bot_instances[index].worker.RunWorkerAsync(2000);
-                    connectToolStripMenuItem.Text = "Disconnect";
-                    send_button.Enabled = true;
-                    input_box.Enabled = true;
+                    bool started = start_connection(tab_name[1]);
+                    if (started)
+                    {
+                        connectToolStripMenuItem.Text = "Disconnect";
+                        send_button.Enabled = true;
+                        input_box.Enabled = true;
+                    }
                 }
             }
         }
@@ -1509,7 +1511,7 @@ namespace IRCBot
             }
             else
             {
-                server_initiated = connect(start_server_name);
+                server_initiated = connect(start_server_name, true);
             }
             return server_initiated;
         }
@@ -1525,6 +1527,7 @@ namespace IRCBot
                     server_terminated = true;
                     bot.disconnected = true;
                     bot.restart = false;
+                    bot.worker.CancelAsync();
                     input_box.Enabled = false;
                     send_button.Enabled = false;
                     bot.worker.CancelAsync();

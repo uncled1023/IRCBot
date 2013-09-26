@@ -285,7 +285,7 @@ namespace IRCBot.Modules
                                                 string re = @"<a [^>]+>(.*?)<\/a>(.*?)";
                                                 if (!post_message.Equals(string.Empty))
                                                 {
-                                                    ircbot.sendData("PRIVMSG", channel + " :" + Regex.Replace(post_message.Trim().TrimEnd('|').Trim(), re, "$1"));
+                                                    ircbot.sendData("PRIVMSG", channel + " :" + Regex.Replace(post_message.Replace("<wbr>", "").Trim().TrimEnd('|').Trim(), re, "$1"));
                                                 }
                                                 break;
                                             }

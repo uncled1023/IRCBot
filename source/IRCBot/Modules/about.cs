@@ -78,27 +78,30 @@ namespace IRCBot.Modules
                                             }
                                             if (conf.module_config[module_id][5].Equals("True"))
                                             {
-                                                response += " My owner" + owner_num + " ";
-                                                if (owners.GetUpperBound(0) > 1)
+                                                if (owners.GetUpperBound(0) > 0)
                                                 {
-                                                    int index = 0;
-                                                    foreach (string owner in owners)
+                                                    response += " My owner" + owner_num + " ";
+                                                    if (owners.GetUpperBound(0) > 1)
                                                     {
-                                                        response += owner;
-                                                        if (index == owners.GetUpperBound(0) - 1)
+                                                        int index = 0;
+                                                        foreach (string owner in owners)
                                                         {
-                                                            response += ", and ";
+                                                            response += owner;
+                                                            if (index == owners.GetUpperBound(0) - 1)
+                                                            {
+                                                                response += ", and ";
+                                                            }
+                                                            else if (index < owners.GetUpperBound(0))
+                                                            {
+                                                                response += ", ";
+                                                            }
+                                                            index++;
                                                         }
-                                                        else if(index < owners.GetUpperBound(0))
-                                                        {
-                                                            response += ", ";
-                                                        }
-                                                        index++;
                                                     }
-                                                }
-                                                else
-                                                {
-                                                    response += conf.owner.TrimStart(',').TrimEnd(',').Replace(",", " and ");
+                                                    else
+                                                    {
+                                                        response += conf.owner.TrimStart(',').TrimEnd(',').Replace(",", " and ");
+                                                    }
                                                 }
                                             }
                                             if (type.Equals("channel"))

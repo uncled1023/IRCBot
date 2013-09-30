@@ -33,7 +33,7 @@ namespace IRCBot.Modules
                 }
                 try
                 {
-                    Regex regex = new Regex("(((https?|ftp|file)://|www\\.)([A-Z0-9.-:]{1,})\\.[0-9A-Z?;~&#=\\-_\\./]{2,})", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                    Regex regex = new Regex("(((https?|ftp|file)://|www\\.)([A-Z0-9.\\-:]{1,})\\.[0-9A-Z?;~&#=\\-_\\./]{2,})", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
                     //get the first match
                     MatchCollection matches = regex.Matches(text);

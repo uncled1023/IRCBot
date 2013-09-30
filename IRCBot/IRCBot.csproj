@@ -248,6 +248,14 @@
     <Content Include="Bot.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties BuildVersion_BuildVersioningStyle="None.None.Increment.Increment" BuildVersion_BuildAction="Build" BuildVersion_AssemblyInfoFilename="..\..\..\..\..\Documents\GitHub\IRCBot\IRCBot\Properties\AssemblyInfo.cs" />
+    </VisualStudio>
+  </ProjectExtensions>
+  <PropertyGroup>
+    <PostBuildEvent>$(ProjectDir)util\ProjectBuildCounter.exe $(ProjectDir)properties\AssemblyInfo.cs B</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

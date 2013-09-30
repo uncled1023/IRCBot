@@ -118,6 +118,7 @@
     <Compile Include="GUI\add_server.Designer.cs">
       <DependentUpon>add_server.cs</DependentUpon>
     </Compile>
+    <Compile Include="GUI\invite.cs" />
     <Compile Include="Modules\4chan.cs" />
     <Compile Include="lib\json.cs" />
     <Compile Include="Modules\about.cs" />

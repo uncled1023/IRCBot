@@ -491,7 +491,7 @@ namespace IRCBot
             string input_tmp = input_box.Text;
             char[] charSeparator = new char[] { ' ' };
             string[] input = input_tmp.Split(charSeparator, 2);
-            if (input[0].StartsWith("/"))
+            if (input[0].StartsWith("/") && !input[0].StartsWith("//"))
             {
                 bool bot_command = true;
                 char[] charSep = new char[] { ':' };
@@ -540,6 +540,11 @@ namespace IRCBot
             }
             else
             {
+                if (input[0].StartsWith("/"))
+                {
+                    input[0] = input[0].TrimStart('/');
+                    input[0] = "/" + input[0];
+                }
                 if (tabControl1.SelectedIndex == 0)
                 {
                     output = Environment.NewLine + tmp_server + ":" + "No channel joined. Try /join #<channel>";

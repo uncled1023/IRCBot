@@ -103,18 +103,11 @@ namespace IRCBot.Modules
             {
                 if (!nick.Equals(conf.nick, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    try
+                    string[] file;
+                    string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "Response" + Path.DirectorySeparatorChar + "dictionary.txt";
+                    if (File.Exists(list_file))
                     {
-                        string[] file;
-                        string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "Response" + Path.DirectorySeparatorChar + "dictionary.txt";
-                        if (File.Exists(list_file))
-                        {
-                            file = System.IO.File.ReadAllLines(list_file);
-                        }
-                        else
-                        {
-                            file = null;
-                        }
+                        file = System.IO.File.ReadAllLines(list_file);
 
                         string tmp_line = line[3];
                         if (line.GetUpperBound(0) > 3)
@@ -295,9 +288,13 @@ namespace IRCBot.Modules
                             }
                         }
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        ircbot.sendData("PRIVMSG", channel + " :" + ex.ToString());
+                        if (!Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "Response"))
+                        {
+                            Directory.CreateDirectory(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "Response");
+                        }
+                        File.Create(list_file);
                     }
                 }
             }

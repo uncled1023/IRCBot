@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.20827.3
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IRCBot", "IRCBot\IRCBot.csproj", "{C9C52AD9-F387-4027-8DCC-7417ACADBF29}"
 EndProject
 Global
@@ -18,10 +20,13 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		BuildVersion_UpdateAssemblyVersion = True
-		BuildVersion_UpdateFileVersion = True
-		BuildVersion_BuildAction = Build
-		BuildVersion_BuildVersioningStyle = None.None.Increment.Increment
 		BuildVersion_AssemblyInfoFilename = IRCBot\Properties\AssemblyInfo.cs
+		BuildVersion_BuildVersioningStyle = None.None.Increment.Increment
+		BuildVersion_BuildAction = Build
+		BuildVersion_UpdateFileVersion = True
+		BuildVersion_UpdateAssemblyVersion = True
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
 	EndGlobalSection
 EndGlobal

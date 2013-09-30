@@ -19,7 +19,13 @@ namespace IRCBot
             this.labelVersion.Text = String.Format("Version {0}", AssemblyVersion);
             this.labelCopyright.Text = AssemblyCopyright;
             this.labelCompanyName.Text = AssemblyCompany;
-            this.textBoxDescription.Text = AssemblyDescription;
+            this.description_box.Text = AssemblyDescription;
+            this.description_box.LinkClicked += description_box_LinkClicked;
+        }
+
+        void description_box_LinkClicked(object sender, LinkClickedEventArgs e)
+        {
+            System.Diagnostics.Process.Start(e.LinkText);
         }
 
         #region Assembly Attribute Accessors

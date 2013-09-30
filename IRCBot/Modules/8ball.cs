@@ -107,6 +107,15 @@ namespace IRCBot.Modules
             }
             else
             {
+                if (!Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "8ball"))
+                {
+                    Directory.CreateDirectory(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "8ball");
+                }
+                List<string> contents = new List<string>();
+                contents.Add("Yes");
+                contents.Add("No");
+                contents.Add("Maybe");
+                File.WriteAllLines(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "8ball" + Path.DirectorySeparatorChar + "answers.txt", contents.ToArray());
                 ircbot.sendData("PRIVMSG", channel + " :I don't know!");
             }
         }

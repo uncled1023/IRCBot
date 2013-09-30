@@ -448,6 +448,8 @@ namespace IRCBot.Modules
                         {
                             post_message += "Subject: " + subject + " | ";
                         }
+                        string quote = "<span class=\"quote\">(.*?)</span>";
+                        post_comment = Regex.Replace(post_comment, quote, "$1");
                         string[] words = post_comment.Split(' ');
                         if (words.GetUpperBound(0) > 15)
                         {
@@ -463,8 +465,6 @@ namespace IRCBot.Modules
                             post_message += " Comment: " + post_comment;
                         }
 
-                        string quote = "<span class=\"quote\">(.*?)</span>";
-                        post_message = Regex.Replace(post_message, quote, "$1");
                         string[] tmp_post = Regex.Split(post_message, "<br>");
                         post_message = "";
                         foreach (string tmp in tmp_post)
@@ -683,6 +683,8 @@ namespace IRCBot.Modules
                                 {
                                     post_message += "Subject: " + subject + " | ";
                                 }
+                                string quote = "<span class=\"quote\">(.*?)</span>";
+                                post_comment = Regex.Replace(post_comment, quote, "$1");
                                 string[] words = post_comment.Split(' ');
                                 if (words.GetUpperBound(0) > 15)
                                 {
@@ -698,8 +700,6 @@ namespace IRCBot.Modules
                                     post_message += " Comment: " + post_comment;
                                 }
 
-                                string quote = "<span class=\"quote\">(.*?)</span>";
-                                post_message = Regex.Replace(post_message, quote, "$1");
                                 string[] tmp_post = Regex.Split(post_message, "<br>");
                                 post_message = "";
                                 foreach (string tmp in tmp_post)

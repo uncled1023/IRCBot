@@ -218,9 +218,9 @@ namespace IRCBot.Modules
                                                         {
                                                             part_chan = true;
                                                             chan_found = true;
-                                                            index++;
                                                             break;
                                                         }
+                                                        index++;
                                                     }
                                                     if (part_chan == true)
                                                     {
@@ -243,9 +243,9 @@ namespace IRCBot.Modules
                                                     if (chan.Equals(channel))
                                                     {
                                                         part_chan = true;
-                                                        index++;
                                                         break;
                                                     }
+                                                    index++;
                                                 }
                                                 if (part_chan == true)
                                                 {

@@ -11,6 +11,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.IO;
 using Microsoft.Win32;
+using IWshRuntimeLibrary;
 
 namespace IRCBot
 {
@@ -23,7 +24,7 @@ namespace IRCBot
             m_parent = frmctrl;
 
             XmlDocument xmlDoc = new XmlDocument();
-            if (File.Exists(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml"))
+            if (System.IO.File.Exists(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml"))
             {
                 xmlDoc.Load(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
             }
@@ -136,15 +137,27 @@ namespace IRCBot
             node["max_message_length"].InnerText = max_message_length_box.Text;
 
             xmlDoc.Save(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
-
-            RegistryKey rkApp = Registry.CurrentUser.OpenSubKey("SOFTWARE" + Path.DirectorySeparatorChar + "Microsoft" + Path.DirectorySeparatorChar + "Windows" + Path.DirectorySeparatorChar + "CurrentVersion" + Path.DirectorySeparatorChar + "Run", true);
+            
+            string startup_loc = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
             if (windows_start_box.Checked.ToString() == "True")
             {
-                rkApp.SetValue("IRCBot", "\"" + Application.ExecutablePath.ToString() + "\"");
+                if (!System.IO.File.Exists(startup_loc + "\\IRCBot.lnk"))
+                {
+                    WshShell shell = new WshShell();
+                    IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(startup_loc + "\\IRCBot.lnk");
+                    shortcut.Description = "IRCBot";
+                    shortcut.WorkingDirectory = Path.GetDirectoryName(Application.ExecutablePath);
+                    shortcut.IconLocation = System.Reflection.Assembly.GetExecutingAssembly().Location + ", 0";
+                    shortcut.TargetPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+                    shortcut.Save();
+                }
             }
             else
             {
-                rkApp.DeleteValue("IRCBot", false);
+                if (System.IO.File.Exists(startup_loc + "\\IRCBot.lnk"))
+                {
+                    System.IO.File.Delete(startup_loc + "\\IRCBot.lnk");
+                }
             }
 
             m_parent.update_conf();

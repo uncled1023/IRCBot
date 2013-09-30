@@ -174,23 +174,13 @@ namespace IRCBot
             worker.RunWorkerAsync(2000);
         }
 
-        [DllImport("wininet.dll")]
-        private extern static bool InternetGetConnectedState(out int Description, int ReservedValue);
-        bool IsConnectedToInternet()
-        {
-            bool a;
-            int xs;
-            a = InternetGetConnectedState(out xs, 0);
-            return a;
-        }
-
         public void check_connection(object sender, DoWorkEventArgs e)
         {
             bool is_connected = true;
             while (shouldRun && is_connected)
             {
-                Thread.Sleep(1000);
-                is_connected = IsConnectedToInternet();
+                Thread.Sleep(1000); 
+                is_connected = NetworkInterface.GetIsNetworkAvailable();
 
                 if (is_connected && shouldRun)
                 {
@@ -1054,66 +1044,40 @@ namespace IRCBot
                         {
                             sw.WriteLine("WHO " + channel.TrimStart(':'));
                             line = read_queue();
-                            while (line == "")
+                            while (!line.Contains("352 " + nick + " " + channel))
                             {
                                 line = read_queue();
                             }
-                            char[] Separator = new char[] { ' ' };
-                            string[] name_line = line.Split(Separator, 5);
-                            while (name_line.GetUpperBound(0) <= 3)
+                            tmp_list.Add(channel);
+                            while (!line.Contains("315 " + nick + " " + channel + " :End of /WHO list."))
                             {
-                                line = read_queue();
-                                name_line = line.Split(Separator, 5);
-                            }
-                            while (name_line[1] != "352")
-                            {
-                                line = read_queue();
-                                name_line = line.Split(charSeparator, 5);
-                                while (name_line.GetUpperBound(0) <= 3)
+                                if (line.Contains("352 " + nick + " " + channel))
                                 {
-                                    line = read_queue();
-                                    name_line = line.Split(charSeparator, 5);
-                                }
-                            }
-                            tmp_list.Add(name_line[3]); string[] name_info = name_line[4].Split(':');
-                            if (name_info.GetUpperBound(0) > 0)
-                            {
-                                char[] sep = new char[] { ' ' };
-                                string[] info = name_info[0].Split(sep, StringSplitOptions.RemoveEmptyEntries);
-                                while (name_line[4] != ":End of /WHO list.")
-                                {
-                                    if (name_line[1] == "352")
+                                    channel_found = true;
+                                    char[] sep = new char[] { ' ' };
+                                    string[] name_line = line.Split(charSeparator, 5);
+                                    string[] name_info = name_line[4].Split(':');
+                                    string[] info = name_info[0].Split(sep, StringSplitOptions.RemoveEmptyEntries);
+                                    char[] arr = info[info.GetUpperBound(0)].ToCharArray();
+                                    int user_access = conf.user_level;
+                                    foreach (char c in arr)
                                     {
-                                        channel_found = true;
-                                        char[] arr = info[info.GetUpperBound(0)].ToCharArray();
-                                        int user_access = conf.user_level;
-                                        foreach (char c in arr)
+                                        if (c.Equals('~') || c.Equals('&') || c.Equals('@') || c.Equals('%') || c.Equals('+'))
                                         {
-                                            if (c.Equals('~') || c.Equals('&') || c.Equals('@') || c.Equals('%') || c.Equals('+'))
+                                            int tmp_access = get_access_num(c.ToString(), false);
+                                            if (tmp_access > user_access)
                                             {
-                                                int tmp_access = get_access_num(c.ToString(), false);
-                                                if (tmp_access > user_access)
-                                                {
-                                                    user_access = tmp_access;
-                                                }
+                                                user_access = tmp_access;
                                             }
                                         }
-                                        tmp_list.Add(user_access + ":" + info[info.GetUpperBound(0) - 1].TrimStart('~'));
                                     }
-                                    line = read_queue();
-                                    name_line = line.Split(charSeparator, 5);
-                                    while (name_line.GetUpperBound(0) <= 3)
-                                    {
-                                        line = read_queue();
-                                        name_line = line.Split(charSeparator, 5);
-                                    }
-                                    name_info = name_line[4].Split(':');
-                                    info = name_info[0].Split(sep, StringSplitOptions.RemoveEmptyEntries);
+                                    tmp_list.Add(user_access + ":" + info[info.GetUpperBound(0) - 1].TrimStart('~'));
                                 }
-                                if (channel_found == true)
-                                {
-                                    nick_list.Add(tmp_list);
-                                }
+                                line = read_queue();
+                            }
+                            if (channel_found == true)
+                            {
+                                nick_list.Add(tmp_list);
                             }
                         }
                     }
@@ -1620,6 +1584,37 @@ namespace IRCBot
             return access;
         }
 
+        public bool get_user_auto(string type, string channel, string tmp_nick)
+        {
+            bool auto = true;
+            if (sw != null)
+            {
+                string line = "";
+                sw.WriteLine("PRIVMSG chanserv :" + type + " " + channel + " list " + tmp_nick);
+                line = read_queue();
+                bool cont = true;
+                while (cont)
+                {
+                    if (line.Contains("No matching entries on " + channel + " " + type + " list.") || line.Contains(channel + " " + type + " list is empty."))
+                    {
+                        auto = false;
+                        cont = false;
+                    }
+                    else if (line.Contains(type + " list for " + channel))
+                    {
+                        auto = true;
+                        cont = false;
+                    }
+                    else
+                    {
+                        cont = true;
+                        line = read_queue();
+                    }
+                }
+            }
+            return auto;
+        }
+
         public bool get_user_ident(string tmp_nick)
         {
             bool identified = false;
@@ -1628,28 +1623,11 @@ namespace IRCBot
                 string line = "";
                 sw.WriteLine("PRIVMSG nickserv :STATUS " + tmp_nick);
                 line = read_queue();
-                while (line == "")
+                while (!line.Contains(":STATUS"))
                 {
                     line = read_queue();
                 }
-                char[] charSeparator = new char[] { ' ' };
-                string[] name_line = line.Split(charSeparator, 5);
-                while (name_line.GetUpperBound(0) < 4)
-                {
-                    line = read_queue();
-                    name_line = line.Split(charSeparator, 5);
-                }
-                while (name_line[3] != ":STATUS")
-                {
-                    line = read_queue();
-                    name_line = line.Split(charSeparator, 5);
-                    while (name_line.GetUpperBound(0) < 4)
-                    {
-                        line = read_queue();
-                        name_line = line.Split(charSeparator, 5);
-                    }
-                }
-                if (name_line[4].StartsWith(tmp_nick + " 3", StringComparison.InvariantCultureIgnoreCase))
+                if (line.Contains(":STATUS " + tmp_nick + " 3"))
                 {
                     identified = true;
                 }
@@ -1660,41 +1638,23 @@ namespace IRCBot
         public int get_user_op(string tmp_nick, string channel)
         {
             int new_access = conf.default_level;
-            bool nick_found = false;
             string line = "";
             if (sw != null)
             {
                 sw.WriteLine("WHO " + channel.TrimStart(':'));
                 line = read_queue();
-                while (line == "")
+                while (!line.Contains("352 " + nick + " " + channel))
                 {
                     line = read_queue();
                 }
-                char[] charSeparator = new char[] { ' ' };
                 char[] Separator = new char[] { ' ' };
-                string[] name_line = line.Split(Separator, 5);
-                while (name_line.GetUpperBound(0) <= 3)
+                while (!line.Contains("315 " + nick + " " + channel + ":End of /WHO list."))
                 {
-                    line = read_queue();
-                    name_line = line.Split(Separator, 5);
-                }
-                while (name_line[1] != "352")
-                {
-                    line = read_queue();
-                    name_line = line.Split(charSeparator, 5);
-                    while (name_line.GetUpperBound(0) <= 3)
+                    if (line.Contains("352 " + nick + " " + channel))
                     {
-                        line = read_queue();
-                        name_line = line.Split(charSeparator, 5);
-                    }
-                }
-                string[] name_info = name_line[4].Split(':');
-                if (name_info.GetUpperBound(0) > 0)
-                {
-                    char[] sep = new char[] { ' ' };
-                    string[] info = name_info[0].Split(sep, StringSplitOptions.RemoveEmptyEntries);
-                    while (name_line[4] != ":End of /WHO list.")
-                    {
+                        string[] name_line = line.Split(Separator, 5);
+                        string[] name_info = name_line[4].Split(':');
+                        string[] info = name_info[0].Split(Separator, StringSplitOptions.RemoveEmptyEntries);
                         if (info.GetUpperBound(0) - 1 >= 0)
                         {
                             if (info[info.GetUpperBound(0) - 1].TrimStart('~').Equals(tmp_nick, StringComparison.InvariantCultureIgnoreCase))
@@ -1717,24 +1677,8 @@ namespace IRCBot
                                 {
                                     new_access = conf.user_level;
                                 }
-                                nick_found = true;
+                                break;
                             }
-                        }
-                        if (nick_found == false)
-                        {
-                            line = read_queue();
-                            name_line = line.Split(charSeparator, 5);
-                            while (name_line.GetUpperBound(0) <= 3)
-                            {
-                                line = read_queue();
-                                name_line = line.Split(charSeparator, 5);
-                            }
-                            name_info = name_line[4].Split(':');
-                            info = name_info[0].Split(sep, StringSplitOptions.RemoveEmptyEntries);
-                        }
-                        else
-                        {
-                            break;
                         }
                     }
                 }

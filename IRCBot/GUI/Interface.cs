@@ -35,6 +35,7 @@ namespace IRCBot
         private System.Windows.Forms.NotifyIcon MyNotifyIcon;
         delegate void SetTextCallback(string text);
 
+        ContextMenu OutputMenu = new ContextMenu();
         ContextMenu TrayMenu = new ContextMenu();
         ContextMenu TabMenu = new ContextMenu();
 
@@ -109,12 +110,19 @@ namespace IRCBot
             control = tabControl1.Controls.Find("output_box_system", true)[0];
             RichTextBox output_box = (RichTextBox)control;
             output_box.LinkClicked += link_Click;
+            output_box.ContextMenu = OutputMenu;
+            output_box.ContextMenu.Popup += ContextMenu_Popup;
 
             MyNotifyIcon = new System.Windows.Forms.NotifyIcon();
             MyNotifyIcon.Visible = false;
             MyNotifyIcon.Icon = new System.Drawing.Icon(cur_dir + Path.DirectorySeparatorChar + "Bot.ico");
             MyNotifyIcon.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(MyNotifyIcon_MouseDoubleClick);
             MyNotifyIcon.ContextMenu = TrayMenu;
+
+            MenuItem copy_item = new MenuItem();
+            copy_item.Text = "Copy";
+            copy_item.Click += new EventHandler(copyToolStripMenuItem_Click);
+            OutputMenu.MenuItems.Add(copy_item);
 
             MenuItem config_item = new MenuItem();
             config_item.Text = "Configuration";
@@ -134,6 +142,36 @@ namespace IRCBot
             this.Icon = new System.Drawing.Icon(cur_dir + Path.DirectorySeparatorChar + "Bot.ico");
             tabControl1.SelectedIndexChanged += tab_changed;
             start_client();
+        }
+
+        void ContextMenu_Popup(object sender, EventArgs e)
+        {
+            char[] charSep = new char[] { ':' };
+            string[] tab_name = tabControl1.SelectedTab.Name.ToString().Split(charSep, 4);
+            RichTextBox control = new RichTextBox();
+            if (tab_name[2].Equals("__"))
+            {
+                control = (RichTextBox)tabControl1.Controls.Find("output_box_" + tab_name[1] + ":system", true)[0];
+            }
+            if (tab_name[2].Equals("_chan_"))
+            {
+                control = (RichTextBox)tabControl1.Controls.Find("output_box_chan_" + tab_name[1] + ":" + tab_name[3], true)[0];
+            }
+            else if (tab_name[2].Equals("_user_"))
+            {
+                control = (RichTextBox)tabControl1.Controls.Find("output_box_user_" + tab_name[1] + ":" + tab_name[3], true)[0];
+            }
+            else
+            {
+            }
+            if (control.SelectionLength == 0)
+            {
+                control.ContextMenu.MenuItems[0].Enabled = false;
+            }
+            else
+            {
+                control.ContextMenu.MenuItems[0].Enabled = true;
+            }
         }
 
         private void MyNotifyIcon_MouseDoubleClick(object sender, System.Windows.Forms.MouseEventArgs e)
@@ -361,6 +399,9 @@ namespace IRCBot
                                 box.ReadOnly = true;
                                 box.Text = "";
                                 box.HideSelection = false;
+                                box.MouseClick += new System.Windows.Forms.MouseEventHandler(output_box_system_MouseClick);
+                                box.ContextMenu = OutputMenu;
+                                box.ContextMenu.Popup += ContextMenu_Popup;
                                 TabPage tabpage = new TabPage();
                                 tabpage.Controls.Add(box);
                                 tabpage.Location = new System.Drawing.Point(4, 22);
@@ -1218,6 +1259,9 @@ namespace IRCBot
                 RichTextBox box = new RichTextBox();
                 box.Dock = System.Windows.Forms.DockStyle.Fill;
                 box.Location = new System.Drawing.Point(3, 3);
+                box.MouseClick += new System.Windows.Forms.MouseEventHandler(output_box_system_MouseClick);
+                box.ContextMenu = OutputMenu;
+                box.ContextMenu.Popup += ContextMenu_Popup;
                 if (channel[1].StartsWith("#"))
                 {
                     box.Name = "output_box_chan_" + tab_name;

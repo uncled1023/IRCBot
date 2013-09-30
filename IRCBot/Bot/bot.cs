@@ -38,6 +38,7 @@ namespace IRCBot
         private spam_info spam_list = new spam_info();
         private List<string> data_queue = new List<string>();
         private List<string> stream_queue = new List<string>();
+        private int disconnect_count = 0;
 
         public readonly object queuelock = new object();
         public readonly object streamlock = new object();
@@ -204,8 +205,18 @@ namespace IRCBot
                     }
                 }
 
-                if (!is_connected || !shouldRun)
+                if (!is_connected)
                 {
+                    disconnect_count++;
+                }
+                else
+                {
+                    disconnect_count = 0;
+                }
+
+                if (disconnect_count >= 5 || !shouldRun)
+                {
+                    disconnect_count = 0;
                     check_cancel.Stop();
                     connected = false;
                     connecting = false;
@@ -1539,13 +1550,13 @@ namespace IRCBot
             sendData("PRIVMSG", "NickServ :register " + password + " " + email);
         }
 
-        public string get_user_host(string nick)
+        public string get_user_host(string tmp_nick)
         {
             string access = "";
             string line = "";
             //sendData("ISON", nick);
             //line = sr.ReadLine();
-            string[] new_nick = nick.Split(' ');
+            string[] new_nick = tmp_nick.Split(' ');
             if (sw != null)
             {
                 sw.WriteLine("USERHOST " + new_nick[0]);
@@ -1564,7 +1575,7 @@ namespace IRCBot
                 }
                 if (name_line[3] != ":")
                 {
-                    string[] strSplit = new string[] { "=+" };
+                    string[] strSplit = new string[] { "=" };
                     string[] who_split = name_line[3].TrimStart(':').Split(strSplit, StringSplitOptions.RemoveEmptyEntries);
                     if (who_split.GetUpperBound(0) > 0)
                     {
@@ -1609,13 +1620,13 @@ namespace IRCBot
             return access;
         }
 
-        public bool get_user_ident(string nick)
+        public bool get_user_ident(string tmp_nick)
         {
             bool identified = false;
             if (sw != null)
             {
                 string line = "";
-                sw.WriteLine("PRIVMSG nickserv :STATUS " + nick);
+                sw.WriteLine("PRIVMSG nickserv :STATUS " + tmp_nick);
                 line = read_queue();
                 while (line == "")
                 {
@@ -1638,7 +1649,7 @@ namespace IRCBot
                         name_line = line.Split(charSeparator, 5);
                     }
                 }
-                if (name_line[4].StartsWith(nick + " 3", StringComparison.InvariantCultureIgnoreCase))
+                if (name_line[4].StartsWith(tmp_nick + " 3", StringComparison.InvariantCultureIgnoreCase))
                 {
                     identified = true;
                 }
@@ -1646,7 +1657,7 @@ namespace IRCBot
             return identified;
         }
 
-        public int get_user_op(string nick, string channel)
+        public int get_user_op(string tmp_nick, string channel)
         {
             int new_access = conf.default_level;
             bool nick_found = false;
@@ -1686,7 +1697,7 @@ namespace IRCBot
                     {
                         if (info.GetUpperBound(0) - 1 >= 0)
                         {
-                            if (info[info.GetUpperBound(0) - 1].TrimStart('~').Equals(nick, StringComparison.InvariantCultureIgnoreCase))
+                            if (info[info.GetUpperBound(0) - 1].TrimStart('~').Equals(tmp_nick, StringComparison.InvariantCultureIgnoreCase))
                             {
                                 bool char_found = false;
                                 char[] arr = info[info.GetUpperBound(0)].ToCharArray();
@@ -1731,18 +1742,18 @@ namespace IRCBot
             return new_access;
         }
 
-        public int get_user_access(string nick, string channel)
+        public int get_user_access(string tmp_nick, string channel)
         {
             int access_num = conf.default_level;
             try
             {
                 string access = access_num.ToString();
                 string tmp_custom_access = "";
-                if (nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase))
+                if (tmp_nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase))
                 {
                     access = conf.owner_level.ToString();
                 }
-                bool user_identified = get_user_ident(nick);
+                bool user_identified = get_user_ident(tmp_nick);
                 if (user_identified == true)
                 {
                     for (int x = 0; x < conf.module_config.Count(); x++)
@@ -1763,7 +1774,7 @@ namespace IRCBot
                                 if (channel != null)
                                 {
                                     Modules.access acc = new Modules.access();
-                                    tmp_custom_access = acc.get_access_list(nick, channel, this);
+                                    tmp_custom_access = acc.get_access_list(tmp_nick, channel, this);
                                     access = tmp_custom_access;
                                 }
                             }
@@ -1780,7 +1791,7 @@ namespace IRCBot
                             string[] lists = nick_list[x][i].Split(':');
                             if (lists.GetUpperBound(0) > 0)
                             {
-                                if (lists[1].Equals(nick, StringComparison.InvariantCultureIgnoreCase))
+                                if (lists[1].Equals(tmp_nick, StringComparison.InvariantCultureIgnoreCase))
                                 {
                                     access += "," + lists[0];
                                     break;
@@ -1795,7 +1806,7 @@ namespace IRCBot
                     string[] owners = conf.owner.Split(','); // Get list of owners
                     for (int x = 0; x <= owners.GetUpperBound(0); x++)
                     {
-                        if (nick.Equals(owners[x], StringComparison.InvariantCultureIgnoreCase))
+                        if (tmp_nick.Equals(owners[x], StringComparison.InvariantCultureIgnoreCase))
                         {
                             access += "," + conf.owner_level.ToString();
                         }
@@ -1815,7 +1826,7 @@ namespace IRCBot
                 if (access_num == conf.default_level && channel != null)
                 {
                     bool nick_found = false;
-                    access_num = get_user_op(nick, channel);
+                    access_num = get_user_op(tmp_nick, channel);
                     if (access_num != conf.default_level)
                     {
                         for (int x = 0; x < nick_list.Count(); x++)
@@ -1827,7 +1838,7 @@ namespace IRCBot
                                     string[] lists = nick_list[x][i].Split(':');
                                     if (lists.GetUpperBound(0) > 0)
                                     {
-                                        if (lists[1].Equals(nick, StringComparison.InvariantCultureIgnoreCase))
+                                        if (lists[1].Equals(tmp_nick, StringComparison.InvariantCultureIgnoreCase))
                                         {
                                             nick_found = true;
                                             string new_nick = access_num.ToString();
@@ -1842,7 +1853,7 @@ namespace IRCBot
                                 }
                                 if (nick_found == false)
                                 {
-                                    nick_list[x].Add(access_num + ":" + nick);
+                                    nick_list[x].Add(access_num + ":" + tmp_nick);
                                 }
                                 break;
                             }

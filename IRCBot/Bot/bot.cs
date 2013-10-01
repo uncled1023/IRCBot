@@ -271,7 +271,7 @@ namespace IRCBot
             if (modules_error.Count > 0)
             {
                 string msg = "";
-                foreach (string module_name in modules_loaded)
+                foreach (string module_name in modules_error)
                 {
                     msg += ", " + module_name;
                 }

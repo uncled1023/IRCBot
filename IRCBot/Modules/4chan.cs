@@ -562,13 +562,14 @@ namespace IRCBot.Modules
                             ID = "[" + ID + "]";
                         }
 
+                        string quote = "<span class=\"(.*?)\">(.*?)</span>";
+                        subject = Regex.Replace(subject, quote, "$2");
                         string post_message = "";
                         if (!subject.Equals(string.Empty))
                         {
                             post_message += "Subject: " + subject + " | ";
                         }
-                        string quote = "<span class=\"quote\">(.*?)</span>";
-                        post_comment = Regex.Replace(post_comment, quote, "$1");
+                        post_comment = Regex.Replace(post_comment, quote, "$2");
                         string[] words = post_comment.Split(' ');
                         if (words.GetUpperBound(0) > 15)
                         {
@@ -797,13 +798,14 @@ namespace IRCBot.Modules
                                     ID = "[" + ID + "]";
                                 }
 
+                                string quote = "<span class=\"(.*?)\">(.*?)</span>";
+                                subject = Regex.Replace(subject, quote, "$2");
                                 string post_message = "";
                                 if (!subject.Equals(string.Empty))
                                 {
                                     post_message += "Subject: " + subject + " | ";
                                 }
-                                string quote = "<span class=\"quote\">(.*?)</span>";
-                                post_comment = Regex.Replace(post_comment, quote, "$1");
+                                post_comment = Regex.Replace(post_comment, quote, "$2");
                                 string[] words = post_comment.Split(' ');
                                 if (words.GetUpperBound(0) > 15)
                                 {

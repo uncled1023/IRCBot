@@ -79,32 +79,80 @@ namespace IRCBot.Modules
         private void display_help(string[] line, string nick, string channel, int access, bot ircbot, BotConfig conf)
         {
             string search_term = "";
-            string msg = "";
+            string cmds = "";
             if (line.GetUpperBound(0) > 3)
             {
                 string[] new_line = line[4].Split(' ');
                 if (new_line.GetUpperBound(0) > 0)
                 {
-                    foreach (List<string> tmp_command in conf.command_list)
+                    try
                     {
-                        if (new_line[0].Equals(tmp_command[0], StringComparison.InvariantCultureIgnoreCase))
+                        int mod_num = Convert.ToInt32(new_line[0]);
+                        int index = 1;
+                        foreach (List<string> tmp_module in conf.module_config)
                         {
-                            string[] triggers = tmp_command[3].Split('|');
-                            int command_access = Convert.ToInt32(tmp_command[5]);
-                            bool show_help = Convert.ToBoolean(tmp_command[7]);
-                            if (show_help == true)
+                            if (index == mod_num)
                             {
-                                foreach (string trigger in triggers)
+                                string module_name = tmp_module[0];
+                                foreach (List<string> tmp_command in conf.command_list)
                                 {
-                                    if (access >= Convert.ToInt32(command_access))
+                                    if (module_name.Equals(tmp_command[0], StringComparison.InvariantCultureIgnoreCase))
                                     {
-                                        search_term = new_line[1].Trim();
-                                        if (search_term.Equals(trigger, StringComparison.InvariantCultureIgnoreCase))
+                                        string[] triggers = tmp_command[3].Split('|');
+                                        int command_access = Convert.ToInt32(tmp_command[5]);
+                                        bool show_help = Convert.ToBoolean(tmp_command[7]);
+                                        if (show_help == true)
                                         {
-                                            ircbot.sendData("NOTICE", nick + " :" + tmp_command[1] + " | Usage: " + ircbot.ircbot.irc_conf.command + trigger + " " + tmp_command[4] + " | Description: " + tmp_command[2]);
+                                            foreach (string trigger in triggers)
+                                            {
+                                                if (access >= Convert.ToInt32(command_access))
+                                                {
+                                                    search_term = new_line[1].Trim();
+                                                    if (search_term.Equals(trigger, StringComparison.InvariantCultureIgnoreCase))
+                                                    {
+                                                        ircbot.sendData("NOTICE", nick + " :" + tmp_command[1] + " | Usage: " + ircbot.ircbot.irc_conf.command + trigger + " " + tmp_command[4] + " | Description: " + tmp_command[2]);
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                 }
+                                break;
+                            }
+                            index++;
+                        }
+                    }
+                    catch
+                    {
+                        foreach (List<string> tmp_module in conf.module_config)
+                        {
+                            if (tmp_module[0].Equals(new_line[0], StringComparison.InvariantCultureIgnoreCase))
+                            {
+                                string module_name = tmp_module[0];
+                                foreach (List<string> tmp_command in conf.command_list)
+                                {
+                                    if (module_name.Equals(tmp_command[0], StringComparison.InvariantCultureIgnoreCase))
+                                    {
+                                        string[] triggers = tmp_command[3].Split('|');
+                                        int command_access = Convert.ToInt32(tmp_command[5]);
+                                        bool show_help = Convert.ToBoolean(tmp_command[7]);
+                                        if (show_help == true)
+                                        {
+                                            foreach (string trigger in triggers)
+                                            {
+                                                if (access >= Convert.ToInt32(command_access))
+                                                {
+                                                    search_term = new_line[1].Trim();
+                                                    if (search_term.Equals(trigger, StringComparison.InvariantCultureIgnoreCase))
+                                                    {
+                                                        ircbot.sendData("NOTICE", nick + " :" + tmp_command[1] + " | Usage: " + ircbot.ircbot.irc_conf.command + trigger + " " + tmp_command[4] + " | Description: " + tmp_command[2]);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                break;
                             }
                         }
                     }
@@ -112,53 +160,74 @@ namespace IRCBot.Modules
                 else
                 {
                     string module_name = "";
-                    int index = 0;
                     try
                     {
                         int mod_num = Convert.ToInt32(line[4]);
-                        foreach (List<string> module in conf.module_config)
+                        int index = 1;
+                        foreach (List<string> tmp_module in conf.module_config)
                         {
                             if (index == mod_num)
                             {
-                                module_name = module[1];
+                                module_name = tmp_module[0];
+                                foreach (List<string> tmp_command in conf.command_list)
+                                {
+                                    if (module_name.Equals(tmp_command[0], StringComparison.InvariantCultureIgnoreCase))
+                                    {
+                                        string[] triggers = tmp_command[3].Split('|');
+                                        int command_access = Convert.ToInt32(tmp_command[5]);
+                                        bool show_help = Convert.ToBoolean(tmp_command[7]);
+                                        if (show_help == true)
+                                        {
+                                            foreach (string trigger in triggers)
+                                            {
+                                                if (access >= Convert.ToInt32(command_access))
+                                                {
+                                                    cmds += " " + ircbot.ircbot.irc_conf.command + trigger + ",";
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                break;
                             }
                             index++;
                         }
                     }
                     catch
                     {
-                        foreach (List<string> module in conf.module_config)
+                        foreach (List<string> tmp_module in conf.module_config)
                         {
-                            if (module[0].Equals(line[4], StringComparison.InvariantCultureIgnoreCase))
+                            if (tmp_module[0].Equals(line[4], StringComparison.InvariantCultureIgnoreCase))
                             {
-                                module_name = module[1];
-                            }
-                        }
-                    }
-                    foreach (List<string> tmp_command in conf.command_list)
-                    {
-                        if (line[4].Equals(tmp_command[0], StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            string[] triggers = tmp_command[3].Split('|');
-                            int command_access = Convert.ToInt32(tmp_command[5]);
-                            bool show_help = Convert.ToBoolean(tmp_command[7]);
-                            if (show_help == true)
-                            {
-                                foreach (string trigger in triggers)
+                                module_name = tmp_module[0];
+                                foreach (List<string> tmp_command in conf.command_list)
                                 {
-                                    if (access >= Convert.ToInt32(command_access))
+                                    if (module_name.Equals(tmp_command[0], StringComparison.InvariantCultureIgnoreCase))
                                     {
-                                        msg += " " + ircbot.ircbot.irc_conf.command + trigger + ",";
+                                        string[] triggers = tmp_command[3].Split('|');
+                                        int command_access = Convert.ToInt32(tmp_command[5]);
+                                        bool show_help = Convert.ToBoolean(tmp_command[7]);
+                                        if (show_help == true)
+                                        {
+                                            foreach (string trigger in triggers)
+                                            {
+                                                if (access >= Convert.ToInt32(command_access))
+                                                {
+                                                    cmds += " " + ircbot.ircbot.irc_conf.command + trigger + ",";
+                                                }
+                                            }
+                                        }
                                     }
                                 }
+                                break;
                             }
                         }
                     }
-                    if (msg != "")
+                    if (cmds != "")
                     {
-                        ircbot.sendData("NOTICE", nick + " :Commands for " + line[4] + ":" + msg.TrimEnd(','));
-                        msg = "";
-                        ircbot.sendData("NOTICE", nick + " :For more information about a specific command, type " + ircbot.ircbot.irc_conf.command + "help {module} {command name}");
+                        ircbot.sendData("NOTICE", nick + " :Commands for " + module_name + ":" + cmds.TrimEnd(','));
+                        cmds = "";
+                        ircbot.sendData("NOTICE", nick + " :For more information about a specific command, type " + ircbot.ircbot.irc_conf.command + "help {module_name of module_number} {command name}");
                     }
                     else
                     {
@@ -168,41 +237,18 @@ namespace IRCBot.Modules
             }
             else
             {
-                msg += "Modules Available:";
-                int index = 0;
+                string mods = "Modules Available:";
+                int index = 1;
                 foreach (List<string> tmp_module in conf.module_config)
                 {
                     string module_name = tmp_module[0];
-                    int commands = 0;
-                    foreach (List<string> tmp_command in conf.command_list)
-                    {
-                        if (module_name.Equals(tmp_command[0]))
-                        {
-                            string[] triggers = tmp_command[3].Split('|');
-                            int command_access = Convert.ToInt32(tmp_command[5]);
-                            bool show_help = Convert.ToBoolean(tmp_command[7]);
-                            if (show_help == true)
-                            {
-                                foreach (string trigger in triggers)
-                                {
-                                    if (access >= Convert.ToInt32(command_access))
-                                    {
-                                        commands++;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    if (commands >= 1)
-                    {
-                        msg += " [" + index + "]" + module_name + ",";
-                        index++;
-                    }
+                    mods += " [" + index + "]" + module_name + ",";
+                    index++;
                 }
-                if (msg != "")
+                if (mods != "")
                 {
-                    ircbot.sendData("NOTICE", nick + " :" + msg.TrimEnd(','));
-                    msg = "";
+                    ircbot.sendData("NOTICE", nick + " :" + mods.TrimEnd(','));
+                    mods = "";
                     ircbot.sendData("NOTICE", nick + " :To view the commands for a specific module, type " + ircbot.ircbot.irc_conf.command + "help {module_name or module_number}");
                 }
                 else

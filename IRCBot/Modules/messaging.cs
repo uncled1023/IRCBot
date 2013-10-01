@@ -59,26 +59,29 @@ namespace IRCBot.Modules
                                         {
                                             ircbot.add_spam_count(channel);
                                         }
-                                        if (line.GetUpperBound(0) > 3)
+                                        if (nick_access >= command_access)
                                         {
-                                            if (type.Equals("channel"))
+                                            if (line.GetUpperBound(0) > 3)
                                             {
-                                                add_message(nick, line, line[2], ircbot, module_id);
+                                                if (type.Equals("channel"))
+                                                {
+                                                    add_message(nick, line, line[2], ircbot, module_id);
+                                                }
+                                                else
+                                                {
+                                                    add_message(nick, line, null, ircbot, module_id);
+                                                }
                                             }
                                             else
                                             {
-                                                add_message(nick, line, null, ircbot, module_id);
-                                            }
-                                        }
-                                        else
-                                        {
-                                            if (type.Equals("channel"))
-                                            {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                                            }
-                                            else
-                                            {
-                                                ircbot.sendData("PRIVMSG", nick + " :" + nick + ", you need to include more info.");
+                                                if (type.Equals("channel"))
+                                                {
+                                                    ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                                                }
+                                                else
+                                                {
+                                                    ircbot.sendData("PRIVMSG", nick + " :" + nick + ", you need to include more info.");
+                                                }
                                             }
                                         }
                                         break;
@@ -87,26 +90,29 @@ namespace IRCBot.Modules
                                         {
                                             ircbot.add_spam_count(channel);
                                         }
-                                        if (line.GetUpperBound(0) > 3)
+                                        if (nick_access >= command_access)
                                         {
-                                            if (type.Equals("channel"))
+                                            if (line.GetUpperBound(0) > 3)
                                             {
-                                                add_anonmessage(nick, line, line[2], ircbot, module_id);
+                                                if (type.Equals("channel"))
+                                                {
+                                                    add_anonmessage(nick, line, line[2], ircbot, module_id);
+                                                }
+                                                else
+                                                {
+                                                    add_anonmessage(nick, line, null, ircbot, module_id);
+                                                }
                                             }
                                             else
                                             {
-                                                add_anonmessage(nick, line, null, ircbot, module_id);
-                                            }
-                                        }
-                                        else
-                                        {
-                                            if (type.Equals("channel"))
-                                            {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                                            }
-                                            else
-                                            {
-                                                ircbot.sendData("PRIVMSG", nick + " :" + nick + ", you need to include more info.");
+                                                if (type.Equals("channel"))
+                                                {
+                                                    ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                                                }
+                                                else
+                                                {
+                                                    ircbot.sendData("PRIVMSG", nick + " :" + nick + ", you need to include more info.");
+                                                }
                                             }
                                         }
                                         break;

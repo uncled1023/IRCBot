@@ -10,6 +10,8 @@ using Microsoft.Win32;
 using System.Runtime.InteropServices;
 using System.Management;
 using System.Reflection;
+using System.Diagnostics;
+using System.Threading;
 
 namespace IRCBot.Modules
 {
@@ -19,7 +21,7 @@ namespace IRCBot.Modules
         public override void control(bot ircbot, ref BotConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
             char[] charS = new char[] { ' ' };
-            string module_name = ircbot.conf.module_config[module_id][0];
+            string module_name = ircbot.conf.module_config[module_id][0]; 
             if ((type.Equals("channel") || type.Equals("query")) && bot_command == true)
             {
                 foreach (List<string> tmp_command in conf.command_list)
@@ -1059,6 +1061,38 @@ namespace IRCBot.Modules
                                                         ircbot.sendData("NOTICE", nick + " :" + info.Name.Replace("k__BackingField", "") + ": " + info.GetValue(conf).ToString());
                                                     }
                                                 }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                        }
+                                        break;
+                                    case "resources":
+                                        if (spam_check == true)
+                                        {
+                                            ircbot.add_spam_count(channel);
+                                        }
+                                        if (nick_access >= command_access)
+                                        {
+                                            Process currentProcess = System.Diagnostics.Process.GetCurrentProcess();
+                                            float totalBytesOfMemoryUsed = (currentProcess.WorkingSet64 / 1024f) / 1024f;
+                                            PerformanceCounter pc1 = new PerformanceCounter();
+                                            pc1.CategoryName = "Processor";
+                                            pc1.CounterName = "% Processor Time";
+                                            pc1.InstanceName = "_Total";
+                                            pc1.NextValue();
+                                            Thread.Sleep(500);
+                                            float totalCPUUsage = pc1.NextValue();
+                                            if (type.Equals("channel"))
+                                            {
+                                                ircbot.sendData("PRIVMSG", channel + " :CPU: " + totalCPUUsage + "%");
+                                                ircbot.sendData("PRIVMSG", channel + " :RAM: " + totalBytesOfMemoryUsed + "MB");
+                                            }
+                                            else
+                                            {
+                                                ircbot.sendData("NOTICE", nick + " :CPU: " + totalCPUUsage + "%");
+                                                ircbot.sendData("NOTICE", nick + " :RAM: " + totalBytesOfMemoryUsed + "MB");
                                             }
                                         }
                                         else

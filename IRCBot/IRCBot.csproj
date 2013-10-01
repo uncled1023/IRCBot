@@ -129,6 +129,7 @@
     <Compile Include="Modules\logging.cs" />
     <Compile Include="Modules\flood_control.cs" />
     <Compile Include="Modules\survey.cs" />
+    <Compile Include="Modules\trivia.cs" />
     <Compile Include="Modules\url.cs" />
     <Compile Include="Modules\wolfram_alpha.cs" />
     <Compile Include="Modules\module.cs" />
@@ -261,7 +262,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties BuildVersion_AssemblyInfoFilename="..\..\..\..\..\Documents\GitHub\IRCBot\IRCBot\Properties\AssemblyInfo.cs" BuildVersion_BuildAction="Build" BuildVersion_BuildVersioningStyle="None.None.Increment.Increment" />
+      <UserProperties BuildVersion_BuildVersioningStyle="None.None.Increment.Increment" BuildVersion_BuildAction="Build" BuildVersion_AssemblyInfoFilename="..\..\..\..\..\Documents\GitHub\IRCBot\IRCBot\Properties\AssemblyInfo.cs" />
     </VisualStudio>
   </ProjectExtensions>
   <PropertyGroup>

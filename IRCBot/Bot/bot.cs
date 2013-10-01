@@ -55,6 +55,8 @@ namespace IRCBot
         public string cur_dir;
         public string nick;
         public BackgroundWorker worker;
+        BackgroundWorker save_stream_worker;
+        BackgroundWorker check_connect_worker;
         public List<Modules.Module> module_list = new List<Modules.Module>();
         public List<string> modules_loaded = new List<string>();
         public List<string> modules_error = new List<string>();
@@ -84,6 +86,8 @@ namespace IRCBot
             restart = false;
             restart_attempts = 0;
             worker = new BackgroundWorker();
+            save_stream_worker = new BackgroundWorker();
+            check_connect_worker = new BackgroundWorker();
 
             shouldRun = true;
             first_run = true;
@@ -117,6 +121,16 @@ namespace IRCBot
             check_cancel.Interval = 500;
             check_cancel.Start();
 
+            BackgroundWorker save = new BackgroundWorker();
+            save.DoWork += new DoWorkEventHandler(save_stream);
+            save.WorkerSupportsCancellation = true;
+            save_stream_worker = save;
+
+            BackgroundWorker check = new BackgroundWorker();
+            check.DoWork += new DoWorkEventHandler(check_connection);
+            check.WorkerSupportsCancellation = true;
+            check_connect_worker = check;
+
             BackgroundWorker work = new BackgroundWorker();
             work.DoWork += new DoWorkEventHandler(backgroundWorker_DoWork);
             work.RunWorkerCompleted += new RunWorkerCompletedEventHandler(backgroundWorker_RunWorkerCompleted);
@@ -128,6 +142,21 @@ namespace IRCBot
 
         public void restart_server()
         {
+            while (worker.IsBusy)
+            {
+                Thread.Sleep(30);
+            }
+            lock (queuelock)
+            {
+                stream_queue.Clear();
+            }
+            checkRegisterationTimer.Stop();
+            Spam_Check_Timer.Stop();
+            Spam_Threshold_Check.Stop();
+            foreach (timer_info timer in Spam_Timers)
+            {
+                timer.spam_timer.Stop();
+            }
             checkRegisterationTimer = new System.Windows.Forms.Timer();
             Spam_Check_Timer = new System.Windows.Forms.Timer();
             Spam_Threshold_Check = new System.Windows.Forms.Timer();
@@ -138,7 +167,8 @@ namespace IRCBot
             disconnected = true;
             start_time = DateTime.Now;
             worker = new BackgroundWorker();
-            worker.WorkerSupportsCancellation = true;
+            save_stream_worker = new BackgroundWorker();
+            check_connect_worker = new BackgroundWorker();
 
             shouldRun = true;
             first_run = true;
@@ -165,6 +195,16 @@ namespace IRCBot
             check_cancel.Interval = 500;
             check_cancel.Start();
 
+            BackgroundWorker save = new BackgroundWorker();
+            save.DoWork += new DoWorkEventHandler(save_stream);
+            save.WorkerSupportsCancellation = true;
+            save_stream_worker = save;
+
+            BackgroundWorker check = new BackgroundWorker();
+            check.DoWork += new DoWorkEventHandler(check_connection);
+            check.WorkerSupportsCancellation = true;
+            check_connect_worker = check;
+
             BackgroundWorker work = new BackgroundWorker();
             work.DoWork += new DoWorkEventHandler(backgroundWorker_DoWork);
             work.RunWorkerCompleted += new RunWorkerCompletedEventHandler(backgroundWorker_RunWorkerCompleted);
@@ -177,7 +217,8 @@ namespace IRCBot
         public void check_connection(object sender, DoWorkEventArgs e)
         {
             bool is_connected = true;
-            while (shouldRun && is_connected)
+            BackgroundWorker bw = sender as BackgroundWorker;
+            while (shouldRun && is_connected && !bw.CancellationPending)
             {
                 Thread.Sleep(1000); 
                 is_connected = NetworkInterface.GetIsNetworkAvailable();
@@ -427,14 +468,6 @@ namespace IRCBot
 
             if (restart == false)
             {
-                BackgroundWorker work = new BackgroundWorker();
-                work.WorkerSupportsCancellation = true;
-                work.DoWork += (sender, e) => save_stream(sender, e);
-
-                BackgroundWorker check_connect = new BackgroundWorker();
-                check_connect.WorkerSupportsCancellation = true;
-                check_connect.DoWork += (sender, e) => check_connection(sender, e);
-
                 try
                 {
                     IRCConnection.NoDelay = true;
@@ -456,8 +489,8 @@ namespace IRCBot
                         sendData("USER", nick + " default_host default_server :" + conf.name);
                     }
 
-                    work.RunWorkerAsync(2000);
-                    check_connect.RunWorkerAsync(2000);
+                    save_stream_worker.RunWorkerAsync(2000);
+                    check_connect_worker.RunWorkerAsync(2000);
 
                     IRCWork(bw);
                 }
@@ -473,8 +506,8 @@ namespace IRCBot
                 }
                 finally
                 {
-                    work.CancelAsync();
-                    check_connect.CancelAsync();
+                    save_stream_worker.CancelAsync();
+                    check_connect_worker.CancelAsync();
                     connecting = false;
                     connected = false;
                     if (sr != null)
@@ -627,7 +660,8 @@ namespace IRCBot
 
         private void save_stream(Object sender, EventArgs e)
         {
-            while (shouldRun)
+            BackgroundWorker bw = sender as BackgroundWorker;
+            while (shouldRun && !bw.CancellationPending)
             {
                 try
                 {

@@ -38,7 +38,7 @@ namespace IRCBot.Modules
                         string[] blacklist = tmp_command[6].Split(',');
                         bool blocked = false;
                         bool cmd_found = false;
-                        bool spam_check = Convert.ToBoolean(tmp_command[8]);
+                        bool spam_check = ircbot.get_spam_check(channel, nick, Convert.ToBoolean(tmp_command[8]));
                         foreach (string bl_chan in blacklist)
                         {
                             if (bl_chan.Equals(channel))
@@ -235,7 +235,10 @@ namespace IRCBot.Modules
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 ircbot.sendData("MODE", line[2] + " +o " + line[4]);
-                                                ircbot.sendData("PRIVMSG", "chanserv :AOP " + line[2] + " add " + line[4]);
+                                                if (!ircbot.get_user_auto("SOP", line[2], line[4]))
+                                                {
+                                                    ircbot.sendData("PRIVMSG", "chanserv :AOP " + line[2] + " add " + line[4]);
+                                                }
                                                 access.set_access_list(line[4], line[2], conf.op_level.ToString(), ircbot);
                                             }
                                             else
@@ -303,7 +306,10 @@ namespace IRCBot.Modules
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 ircbot.sendData("MODE", line[2] + " +h " + line[4]);
-                                                ircbot.sendData("PRIVMSG", "chanserv :HOP " + line[2] + " add " + line[4]);
+                                                if (!ircbot.get_user_auto("AOP", line[2], line[4]) && !ircbot.get_user_auto("SOP", line[2], line[4]))
+                                                {
+                                                    ircbot.sendData("PRIVMSG", "chanserv :HOP " + line[2] + " add " + line[4]);
+                                                }
                                                 access.set_access_list(line[4], line[2], conf.hop_level.ToString(), ircbot);
                                             }
                                             else
@@ -393,7 +399,10 @@ namespace IRCBot.Modules
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 ircbot.sendData("MODE", line[2] + " +v " + line[4]);
-                                                ircbot.sendData("PRIVMSG", "chanserv :VOP " + line[2] + " add " + line[4]);
+                                                if (!ircbot.get_user_auto("AOP", line[2], line[4]) && !ircbot.get_user_auto("SOP", line[2], line[4]) && !ircbot.get_user_auto("VOP", line[2], line[4]))
+                                                {
+                                                    ircbot.sendData("PRIVMSG", "chanserv :VOP " + line[2] + " add " + line[4]);
+                                                }
                                                 access.set_access_list(line[4], line[2], conf.voice_level.ToString(), ircbot);
                                             }
                                             else

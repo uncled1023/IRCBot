@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Net;
 
 namespace IRCBot.Modules
 {
-    class check_connection : Module
+    class air : Module
     {
         public override void control(bot ircbot, ref BotConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
@@ -53,29 +52,14 @@ namespace IRCBot.Modules
                             {
                                 switch (trigger)
                                 {
-                                    case "isitup":
+                                    case "fortune":
                                         if (spam_check == true)
                                         {
                                             ircbot.add_spam_count(channel);
                                         }
                                         if (nick_access >= command_access)
                                         {
-                                            if (line.GetUpperBound(0) > 3)
-                                            {
-                                                bool isitup = CheckConnection(line[4]);
-                                                if (isitup)
-                                                {
-                                                    ircbot.sendData("PRIVMSG", channel + " :" + line[4] + " is up for me!");
-                                                }
-                                                else
-                                                {
-                                                    ircbot.sendData("PRIVMSG", channel + " :" + line[4] + " looks down for me too.");
-                                                }
-                                            }
-                                            else
-                                            {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                                            }
+                                            get_airtime(line[2], ircbot);
                                         }
                                         else
                                         {
@@ -90,26 +74,8 @@ namespace IRCBot.Modules
             }
         }
 
-        private bool CheckConnection(String Url)
+        private void get_airtime(string channel, bot ircbot)
         {
-            if (!Url.Contains("://"))
-            {
-                Url = "http://" + Url;
-            }
-            try
-            {
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(Url);
-                request.Timeout = 5000;
-                request.Credentials = CredentialCache.DefaultNetworkCredentials;
-                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-
-                if (response.StatusCode == HttpStatusCode.OK) return true;
-                else return false;
-            }
-            catch
-            {
-                return false;
-            }
         }
     }
 }

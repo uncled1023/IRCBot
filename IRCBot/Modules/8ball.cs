@@ -23,7 +23,7 @@ namespace IRCBot.Modules
                         string[] blacklist = tmp_command[6].Split(',');
                         bool blocked = false;
                         bool cmd_found = false;
-                        bool spam_check = Convert.ToBoolean(tmp_command[8]);
+                        bool spam_check = ircbot.get_spam_check(channel, nick, Convert.ToBoolean(tmp_command[8]));
                         foreach (string bl_chan in blacklist)
                         {
                             if (bl_chan.Equals(channel))
@@ -107,6 +107,15 @@ namespace IRCBot.Modules
             }
             else
             {
+                if (!Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "8ball"))
+                {
+                    Directory.CreateDirectory(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "8ball");
+                }
+                List<string> contents = new List<string>();
+                contents.Add("Yes");
+                contents.Add("No");
+                contents.Add("Maybe");
+                File.WriteAllLines(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "8ball" + Path.DirectorySeparatorChar + "answers.txt", contents.ToArray());
                 ircbot.sendData("PRIVMSG", channel + " :I don't know!");
             }
         }

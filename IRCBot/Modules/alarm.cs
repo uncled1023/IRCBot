@@ -35,7 +35,7 @@ namespace IRCBot.Modules
                         string[] blacklist = tmp_command[6].Split(',');
                         bool blocked = false;
                         bool cmd_found = false;
-                        bool spam_check = Convert.ToBoolean(tmp_command[8]);
+                        bool spam_check = ircbot.get_spam_check(channel, nick, Convert.ToBoolean(tmp_command[8]));
                         foreach (string bl_chan in blacklist)
                         {
                             if (bl_chan.Equals(channel))
@@ -96,7 +96,7 @@ namespace IRCBot.Modules
                                                     {
                                                         char[] charSplit = new char[] { ' ' };
                                                         string[] ex = new_line[1].Split(charSplit);
-                                                        if (ex[0].TrimStart(Convert.ToChar(ircbot.ircbot.irc_conf.command)).Equals("alarm"))
+                                                        if (ex[0].TrimStart(Convert.ToChar(ircbot.conf.command)).Equals("alarm"))
                                                         {
                                                             if (type.Equals("channel"))
                                                             {
@@ -181,7 +181,7 @@ namespace IRCBot.Modules
             BotConfig conf = tmp_conf;
             System.Timers.Timer alarm_trigger = (System.Timers.Timer)sender;
             alarm_trigger.Enabled = false;
-            if (msg.StartsWith(ircbot.ircbot.irc_conf.command))
+            if (msg.StartsWith(ircbot.conf.command))
             {
                 bool bot_command = true;
                 string line = "";
@@ -250,7 +250,7 @@ namespace IRCBot.Modules
                             }
                             if (module_allowed == true)
                             {
-                                module.control(ircbot, ref conf, index, ex, ex[3].TrimStart(':').TrimStart(Convert.ToChar(ircbot.ircbot.irc_conf.command)), nick_access, nick, channel, bot_command, type);
+                                module.control(ircbot, ref conf, index, ex, ex[3].TrimStart(':').TrimStart(Convert.ToChar(ircbot.conf.command)), nick_access, nick, channel, bot_command, type);
                             }
                         }
                     }

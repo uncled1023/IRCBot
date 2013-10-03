@@ -33,7 +33,7 @@ namespace IRCBot.Modules
                 }
                 try
                 {
-                    Regex regex = new Regex("(((https?|ftp|file)://|www\\.)([A-Z0-9.-:]{1,})\\.[0-9A-Z?;~&#=\\-_\\./]{2,})", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                    Regex regex = new Regex("(((https?|ftp|file)://|www\\.)([A-Z0-9.\\-:]{1,})\\.[0-9A-Z?;~&#=\\-_\\./]{2,})", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
                     //get the first match
                     MatchCollection matches = regex.Matches(text);
@@ -228,11 +228,14 @@ namespace IRCBot.Modules
                                                     ID = "[" + ID + "]";
                                                 }
 
+                                                string quote = "<span class=\"(.*?)\">(.*?)</span>";
+                                                subject = Regex.Replace(subject, quote, "$2");
                                                 string post_message = "";
                                                 if (!subject.Equals(string.Empty))
                                                 {
                                                     post_message += "Subject: " + subject + " | ";
                                                 }
+                                                post_comment = Regex.Replace(post_comment, quote, "$2");
                                                 string[] words = post_comment.Split(' ');
                                                 if (words.GetUpperBound(0) > 10)
                                                 {
@@ -248,8 +251,6 @@ namespace IRCBot.Modules
                                                     post_message += " Comment: " + post_comment;
                                                 }
 
-                                                string quote = "<span class=\"quote\">(.*?)</span>";
-                                                post_message = Regex.Replace(post_message, quote, "$1");
                                                 string[] tmp_post = Regex.Split(post_message, "<br>");
                                                 post_message = "";
                                                 foreach (string tmp in tmp_post)

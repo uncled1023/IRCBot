@@ -23,7 +23,7 @@ namespace IRCBot.Modules
                         string[] blacklist = tmp_command[6].Split(',');
                         bool blocked = false;
                         bool cmd_found = false;
-                        bool spam_check = Convert.ToBoolean(tmp_command[8]);
+                        bool spam_check = ircbot.get_spam_check(channel, nick, Convert.ToBoolean(tmp_command[8]));
                         foreach (string bl_chan in blacklist)
                         {
                             if (bl_chan.Equals(channel))
@@ -213,7 +213,7 @@ namespace IRCBot.Modules
                     }
                     if (cmd_found == true)
                     {
-                        ircbot.sendData("NOTICE", requst_nick + " :The last command used was " + ircbot.ircbot.irc_conf.command + command + " by " + nick + " on " + date + " in " + inside + parameters);
+                        ircbot.sendData("NOTICE", requst_nick + " :The last command used was " + ircbot.conf.command + command + " by " + nick + " on " + date + " in " + inside + parameters);
                     }
                     else
                     {
@@ -272,7 +272,7 @@ namespace IRCBot.Modules
                     }
                     if (cmd_found == true)
                     {
-                        ircbot.sendData("NOTICE", requst_nick + " :" + ircbot.ircbot.irc_conf.command + command + " has been used " + num_uses + " times.");
+                        ircbot.sendData("NOTICE", requst_nick + " :" + ircbot.conf.command + command + " has been used " + num_uses + " times.");
                         ircbot.sendData("NOTICE", requst_nick + " :It was last used by " + nick + " on " + date + " in " + inside + parameters);
                     }
                     else
@@ -306,7 +306,7 @@ namespace IRCBot.Modules
                         if (cmd_found == true)
                         {
                             ircbot.sendData("NOTICE", requst_nick + " :" + nick + " has used " + num_uses + " commands.");
-                            ircbot.sendData("NOTICE", requst_nick + " :The last command they used was " + ircbot.ircbot.irc_conf.command + new_command + " on " + date + " in " + inside + parameters);
+                            ircbot.sendData("NOTICE", requst_nick + " :The last command they used was " + ircbot.conf.command + new_command + " on " + date + " in " + inside + parameters);
                         }
                         else
                         {
@@ -376,7 +376,7 @@ namespace IRCBot.Modules
                             date = command_list[number][2];
                             inside = command_list[number][1];
                             nick = command_list[number][0];
-                            ircbot.sendData("NOTICE", requst_nick + " :" + ircbot.ircbot.irc_conf.command + command + " was used by " + nick + " on " + date + " in " + inside + parameters);
+                            ircbot.sendData("NOTICE", requst_nick + " :" + ircbot.conf.command + command + " was used by " + nick + " on " + date + " in " + inside + parameters);
                         }
                         else
                         {
@@ -418,7 +418,7 @@ namespace IRCBot.Modules
                             date = command_list[number][2];
                             inside = command_list[number][1];
                             nick = command_list[number][0];
-                            ircbot.sendData("NOTICE", requst_nick + " :" + nick + " used " + ircbot.ircbot.irc_conf.command + command_list[number][3] + " on " + date + " in " + inside + parameters);
+                            ircbot.sendData("NOTICE", requst_nick + " :" + nick + " used " + ircbot.conf.command + command_list[number][3] + " on " + date + " in " + inside + parameters);
                         }
                         else
                         {
@@ -428,12 +428,12 @@ namespace IRCBot.Modules
                 }
                 else
                 {
-                    ircbot.sendData("NOTICE", requst_nick + " :" + ircbot.ircbot.irc_conf.command + command + " has not been used");
+                    ircbot.sendData("NOTICE", requst_nick + " :" + ircbot.conf.command + command + " has not been used");
                 }
             }
             else
             {
-                ircbot.sendData("NOTICE", requst_nick + " :" + ircbot.ircbot.irc_conf.command + command + " has not been used");
+                ircbot.sendData("NOTICE", requst_nick + " :" + ircbot.conf.command + command + " has not been used");
             }
         }
 
@@ -476,12 +476,12 @@ namespace IRCBot.Modules
                     }
                     if (cmd_found == true)
                     {
-                        ircbot.sendData("NOTICE", requst_nick + " :" + nick + " has used " + ircbot.ircbot.irc_conf.command + command + " " + num_uses + " times.");
-                        ircbot.sendData("NOTICE", requst_nick + " :They last used " + ircbot.ircbot.irc_conf.command + command + " on " + date + " in " + inside + parameters);
+                        ircbot.sendData("NOTICE", requst_nick + " :" + nick + " has used " + ircbot.conf.command + command + " " + num_uses + " times.");
+                        ircbot.sendData("NOTICE", requst_nick + " :They last used " + ircbot.conf.command + command + " on " + date + " in " + inside + parameters);
                     }
                     else
                     {
-                        ircbot.sendData("NOTICE", requst_nick + " :" + nick + " has not used " + ircbot.ircbot.irc_conf.command + command);
+                        ircbot.sendData("NOTICE", requst_nick + " :" + nick + " has not used " + ircbot.conf.command + command);
                     }
                 }
                 else
@@ -545,16 +545,16 @@ namespace IRCBot.Modules
                             date = command_list[number][2];
                             inside = command_list[number][1];
                             nick = command_list[number][0];
-                            ircbot.sendData("NOTICE", requst_nick + " :" + nick + " used " + ircbot.ircbot.irc_conf.command + command + " on " + date + " in " + inside + parameters);
+                            ircbot.sendData("NOTICE", requst_nick + " :" + nick + " used " + ircbot.conf.command + command + " on " + date + " in " + inside + parameters);
                         }
                         else
                         {
-                            ircbot.sendData("NOTICE", requst_nick + " :" + nick + " has not used " + ircbot.ircbot.irc_conf.command + command + " that many times");
+                            ircbot.sendData("NOTICE", requst_nick + " :" + nick + " has not used " + ircbot.conf.command + command + " that many times");
                         }
                     }
                     else
                     {
-                        ircbot.sendData("NOTICE", requst_nick + " :" + nick + " has not used " + ircbot.ircbot.irc_conf.command + command);
+                        ircbot.sendData("NOTICE", requst_nick + " :" + nick + " has not used " + ircbot.conf.command + command);
                     }
                 }
                 else

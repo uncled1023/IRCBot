@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Net;
+using System.IO;
 
 namespace IRCBot.Modules
 {
-    class check_connection : Module
+    class fortune : Module
     {
         public override void control(bot ircbot, ref BotConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
@@ -53,29 +53,14 @@ namespace IRCBot.Modules
                             {
                                 switch (trigger)
                                 {
-                                    case "isitup":
+                                    case "fortune":
                                         if (spam_check == true)
                                         {
                                             ircbot.add_spam_count(channel);
                                         }
                                         if (nick_access >= command_access)
                                         {
-                                            if (line.GetUpperBound(0) > 3)
-                                            {
-                                                bool isitup = CheckConnection(line[4]);
-                                                if (isitup)
-                                                {
-                                                    ircbot.sendData("PRIVMSG", channel + " :" + line[4] + " is up for me!");
-                                                }
-                                                else
-                                                {
-                                                    ircbot.sendData("PRIVMSG", channel + " :" + line[4] + " looks down for me too.");
-                                                }
-                                            }
-                                            else
-                                            {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                                            }
+                                            get_quote(line[2], ircbot);
                                         }
                                         else
                                         {
@@ -90,25 +75,38 @@ namespace IRCBot.Modules
             }
         }
 
-        private bool CheckConnection(String Url)
+        private void get_quote(string channel, bot ircbot)
         {
-            if (!Url.Contains("://"))
+            if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "fortune" + Path.DirectorySeparatorChar + "list.txt"))
             {
-                Url = "http://" + Url;
+                string[] answer_file = System.IO.File.ReadAllLines(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "fortune" + Path.DirectorySeparatorChar + "list.txt");
+                int number_of_lines = answer_file.GetUpperBound(0) + 1;
+                if (number_of_lines > 0)
+                {
+                    string line = "";
+                    while (line == "")
+                    {
+                        Random random = new Random();
+                        int index = random.Next(0, number_of_lines);
+                        line = answer_file[index];
+                    }
+                    ircbot.sendData("PRIVMSG", channel + " :" + line);
+                }
+                else
+                {
+                    ircbot.sendData("PRIVMSG", channel + " :No fortune for you!");
+                }
             }
-            try
+            else
             {
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(Url);
-                request.Timeout = 5000;
-                request.Credentials = CredentialCache.DefaultNetworkCredentials;
-                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-
-                if (response.StatusCode == HttpStatusCode.OK) return true;
-                else return false;
-            }
-            catch
-            {
-                return false;
+                if (!Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "fortune"))
+                {
+                    Directory.CreateDirectory(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "fortune");
+                }
+                List<string> contents = new List<string>();
+                contents.Add("You will find fortune soon.");
+                File.WriteAllLines(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "fortune" + Path.DirectorySeparatorChar + "list.txt", contents.ToArray());
+                ircbot.sendData("PRIVMSG", channel + " :No fortune for you!");
             }
         }
     }

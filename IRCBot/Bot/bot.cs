@@ -38,6 +38,7 @@ namespace IRCBot
         private spam_info spam_list = new spam_info();
         private List<string> data_queue = new List<string>();
         private List<string> stream_queue = new List<string>();
+        private int disconnect_count = 0;
 
         public readonly object queuelock = new object();
         public readonly object streamlock = new object();
@@ -54,6 +55,8 @@ namespace IRCBot
         public string cur_dir;
         public string nick;
         public BackgroundWorker worker;
+        BackgroundWorker save_stream_worker;
+        BackgroundWorker check_connect_worker;
         public List<Modules.Module> module_list = new List<Modules.Module>();
         public List<string> modules_loaded = new List<string>();
         public List<string> modules_error = new List<string>();
@@ -83,6 +86,8 @@ namespace IRCBot
             restart = false;
             restart_attempts = 0;
             worker = new BackgroundWorker();
+            save_stream_worker = new BackgroundWorker();
+            check_connect_worker = new BackgroundWorker();
 
             shouldRun = true;
             first_run = true;
@@ -101,7 +106,7 @@ namespace IRCBot
             load_modules();
 
             Spam_Check_Timer.Tick += new EventHandler(spam_tick);
-            Spam_Check_Timer.Interval = ircbot.irc_conf.spam_threshold;
+            Spam_Check_Timer.Interval = conf.spam_threshold;
             Spam_Check_Timer.Start();
 
             Spam_Threshold_Check.Tick += new EventHandler(spam_check);
@@ -115,6 +120,16 @@ namespace IRCBot
             check_cancel.Tick += new EventHandler(cancel_tick);
             check_cancel.Interval = 500;
             check_cancel.Start();
+
+            BackgroundWorker save = new BackgroundWorker();
+            save.DoWork += new DoWorkEventHandler(save_stream);
+            save.WorkerSupportsCancellation = true;
+            save_stream_worker = save;
+
+            BackgroundWorker check = new BackgroundWorker();
+            check.DoWork += new DoWorkEventHandler(check_connection);
+            check.WorkerSupportsCancellation = true;
+            check_connect_worker = check;
 
             BackgroundWorker work = new BackgroundWorker();
             work.DoWork += new DoWorkEventHandler(backgroundWorker_DoWork);
@@ -127,6 +142,21 @@ namespace IRCBot
 
         public void restart_server()
         {
+            while (worker.IsBusy)
+            {
+                Thread.Sleep(30);
+            }
+            lock (queuelock)
+            {
+                stream_queue.Clear();
+            }
+            checkRegisterationTimer.Stop();
+            Spam_Check_Timer.Stop();
+            Spam_Threshold_Check.Stop();
+            foreach (timer_info timer in Spam_Timers)
+            {
+                timer.spam_timer.Stop();
+            }
             checkRegisterationTimer = new System.Windows.Forms.Timer();
             Spam_Check_Timer = new System.Windows.Forms.Timer();
             Spam_Threshold_Check = new System.Windows.Forms.Timer();
@@ -137,7 +167,8 @@ namespace IRCBot
             disconnected = true;
             start_time = DateTime.Now;
             worker = new BackgroundWorker();
-            worker.WorkerSupportsCancellation = true;
+            save_stream_worker = new BackgroundWorker();
+            check_connect_worker = new BackgroundWorker();
 
             shouldRun = true;
             first_run = true;
@@ -149,7 +180,7 @@ namespace IRCBot
             nick = conf.nick;
 
             Spam_Check_Timer.Tick += new EventHandler(spam_tick);
-            Spam_Check_Timer.Interval = ircbot.irc_conf.spam_threshold;
+            Spam_Check_Timer.Interval = conf.spam_threshold;
             Spam_Check_Timer.Start();
 
             Spam_Threshold_Check.Tick += new EventHandler(spam_check);
@@ -164,6 +195,16 @@ namespace IRCBot
             check_cancel.Interval = 500;
             check_cancel.Start();
 
+            BackgroundWorker save = new BackgroundWorker();
+            save.DoWork += new DoWorkEventHandler(save_stream);
+            save.WorkerSupportsCancellation = true;
+            save_stream_worker = save;
+
+            BackgroundWorker check = new BackgroundWorker();
+            check.DoWork += new DoWorkEventHandler(check_connection);
+            check.WorkerSupportsCancellation = true;
+            check_connect_worker = check;
+
             BackgroundWorker work = new BackgroundWorker();
             work.DoWork += new DoWorkEventHandler(backgroundWorker_DoWork);
             work.RunWorkerCompleted += new RunWorkerCompletedEventHandler(backgroundWorker_RunWorkerCompleted);
@@ -173,23 +214,14 @@ namespace IRCBot
             worker.RunWorkerAsync(2000);
         }
 
-        [DllImport("wininet.dll")]
-        private extern static bool InternetGetConnectedState(out int Description, int ReservedValue);
-        bool IsConnectedToInternet()
-        {
-            bool a;
-            int xs;
-            a = InternetGetConnectedState(out xs, 0);
-            return a;
-        }
-
         public void check_connection(object sender, DoWorkEventArgs e)
         {
             bool is_connected = true;
-            while (shouldRun && is_connected)
+            BackgroundWorker bw = sender as BackgroundWorker;
+            while (shouldRun && is_connected && !bw.CancellationPending)
             {
-                Thread.Sleep(1000);
-                is_connected = IsConnectedToInternet();
+                Thread.Sleep(1000); 
+                is_connected = NetworkInterface.GetIsNetworkAvailable();
 
                 if (is_connected && shouldRun)
                 {
@@ -204,8 +236,18 @@ namespace IRCBot
                     }
                 }
 
-                if (!is_connected || !shouldRun)
+                if (!is_connected)
                 {
+                    disconnect_count++;
+                }
+                else
+                {
+                    disconnect_count = 0;
+                }
+
+                if (disconnect_count >= 5 || !shouldRun)
+                {
+                    disconnect_count = 0;
                     check_cancel.Stop();
                     connected = false;
                     connecting = false;
@@ -270,7 +312,7 @@ namespace IRCBot
             if (modules_error.Count > 0)
             {
                 string msg = "";
-                foreach (string module_name in modules_loaded)
+                foreach (string module_name in modules_error)
                 {
                     msg += ", " + module_name;
                 }
@@ -367,6 +409,9 @@ namespace IRCBot
             Spam_Threshold_Check.Stop();
             check_cancel.Stop();
 
+            save_stream_worker.CancelAsync();
+            check_connect_worker.CancelAsync();
+
             if (restart == true)
             {
                 string output = Environment.NewLine + conf.server + ":" + "Restart Attempt " + restart_attempts + " [" + Math.Pow(2, Convert.ToDouble(restart_attempts)) + " Seconds Delay]";
@@ -426,14 +471,6 @@ namespace IRCBot
 
             if (restart == false)
             {
-                BackgroundWorker work = new BackgroundWorker();
-                work.WorkerSupportsCancellation = true;
-                work.DoWork += (sender, e) => save_stream(sender, e);
-
-                BackgroundWorker check_connect = new BackgroundWorker();
-                check_connect.WorkerSupportsCancellation = true;
-                check_connect.DoWork += (sender, e) => check_connection(sender, e);
-
                 try
                 {
                     IRCConnection.NoDelay = true;
@@ -455,8 +492,8 @@ namespace IRCBot
                         sendData("USER", nick + " default_host default_server :" + conf.name);
                     }
 
-                    work.RunWorkerAsync(2000);
-                    check_connect.RunWorkerAsync(2000);
+                    save_stream_worker.RunWorkerAsync(2000);
+                    check_connect_worker.RunWorkerAsync(2000);
 
                     IRCWork(bw);
                 }
@@ -472,8 +509,8 @@ namespace IRCBot
                 }
                 finally
                 {
-                    work.CancelAsync();
-                    check_connect.CancelAsync();
+                    save_stream_worker.CancelAsync();
+                    check_connect_worker.CancelAsync();
                     connecting = false;
                     connected = false;
                     if (sr != null)
@@ -532,13 +569,13 @@ namespace IRCBot
                         string[] lines = second.Split(stringSeparators, StringSplitOptions.RemoveEmptyEntries);
                         for (int x = 0; x <= lines.GetUpperBound(0); x++)
                         {
-                            if ((first.Length + 1 + lines[x].Length) > ircbot.irc_conf.max_message_length)
+                            if ((first.Length + 1 + lines[x].Length) > conf.max_message_length)
                             {
                                 string msg = "";
                                 string[] par = lines[x].Split(' ');
                                 foreach (string word in par)
                                 {
-                                    if ((first.Length + msg.Length + word.Length + 1) < ircbot.irc_conf.max_message_length)
+                                    if ((first.Length + msg.Length + word.Length + 1) < conf.max_message_length)
                                     {
                                         msg += " " + word;
                                     }
@@ -626,7 +663,8 @@ namespace IRCBot
 
         private void save_stream(Object sender, EventArgs e)
         {
-            while (shouldRun)
+            BackgroundWorker bw = sender as BackgroundWorker;
+            while (shouldRun && !bw.CancellationPending)
             {
                 try
                 {
@@ -961,7 +999,7 @@ namespace IRCBot
                     {
                         command = ex[3].ToLower(); //grab the command sent
                         string msg_type = command.TrimStart(':');
-                        if (msg_type.StartsWith(ircbot.irc_conf.command) == true)
+                        if (msg_type.StartsWith(conf.command) == true)
                         {
                             bot_command = true;
                             command = command.Remove(0, 2);
@@ -1043,66 +1081,38 @@ namespace IRCBot
                         {
                             sw.WriteLine("WHO " + channel.TrimStart(':'));
                             line = read_queue();
-                            while (line == "")
+                            while (!line.Contains("352 " + nick + " " + channel))
                             {
                                 line = read_queue();
                             }
-                            char[] Separator = new char[] { ' ' };
-                            string[] name_line = line.Split(Separator, 5);
-                            while (name_line.GetUpperBound(0) <= 3)
+                            tmp_list.Add(channel);
+                            while (!line.Contains("315 " + nick + " " + channel + " :End of /WHO list."))
                             {
-                                line = read_queue();
-                                name_line = line.Split(Separator, 5);
-                            }
-                            while (name_line[1] != "352")
-                            {
-                                line = read_queue();
-                                name_line = line.Split(charSeparator, 5);
-                                while (name_line.GetUpperBound(0) <= 3)
+                                if (line.Contains("352 " + nick + " " + channel))
                                 {
-                                    line = read_queue();
-                                    name_line = line.Split(charSeparator, 5);
-                                }
-                            }
-                            tmp_list.Add(name_line[3]); string[] name_info = name_line[4].Split(':');
-                            if (name_info.GetUpperBound(0) > 0)
-                            {
-                                char[] sep = new char[] { ' ' };
-                                string[] info = name_info[0].Split(sep, StringSplitOptions.RemoveEmptyEntries);
-                                while (name_line[4] != ":End of /WHO list.")
-                                {
-                                    if (name_line[1] == "352")
+                                    channel_found = true;
+                                    char[] sep = new char[] { ' ' };
+                                    string[] name_line = line.Split(sep, StringSplitOptions.RemoveEmptyEntries);
+                                    char[] arr = name_line[8].ToCharArray();
+                                    int user_access = conf.user_level;
+                                    foreach (char c in arr)
                                     {
-                                        channel_found = true;
-                                        char[] arr = info[info.GetUpperBound(0)].ToCharArray();
-                                        int user_access = conf.user_level;
-                                        foreach (char c in arr)
+                                        if (c.Equals('~') || c.Equals('&') || c.Equals('@') || c.Equals('%') || c.Equals('+'))
                                         {
-                                            if (c.Equals('~') || c.Equals('&') || c.Equals('@') || c.Equals('%') || c.Equals('+'))
+                                            int tmp_access = get_access_num(c.ToString(), false);
+                                            if (tmp_access > user_access)
                                             {
-                                                int tmp_access = get_access_num(c.ToString(), false);
-                                                if (tmp_access > user_access)
-                                                {
-                                                    user_access = tmp_access;
-                                                }
+                                                user_access = tmp_access;
                                             }
                                         }
-                                        tmp_list.Add(user_access + ":" + info[info.GetUpperBound(0) - 1].TrimStart('~'));
                                     }
-                                    line = read_queue();
-                                    name_line = line.Split(charSeparator, 5);
-                                    while (name_line.GetUpperBound(0) <= 3)
-                                    {
-                                        line = read_queue();
-                                        name_line = line.Split(charSeparator, 5);
-                                    }
-                                    name_info = name_line[4].Split(':');
-                                    info = name_info[0].Split(sep, StringSplitOptions.RemoveEmptyEntries);
+                                    tmp_list.Add(user_access + ":" + name_line[7].TrimStart('~'));
                                 }
-                                if (channel_found == true)
-                                {
-                                    nick_list.Add(tmp_list);
-                                }
+                                line = read_queue();
+                            }
+                            if (channel_found == true)
+                            {
+                                nick_list.Add(tmp_list);
                             }
                         }
                     }
@@ -1402,7 +1412,7 @@ namespace IRCBot
                 int index = 0;
                 foreach (spam_info spam in conf.spam_check)
                 {
-                    if (spam.spam_count < ircbot.irc_conf.spam_count_max)
+                    if (spam.count < conf.spam_count_max)
                     {
                         spam_index.Add(index);
                     }
@@ -1424,23 +1434,23 @@ namespace IRCBot
             {
                 foreach (spam_info spam in conf.spam_check)
                 {
-                    if (spam.spam_count > ircbot.irc_conf.spam_count_max)
+                    if (spam.count > conf.spam_count_max)
                     {
-                        if (!spam.spam_activated)
+                        if (!spam.activated)
                         {
                             System.Windows.Forms.Timer new_timer = new System.Windows.Forms.Timer();
-                            new_timer.Interval = ircbot.irc_conf.spam_timout;
-                            new_timer.Tick += (new_sender, new_e) => spam_deactivate(new_sender, new_e, spam.spam_channel);
+                            new_timer.Interval = conf.spam_timout;
+                            new_timer.Tick += (new_sender, new_e) => spam_deactivate(new_sender, new_e, spam.channel);
                             new_timer.Enabled = true;
                             timer_info tmp_timer = new timer_info();
-                            tmp_timer.spam_channel = spam.spam_channel;
+                            tmp_timer.channel = spam.channel;
                             tmp_timer.spam_timer = new_timer;
                             lock (timerlock)
                             {
                                 Spam_Timers.Add(tmp_timer);
                             }
-                            spam.spam_activated = true;
-                            spam.spam_count++;
+                            spam.activated = true;
+                            spam.count++;
                             Spam_Timers[Spam_Timers.Count - 1].spam_timer.Start();
                         }
                     }
@@ -1453,29 +1463,39 @@ namespace IRCBot
             lock (spamlock)
             {
                 int index = 0;
+                bool spam_found = false;
                 foreach (spam_info spam in conf.spam_check)
                 {
-                    if (spam.spam_activated && spam.spam_channel.Equals(channel, StringComparison.InvariantCultureIgnoreCase))
+                    if (spam.activated && spam.channel.Equals(channel, StringComparison.InvariantCultureIgnoreCase))
                     {
+                        spam_found = true;
                         break;
                     }
                     index++;
                 }
-                conf.spam_check.RemoveAt(index);
+                if (spam_found)
+                {
+                    conf.spam_check.RemoveAt(index);
+                }
             }
             lock (timerlock)
             {
                 int index = 0;
+                bool spam_found = false;
                 foreach (timer_info spam in Spam_Timers)
                 {
-                    if (spam.spam_channel.Equals(channel, StringComparison.InvariantCultureIgnoreCase))
+                    if (spam.channel.Equals(channel, StringComparison.InvariantCultureIgnoreCase))
                     {
+                        spam_found = true;
                         break;
                     }
                     index++;
                 }
-                Spam_Timers[index].spam_timer.Stop();
-                Spam_Timers.RemoveAt(index);
+                if (spam_found)
+                {
+                    Spam_Timers[index].spam_timer.Stop();
+                    Spam_Timers.RemoveAt(index);
+                }
             }
         }
 
@@ -1488,9 +1508,9 @@ namespace IRCBot
                 int index = 0;
                 foreach (spam_info spam in conf.spam_check)
                 {
-                    if (spam.spam_channel.Equals(channel, StringComparison.InvariantCultureIgnoreCase))
+                    if (spam.channel.Equals(channel, StringComparison.InvariantCultureIgnoreCase))
                     {
-                        if (spam.spam_count > ircbot.irc_conf.spam_count_max + 1)
+                        if (spam.count > conf.spam_count_max + 1)
                         {
                             spam_added = true;
                         }
@@ -1501,14 +1521,14 @@ namespace IRCBot
                 }
                 if (!spam_added && spam_found)
                 {
-                    conf.spam_check[index].spam_count++;
+                    conf.spam_check[index].count++;
                 }
                 else if (!spam_found)
                 {
                     spam_info new_spam = new spam_info();
-                    new_spam.spam_channel = channel;
-                    new_spam.spam_activated = false;
-                    new_spam.spam_count = 1;
+                    new_spam.channel = channel;
+                    new_spam.activated = false;
+                    new_spam.count = 1;
                     conf.spam_check.Add(new_spam);
                 }
             }
@@ -1521,13 +1541,29 @@ namespace IRCBot
             {
                 foreach (spam_info spam in conf.spam_check)
                 {
-                    if (spam.spam_channel.Equals(channel, StringComparison.InvariantCultureIgnoreCase))
+                    if (spam.channel.Equals(channel, StringComparison.InvariantCultureIgnoreCase))
                     {
-                        if (spam.spam_activated)
+                        if (spam.activated)
                         {
                             active = true;
                         }
                         break;
+                    }
+                }
+            }
+            return active;
+        }
+
+        public bool get_spam_check(string channel, string nick, bool enabled)
+        {
+            bool active = conf.spam_enable;
+            if (active)
+            {
+                foreach (string part in conf.spam_ignore.Split(','))
+                {
+                    if (part.Equals(channel, StringComparison.InvariantCultureIgnoreCase) || part.Equals(nick, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        active = false;
                     }
                 }
             }
@@ -1539,13 +1575,13 @@ namespace IRCBot
             sendData("PRIVMSG", "NickServ :register " + password + " " + email);
         }
 
-        public string get_user_host(string nick)
+        public string get_user_host(string tmp_nick)
         {
             string access = "";
             string line = "";
             //sendData("ISON", nick);
             //line = sr.ReadLine();
-            string[] new_nick = nick.Split(' ');
+            string[] new_nick = tmp_nick.Split(' ');
             if (sw != null)
             {
                 sw.WriteLine("USERHOST " + new_nick[0]);
@@ -1564,7 +1600,7 @@ namespace IRCBot
                 }
                 if (name_line[3] != ":")
                 {
-                    string[] strSplit = new string[] { "=+" };
+                    string[] strSplit = new string[] { "=" };
                     string[] who_split = name_line[3].TrimStart(':').Split(strSplit, StringSplitOptions.RemoveEmptyEntries);
                     if (who_split.GetUpperBound(0) > 0)
                     {
@@ -1609,36 +1645,50 @@ namespace IRCBot
             return access;
         }
 
-        public bool get_user_ident(string nick)
+        public bool get_user_auto(string type, string channel, string tmp_nick)
+        {
+            bool auto = true;
+            if (sw != null)
+            {
+                string line = "";
+                sw.WriteLine("PRIVMSG chanserv :" + type + " " + channel + " list " + tmp_nick);
+                line = read_queue();
+                bool cont = true;
+                while (cont)
+                {
+                    if (line.Contains("No matching entries on " + channel + " " + type + " list.") || line.Contains(channel + " " + type + " list is empty."))
+                    {
+                        auto = false;
+                        cont = false;
+                    }
+                    else if (line.Contains(type + " list for " + channel))
+                    {
+                        auto = true;
+                        cont = false;
+                    }
+                    else
+                    {
+                        cont = true;
+                        line = read_queue();
+                    }
+                }
+            }
+            return auto;
+        }
+
+        public bool get_user_ident(string tmp_nick)
         {
             bool identified = false;
             if (sw != null)
             {
                 string line = "";
-                sw.WriteLine("PRIVMSG nickserv :STATUS " + nick);
+                sw.WriteLine("PRIVMSG nickserv :STATUS " + tmp_nick);
                 line = read_queue();
-                while (line == "")
+                while (!line.Contains(":STATUS"))
                 {
                     line = read_queue();
                 }
-                char[] charSeparator = new char[] { ' ' };
-                string[] name_line = line.Split(charSeparator, 5);
-                while (name_line.GetUpperBound(0) < 4)
-                {
-                    line = read_queue();
-                    name_line = line.Split(charSeparator, 5);
-                }
-                while (name_line[3] != ":STATUS")
-                {
-                    line = read_queue();
-                    name_line = line.Split(charSeparator, 5);
-                    while (name_line.GetUpperBound(0) < 4)
-                    {
-                        line = read_queue();
-                        name_line = line.Split(charSeparator, 5);
-                    }
-                }
-                if (name_line[4].StartsWith(nick + " 3", StringComparison.InvariantCultureIgnoreCase))
+                if (line.Contains(":STATUS " + tmp_nick + " 3"))
                 {
                     identified = true;
                 }
@@ -1646,50 +1696,30 @@ namespace IRCBot
             return identified;
         }
 
-        public int get_user_op(string nick, string channel)
+        public int get_user_op(string tmp_nick, string channel)
         {
             int new_access = conf.default_level;
-            bool nick_found = false;
             string line = "";
             if (sw != null)
             {
                 sw.WriteLine("WHO " + channel.TrimStart(':'));
                 line = read_queue();
-                while (line == "")
+                while (!line.Contains("352 " + nick + " " + channel))
                 {
                     line = read_queue();
                 }
-                char[] charSeparator = new char[] { ' ' };
                 char[] Separator = new char[] { ' ' };
-                string[] name_line = line.Split(Separator, 5);
-                while (name_line.GetUpperBound(0) <= 3)
+                while (!line.Contains("315 " + nick + " " + channel + ":End of /WHO list."))
                 {
-                    line = read_queue();
-                    name_line = line.Split(Separator, 5);
-                }
-                while (name_line[1] != "352")
-                {
-                    line = read_queue();
-                    name_line = line.Split(charSeparator, 5);
-                    while (name_line.GetUpperBound(0) <= 3)
+                    if (line.Contains("352 " + nick + " " + channel))
                     {
-                        line = read_queue();
-                        name_line = line.Split(charSeparator, 5);
-                    }
-                }
-                string[] name_info = name_line[4].Split(':');
-                if (name_info.GetUpperBound(0) > 0)
-                {
-                    char[] sep = new char[] { ' ' };
-                    string[] info = name_info[0].Split(sep, StringSplitOptions.RemoveEmptyEntries);
-                    while (name_line[4] != ":End of /WHO list.")
-                    {
-                        if (info.GetUpperBound(0) - 1 >= 0)
+                        string[] name_line = line.Split(Separator, StringSplitOptions.RemoveEmptyEntries);
+                        if (name_line.GetUpperBound(0) >= 8)
                         {
-                            if (info[info.GetUpperBound(0) - 1].TrimStart('~').Equals(nick, StringComparison.InvariantCultureIgnoreCase))
+                            if (name_line[7].TrimStart('~').Equals(tmp_nick, StringComparison.InvariantCultureIgnoreCase))
                             {
                                 bool char_found = false;
-                                char[] arr = info[info.GetUpperBound(0)].ToCharArray();
+                                char[] arr = name_line[8].ToCharArray();
                                 foreach (char c in arr)
                                 {
                                     if (c.Equals('~') || c.Equals('&') || c.Equals('@') || c.Equals('%') || c.Equals('+'))
@@ -1706,43 +1736,28 @@ namespace IRCBot
                                 {
                                     new_access = conf.user_level;
                                 }
-                                nick_found = true;
+                                break;
                             }
-                        }
-                        if (nick_found == false)
-                        {
-                            line = read_queue();
-                            name_line = line.Split(charSeparator, 5);
-                            while (name_line.GetUpperBound(0) <= 3)
-                            {
-                                line = read_queue();
-                                name_line = line.Split(charSeparator, 5);
-                            }
-                            name_info = name_line[4].Split(':');
-                            info = name_info[0].Split(sep, StringSplitOptions.RemoveEmptyEntries);
-                        }
-                        else
-                        {
-                            break;
                         }
                     }
+                    line = read_queue();
                 }
             }
             return new_access;
         }
 
-        public int get_user_access(string nick, string channel)
+        public int get_user_access(string tmp_nick, string channel)
         {
             int access_num = conf.default_level;
             try
             {
                 string access = access_num.ToString();
                 string tmp_custom_access = "";
-                if (nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase))
+                if (tmp_nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase))
                 {
                     access = conf.owner_level.ToString();
                 }
-                bool user_identified = get_user_ident(nick);
+                bool user_identified = get_user_ident(tmp_nick);
                 if (user_identified == true)
                 {
                     for (int x = 0; x < conf.module_config.Count(); x++)
@@ -1763,7 +1778,7 @@ namespace IRCBot
                                 if (channel != null)
                                 {
                                     Modules.access acc = new Modules.access();
-                                    tmp_custom_access = acc.get_access_list(nick, channel, this);
+                                    tmp_custom_access = acc.get_access_list(tmp_nick, channel, this);
                                     access = tmp_custom_access;
                                 }
                             }
@@ -1780,7 +1795,7 @@ namespace IRCBot
                             string[] lists = nick_list[x][i].Split(':');
                             if (lists.GetUpperBound(0) > 0)
                             {
-                                if (lists[1].Equals(nick, StringComparison.InvariantCultureIgnoreCase))
+                                if (lists[1].Equals(tmp_nick, StringComparison.InvariantCultureIgnoreCase))
                                 {
                                     access += "," + lists[0];
                                     break;
@@ -1795,7 +1810,7 @@ namespace IRCBot
                     string[] owners = conf.owner.Split(','); // Get list of owners
                     for (int x = 0; x <= owners.GetUpperBound(0); x++)
                     {
-                        if (nick.Equals(owners[x], StringComparison.InvariantCultureIgnoreCase))
+                        if (tmp_nick.Equals(owners[x], StringComparison.InvariantCultureIgnoreCase))
                         {
                             access += "," + conf.owner_level.ToString();
                         }
@@ -1815,7 +1830,7 @@ namespace IRCBot
                 if (access_num == conf.default_level && channel != null)
                 {
                     bool nick_found = false;
-                    access_num = get_user_op(nick, channel);
+                    access_num = get_user_op(tmp_nick, channel);
                     if (access_num != conf.default_level)
                     {
                         for (int x = 0; x < nick_list.Count(); x++)
@@ -1827,7 +1842,7 @@ namespace IRCBot
                                     string[] lists = nick_list[x][i].Split(':');
                                     if (lists.GetUpperBound(0) > 0)
                                     {
-                                        if (lists[1].Equals(nick, StringComparison.InvariantCultureIgnoreCase))
+                                        if (lists[1].Equals(tmp_nick, StringComparison.InvariantCultureIgnoreCase))
                                         {
                                             nick_found = true;
                                             string new_nick = access_num.ToString();
@@ -1842,7 +1857,7 @@ namespace IRCBot
                                 }
                                 if (nick_found == false)
                                 {
-                                    nick_list[x].Add(access_num + ":" + nick);
+                                    nick_list[x].Add(access_num + ":" + tmp_nick);
                                 }
                                 break;
                             }
@@ -1885,6 +1900,13 @@ namespace IRCBot
         public int founder_level { get; set; }
         public int owner_level { get; set; }
         public bool auto_connect { get; set; }
+        public string command { get; set; }
+        public bool spam_enable { get; set; }
+        public string spam_ignore { get; set; }
+        public int spam_count_max { get; set; }
+        public int spam_threshold { get; set; }
+        public int spam_timout { get; set; }
+        public int max_message_length { get; set; }
         public List<List<string>> module_config { get; set; }
         public List<List<string>> command_list { get; set; }
         public List<spam_info> spam_check { get; set; }
@@ -1893,13 +1915,13 @@ namespace IRCBot
 
 public class spam_info
 {
-    public string spam_channel { get; set; }
-    public int spam_count { get; set; }
-    public bool spam_activated { get; set; }
+    public string channel { get; set; }
+    public int count { get; set; }
+    public bool activated { get; set; }
 }
 
 public class timer_info
 {
-    public string spam_channel { get; set; }
+    public string channel { get; set; }
     public System.Windows.Forms.Timer spam_timer { get; set; }
 }

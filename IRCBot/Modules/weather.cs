@@ -24,7 +24,7 @@ namespace IRCBot.Modules
                         string[] blacklist = tmp_command[6].Split(',');
                         bool blocked = false;
                         bool cmd_found = false;
-                        bool spam_check = Convert.ToBoolean(tmp_command[8]);
+                        bool spam_check = ircbot.get_spam_check(channel, nick, Convert.ToBoolean(tmp_command[8]));
                         foreach (string bl_chan in blacklist)
                         {
                             if (bl_chan.Equals(channel))
@@ -60,32 +60,7 @@ namespace IRCBot.Modules
                                         {
                                             if (spam_check == true)
                                             {
-                                                lock (ircbot.spamlock)
-                                                {
-                                                    bool spam_added = false;
-                                                    int index = 0;
-                                                    foreach (spam_info spam in conf.spam_check)
-                                                    {
-                                                        if (spam.spam_channel.Equals(channel))
-                                                        {
-                                                            spam_added = true;
-                                                            index++;
-                                                            break;
-                                                        }
-                                                    }
-                                                    if (spam_added)
-                                                    {
-                                                        conf.spam_check[index].spam_count++;
-                                                    }
-                                                    else
-                                                    {
-                                                        spam_info new_spam = new spam_info();
-                                                        new_spam.spam_channel = channel;
-                                                        new_spam.spam_activated = false;
-                                                        new_spam.spam_count = 1;
-                                                        conf.spam_check.Add(new_spam);
-                                                    }
-                                                }
+                                                ircbot.add_spam_count(channel);
                                             }
                                             if (nick_access >= command_access)
                                             {
@@ -110,32 +85,7 @@ namespace IRCBot.Modules
                                         {
                                             if (spam_check == true)
                                             {
-                                                lock (ircbot.spamlock)
-                                                {
-                                                    bool spam_added = false;
-                                                    int index = 0;
-                                                    foreach (spam_info spam in conf.spam_check)
-                                                    {
-                                                        if (spam.spam_channel.Equals(channel))
-                                                        {
-                                                            spam_added = true;
-                                                            index++;
-                                                            break;
-                                                        }
-                                                    }
-                                                    if (spam_added)
-                                                    {
-                                                        conf.spam_check[index].spam_count++;
-                                                    }
-                                                    else
-                                                    {
-                                                        spam_info new_spam = new spam_info();
-                                                        new_spam.spam_channel = channel;
-                                                        new_spam.spam_activated = false;
-                                                        new_spam.spam_count = 1;
-                                                        conf.spam_check.Add(new_spam);
-                                                    }
-                                                }
+                                                ircbot.add_spam_count(channel);
                                             }
                                             if (nick_access >= command_access)
                                             {

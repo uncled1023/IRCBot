@@ -33,7 +33,7 @@ namespace IRCBot.Modules
                         string[] blacklist = tmp_command[6].Split(',');
                         bool blocked = false;
                         bool cmd_found = false;
-                        bool spam_check = Convert.ToBoolean(tmp_command[8]);
+                        bool spam_check = ircbot.get_spam_check(channel, nick, Convert.ToBoolean(tmp_command[8]));
                         foreach (string bl_chan in blacklist)
                         {
                             if (bl_chan.Equals(channel))
@@ -104,7 +104,7 @@ namespace IRCBot.Modules
                                                     {
                                                         ircbot.sendData("PRIVMSG", channel + " :" + (x + 1).ToString() + ") " + temp_poll.answers[x][0]);
                                                     }
-                                                    ircbot.sendData("PRIVMSG", channel + " :To Vote, type " + ircbot.ircbot.irc_conf.command + "vote <answer_number>.  You may only vote once per poll.  You can change your vote by voting for a different answer.");
+                                                    ircbot.sendData("PRIVMSG", channel + " :To Vote, type " + ircbot.conf.command + "vote <answer_number>.  You may only vote once per poll.  You can change your vote by voting for a different answer.");
                                                     poll_list.Add(temp_poll);
                                                 }
                                                 else
@@ -114,7 +114,7 @@ namespace IRCBot.Modules
                                             }
                                             else
                                             {
-                                                ircbot.sendData("PRIVMSG", channel + " :There is currently a poll active right now.  To view the current results, type " + ircbot.ircbot.irc_conf.command + "results");
+                                                ircbot.sendData("PRIVMSG", channel + " :There is currently a poll active right now.  To view the current results, type " + ircbot.conf.command + "results");
                                             }
                                         }
                                         else

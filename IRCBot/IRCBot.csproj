@@ -294,7 +294,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties BuildVersion_BuildVersioningStyle="None.None.Increment.Increment" BuildVersion_BuildAction="Build" BuildVersion_AssemblyInfoFilename="..\..\..\..\..\Documents\GitHub\IRCBot\IRCBot\Properties\AssemblyInfo.cs" />
+      <UserProperties BuildVersion_AssemblyInfoFilename="..\..\..\..\..\Documents\GitHub\IRCBot\IRCBot\Properties\AssemblyInfo.cs" BuildVersion_BuildAction="Build" BuildVersion_BuildVersioningStyle="None.None.Increment.Increment" />
     </VisualStudio>
   </ProjectExtensions>
   <PropertyGroup>

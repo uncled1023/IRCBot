@@ -40,7 +40,7 @@ namespace IRCBot.Modules
                         string[] blacklist = tmp_command[6].Split(',');
                         bool blocked = false;
                         bool cmd_found = false;
-                        bool spam_check = Convert.ToBoolean(tmp_command[8]);
+                        bool spam_check = ircbot.get_spam_check(channel, nick, Convert.ToBoolean(tmp_command[8]));
                         foreach (string bl_chan in blacklist)
                         {
                             if (bl_chan.Equals(channel))
@@ -137,7 +137,7 @@ namespace IRCBot.Modules
                                                     tmp_info.previous_bomb_holder = nick;
                                                     tmp_info.bomb_holder = nick;
 
-                                                    ircbot.sendData("PRIVMSG", channel + " :" + nick + " has started the timer!  If the bomb gets passed to you, type " + ircbot.ircbot.irc_conf.command + "pass <nick> to pass it to someone else, or type " + ircbot.ircbot.irc_conf.command + "defuse <color> to try to defuse it.");
+                                                    ircbot.sendData("PRIVMSG", channel + " :" + nick + " has started the timer!  If the bomb gets passed to you, type " + ircbot.conf.command + "pass <nick> to pass it to someone else, or type " + ircbot.conf.command + "defuse <color> to try to defuse it.");
                                                     string colors = "";
                                                     foreach (string wire in tmp_info.wire_colors)
                                                     {
@@ -685,7 +685,7 @@ namespace IRCBot.Modules
                 tmp_info.previous_bomb_holder = nick;
                 hbombs[index] = tmp_info;
                 ircbot.sendData("PRIVMSG", channel + " :" + nick + " passed the bomb to " + pass_nick);
-                ircbot.sendData("NOTICE", pass_nick + " :You now have the bomb!  Type " + ircbot.ircbot.irc_conf.command + "pass <nick> to pass it to someone else, or type " + ircbot.ircbot.irc_conf.command + "defuse <color> to try to defuse it.");
+                ircbot.sendData("NOTICE", pass_nick + " :You now have the bomb!  Type " + ircbot.conf.command + "pass <nick> to pass it to someone else, or type " + ircbot.conf.command + "defuse <color> to try to defuse it.");
                 string colors = "";
                 foreach (string wire in tmp_info.wire_colors)
                 {

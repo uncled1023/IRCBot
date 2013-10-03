@@ -26,7 +26,4 @@ Global
 		BuildVersion_BuildVersioningStyle = None.None.Increment.Increment
 		BuildVersion_AssemblyInfoFilename = ..\..\..\..\Documents\GitHub\IRCBot\IRCBot\Properties\AssemblyInfo.cs
 	EndGlobalSection
-	GlobalSection(Performance) = preSolution
-		HasPerformanceSessions = true
-	EndGlobalSection
 EndGlobal

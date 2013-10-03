@@ -24,7 +24,7 @@ namespace IRCBot.Modules
                         string[] blacklist = tmp_command[6].Split(',');
                         bool blocked = false;
                         bool cmd_found = false;
-                        bool spam_check = Convert.ToBoolean(tmp_command[8]);
+                        bool spam_check = ircbot.get_spam_check(channel, nick, Convert.ToBoolean(tmp_command[8]));
                         foreach (string bl_chan in blacklist)
                         {
                             if (bl_chan.Equals(channel))
@@ -74,11 +74,11 @@ namespace IRCBot.Modules
                                             if (nick_found == false)
                                             {
                                                 idle_list.Add(nick);
-                                                ircbot.sendData("NOTICE", nick + " :You are now set as idle.  Type " + ircbot.ircbot.irc_conf.command + "deidle to come back.");
+                                                ircbot.sendData("NOTICE", nick + " :You are now set as idle.  Type " + ircbot.conf.command + "deidle to come back.");
                                             }
                                             else
                                             {
-                                                ircbot.sendData("NOTICE", nick + " :You are already idle.  Type " + ircbot.ircbot.irc_conf.command + "deidle to come back.");
+                                                ircbot.sendData("NOTICE", nick + " :You are already idle.  Type " + ircbot.conf.command + "deidle to come back.");
                                             }
                                         }
                                         else
@@ -109,7 +109,7 @@ namespace IRCBot.Modules
                                             }
                                             else
                                             {
-                                                ircbot.sendData("NOTICE", nick + " :You aren't idle.  Type " + ircbot.ircbot.irc_conf.command + "idle to be set idle.");
+                                                ircbot.sendData("NOTICE", nick + " :You aren't idle.  Type " + ircbot.conf.command + "idle to be set idle.");
                                             }
                                         }
                                         else

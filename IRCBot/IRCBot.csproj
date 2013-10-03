@@ -44,12 +44,14 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
+    <Optimize>false</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>
+    </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>
@@ -58,42 +60,57 @@
   <PropertyGroup>
     <ApplicationIcon>Bot.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AIMLbot, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\AIMLbot.dll</HintPath>
+    <Reference Include="AIMLbot">
+      <HintPath>Resources\AIMLbot.dll</HintPath>
+      <Private>False</Private>
     </Reference>
-    <Reference Include="Google.GData.Client, Version=2.1.0.0, Culture=neutral, PublicKeyToken=04a59ca9b0273830, processorArchitecture=MSIL">
+    <Reference Include="Google.GData.Client, Version=1.8.0.0, Culture=neutral, PublicKeyToken=04a59ca9b0273830, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\Google.GData.Client.dll</HintPath>
+      <HintPath>Resources\Google.GData.Client.dll</HintPath>
+      <Private>False</Private>
     </Reference>
-    <Reference Include="Google.GData.Extensions, Version=2.1.0.0, Culture=neutral, PublicKeyToken=0b4c5df2ebf20876, processorArchitecture=MSIL">
+    <Reference Include="Google.GData.Extensions, Version=1.8.0.0, Culture=neutral, PublicKeyToken=0b4c5df2ebf20876, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\Google.GData.Extensions.dll</HintPath>
+      <HintPath>Resources\Google.GData.Extensions.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Google.GData.YouTube, Version=1.8.0.0, Culture=neutral, PublicKeyToken=af04a32718ae8833, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\Google.GData.YouTube.dll</HintPath>
+      <HintPath>Resources\Google.GData.YouTube.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="HtmlAgilityPack">
+      <HintPath>Resources\HtmlAgilityPack.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="IronPython, Version=2.7.0.40, Culture=neutral, PublicKeyToken=7f709c5b713576e1, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\IronPython.dll</HintPath>
+      <HintPath>Resources\IronPython.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="IronPython.Modules, Version=2.7.0.40, Culture=neutral, PublicKeyToken=7f709c5b713576e1, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\IronPython.Modules.dll</HintPath>
+      <HintPath>Resources\IronPython.Modules.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.Dynamic, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7f709c5b713576e1, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\Microsoft.Dynamic.dll</HintPath>
+      <HintPath>Resources\Microsoft.Dynamic.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.Scripting, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7f709c5b713576e1, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\Microsoft.Scripting.dll</HintPath>
+      <HintPath>Resources\Microsoft.Scripting.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\Newtonsoft.Json.dll</HintPath>
+      <HintPath>Resources\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -108,16 +125,20 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="WolframAlpha.WrapperCore">
-      <HintPath>lib\WolframAlpha.WrapperCore.dll</HintPath>
+      <HintPath>Resources\WolframAlpha.WrapperCore.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Modules\chat.cs" />
     <Compile Include="GUI\add_server.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="GUI\add_server.Designer.cs">
       <DependentUpon>add_server.cs</DependentUpon>
     </Compile>
+    <Compile Include="Modules\air.cs" />
+    <Compile Include="Modules\fortune.cs" />
     <Compile Include="Modules\invite.cs" />
     <Compile Include="Modules\4chan.cs" />
     <Compile Include="lib\json.cs" />
@@ -144,7 +165,6 @@
     <Compile Include="Modules\access.cs" />
     <Compile Include="Modules\response.cs" />
     <Compile Include="Bot\bot.cs" />
-    <Compile Include="Modules\chat.cs" />
     <Compile Include="GUI\configuration.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -181,9 +201,9 @@
     <Compile Include="Modules\roll_call.cs" />
     <Compile Include="Modules\rules.cs" />
     <Compile Include="Modules\seen.cs" />
-    <Compile Include="Modules\urban_dictionary.cs" />
     <Compile Include="Modules\version.cs" />
     <Compile Include="Modules\weather.cs" />
+    <Compile Include="Settings.cs" />
     <EmbeddedResource Include="GUI\AboutBox1.resx">
       <DependentUpon>AboutBox1.cs</DependentUpon>
     </EmbeddedResource>
@@ -204,6 +224,7 @@
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="ClassDiagram1.cd" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -220,7 +241,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5">
@@ -242,11 +265,20 @@
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Resources\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Content Include="Bot.ico" />
+    <Content Include="Resources\AIMLbot.dll" />
+    <Content Include="Resources\Google.GData.Client.dll" />
+    <Content Include="Resources\Google.GData.Extensions.dll" />
+    <Content Include="Resources\Google.GData.YouTube.dll" />
+    <Content Include="Resources\HtmlAgilityPack.dll" />
+    <Content Include="Resources\IronPython.dll" />
+    <Content Include="Resources\IronPython.Modules.dll" />
+    <Content Include="Resources\Microsoft.Dynamic.dll" />
+    <Content Include="Resources\Microsoft.Scripting.dll" />
+    <Content Include="Resources\Newtonsoft.Json.dll" />
+    <Content Include="Resources\WolframAlpha.WrapperCore.dll" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="IWshRuntimeLibrary">
@@ -262,11 +294,13 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties BuildVersion_AssemblyInfoFilename="..\..\..\..\..\Documents\GitHub\IRCBot\IRCBot\Properties\AssemblyInfo.cs" BuildVersion_BuildAction="Build" BuildVersion_BuildVersioningStyle="None.None.Increment.Increment" />
+      <UserProperties BuildVersion_BuildVersioningStyle="None.None.Increment.Increment" BuildVersion_BuildAction="Build" BuildVersion_AssemblyInfoFilename="..\..\..\..\..\Documents\GitHub\IRCBot\IRCBot\Properties\AssemblyInfo.cs" />
     </VisualStudio>
   </ProjectExtensions>
   <PropertyGroup>
-    <PostBuildEvent>$(ProjectDir)util\ProjectBuildCounter.exe $(ProjectDir)properties\AssemblyInfo.cs B</PostBuildEvent>
+    <PostBuildEvent>$(ProjectDir)util\ProjectBuildCounter.exe $(ProjectDir)properties\AssemblyInfo.cs B
+copy /Y "$(ProjectDir)Resources\*" "$(TargetDir)Resources"
+copy /Y "$(ProjectDir)bot.ico" "$(TargetDir)"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

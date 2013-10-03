@@ -24,7 +24,7 @@ namespace IRCBot.Modules
                         string[] blacklist = tmp_command[6].Split(',');
                         bool blocked = false;
                         bool cmd_found = false;
-                        bool spam_check = Convert.ToBoolean(tmp_command[8]);
+                        bool spam_check = ircbot.get_spam_check(channel, nick, Convert.ToBoolean(tmp_command[8]));
                         foreach (string bl_chan in blacklist)
                         {
                             if (bl_chan.Equals(channel))
@@ -335,7 +335,7 @@ namespace IRCBot.Modules
                                             {
                                                 bot_command = true;
                                                 string data = "";
-                                                data = ":" + ircbot.nick + " PRIVMSG " + channel + " :" + ircbot.ircbot.irc_conf.command + events[y].Remove(0, 5);
+                                                data = ":" + ircbot.nick + " PRIVMSG " + channel + " :" + ircbot.conf.command + events[y].Remove(0, 5);
 
                                                 char[] charSplit = new char[] { ' ' };
                                                 string[] ex = data.Split(charSplit, 5);
@@ -393,7 +393,7 @@ namespace IRCBot.Modules
                                                             }
                                                             if (module_allowed == true)
                                                             {
-                                                                module.control(ircbot, ref conf, mod_index, ex, ex[3].TrimStart(':').TrimStart(Convert.ToChar(ircbot.ircbot.irc_conf.command)), conf.owner_level, nick, channel, bot_command, type);
+                                                                module.control(ircbot, ref conf, mod_index, ex, ex[3].TrimStart(':').TrimStart(Convert.ToChar(ircbot.conf.command)), conf.owner_level, nick, channel, bot_command, type);
                                                             }
                                                         }
                                                     }

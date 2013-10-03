@@ -33,7 +33,7 @@ namespace IRCBot.Modules
                         string[] blacklist = tmp_command[6].Split(',');
                         bool blocked = false;
                         bool cmd_found = false;
-                        bool spam_check = Convert.ToBoolean(tmp_command[8]);
+                        bool spam_check = ircbot.get_spam_check(channel, nick, Convert.ToBoolean(tmp_command[8]));
                         foreach (string bl_chan in blacklist)
                         {
                             if (bl_chan.Equals(channel))
@@ -816,7 +816,7 @@ namespace IRCBot.Modules
                                                             foreach (string owner_nick in owners)
                                                             {
                                                                 ircbot.sendData("NOTICE", owner_nick + " :" + nick + " has invited me to join " + line[4]);
-                                                                ircbot.sendData("NOTICE", owner_nick + " :If you would like to permanently add this channel, please type " + ircbot.ircbot.irc_conf.command + "addchanlist " + line[4]);
+                                                                ircbot.sendData("NOTICE", owner_nick + " :If you would like to permanently add this channel, please type " + ircbot.conf.command + "addchanlist " + line[4]);
                                                             }
                                                         }
                                                         ircbot.sendData("JOIN", line[4]);
@@ -1298,11 +1298,11 @@ namespace IRCBot.Modules
                 {
                     xmlDoc.Save(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + ircbot.conf.server + Path.DirectorySeparatorChar + "modules.xml");
                     ircbot.ircbot.update_conf();
-                    ircbot.sendData("NOTICE", nick + " :" + ignore_nick + " added successfully to the " + ircbot.ircbot.irc_conf.command + cmd + " ignore list!");
+                    ircbot.sendData("NOTICE", nick + " :" + ignore_nick + " added successfully to the " + ircbot.conf.command + cmd + " ignore list!");
                 }
                 else
                 {
-                    ircbot.sendData("NOTICE", nick + " :" + ircbot.ircbot.irc_conf.command + cmd + " does not exist.");
+                    ircbot.sendData("NOTICE", nick + " :" + ircbot.conf.command + cmd + " does not exist.");
                 }
             }
         }
@@ -1367,11 +1367,11 @@ namespace IRCBot.Modules
                 {
                     xmlDoc.Save(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + ircbot.conf.server + Path.DirectorySeparatorChar + "modules.xml");
                     ircbot.ircbot.update_conf();
-                    ircbot.sendData("NOTICE", nick + " :" + ignore_nick + " removed successfully from the " + ircbot.ircbot.irc_conf.command + cmd + " ignore list!");
+                    ircbot.sendData("NOTICE", nick + " :" + ignore_nick + " removed successfully from the " + ircbot.conf.command + cmd + " ignore list!");
                 }
                 else
                 {
-                    ircbot.sendData("NOTICE", nick + " :" + ircbot.ircbot.irc_conf.command + cmd + " does not exist.");
+                    ircbot.sendData("NOTICE", nick + " :" + ircbot.conf.command + cmd + " does not exist.");
                 }
             }
         }

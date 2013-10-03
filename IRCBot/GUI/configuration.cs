@@ -31,9 +31,6 @@ namespace IRCBot
             else
             {
                 XmlNode node = xmlDoc.CreateNode(XmlNodeType.Element, "global_settings", null);
-                XmlNode nodeCommand = xmlDoc.CreateElement("command_prefix");
-                nodeCommand.InnerText = ".";
-                node.AppendChild(nodeCommand);
                 XmlNode nodeKeep = xmlDoc.CreateElement("keep_logs");
                 nodeKeep.InnerText = "True";
                 node.AppendChild(nodeKeep);
@@ -46,29 +43,12 @@ namespace IRCBot
                 XmlNode nodeTray = xmlDoc.CreateElement("minimize_to_tray");
                 nodeTray.InnerText = "False";
                 node.AppendChild(nodeTray);
-                XmlNode nodeSpamCount = xmlDoc.CreateElement("spam_count");
-                nodeSpamCount.InnerText = "5";
-                node.AppendChild(nodeSpamCount);
-                XmlNode nodeSpamThreshold = xmlDoc.CreateElement("spam_threshold");
-                nodeSpamThreshold.InnerText = "1000";
-                node.AppendChild(nodeSpamThreshold);
-                XmlNode nodeSpamTime = xmlDoc.CreateElement("spam_timeout");
-                nodeSpamTime.InnerText = "10000";
-                node.AppendChild(nodeSpamTime);
-                XmlNode nodeSpamMaxMsgLength = xmlDoc.CreateElement("max_message_length");
-                nodeSpamMaxMsgLength.InnerText = "450";
-                node.AppendChild(nodeSpamMaxMsgLength);
                 xmlDoc.AppendChild(node);
                 xmlDoc.Save(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
                 xmlDoc.Load(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
             }
             XmlNode list = xmlDoc.SelectSingleNode("/bot_settings/global_settings");
 
-            command_prefix_box.Text = list["command_prefix"].InnerText;
-            spam_count_box.Text = list["spam_count"].InnerText;
-            spam_threshold_box.Text = list["spam_threshold"].InnerText;
-            spam_timeout_box.Text = list["spam_timeout"].InnerText;
-            max_message_length_box.Text = list["max_message_length"].InnerText;
             if (list["keep_logs"].InnerText == "True")
             {
                 keep_logs_box.Checked = true;
@@ -126,15 +106,10 @@ namespace IRCBot
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.Load(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
             XmlNode node = xmlDoc.SelectSingleNode("/bot_settings/global_settings");
-            node["command_prefix"].InnerText = command_prefix_box.Text;
             node["keep_logs"].InnerText = keep_logs_box.Checked.ToString();
             node["logs_path"].InnerText = log_folder_box.Text;
             node["start_with_windows"].InnerText = windows_start_box.Checked.ToString();
             node["minimize_to_tray"].InnerText = minimize_to_tray.Checked.ToString();
-            node["spam_count"].InnerText = spam_count_box.Text;
-            node["spam_threshold"].InnerText = spam_threshold_box.Text;
-            node["spam_timeout"].InnerText = spam_timeout_box.Text;
-            node["max_message_length"].InnerText = max_message_length_box.Text;
 
             xmlDoc.Save(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
             

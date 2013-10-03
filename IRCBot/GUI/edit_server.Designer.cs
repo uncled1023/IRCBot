@@ -46,14 +46,15 @@
             this.label3 = new System.Windows.Forms.Label();
             this.save_server_button = new System.Windows.Forms.Button();
             this.cancel_button = new System.Windows.Forms.Button();
-            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.Advanced_tab = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.ignore_list_box = new System.Windows.Forms.TextBox();
-            this.label28 = new System.Windows.Forms.Label();
+            this.label31 = new System.Windows.Forms.Label();
+            this.auto_connect = new System.Windows.Forms.CheckBox();
+            this.label30 = new System.Windows.Forms.Label();
+            this.label29 = new System.Windows.Forms.Label();
+            this.server_address_box = new System.Windows.Forms.TextBox();
             this.label27 = new System.Windows.Forms.Label();
             this.sec_nicks = new System.Windows.Forms.TextBox();
-            this.channel_blacklist_box = new System.Windows.Forms.TextBox();
-            this.label16 = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.module_options = new System.Windows.Forms.Panel();
             this.label26 = new System.Windows.Forms.Label();
@@ -93,16 +94,32 @@
             this.label14 = new System.Windows.Forms.Label();
             this.user_level_box = new System.Windows.Forms.TextBox();
             this.label15 = new System.Windows.Forms.Label();
-            this.label29 = new System.Windows.Forms.Label();
-            this.server_address_box = new System.Windows.Forms.TextBox();
-            this.label30 = new System.Windows.Forms.Label();
-            this.auto_connect = new System.Windows.Forms.CheckBox();
-            this.label31 = new System.Windows.Forms.Label();
-            this.tabControl1.SuspendLayout();
+            this.Advanced = new System.Windows.Forms.TabPage();
+            this.label16 = new System.Windows.Forms.Label();
+            this.max_message_length_box = new System.Windows.Forms.TextBox();
+            this.label32 = new System.Windows.Forms.Label();
+            this.spam_threshold_box = new System.Windows.Forms.TextBox();
+            this.label33 = new System.Windows.Forms.Label();
+            this.spam_timeout_box = new System.Windows.Forms.TextBox();
+            this.label34 = new System.Windows.Forms.Label();
+            this.spam_count_box = new System.Windows.Forms.TextBox();
+            this.label35 = new System.Windows.Forms.Label();
+            this.command_prefix_box = new System.Windows.Forms.TextBox();
+            this.label36 = new System.Windows.Forms.Label();
+            this.ignore_list_box = new System.Windows.Forms.TextBox();
+            this.label37 = new System.Windows.Forms.Label();
+            this.channel_blacklist_box = new System.Windows.Forms.TextBox();
+            this.label38 = new System.Windows.Forms.Label();
+            this.spam_enable = new System.Windows.Forms.CheckBox();
+            this.label28 = new System.Windows.Forms.Label();
+            this.spam_ignore = new System.Windows.Forms.TextBox();
+            this.label39 = new System.Windows.Forms.Label();
+            this.Advanced_tab.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.tabPage3.SuspendLayout();
             this.tabPage4.SuspendLayout();
+            this.Advanced.SuspendLayout();
             this.SuspendLayout();
             // 
             // port_box
@@ -124,15 +141,15 @@
             // 
             // channels_box
             // 
-            this.channels_box.Location = new System.Drawing.Point(165, 86);
+            this.channels_box.Location = new System.Drawing.Point(165, 216);
             this.channels_box.Name = "channels_box";
             this.channels_box.Size = new System.Drawing.Size(301, 20);
-            this.channels_box.TabIndex = 4;
+            this.channels_box.TabIndex = 9;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(18, 89);
+            this.label2.Location = new System.Drawing.Point(18, 219);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(117, 13);
             this.label2.TabIndex = 8;
@@ -156,15 +173,15 @@
             // 
             // email_box
             // 
-            this.email_box.Location = new System.Drawing.Point(165, 216);
+            this.email_box.Location = new System.Drawing.Point(165, 190);
             this.email_box.Name = "email_box";
             this.email_box.Size = new System.Drawing.Size(301, 20);
-            this.email_box.TabIndex = 9;
+            this.email_box.TabIndex = 8;
             // 
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(18, 219);
+            this.label8.Location = new System.Drawing.Point(18, 193);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(32, 13);
             this.label8.TabIndex = 20;
@@ -172,15 +189,15 @@
             // 
             // password_box
             // 
-            this.password_box.Location = new System.Drawing.Point(165, 190);
+            this.password_box.Location = new System.Drawing.Point(165, 164);
             this.password_box.Name = "password_box";
             this.password_box.Size = new System.Drawing.Size(301, 20);
-            this.password_box.TabIndex = 8;
+            this.password_box.TabIndex = 7;
             // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(18, 193);
+            this.label6.Location = new System.Drawing.Point(18, 167);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(53, 13);
             this.label6.TabIndex = 18;
@@ -204,15 +221,15 @@
             // 
             // bot_nick_box
             // 
-            this.bot_nick_box.Location = new System.Drawing.Point(165, 138);
+            this.bot_nick_box.Location = new System.Drawing.Point(165, 112);
             this.bot_nick_box.Name = "bot_nick_box";
             this.bot_nick_box.Size = new System.Drawing.Size(301, 20);
-            this.bot_nick_box.TabIndex = 6;
+            this.bot_nick_box.TabIndex = 5;
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(18, 193);
+            this.label4.Location = new System.Drawing.Point(18, 167);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(29, 13);
             this.label4.TabIndex = 14;
@@ -220,15 +237,15 @@
             // 
             // bot_name_box
             // 
-            this.bot_name_box.Location = new System.Drawing.Point(165, 112);
+            this.bot_name_box.Location = new System.Drawing.Point(165, 86);
             this.bot_name_box.Name = "bot_name_box";
             this.bot_name_box.Size = new System.Drawing.Size(301, 20);
-            this.bot_name_box.TabIndex = 5;
+            this.bot_name_box.TabIndex = 4;
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(18, 115);
+            this.label3.Location = new System.Drawing.Point(18, 89);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(35, 13);
             this.label3.TabIndex = 12;
@@ -236,7 +253,7 @@
             // 
             // save_server_button
             // 
-            this.save_server_button.Location = new System.Drawing.Point(336, 379);
+            this.save_server_button.Location = new System.Drawing.Point(336, 325);
             this.save_server_button.Name = "save_server_button";
             this.save_server_button.Size = new System.Drawing.Size(75, 23);
             this.save_server_button.TabIndex = 98;
@@ -246,7 +263,7 @@
             // 
             // cancel_button
             // 
-            this.cancel_button.Location = new System.Drawing.Point(417, 379);
+            this.cancel_button.Location = new System.Drawing.Point(417, 325);
             this.cancel_button.Name = "cancel_button";
             this.cancel_button.Size = new System.Drawing.Size(75, 23);
             this.cancel_button.TabIndex = 99;
@@ -254,17 +271,18 @@
             this.cancel_button.UseVisualStyleBackColor = true;
             this.cancel_button.Click += new System.EventHandler(this.cancel_button_Click);
             // 
-            // tabControl1
+            // Advanced_tab
             // 
-            this.tabControl1.Controls.Add(this.tabPage1);
-            this.tabControl1.Controls.Add(this.tabPage2);
-            this.tabControl1.Controls.Add(this.tabPage3);
-            this.tabControl1.Controls.Add(this.tabPage4);
-            this.tabControl1.Location = new System.Drawing.Point(12, 1);
-            this.tabControl1.Name = "tabControl1";
-            this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(480, 372);
-            this.tabControl1.TabIndex = 0;
+            this.Advanced_tab.Controls.Add(this.tabPage1);
+            this.Advanced_tab.Controls.Add(this.tabPage2);
+            this.Advanced_tab.Controls.Add(this.tabPage3);
+            this.Advanced_tab.Controls.Add(this.tabPage4);
+            this.Advanced_tab.Controls.Add(this.Advanced);
+            this.Advanced_tab.Location = new System.Drawing.Point(12, 1);
+            this.Advanced_tab.Name = "Advanced_tab";
+            this.Advanced_tab.SelectedIndex = 0;
+            this.Advanced_tab.Size = new System.Drawing.Size(480, 318);
+            this.Advanced_tab.TabIndex = 0;
             // 
             // tabPage1
             // 
@@ -273,12 +291,8 @@
             this.tabPage1.Controls.Add(this.label30);
             this.tabPage1.Controls.Add(this.label29);
             this.tabPage1.Controls.Add(this.server_address_box);
-            this.tabPage1.Controls.Add(this.ignore_list_box);
-            this.tabPage1.Controls.Add(this.label28);
             this.tabPage1.Controls.Add(this.label27);
             this.tabPage1.Controls.Add(this.sec_nicks);
-            this.tabPage1.Controls.Add(this.channel_blacklist_box);
-            this.tabPage1.Controls.Add(this.label16);
             this.tabPage1.Controls.Add(this.port_box);
             this.tabPage1.Controls.Add(this.label1);
             this.tabPage1.Controls.Add(this.server_name_box);
@@ -298,31 +312,58 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(472, 346);
+            this.tabPage1.Size = new System.Drawing.Size(472, 292);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Server Configuration";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
-            // ignore_list_box
+            // label31
             // 
-            this.ignore_list_box.Location = new System.Drawing.Point(165, 294);
-            this.ignore_list_box.Name = "ignore_list_box";
-            this.ignore_list_box.Size = new System.Drawing.Size(301, 20);
-            this.ignore_list_box.TabIndex = 12;
+            this.label31.AutoSize = true;
+            this.label31.Location = new System.Drawing.Point(18, 115);
+            this.label31.Name = "label31";
+            this.label31.Size = new System.Drawing.Size(29, 13);
+            this.label31.TabIndex = 31;
+            this.label31.Text = "Nick";
             // 
-            // label28
+            // auto_connect
             // 
-            this.label28.AutoSize = true;
-            this.label28.Location = new System.Drawing.Point(18, 297);
-            this.label28.Name = "label28";
-            this.label28.Size = new System.Drawing.Size(79, 13);
-            this.label28.TabIndex = 26;
-            this.label28.Text = "Nicks to Ignore";
+            this.auto_connect.AutoSize = true;
+            this.auto_connect.Location = new System.Drawing.Point(165, 268);
+            this.auto_connect.Name = "auto_connect";
+            this.auto_connect.Size = new System.Drawing.Size(15, 14);
+            this.auto_connect.TabIndex = 13;
+            this.auto_connect.UseVisualStyleBackColor = true;
+            // 
+            // label30
+            // 
+            this.label30.AutoSize = true;
+            this.label30.Location = new System.Drawing.Point(18, 269);
+            this.label30.Name = "label30";
+            this.label30.Size = new System.Drawing.Size(99, 13);
+            this.label30.TabIndex = 29;
+            this.label30.Text = "Connect on Startup";
+            // 
+            // label29
+            // 
+            this.label29.AutoSize = true;
+            this.label29.Location = new System.Drawing.Point(18, 37);
+            this.label29.Name = "label29";
+            this.label29.Size = new System.Drawing.Size(79, 13);
+            this.label29.TabIndex = 28;
+            this.label29.Text = "Server Address";
+            // 
+            // server_address_box
+            // 
+            this.server_address_box.Location = new System.Drawing.Point(165, 34);
+            this.server_address_box.Name = "server_address_box";
+            this.server_address_box.Size = new System.Drawing.Size(301, 20);
+            this.server_address_box.TabIndex = 2;
             // 
             // label27
             // 
             this.label27.AutoSize = true;
-            this.label27.Location = new System.Drawing.Point(18, 167);
+            this.label27.Location = new System.Drawing.Point(18, 141);
             this.label27.Name = "label27";
             this.label27.Size = new System.Drawing.Size(125, 13);
             this.label27.TabIndex = 24;
@@ -330,26 +371,10 @@
             // 
             // sec_nicks
             // 
-            this.sec_nicks.Location = new System.Drawing.Point(165, 164);
+            this.sec_nicks.Location = new System.Drawing.Point(165, 138);
             this.sec_nicks.Name = "sec_nicks";
             this.sec_nicks.Size = new System.Drawing.Size(301, 20);
-            this.sec_nicks.TabIndex = 7;
-            // 
-            // channel_blacklist_box
-            // 
-            this.channel_blacklist_box.Location = new System.Drawing.Point(165, 268);
-            this.channel_blacklist_box.Name = "channel_blacklist_box";
-            this.channel_blacklist_box.Size = new System.Drawing.Size(301, 20);
-            this.channel_blacklist_box.TabIndex = 11;
-            // 
-            // label16
-            // 
-            this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(18, 271);
-            this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(88, 13);
-            this.label16.TabIndex = 22;
-            this.label16.Text = "Channel Blacklist";
+            this.sec_nicks.TabIndex = 6;
             // 
             // tabPage2
             // 
@@ -359,7 +384,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(472, 346);
+            this.tabPage2.Size = new System.Drawing.Size(472, 292);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Module Configuration";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -368,7 +393,7 @@
             // 
             this.module_options.Location = new System.Drawing.Point(135, 6);
             this.module_options.Name = "module_options";
-            this.module_options.Size = new System.Drawing.Size(331, 329);
+            this.module_options.Size = new System.Drawing.Size(331, 277);
             this.module_options.TabIndex = 5;
             // 
             // label26
@@ -386,7 +411,7 @@
             this.module_list.HorizontalScrollbar = true;
             this.module_list.Location = new System.Drawing.Point(9, 19);
             this.module_list.Name = "module_list";
-            this.module_list.Size = new System.Drawing.Size(120, 316);
+            this.module_list.Size = new System.Drawing.Size(120, 264);
             this.module_list.Sorted = true;
             this.module_list.TabIndex = 3;
             this.module_list.SelectedIndexChanged += new System.EventHandler(this.module_list_SelectedIndexChanged);
@@ -415,7 +440,7 @@
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(472, 346);
+            this.tabPage3.Size = new System.Drawing.Size(472, 292);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "Command Options";
             this.tabPage3.UseVisualStyleBackColor = true;
@@ -575,7 +600,7 @@
             this.command_list.FormattingEnabled = true;
             this.command_list.Location = new System.Drawing.Point(9, 19);
             this.command_list.Name = "command_list";
-            this.command_list.Size = new System.Drawing.Size(120, 316);
+            this.command_list.Size = new System.Drawing.Size(120, 264);
             this.command_list.Sorted = true;
             this.command_list.TabIndex = 1;
             this.command_list.SelectedIndexChanged += new System.EventHandler(this.command_list_change);
@@ -599,22 +624,22 @@
             this.tabPage4.Location = new System.Drawing.Point(4, 22);
             this.tabPage4.Name = "tabPage4";
             this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(472, 298);
+            this.tabPage4.Size = new System.Drawing.Size(472, 292);
             this.tabPage4.TabIndex = 3;
             this.tabPage4.Text = "Op Levels";
             this.tabPage4.UseVisualStyleBackColor = true;
             // 
             // owner_level_box
             // 
-            this.owner_level_box.Location = new System.Drawing.Point(155, 173);
+            this.owner_level_box.Location = new System.Drawing.Point(165, 173);
             this.owner_level_box.Name = "owner_level_box";
-            this.owner_level_box.Size = new System.Drawing.Size(311, 20);
+            this.owner_level_box.Size = new System.Drawing.Size(301, 20);
             this.owner_level_box.TabIndex = 7;
             // 
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(10, 176);
+            this.label9.Location = new System.Drawing.Point(6, 176);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(105, 13);
             this.label9.TabIndex = 39;
@@ -622,15 +647,15 @@
             // 
             // founder_level_box
             // 
-            this.founder_level_box.Location = new System.Drawing.Point(155, 147);
+            this.founder_level_box.Location = new System.Drawing.Point(165, 147);
             this.founder_level_box.Name = "founder_level_box";
-            this.founder_level_box.Size = new System.Drawing.Size(311, 20);
+            this.founder_level_box.Size = new System.Drawing.Size(301, 20);
             this.founder_level_box.TabIndex = 6;
             // 
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(10, 150);
+            this.label10.Location = new System.Drawing.Point(6, 150);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(113, 13);
             this.label10.TabIndex = 37;
@@ -638,15 +663,15 @@
             // 
             // sop_level_box
             // 
-            this.sop_level_box.Location = new System.Drawing.Point(155, 121);
+            this.sop_level_box.Location = new System.Drawing.Point(165, 121);
             this.sop_level_box.Name = "sop_level_box";
-            this.sop_level_box.Size = new System.Drawing.Size(311, 20);
+            this.sop_level_box.Size = new System.Drawing.Size(301, 20);
             this.sop_level_box.TabIndex = 5;
             // 
             // label11
             // 
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(10, 124);
+            this.label11.Location = new System.Drawing.Point(6, 124);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(120, 13);
             this.label11.TabIndex = 35;
@@ -654,15 +679,15 @@
             // 
             // op_level_box
             // 
-            this.op_level_box.Location = new System.Drawing.Point(155, 95);
+            this.op_level_box.Location = new System.Drawing.Point(165, 95);
             this.op_level_box.Name = "op_level_box";
-            this.op_level_box.Size = new System.Drawing.Size(311, 20);
+            this.op_level_box.Size = new System.Drawing.Size(301, 20);
             this.op_level_box.TabIndex = 4;
             // 
             // label12
             // 
             this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(10, 98);
+            this.label12.Location = new System.Drawing.Point(6, 98);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(89, 13);
             this.label12.TabIndex = 33;
@@ -670,15 +695,15 @@
             // 
             // hop_level_box
             // 
-            this.hop_level_box.Location = new System.Drawing.Point(155, 69);
+            this.hop_level_box.Location = new System.Drawing.Point(165, 69);
             this.hop_level_box.Name = "hop_level_box";
-            this.hop_level_box.Size = new System.Drawing.Size(311, 20);
+            this.hop_level_box.Size = new System.Drawing.Size(301, 20);
             this.hop_level_box.TabIndex = 3;
             // 
             // label13
             // 
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(10, 72);
+            this.label13.Location = new System.Drawing.Point(6, 72);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(111, 13);
             this.label13.TabIndex = 31;
@@ -686,15 +711,15 @@
             // 
             // voice_level_box
             // 
-            this.voice_level_box.Location = new System.Drawing.Point(155, 43);
+            this.voice_level_box.Location = new System.Drawing.Point(165, 43);
             this.voice_level_box.Name = "voice_level_box";
-            this.voice_level_box.Size = new System.Drawing.Size(311, 20);
+            this.voice_level_box.Size = new System.Drawing.Size(301, 20);
             this.voice_level_box.TabIndex = 2;
             // 
             // label14
             // 
             this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(10, 46);
+            this.label14.Location = new System.Drawing.Point(6, 46);
             this.label14.Name = "label14";
             this.label14.Size = new System.Drawing.Size(101, 13);
             this.label14.TabIndex = 29;
@@ -702,70 +727,212 @@
             // 
             // user_level_box
             // 
-            this.user_level_box.Location = new System.Drawing.Point(155, 17);
+            this.user_level_box.Location = new System.Drawing.Point(165, 17);
             this.user_level_box.Name = "user_level_box";
-            this.user_level_box.Size = new System.Drawing.Size(311, 20);
+            this.user_level_box.Size = new System.Drawing.Size(301, 20);
             this.user_level_box.TabIndex = 1;
             // 
             // label15
             // 
             this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(10, 20);
+            this.label15.Location = new System.Drawing.Point(6, 20);
             this.label15.Name = "label15";
             this.label15.Size = new System.Drawing.Size(96, 13);
             this.label15.TabIndex = 27;
             this.label15.Text = "User Access Level";
             // 
-            // label29
+            // Advanced
             // 
-            this.label29.AutoSize = true;
-            this.label29.Location = new System.Drawing.Point(18, 37);
-            this.label29.Name = "label29";
-            this.label29.Size = new System.Drawing.Size(79, 13);
-            this.label29.TabIndex = 28;
-            this.label29.Text = "Server Address";
+            this.Advanced.Controls.Add(this.spam_enable);
+            this.Advanced.Controls.Add(this.label28);
+            this.Advanced.Controls.Add(this.spam_ignore);
+            this.Advanced.Controls.Add(this.label39);
+            this.Advanced.Controls.Add(this.label16);
+            this.Advanced.Controls.Add(this.max_message_length_box);
+            this.Advanced.Controls.Add(this.label32);
+            this.Advanced.Controls.Add(this.spam_threshold_box);
+            this.Advanced.Controls.Add(this.label33);
+            this.Advanced.Controls.Add(this.spam_timeout_box);
+            this.Advanced.Controls.Add(this.label34);
+            this.Advanced.Controls.Add(this.spam_count_box);
+            this.Advanced.Controls.Add(this.label35);
+            this.Advanced.Controls.Add(this.command_prefix_box);
+            this.Advanced.Controls.Add(this.label36);
+            this.Advanced.Controls.Add(this.ignore_list_box);
+            this.Advanced.Controls.Add(this.label37);
+            this.Advanced.Controls.Add(this.channel_blacklist_box);
+            this.Advanced.Controls.Add(this.label38);
+            this.Advanced.Location = new System.Drawing.Point(4, 22);
+            this.Advanced.Name = "Advanced";
+            this.Advanced.Padding = new System.Windows.Forms.Padding(3);
+            this.Advanced.Size = new System.Drawing.Size(472, 292);
+            this.Advanced.TabIndex = 4;
+            this.Advanced.Text = "Advanced";
+            this.Advanced.UseVisualStyleBackColor = true;
             // 
-            // server_address_box
+            // label16
             // 
-            this.server_address_box.Location = new System.Drawing.Point(165, 34);
-            this.server_address_box.Name = "server_address_box";
-            this.server_address_box.Size = new System.Drawing.Size(301, 20);
-            this.server_address_box.TabIndex = 2;
+            this.label16.AutoSize = true;
+            this.label16.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label16.Location = new System.Drawing.Point(6, 123);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(112, 18);
+            this.label16.TabIndex = 57;
+            this.label16.Text = "Flood Control";
             // 
-            // label30
+            // max_message_length_box
             // 
-            this.label30.AutoSize = true;
-            this.label30.Location = new System.Drawing.Point(18, 321);
-            this.label30.Name = "label30";
-            this.label30.Size = new System.Drawing.Size(99, 13);
-            this.label30.TabIndex = 29;
-            this.label30.Text = "Connect on Startup";
+            this.max_message_length_box.Location = new System.Drawing.Point(165, 95);
+            this.max_message_length_box.Name = "max_message_length_box";
+            this.max_message_length_box.Size = new System.Drawing.Size(301, 20);
+            this.max_message_length_box.TabIndex = 4;
             // 
-            // auto_connect
+            // label32
             // 
-            this.auto_connect.AutoSize = true;
-            this.auto_connect.Location = new System.Drawing.Point(165, 320);
-            this.auto_connect.Name = "auto_connect";
-            this.auto_connect.Size = new System.Drawing.Size(15, 14);
-            this.auto_connect.TabIndex = 13;
-            this.auto_connect.UseVisualStyleBackColor = true;
+            this.label32.AutoSize = true;
+            this.label32.Location = new System.Drawing.Point(6, 98);
+            this.label32.Name = "label32";
+            this.label32.Size = new System.Drawing.Size(109, 13);
+            this.label32.TabIndex = 56;
+            this.label32.Text = "Max Message Length";
             // 
-            // label31
+            // spam_threshold_box
             // 
-            this.label31.AutoSize = true;
-            this.label31.Location = new System.Drawing.Point(18, 141);
-            this.label31.Name = "label31";
-            this.label31.Size = new System.Drawing.Size(29, 13);
-            this.label31.TabIndex = 31;
-            this.label31.Text = "Nick";
+            this.spam_threshold_box.Location = new System.Drawing.Point(165, 222);
+            this.spam_threshold_box.Name = "spam_threshold_box";
+            this.spam_threshold_box.Size = new System.Drawing.Size(301, 20);
+            this.spam_threshold_box.TabIndex = 8;
+            // 
+            // label33
+            // 
+            this.label33.AutoSize = true;
+            this.label33.Location = new System.Drawing.Point(6, 225);
+            this.label33.Name = "label33";
+            this.label33.Size = new System.Drawing.Size(94, 13);
+            this.label33.TabIndex = 55;
+            this.label33.Text = "Tick (Milliseconds)";
+            // 
+            // spam_timeout_box
+            // 
+            this.spam_timeout_box.Location = new System.Drawing.Point(165, 248);
+            this.spam_timeout_box.Name = "spam_timeout_box";
+            this.spam_timeout_box.Size = new System.Drawing.Size(301, 20);
+            this.spam_timeout_box.TabIndex = 9;
+            // 
+            // label34
+            // 
+            this.label34.AutoSize = true;
+            this.label34.Location = new System.Drawing.Point(6, 251);
+            this.label34.Name = "label34";
+            this.label34.Size = new System.Drawing.Size(111, 13);
+            this.label34.TabIndex = 54;
+            this.label34.Text = "Timeout (Milliseconds)";
+            // 
+            // spam_count_box
+            // 
+            this.spam_count_box.Location = new System.Drawing.Point(165, 196);
+            this.spam_count_box.Name = "spam_count_box";
+            this.spam_count_box.Size = new System.Drawing.Size(301, 20);
+            this.spam_count_box.TabIndex = 7;
+            // 
+            // label35
+            // 
+            this.label35.AutoSize = true;
+            this.label35.Location = new System.Drawing.Point(6, 199);
+            this.label35.Name = "label35";
+            this.label35.Size = new System.Drawing.Size(124, 13);
+            this.label35.TabIndex = 53;
+            this.label35.Text = "Max Commands per Tick";
+            // 
+            // command_prefix_box
+            // 
+            this.command_prefix_box.Location = new System.Drawing.Point(165, 69);
+            this.command_prefix_box.Name = "command_prefix_box";
+            this.command_prefix_box.Size = new System.Drawing.Size(301, 20);
+            this.command_prefix_box.TabIndex = 3;
+            // 
+            // label36
+            // 
+            this.label36.AutoSize = true;
+            this.label36.Location = new System.Drawing.Point(6, 72);
+            this.label36.Name = "label36";
+            this.label36.Size = new System.Drawing.Size(83, 13);
+            this.label36.TabIndex = 52;
+            this.label36.Text = "Command Prefix";
+            // 
+            // ignore_list_box
+            // 
+            this.ignore_list_box.Location = new System.Drawing.Point(165, 43);
+            this.ignore_list_box.Name = "ignore_list_box";
+            this.ignore_list_box.Size = new System.Drawing.Size(301, 20);
+            this.ignore_list_box.TabIndex = 2;
+            // 
+            // label37
+            // 
+            this.label37.AutoSize = true;
+            this.label37.Location = new System.Drawing.Point(6, 46);
+            this.label37.Name = "label37";
+            this.label37.Size = new System.Drawing.Size(79, 13);
+            this.label37.TabIndex = 46;
+            this.label37.Text = "Nicks to Ignore";
+            // 
+            // channel_blacklist_box
+            // 
+            this.channel_blacklist_box.Location = new System.Drawing.Point(165, 17);
+            this.channel_blacklist_box.Name = "channel_blacklist_box";
+            this.channel_blacklist_box.Size = new System.Drawing.Size(301, 20);
+            this.channel_blacklist_box.TabIndex = 1;
+            // 
+            // label38
+            // 
+            this.label38.AutoSize = true;
+            this.label38.Location = new System.Drawing.Point(6, 20);
+            this.label38.Name = "label38";
+            this.label38.Size = new System.Drawing.Size(88, 13);
+            this.label38.TabIndex = 45;
+            this.label38.Text = "Channel Blacklist";
+            // 
+            // spam_enable
+            // 
+            this.spam_enable.AutoSize = true;
+            this.spam_enable.Location = new System.Drawing.Point(165, 150);
+            this.spam_enable.Name = "spam_enable";
+            this.spam_enable.Size = new System.Drawing.Size(15, 14);
+            this.spam_enable.TabIndex = 5;
+            this.spam_enable.UseVisualStyleBackColor = true;
+            // 
+            // label28
+            // 
+            this.label28.AutoSize = true;
+            this.label28.Location = new System.Drawing.Point(6, 150);
+            this.label28.Name = "label28";
+            this.label28.Size = new System.Drawing.Size(119, 13);
+            this.label28.TabIndex = 61;
+            this.label28.Text = "Enable Spam Detection";
+            // 
+            // spam_ignore
+            // 
+            this.spam_ignore.Location = new System.Drawing.Point(165, 170);
+            this.spam_ignore.Name = "spam_ignore";
+            this.spam_ignore.Size = new System.Drawing.Size(301, 20);
+            this.spam_ignore.TabIndex = 6;
+            // 
+            // label39
+            // 
+            this.label39.AutoSize = true;
+            this.label39.Location = new System.Drawing.Point(6, 173);
+            this.label39.Name = "label39";
+            this.label39.Size = new System.Drawing.Size(143, 13);
+            this.label39.TabIndex = 60;
+            this.label39.Text = "Ignore List (chans and nicks)";
             // 
             // edit_server
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(504, 409);
-            this.Controls.Add(this.tabControl1);
+            this.ClientSize = new System.Drawing.Size(504, 355);
+            this.Controls.Add(this.Advanced_tab);
             this.Controls.Add(this.cancel_button);
             this.Controls.Add(this.save_server_button);
             this.MaximizeBox = false;
@@ -773,7 +940,7 @@
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Edit Server";
-            this.tabControl1.ResumeLayout(false);
+            this.Advanced_tab.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
             this.tabPage2.ResumeLayout(false);
@@ -782,6 +949,8 @@
             this.tabPage3.PerformLayout();
             this.tabPage4.ResumeLayout(false);
             this.tabPage4.PerformLayout();
+            this.Advanced.ResumeLayout(false);
+            this.Advanced.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -806,7 +975,7 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button save_server_button;
         private System.Windows.Forms.Button cancel_button;
-        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabControl Advanced_tab;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.TabPage tabPage3;
@@ -832,8 +1001,6 @@
         private System.Windows.Forms.TextBox command_name;
         private System.Windows.Forms.Label label17;
         private System.Windows.Forms.ListBox command_list;
-        private System.Windows.Forms.TextBox channel_blacklist_box;
-        private System.Windows.Forms.Label label16;
         private System.Windows.Forms.TextBox owner_level_box;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.TextBox founder_level_box;
@@ -850,13 +1017,31 @@
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.Label label27;
         private System.Windows.Forms.TextBox sec_nicks;
-        private System.Windows.Forms.TextBox ignore_list_box;
-        private System.Windows.Forms.Label label28;
         private System.Windows.Forms.Label command_label;
         private System.Windows.Forms.Label label29;
         private System.Windows.Forms.TextBox server_address_box;
         private System.Windows.Forms.CheckBox auto_connect;
         private System.Windows.Forms.Label label30;
         private System.Windows.Forms.Label label31;
+        private System.Windows.Forms.TabPage Advanced;
+        private System.Windows.Forms.TextBox max_message_length_box;
+        private System.Windows.Forms.Label label32;
+        private System.Windows.Forms.TextBox spam_threshold_box;
+        private System.Windows.Forms.Label label33;
+        private System.Windows.Forms.TextBox spam_timeout_box;
+        private System.Windows.Forms.Label label34;
+        private System.Windows.Forms.TextBox spam_count_box;
+        private System.Windows.Forms.Label label35;
+        private System.Windows.Forms.TextBox command_prefix_box;
+        private System.Windows.Forms.Label label36;
+        private System.Windows.Forms.TextBox ignore_list_box;
+        private System.Windows.Forms.Label label37;
+        private System.Windows.Forms.TextBox channel_blacklist_box;
+        private System.Windows.Forms.Label label38;
+        private System.Windows.Forms.Label label16;
+        private System.Windows.Forms.CheckBox spam_enable;
+        private System.Windows.Forms.Label label28;
+        private System.Windows.Forms.TextBox spam_ignore;
+        private System.Windows.Forms.Label label39;
     }
 }

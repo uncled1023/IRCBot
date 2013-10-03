@@ -36,7 +36,7 @@ namespace IRCBot.Modules
                         string[] blacklist = tmp_command[6].Split(',');
                         bool blocked = false;
                         bool cmd_found = false;
-                        bool spam_check = Convert.ToBoolean(tmp_command[8]);
+                        bool spam_check = ircbot.get_spam_check(channel, nick, Convert.ToBoolean(tmp_command[8]));
                         foreach (string bl_chan in blacklist)
                         {
                             if (bl_chan.Equals(channel))
@@ -84,12 +84,12 @@ namespace IRCBot.Modules
                                                 }
                                                 catch
                                                 {
-                                                    ircbot.sendData("NOTICE", nick + " :You need to choose a valid survey.  To view all surveys, please type " + ircbot.ircbot.irc_conf.command + "surveys");
+                                                    ircbot.sendData("NOTICE", nick + " :You need to choose a valid survey.  To view all surveys, please type " + ircbot.conf.command + "surveys");
                                                 }
                                             }
                                             else
                                             {
-                                                ircbot.sendData("NOTICE", nick + " :You need to choose a valid survey.  To view all surveys, please type " + ircbot.ircbot.irc_conf.command + "surveys");
+                                                ircbot.sendData("NOTICE", nick + " :You need to choose a valid survey.  To view all surveys, please type " + ircbot.conf.command + "surveys");
                                             }
                                         }
                                         else
@@ -240,7 +240,7 @@ namespace IRCBot.Modules
                                                     }
                                                     catch
                                                     {
-                                                        ircbot.sendData("NOTICE", nick + " :You need to choose a valid survey.  To view all surveys, please type " + ircbot.ircbot.irc_conf.command + "surveys");
+                                                        ircbot.sendData("NOTICE", nick + " :You need to choose a valid survey.  To view all surveys, please type " + ircbot.conf.command + "surveys");
                                                     }
                                                 }
                                                 else
@@ -252,7 +252,7 @@ namespace IRCBot.Modules
                                                     }
                                                     catch
                                                     {
-                                                        ircbot.sendData("NOTICE", nick + " :You need to choose a valid survey.  To view all surveys, please type " + ircbot.ircbot.irc_conf.command + "surveys");
+                                                        ircbot.sendData("NOTICE", nick + " :You need to choose a valid survey.  To view all surveys, please type " + ircbot.conf.command + "surveys");
                                                     }
                                                 }
                                             }
@@ -284,12 +284,12 @@ namespace IRCBot.Modules
                                                 }
                                                 catch
                                                 {
-                                                    ircbot.sendData("NOTICE", nick + " :You need to choose a valid survey.  To view all surveys, please type " + ircbot.ircbot.irc_conf.command + "surveys");
+                                                    ircbot.sendData("NOTICE", nick + " :You need to choose a valid survey.  To view all surveys, please type " + ircbot.conf.command + "surveys");
                                                 }
                                             }
                                             else
                                             {
-                                                ircbot.sendData("NOTICE", nick + " :You need to choose a valid survey.  To view all surveys, please type " + ircbot.ircbot.irc_conf.command + "surveys");
+                                                ircbot.sendData("NOTICE", nick + " :You need to choose a valid survey.  To view all surveys, please type " + ircbot.conf.command + "surveys");
                                             }
                                         }
                                         else
@@ -315,12 +315,12 @@ namespace IRCBot.Modules
                                                 }
                                                 catch
                                                 {
-                                                    ircbot.sendData("NOTICE", nick + " :You need to choose a valid survey.  To view all surveys, please type " + ircbot.ircbot.irc_conf.command + "surveys");
+                                                    ircbot.sendData("NOTICE", nick + " :You need to choose a valid survey.  To view all surveys, please type " + ircbot.conf.command + "surveys");
                                                 }
                                             }
                                             else
                                             {
-                                                ircbot.sendData("NOTICE", nick + " :You need to choose a valid survey.  To view all surveys, please type " + ircbot.ircbot.irc_conf.command + "surveys");
+                                                ircbot.sendData("NOTICE", nick + " :You need to choose a valid survey.  To view all surveys, please type " + ircbot.conf.command + "surveys");
                                             }
                                         }
                                         else
@@ -358,17 +358,17 @@ namespace IRCBot.Modules
                                                     }
                                                     else
                                                     {
-                                                        ircbot.sendData("NOTICE", nick + " :Please include the survey access level and title for the survey.  Ex: " + ircbot.ircbot.irc_conf.command + "addsurvey 1 Title of Survey");
+                                                        ircbot.sendData("NOTICE", nick + " :Please include the survey access level and title for the survey.  Ex: " + ircbot.conf.command + "addsurvey 1 Title of Survey");
                                                     }
                                                 }
                                                 else
                                                 {
-                                                    ircbot.sendData("NOTICE", nick + " :Please include the survey access level and title for the survey.  Ex: " + ircbot.ircbot.irc_conf.command + "addsurvey 1 Title of Survey");
+                                                    ircbot.sendData("NOTICE", nick + " :Please include the survey access level and title for the survey.  Ex: " + ircbot.conf.command + "addsurvey 1 Title of Survey");
                                                 }
                                             }
                                             else
                                             {
-                                                ircbot.sendData("NOTICE", nick + " :Please include the survey access level and title for the survey.  Ex: " + ircbot.ircbot.irc_conf.command + "addsurvey 1 Title of Survey");
+                                                ircbot.sendData("NOTICE", nick + " :Please include the survey access level and title for the survey.  Ex: " + ircbot.conf.command + "addsurvey 1 Title of Survey");
                                             }
                                         }
                                         else
@@ -393,12 +393,12 @@ namespace IRCBot.Modules
                                                 }
                                                 catch
                                                 {
-                                                    ircbot.sendData("NOTICE", nick + " :You need to choose a valid survey.  To view all surveys, please type " + ircbot.ircbot.irc_conf.command + "surveys");
+                                                    ircbot.sendData("NOTICE", nick + " :You need to choose a valid survey.  To view all surveys, please type " + ircbot.conf.command + "surveys");
                                                 }
                                             }
                                             else
                                             {
-                                                ircbot.sendData("NOTICE", nick + " :You need to choose a valid survey.  To view all surveys, please type " + ircbot.ircbot.irc_conf.command + "surveys");
+                                                ircbot.sendData("NOTICE", nick + " :You need to choose a valid survey.  To view all surveys, please type " + ircbot.conf.command + "surveys");
                                             }
                                         }
                                         else
@@ -551,7 +551,7 @@ namespace IRCBot.Modules
                 }
                 if (survey_found == false)
                 {
-                    ircbot.sendData("NOTICE", nick + " :Sorry, but either you are not the owner of the survey, or the survey does not exist.  To view all surveys available to you, please type " + ircbot.ircbot.irc_conf.command + "surveys");
+                    ircbot.sendData("NOTICE", nick + " :Sorry, but either you are not the owner of the survey, or the survey does not exist.  To view all surveys available to you, please type " + ircbot.conf.command + "surveys");
                 }
             }
             else
@@ -741,8 +741,8 @@ namespace IRCBot.Modules
 
                 active_surveys.Add(tmp_info);
 
-                ircbot.sendData("PRIVMSG", nick + " :Please type out a question per line.  Once you are finished adding all the questions you want, type " + ircbot.ircbot.irc_conf.command + "finishsurvey to submit the finished survey.");
-                ircbot.sendData("PRIVMSG", nick + " :If at any time during the survey you wish to cancel, type " + ircbot.ircbot.irc_conf.command + "cancelsurvey to cancel your current survey submission.");
+                ircbot.sendData("PRIVMSG", nick + " :Please type out a question per line.  Once you are finished adding all the questions you want, type " + ircbot.conf.command + "finishsurvey to submit the finished survey.");
+                ircbot.sendData("PRIVMSG", nick + " :If at any time during the survey you wish to cancel, type " + ircbot.conf.command + "cancelsurvey to cancel your current survey submission.");
             }
             else
             {
@@ -839,7 +839,7 @@ namespace IRCBot.Modules
                                         foreach (string owner in owners)
                                         {
                                             ircbot.sendData("PRIVMSG", owner + " :" + nick + " has finished your survey, \"" + questions[1] + "\"");
-                                            ircbot.sendData("PRIVMSG", owner + " :To view his answers, please type " + ircbot.ircbot.irc_conf.command + "surveys " + (tmp_survey.survey_number + 1).ToString() + " " + tmp_survey.nick);
+                                            ircbot.sendData("PRIVMSG", owner + " :To view his answers, please type " + ircbot.conf.command + "surveys " + (tmp_survey.survey_number + 1).ToString() + " " + tmp_survey.nick);
                                         }
                                         active_surveys.RemoveAt(cur_survey);
                                     }
@@ -910,8 +910,8 @@ namespace IRCBot.Modules
                                 }
 
                                 ircbot.sendData("PRIVMSG", nick + " :You have chosen to take the following survey: " + questions[1]);
-                                ircbot.sendData("PRIVMSG", nick + " :You will be presented with a series of questions.  After you write the answer, type " + ircbot.ircbot.irc_conf.command + "nextquestion to submit your answer and view the next question.");
-                                ircbot.sendData("PRIVMSG", nick + " :If at any time during the survey you wish to cancel, type " + ircbot.ircbot.irc_conf.command + "cancelsurvey to cancel your current survey and any answers you may have submitted.");
+                                ircbot.sendData("PRIVMSG", nick + " :You will be presented with a series of questions.  After you write the answer, type " + ircbot.conf.command + "nextquestion to submit your answer and view the next question.");
+                                ircbot.sendData("PRIVMSG", nick + " :If at any time during the survey you wish to cancel, type " + ircbot.conf.command + "cancelsurvey to cancel your current survey and any answers you may have submitted.");
                                 string[] owners = questions[2].Split(',');
                                 foreach (string owner in owners)
                                 {
@@ -929,7 +929,7 @@ namespace IRCBot.Modules
             }
             if (survey_found == false)
             {
-                ircbot.sendData("NOTICE", nick + " :Sorry, but that survey is not available to you.  To view all surveys available to you, please type " + ircbot.ircbot.irc_conf.command + "surveys");
+                ircbot.sendData("NOTICE", nick + " :Sorry, but that survey is not available to you.  To view all surveys available to you, please type " + ircbot.conf.command + "surveys");
             }
         }
     }

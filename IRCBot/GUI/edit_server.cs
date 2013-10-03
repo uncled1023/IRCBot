@@ -55,9 +55,17 @@ namespace IRCBot
                     sop_level_box.Text = xn["sop_level"].InnerText;
                     founder_level_box.Text = xn["founder_level"].InnerText;
                     owner_level_box.Text = xn["owner_level"].InnerText;
+                    command_prefix_box.Text = xn["command_prefix"].InnerText;
+                    spam_enable.Checked = Convert.ToBoolean(xn["spam_enable"].InnerText);
+                    spam_ignore.Text = xn["spam_ignore"].InnerText;
+                    spam_count_box.Text = xn["spam_count"].InnerText;
+                    spam_threshold_box.Text = xn["spam_threshold"].InnerText;
+                    spam_timeout_box.Text = xn["spam_timeout"].InnerText;
+                    max_message_length_box.Text = xn["max_message_length"].InnerText;
 
                     if (File.Exists(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + server_module_folder + Path.DirectorySeparatorChar + "modules.xml"))
                     {
+                        m_parent.check_config(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + server_module_folder + Path.DirectorySeparatorChar + "modules.xml");
                         xmlDocModules.Load(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + server_module_folder + Path.DirectorySeparatorChar + "modules.xml");
                     }
                     else
@@ -66,7 +74,8 @@ namespace IRCBot
                         File.Copy(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + "Default" + Path.DirectorySeparatorChar + "modules.xml", m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + server_module_folder + Path.DirectorySeparatorChar + "modules.xml");
                         xmlDocModules.Load(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + server_module_folder + Path.DirectorySeparatorChar + "modules.xml");
                     }
-                    XmlNodeList xnList = xmlDocModules.SelectNodes("/modules/module");
+                    XmlNode xnNode = xmlDocModules.SelectSingleNode("/modules");
+                    XmlNodeList xnList = xnNode.ChildNodes;
                     foreach (XmlNode xnModules in xnList)
                     {
                         String module_name = xnModules["name"].InnerText;
@@ -85,7 +94,8 @@ namespace IRCBot
                             }
                         }
                     }
-                    xnList = xmlDocModules.SelectNodes("/modules/module");
+                    xnNode = xmlDocModules.SelectSingleNode("/modules");
+                    xnList = xnNode.ChildNodes;
                     foreach (XmlNode xn_node in xnList)
                     {
                         XmlNodeList optionList = xn_node.ChildNodes;
@@ -186,12 +196,20 @@ namespace IRCBot
                             xn["sop_level"].InnerText = sop_level_box.Text;
                             xn["founder_level"].InnerText = founder_level_box.Text;
                             xn["owner_level"].InnerText = owner_level_box.Text;
+                            xn["command_prefix"].InnerText = command_prefix_box.Text;
+                            xn["spam_enable"].InnerText = spam_enable.Checked.ToString();
+                            xn["spam_ignore"].InnerText = spam_ignore.Text;
+                            xn["spam_count"].InnerText = spam_count_box.Text;
+                            xn["spam_threshold"].InnerText = spam_threshold_box.Text;
+                            xn["spam_timeout"].InnerText = spam_timeout_box.Text;
+                            xn["max_message_length"].InnerText = max_message_length_box.Text;
                             break;
                         }
                     }
                     xmlDoc.Save(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
 
-                    XmlNodeList xnList = xmlDocModules.SelectNodes("/modules/module");
+                    XmlNode xnNode = xmlDocModules.SelectSingleNode("/modules");
+                    XmlNodeList xnList = xnNode.ChildNodes;
                     foreach (XmlNode xn in xnList)
                     {
                         int element_num = 0;
@@ -245,7 +263,8 @@ namespace IRCBot
 
         private void command_list_change(Object sender, EventArgs e)
         {
-            XmlNodeList xnList = xmlDocModules.SelectNodes("/modules/module");
+            XmlNode xnNode = xmlDocModules.SelectSingleNode("/modules");
+            XmlNodeList xnList = xnNode.ChildNodes;
             foreach (XmlNode xn in xnList)
             {
                 XmlNodeList optionList = xn.ChildNodes;
@@ -272,7 +291,8 @@ namespace IRCBot
                     }
                 }
             }
-            xnList = xmlDocModules.SelectNodes("/modules/module");
+            xnNode = xmlDocModules.SelectSingleNode("/modules");
+            xnList = xnNode.ChildNodes;
             foreach (XmlNode xn in xnList)
             {
                 XmlNodeList optionList = xn.ChildNodes;
@@ -306,7 +326,8 @@ namespace IRCBot
         {
             if (module_options.Controls.Count > 0)
             {
-                XmlNodeList xnList = xmlDocModules.SelectNodes("/modules/module");
+                XmlNode xnNode = xmlDocModules.SelectSingleNode("/modules");
+                XmlNodeList xnList = xnNode.ChildNodes;
                 foreach (XmlNode xn in xnList)
                 {
                     int element_num = 0;
@@ -347,7 +368,8 @@ namespace IRCBot
                     }
                 }
             }
-            XmlNodeList xnList_2 = xmlDocModules.SelectNodes("/modules/module");
+            XmlNode xnNode_2 = xmlDocModules.SelectSingleNode("/modules");
+            XmlNodeList xnList_2 = xnNode_2.ChildNodes;
             foreach (XmlNode xn in xnList_2)
             {
                 int element_num = 0;
@@ -405,14 +427,6 @@ namespace IRCBot
                     XmlNodeList optionList = xn.ChildNodes;
                     foreach (XmlNode option in optionList)
                     {
-                        if (option.Name.Equals("commands"))
-                        {
-                            XmlNodeList Options = option.ChildNodes;
-                            foreach (XmlNode options in Options)
-                            {
-                                command_list.Items.Add(options["name"].InnerText);
-                            }
-                        }
                         if (option.Name.Equals("options"))
                         {
                             XmlNodeList Options = option.ChildNodes;

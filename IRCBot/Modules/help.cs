@@ -23,7 +23,7 @@ namespace IRCBot.Modules
                         string[] blacklist = tmp_command[6].Split(',');
                         bool blocked = false;
                         bool cmd_found = false;
-                        bool spam_check = Convert.ToBoolean(tmp_command[8]);
+                        bool spam_check = ircbot.get_spam_check(channel, nick, Convert.ToBoolean(tmp_command[8]));
                         foreach (string bl_chan in blacklist)
                         {
                             if (bl_chan.Equals(channel))
@@ -103,16 +103,34 @@ namespace IRCBot.Modules
                                         bool show_help = Convert.ToBoolean(tmp_command[7]);
                                         if (show_help == true)
                                         {
+                                            char[] trm = ircbot.conf.command.ToCharArray();
+                                            search_term = new_line[1].Trim().TrimStart(trm);
+                                            bool trigger_found = false;
                                             foreach (string trigger in triggers)
                                             {
-                                                if (access >= Convert.ToInt32(command_access))
+                                                if (search_term.Equals(trigger, StringComparison.InvariantCultureIgnoreCase))
                                                 {
-                                                    search_term = new_line[1].Trim();
-                                                    if (search_term.Equals(trigger, StringComparison.InvariantCultureIgnoreCase))
+                                                    trigger_found = true;
+                                                    break;
+                                                }
+                                            }
+                                            if (access >= Convert.ToInt32(command_access) && trigger_found)
+                                            {
+                                                string alt = "";
+                                                foreach (string trigger in triggers)
+                                                {
+                                                    if (!search_term.Equals(trigger, StringComparison.InvariantCultureIgnoreCase))
                                                     {
-                                                        ircbot.sendData("NOTICE", nick + " :" + tmp_command[1] + " | Usage: " + ircbot.ircbot.irc_conf.command + trigger + " " + tmp_command[4] + " | Description: " + tmp_command[2]);
+                                                        alt += ircbot.conf.command + trigger + ", ";
                                                     }
                                                 }
+                                                if (!alt.Equals(string.Empty))
+                                                {
+                                                    alt = " | Alternate Commands: " + alt.Trim().TrimEnd(',');
+                                                }
+                                                ircbot.sendData("NOTICE", nick + " :Name: " + tmp_command[1] + alt);
+                                                ircbot.sendData("NOTICE", nick + " :Usage: " + ircbot.conf.command + search_term + " " + tmp_command[4]);
+                                                ircbot.sendData("NOTICE", nick + " :Description: " + tmp_command[2]);
                                             }
                                         }
                                     }
@@ -138,16 +156,34 @@ namespace IRCBot.Modules
                                         bool show_help = Convert.ToBoolean(tmp_command[7]);
                                         if (show_help == true)
                                         {
+                                            char[] trm = ircbot.conf.command.ToCharArray();
+                                            search_term = new_line[1].Trim().TrimStart(trm);
+                                            bool trigger_found = false;
                                             foreach (string trigger in triggers)
                                             {
-                                                if (access >= Convert.ToInt32(command_access))
+                                                if (search_term.Equals(trigger, StringComparison.InvariantCultureIgnoreCase))
                                                 {
-                                                    search_term = new_line[1].Trim();
-                                                    if (search_term.Equals(trigger, StringComparison.InvariantCultureIgnoreCase))
+                                                    trigger_found = true;
+                                                    break;
+                                                }
+                                            }
+                                            if (access >= Convert.ToInt32(command_access) && trigger_found)
+                                            {
+                                                string alt = "";
+                                                foreach (string trigger in triggers)
+                                                {
+                                                    if (!search_term.Equals(trigger, StringComparison.InvariantCultureIgnoreCase))
                                                     {
-                                                        ircbot.sendData("NOTICE", nick + " :" + tmp_command[1] + " | Usage: " + ircbot.ircbot.irc_conf.command + trigger + " " + tmp_command[4] + " | Description: " + tmp_command[2]);
+                                                        alt += ircbot.conf.command + trigger + ", ";
                                                     }
                                                 }
+                                                if(!alt.Equals(string.Empty))
+                                                {
+                                                    alt = " | Alternate Commands: " + alt.Trim().TrimEnd(',');
+                                                }
+                                                ircbot.sendData("NOTICE", nick + " :Name: " + tmp_command[1] + alt);
+                                                ircbot.sendData("NOTICE", nick + " :Usage: " + ircbot.conf.command + search_term + " " + tmp_command[4]);
+                                                ircbot.sendData("NOTICE", nick + " :Description: " + tmp_command[2]);
                                             }
                                         }
                                     }
@@ -178,12 +214,9 @@ namespace IRCBot.Modules
                                         bool show_help = Convert.ToBoolean(tmp_command[7]);
                                         if (show_help == true)
                                         {
-                                            foreach (string trigger in triggers)
+                                            if (triggers.GetUpperBound(0) >= 0)
                                             {
-                                                if (access >= Convert.ToInt32(command_access))
-                                                {
-                                                    cmds += " " + ircbot.ircbot.irc_conf.command + trigger + ",";
-                                                }
+                                                cmds += " " + ircbot.conf.command + triggers[0] + ",";
                                             }
                                         }
                                     }
@@ -209,12 +242,9 @@ namespace IRCBot.Modules
                                         bool show_help = Convert.ToBoolean(tmp_command[7]);
                                         if (show_help == true)
                                         {
-                                            foreach (string trigger in triggers)
+                                            if (triggers.GetUpperBound(0) >= 0)
                                             {
-                                                if (access >= Convert.ToInt32(command_access))
-                                                {
-                                                    cmds += " " + ircbot.ircbot.irc_conf.command + trigger + ",";
-                                                }
+                                                cmds += " " + ircbot.conf.command + triggers[0] + ",";
                                             }
                                         }
                                     }
@@ -227,11 +257,11 @@ namespace IRCBot.Modules
                     {
                         ircbot.sendData("NOTICE", nick + " :Commands for " + module_name + ":" + cmds.TrimEnd(','));
                         cmds = "";
-                        ircbot.sendData("NOTICE", nick + " :For more information about a specific command, type " + ircbot.ircbot.irc_conf.command + "help {module_name of module_number} {command name}");
+                        ircbot.sendData("NOTICE", nick + " :For more information about a specific command, type " + ircbot.conf.command + "help " + module_name + " {command name}");
                     }
                     else
                     {
-                        ircbot.sendData("NOTICE", nick + " :There are no commands for " + line[4]);
+                        ircbot.sendData("NOTICE", nick + " :There are no commands for " + module_name);
                     }
                 }
             }
@@ -249,7 +279,7 @@ namespace IRCBot.Modules
                 {
                     ircbot.sendData("NOTICE", nick + " :" + mods.TrimEnd(','));
                     mods = "";
-                    ircbot.sendData("NOTICE", nick + " :To view the commands for a specific module, type " + ircbot.ircbot.irc_conf.command + "help {module_name or module_number}");
+                    ircbot.sendData("NOTICE", nick + " :To view the commands for a specific module, type " + ircbot.conf.command + "help {module_name or module_number}");
                 }
                 else
                 {

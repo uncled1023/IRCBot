@@ -43,7 +43,7 @@ namespace IRCBot.Modules
                                 foreach (string owner_nick in owners)
                                 {
                                     ircbot.sendData("NOTICE", owner_nick + " :" + nick + " has invited me to join " + request_chan);
-                                    ircbot.sendData("NOTICE", owner_nick + " :If you would like to permanently add this channel, please type " + ircbot.ircbot.irc_conf.command + "addchanlist " + request_chan);
+                                    ircbot.sendData("NOTICE", owner_nick + " :If you would like to permanently add this channel, please type " + ircbot.conf.command + "addchanlist " + request_chan);
                                 }
                             }
                             ircbot.sendData("JOIN", request_chan);

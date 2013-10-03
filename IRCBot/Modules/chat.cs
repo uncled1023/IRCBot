@@ -29,7 +29,7 @@ namespace IRCBot.Modules
             still_chatting = false;
             chatting_nick = new List<string>();
             myBot = new Bot();
-            myBot.loadSettings();
+            myBot.loadSettings(Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "chat" + Path.DirectorySeparatorChar + "Settings.xml");
             myUser = new User("chat_nick", myBot);
 
             AIMLbot.Utils.AIMLLoader loader = new AIMLbot.Utils.AIMLLoader(myBot);
@@ -52,7 +52,7 @@ namespace IRCBot.Modules
                         string[] blacklist = tmp_command[6].Split(',');
                         bool blocked = false;
                         bool cmd_found = false;
-                        bool spam_check = Convert.ToBoolean(tmp_command[8]);
+                        bool spam_check = ircbot.get_spam_check(channel, nick, Convert.ToBoolean(tmp_command[8]));
                         foreach (string bl_chan in blacklist)
                         {
                             if (bl_chan.Equals(channel))

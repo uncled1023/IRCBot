@@ -62,21 +62,26 @@ Adding a Server
 
 To add a new server, click the "Add Server" button in the Configuration window. The required fields are as follows:
 
-    Server Name
-        Format: <string>
-        Default: Blank
-    Server Address
-        Format: irc.hostname.net
-        Default: Blank
-    Port Number
-        Format: <integer>
-        Default: 6667
-    Name
-        Format: <string>
-        Default: Blank
-    Nick
-        Format: <string>
-        Default: Blank
+<table>
+  <tr>
+    <th>Property</th><th>Format</th><th>Default Value</th>
+  </tr>
+  <tr>
+    <td>Server Name</td><td>string</td><td></td>
+  </tr>
+  <tr>
+    <td>Server Address</td><td>irc.hostname.net</td><td></td>
+  </tr>
+  <tr>
+    <td>Port Number</td><td>int32</td><td>6667</td>
+  </tr>
+  <tr>
+    <td>Name</td><td>string</td><td></td>
+  </tr>
+  <tr>
+    <td>Nick</td><td>string</td><td></td>
+  </tr>
+</table>
 
 Each server has it's own settings for the Modules and Commands within the modules. You also can control the access level for each XOP level within the Op Levels Configuration tab.
 

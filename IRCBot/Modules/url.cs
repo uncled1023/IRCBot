@@ -237,7 +237,7 @@ namespace IRCBot.Modules
                                                 }
                                                 post_comment = Regex.Replace(post_comment, quote, "$2");
                                                 string[] words = post_comment.Split(' ');
-                                                if (words.GetUpperBound(0) > 10)
+                                                if (words.GetUpperBound(0) > 15)
                                                 {
                                                     post_message += " Comment: ";
                                                     for (int i = 0; i < 15; i++)

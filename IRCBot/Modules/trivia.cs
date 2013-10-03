@@ -63,8 +63,27 @@ namespace IRCBot.Modules
                                         }
                                         if (nick_access >= command_access)
                                         {
-                                            ircbot.sendData("PRIVMSG", channel + " :Lets play some Trivia!");
-                                            new_question(channel, ircbot);
+                                            bool score_found = false;
+                                            lock (trivialock)
+                                            {
+                                                foreach (trivia_info trivia in trivias)
+                                                {
+                                                    if (trivia.channel.Equals(channel, StringComparison.InvariantCultureIgnoreCase) && trivia.running)
+                                                    {
+                                                        score_found = true;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                            if (!score_found)
+                                            {
+                                                ircbot.sendData("PRIVMSG", channel + " :Lets play some Trivia!");
+                                                new_question(channel, ircbot);
+                                            }
+                                            else
+                                            {
+                                                ircbot.sendData("PRIVMSG", channel + " :There is already a trivia game started!");
+                                            }
                                         }
                                         break;
                                     case "scores":
@@ -75,40 +94,43 @@ namespace IRCBot.Modules
                                         if (nick_access >= command_access)
                                         {
                                             bool score_found = false;
-                                            foreach(trivia_info trivia in trivias)
+                                            lock (trivialock)
                                             {
-                                                if(trivia.channel.Equals(channel, StringComparison.InvariantCultureIgnoreCase))
+                                                foreach (trivia_info trivia in trivias)
                                                 {
-                                                    score_found = true;
-                                                    int index = 1;
-                                                    List<List<string>> sorted = new List<List<string>>();
-                                                    string msg = "";
-                                                    foreach (List<string> score in trivia.scores)
+                                                    if (trivia.channel.Equals(channel, StringComparison.InvariantCultureIgnoreCase))
                                                     {
-                                                        if (index <= 10)
+                                                        score_found = true;
+                                                        int index = 1;
+                                                        List<List<string>> sorted = new List<List<string>>();
+                                                        string msg = "";
+                                                        foreach (List<string> score in trivia.scores)
                                                         {
-                                                            msg += "[" + index + "] " + score[0] + ": " + score[1] + " points | ";
+                                                            if (index <= 10)
+                                                            {
+                                                                msg += "[" + index + "] " + score[0] + ": " + score[1] + " points | ";
+                                                            }
+                                                            else
+                                                            {
+                                                                break;
+                                                            }
+                                                            index++;
+                                                        }
+                                                        if (!msg.Equals(string.Empty))
+                                                        {
+                                                            ircbot.sendData("PRIVMSG", channel + " :" + msg.Trim().TrimEnd('|').Trim());
                                                         }
                                                         else
                                                         {
-                                                            break;
+                                                            ircbot.sendData("PRIVMSG", channel + " :No scores are available.");
                                                         }
-                                                        index++;
+                                                        break;
                                                     }
-                                                    if(!msg.Equals(string.Empty))
-                                                    {
-                                                        ircbot.sendData("PRIVMSG", channel + " :" + msg.Trim().TrimEnd('|').Trim());
-                                                    }
-                                                    else
-                                                    {
-                                                        ircbot.sendData("PRIVMSG", channel + " :No scores are available.");
-                                                    }
-                                                    break;
                                                 }
-                                                if (!score_found)
-                                                {
-                                                    ircbot.sendData("PRIVMSG", channel + " :No scores are available.");
-                                                }
+                                            }
+                                            if (!score_found)
+                                            {
+                                                ircbot.sendData("PRIVMSG", channel + " :No scores are available.");
                                             }
                                         }
                                         break;
@@ -225,73 +247,78 @@ namespace IRCBot.Modules
                             {
                                 response = line[3].TrimStart(':');
                             }
-                            if (response.Equals(trivia.answer, StringComparison.InvariantCultureIgnoreCase))
+                            string[] answers = trivia.answer.Split('*');
+                            foreach (string answer in answers)
                             {
-                                int points = 0;
-                                int index = 0;
-                                won = true;
-                                foreach(List<string> score in trivia.scores)
+                                if (response.Equals(trivia.answer, StringComparison.InvariantCultureIgnoreCase))
                                 {
-                                    if(score[0].Equals(nick, StringComparison.InvariantCultureIgnoreCase))
+                                    int points = 0;
+                                    int index = 0;
+                                    won = true;
+                                    foreach (List<string> score in trivia.scores)
                                     {
-                                        List<string> tmp_list = new List<string>();
-                                        int old_points = Convert.ToInt32(score[1]);
-                                        points = old_points + 1;
-                                        score[1] = points.ToString();
-                                        break;
+                                        if (score[0].Equals(nick, StringComparison.InvariantCultureIgnoreCase))
+                                        {
+                                            List<string> tmp_list = new List<string>();
+                                            int old_points = Convert.ToInt32(score[1]);
+                                            points = old_points + 1;
+                                            score[1] = points.ToString();
+                                            break;
+                                        }
+                                        index++;
                                     }
-                                    index++;
-                                }
-                                if (points > 0)
-                                {
-                                    ircbot.sendData("PRIVMSG", channel + " :\"" + response + "\" is correct! " + nick + " now has " + points + " points!");
-                                }
-                                else
-                                {
-                                    List<string> tmp_score = new List<string>();
-                                    tmp_score.Add(nick);
-                                    tmp_score.Add("1");
-                                    trivia.scores.Add(tmp_score);
-                                    points = 1;
-                                    ircbot.sendData("PRIVMSG", channel + " :\"" + response + "\" is correct! " + nick + " now has " + points + " point!");
-                                }
-                                trivia.questions_answered++;
-                                trivia.answer_timer.Stop();
-
-                                List<List<string>> top = new List<List<string>>();
-                                List<List<string>> tmp_top = new List<List<string>>();
-                                tmp_top = trivia.scores;
-                                for (int x = 0; x < trivia.scores.Count; x++)
-                                {
-                                    if (tmp_top.Count > 0)
+                                    if (points > 0)
                                     {
-                                        int score_index = 0;
-                                        int tmp_top_score = 0;
-                                        int top_score_index = 0;
-                                        bool found = false;
-                                        foreach (List<string> top_score in tmp_top)
-                                        {
-                                            if (Convert.ToInt32(top_score[1]) > tmp_top_score)
-                                            {
-                                                found = true;
-                                                tmp_top_score = Convert.ToInt32(top_score[1]);
-                                                top_score_index = score_index;
-                                            }
-                                            score_index++;
-                                        }
-                                        if (found)
-                                        {
-                                            top.Add(tmp_top[top_score_index]);
-                                            tmp_top.RemoveAt(top_score_index);
-                                            x--;
-                                        }
+                                        ircbot.sendData("PRIVMSG", channel + " :\"" + response + "\" is correct! " + nick + " now has " + points + " points!");
                                     }
                                     else
                                     {
-                                        break;
+                                        List<string> tmp_score = new List<string>();
+                                        tmp_score.Add(nick);
+                                        tmp_score.Add("1");
+                                        trivia.scores.Add(tmp_score);
+                                        points = 1;
+                                        ircbot.sendData("PRIVMSG", channel + " :\"" + response + "\" is correct! " + nick + " now has " + points + " point!");
                                     }
+                                    trivia.questions_answered++;
+                                    trivia.answer_timer.Stop();
+
+                                    List<List<string>> top = new List<List<string>>();
+                                    List<List<string>> tmp_top = new List<List<string>>();
+                                    tmp_top = trivia.scores;
+                                    for (int x = 0; x < trivia.scores.Count; x++)
+                                    {
+                                        if (tmp_top.Count > 0)
+                                        {
+                                            int score_index = 0;
+                                            int tmp_top_score = 0;
+                                            int top_score_index = 0;
+                                            bool found = false;
+                                            foreach (List<string> top_score in tmp_top)
+                                            {
+                                                if (Convert.ToInt32(top_score[1]) > tmp_top_score)
+                                                {
+                                                    found = true;
+                                                    tmp_top_score = Convert.ToInt32(top_score[1]);
+                                                    top_score_index = score_index;
+                                                }
+                                                score_index++;
+                                            }
+                                            if (found)
+                                            {
+                                                top.Add(tmp_top[top_score_index]);
+                                                tmp_top.RemoveAt(top_score_index);
+                                                x--;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            break;
+                                        }
+                                    }
+                                    trivia.scores = top;
                                 }
-                                trivia.scores = top;
+                                break;
                             }
                             break;
                         }
@@ -367,7 +394,7 @@ namespace IRCBot.Modules
                 {
                     if (trivia.channel.Equals(channel, StringComparison.InvariantCultureIgnoreCase))
                     {
-                        ircbot.sendData("PRIVMSG", channel + " :Times up!  The answer was: " + trivia.answer);
+                        ircbot.sendData("PRIVMSG", channel + " :Times up!  The answer was: " + trivia.answer.Replace("*", " or "));
                         trivia.answer_timer.Stop();
                         trivia_found = true;
                         break;

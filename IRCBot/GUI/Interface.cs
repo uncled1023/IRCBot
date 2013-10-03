@@ -17,6 +17,7 @@ using System.Text.RegularExpressions;
 using Microsoft.Win32;
 using System.Runtime.InteropServices;
 using System.Management;
+using System.Reflection;
 
 namespace IRCBot
 {
@@ -95,9 +96,11 @@ namespace IRCBot
             public UInt32 uCount;
             public Int32 dwTimeout;
         }
-
         public Interface()
         {
+            AppDomain currentDomain = AppDomain.CurrentDomain;
+            currentDomain.AssemblyResolve += new ResolveEventHandler(LoadFromSameFolder);
+
             InitializeComponent();
             run_time = DateTime.Now;
             cur_dir = Directory.GetCurrentDirectory();
@@ -142,6 +145,15 @@ namespace IRCBot
             this.Icon = new System.Drawing.Icon(cur_dir + Path.DirectorySeparatorChar + "Bot.ico");
             tabControl1.SelectedIndexChanged += tab_changed;
             start_client();
+        }
+
+        static Assembly LoadFromSameFolder(object sender, ResolveEventArgs args)
+        {
+            string folderPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Resources");
+            string assemblyPath = Path.Combine(folderPath, new AssemblyName(args.Name).Name + ".dll");
+            if (File.Exists(assemblyPath) == false) return null;
+            Assembly assembly = Assembly.LoadFrom(assemblyPath);
+            return assembly;
         }
 
         void ContextMenu_Popup(object sender, EventArgs e)

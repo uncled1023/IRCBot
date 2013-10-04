@@ -121,7 +121,7 @@ Each command has the following properties:
 
 ### Fortunes
 
-* `fortune` Displays a fortune.
+* `fortune` Displays a fortune.<br>
 Usage: `fortune`
 
 ### Trivia

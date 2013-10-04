@@ -1109,22 +1109,49 @@ namespace IRCBot.Modules
                                         {
                                             if (type.Equals("channel"))
                                             {
-                                                foreach (List<string> tmp_nick in ircbot.nick_list)
+                                                if (line.GetUpperBound(0) > 3)
                                                 {
-                                                    if (tmp_nick[0].Equals(channel))
+                                                    foreach (List<string> tmp_nick in ircbot.nick_list)
                                                     {
-                                                        for (int i = 1; i < tmp_nick.Count(); i++)
+                                                        if (tmp_nick[0].Equals(line[4]))
                                                         {
-                                                            string[] split = tmp_nick[i].Split(':');
-                                                            if (split.GetUpperBound(0) > 0)
+                                                            for (int i = 1; i < tmp_nick.Count(); i++)
                                                             {
-                                                                if (!split[1].Equals(nick, StringComparison.InvariantCultureIgnoreCase) && !split[1].Equals(ircbot.nick, StringComparison.InvariantCultureIgnoreCase))
+                                                                string[] split = tmp_nick[i].Split(':');
+                                                                if (split.GetUpperBound(0) > 0)
                                                                 {
-                                                                    ircbot.sendData("KICK", channel + " :" + split[1]);
+                                                                    if (split[1].Equals(nick, StringComparison.InvariantCultureIgnoreCase) || split[1].Equals(ircbot.nick, StringComparison.InvariantCultureIgnoreCase))
+                                                                    {
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        ircbot.sendData("KICK", line[4] + " :" + split[1]);
+                                                                    }
                                                                 }
                                                             }
+                                                            break;
                                                         }
-                                                        break;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    foreach (List<string> tmp_nick in ircbot.nick_list)
+                                                    {
+                                                        if (tmp_nick[0].Equals(channel))
+                                                        {
+                                                            for (int i = 1; i < tmp_nick.Count(); i++)
+                                                            {
+                                                                string[] split = tmp_nick[i].Split(':');
+                                                                if (split.GetUpperBound(0) > 0)
+                                                                {
+                                                                    if (!split[1].Equals(nick, StringComparison.InvariantCultureIgnoreCase) && !split[1].Equals(ircbot.nick, StringComparison.InvariantCultureIgnoreCase))
+                                                                    {
+                                                                        ircbot.sendData("KICK", channel + " :" + split[1]);
+                                                                    }
+                                                                }
+                                                            }
+                                                            break;
+                                                        }
                                                     }
                                                 }
                                             }
@@ -1260,10 +1287,11 @@ namespace IRCBot.Modules
                 xmlDoc.Load(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + ircbot.conf.server + Path.DirectorySeparatorChar + "modules.xml");
                 bool cmd_found_file = false;
                 bool cmd_found_conf = false;
-                XmlNodeList ServerxnList = xmlDoc.SelectNodes("/modules");
+                XmlNode Serverxn = xmlDoc.SelectSingleNode("/modules");
+                XmlNodeList ServerxnList = Serverxn.ChildNodes;
                 foreach (XmlNode xn in ServerxnList)
                 {
-                    XmlNodeList cmd_nodes = xn.SelectNodes("module/commands");
+                    XmlNodeList cmd_nodes = xn.SelectNodes("commands");
                     foreach (XmlNode cmd_node in cmd_nodes)
                     {
                         string[] triggers = cmd_node["triggers"].InnerText.Split('|');
@@ -1315,10 +1343,11 @@ namespace IRCBot.Modules
                 xmlDoc.Load(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + ircbot.conf.server + Path.DirectorySeparatorChar + "modules.xml");
                 bool cmd_found_file = false;
                 bool cmd_found_conf = false;
-                XmlNodeList ServerxnList = xmlDoc.SelectNodes("/modules");
+                XmlNode Serverxn = xmlDoc.SelectSingleNode("/modules");
+                XmlNodeList ServerxnList = Serverxn.ChildNodes;
                 foreach (XmlNode xn in ServerxnList)
                 {
-                    XmlNodeList cmd_nodes = xn.SelectNodes("module/commands");
+                    XmlNodeList cmd_nodes = xn.SelectNodes("commands");
                     foreach (XmlNode cmd_node in cmd_nodes)
                     {
                         string[] triggers = cmd_node["triggers"].InnerText.Split('|');
@@ -1384,7 +1413,8 @@ namespace IRCBot.Modules
                 xmlDoc.Load(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + ircbot.conf.server + Path.DirectorySeparatorChar + "modules.xml");
                 bool module_found_file = false;
                 bool module_found_conf = false;
-                XmlNodeList ServerxnList = xmlDoc.SelectNodes("/modules/module");
+                XmlNode Serverxn = xmlDoc.SelectSingleNode("/modules");
+                XmlNodeList ServerxnList = Serverxn.ChildNodes;
                 foreach (XmlNode xn in ServerxnList)
                 {
                     if (xn["class_name"].InnerText.Equals(module))
@@ -1426,7 +1456,8 @@ namespace IRCBot.Modules
                 xmlDoc.Load(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + ircbot.conf.server + Path.DirectorySeparatorChar + "modules.xml");
                 bool module_found_file = false;
                 bool module_found_conf = false;
-                XmlNodeList ServerxnList = xmlDoc.SelectNodes("/modules/module");
+                XmlNode Serverxn = xmlDoc.SelectSingleNode("/modules");
+                XmlNodeList ServerxnList = Serverxn.ChildNodes;
                 foreach (XmlNode xn in ServerxnList)
                 {
                     if (xn["class_name"].InnerText.Equals(module))

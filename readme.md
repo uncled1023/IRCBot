@@ -434,7 +434,7 @@ Usage: `anonmessage {nick} {message}`
 * `intro` Adds a personal greeting for whenever you enter the channel.<br>
 Usage: `intro {greeting_1|greeting_2}`
 
-* `introdelete` Deletes yoru itnroductions for that channel.<br>
+* `introdelete` Deletes your introductions for that channel.<br>
 Aliases: `delintro`, `deleteintro`<br>
 Usage: `introdelete`
 

@@ -37,17 +37,17 @@ The IRCBot is designed to provide an all-in-one solution for those who wish to r
 
 ## Installation - Windows
 
-1) Download the Release.7z from the latest release and extract the files to a directory of your choice.
+1) Download the Release.7z from the latest release and extract the files to a directory of your choice.<br>
 2) Run IRCBot.exe
 
 ## Installation - Linux (Alpha)
 
-1) Install mono and libgdiplus packages.
-1) Download the Release.7z from the latest release and extract the files to a directory of your choice.
-3) Open a terminal emulator and cd it to the directory with the IRCBot.exe.
-4) Type: `mono IRCBot.exe`
-3) Click Tools>Configuration and configure your bot's settings
-4) Select the Server you added from the server list and click Connect, or restart the Bot application.
+1) Install mono and libgdiplus packages.<br>
+1) Download the Release.7z from the latest release and extract the files to a directory of your choice.<br>
+3) Open a terminal emulator and cd it to the directory with the IRCBot.exe.<br>
+4) Type: `mono IRCBot.exe`<br>
+3) Click Tools>Configuration and configure your bot's settings<br>
+4) Select the Server you added from the server list and click Connect, or restart the Bot application.<br>
 
 * Current Limitations: Does not display any output, some functions may not work, buggy.
 
@@ -126,513 +126,513 @@ Usage: `fortune`
 
 ### Trivia
 
-* `trivia` Starts a new game of trivia.
+* `trivia` Starts a new game of trivia.<br>
 Usage: `trivia`
 
-* `stoptrivia` Stops a running game of trivia.
-Aliases: `strivia`
+* `stoptrivia` Stops a running game of trivia.<br>
+Aliases: `strivia`<br>
 Usage: `stoptrivia`
 
-* `scores` Displays the top 10 scores.
+* `scores` Displays the top 10 scores.<br>
 Usage: `scores`
 
-* `score` Shows your current rank and score.
+* `score` Shows your current rank and score.<br>
 Usage: `score`
 
 ### 4chan
 
-* `4chan` Views a specific thread ID or OP number of a board, or a list of boards on 4chan.
+* `4chan` Views a specific thread ID or OP number of a board, or a list of boards on 4chan.<br>
 Usage: `4chan [{board}] [{(#)thread_ID|OP_index}] [{(#)reply_ID|reply_index}]`
 
-* `next_thread` Displays the next OP on the current board.
-Aliases: `nt`
+* `next_thread` Displays the next OP on the current board.<br>
+Aliases: `nt`<br>
 Usage: `next_thread`
 
-* `next_reply` Displays the next reply on the current thread.
-Aliases: `nr`
+* `next_reply` Displays the next reply on the current thread.<br>
+Aliases: `nr`<br>
 Usage: `nr`
 
-* `4chansearch` Searchs a specific board for a thread that contains the specified query.
-Aliases: `4chs`, `4cs`, `4chans`
+* `4chansearch` Searchs a specific board for a thread that contains the specified query.<br>
+Aliases: `4chs`, `4cs`, `4chans`<br>
 Usage: `4chansearch {board} {query}`
 
 ### Is It Up
 
-* `isitup` Checks if the web address specified is accessible from the bot.
-Aliases: `isup`
+* `isitup` Checks if the web address specified is accessible from the bot.<br>
+Aliases: `isup`<br>
 Usage: `isitup {url}`
 
 ### Ping Me
 
-* `pingme` Gets the ping time between the bot and the client requesting the ping.
+* `pingme` Gets the ping time between the bot and the client requesting the ping.<br>
 Usage: `pingme`
 
 ### Seen
 
-* `seen` Displays the last time the nick has been seen in the channel.
+* `seen` Displays the last time the nick has been seen in the channel.<br>
 Usage: `seen`
 
 ### Access
 
-* `setaccess` Adds the specified nick to the access list with the specified level.
-Aliases: `addaccess`
+* `setaccess` Adds the specified nick to the access list with the specified level.<br>
+Aliases: `addaccess`<br>
 Usage: `setaccess {nick} {access_level}`
 
-* `delaccess` Removes the specified access level from the nick.
+* `delaccess` Removes the specified access level from the nick.<br>
 Usage: `delaccess {nick} {access_level}`
 
-* `listaccess` Lists all the users with access on the channel and their level.
-Aliases: `accesslist`
+* `listaccess` Lists all the users with access on the channel and their level.<br>
+Aliases: `accesslist`<br>
 Usage: `listaccess`
 
-* `getaccess` Displays the current access level of a user.
-Aliases: `access`
+* `getaccess` Displays the current access level of a user.<br>
+Aliases: `access`<br>
 Usage: `getaccess [{channel}] {nick}`
 
 ### Moderation
 
-* `founder` Sets the nick to Owner of the chan.
+* `founder` Sets the nick to Owner of the chan.<br>
 Usage: `founder {nick}`
 
-* `defounder` Unsets the nick as Owner of the chan.
+* `defounder` Unsets the nick as Owner of the chan.<br>
 Usage: `defounder {nick}
 
-* `asop` Adds the nick to the Auto Super Op List.
+* `asop` Adds the nick to the Auto Super Op List.<br>
 Usage: `asop {nick}`
 
-* `deasop` Removes the nick from the Auto Super Op List.
+* `deasop` Removes the nick from the Auto Super Op List.<br>
 Usage: `deasop {nick}`
 
-* `sop` Sets the nick as Super Op.
+* `sop` Sets the nick as Super Op.<br>
 Usage: `sop {nick}`
 
-* `desop` Removes the nick as Super Op.
+* `desop` Removes the nick as Super Op.<br>
 Usage: `desop {nick}`
 
-* `aop` Adds the nick to the Auto Op List.
+* `aop` Adds the nick to the Auto Op List.<br>
 Usage: `aop {nick}`
 
-* `deaop` Removes the nick from the Auto Op List.
+* `deaop` Removes the nick from the Auto Op List.<br>
 Usage: `deaop {nick}`
 
-* `op` Sets the nick as an Op.
+* `op` Sets the nick as an Op.<br>
 Usage: `op {nick}`
 
-* `deop` Removes the nick as an Op.
+* `deop` Removes the nick as an Op.<br>
 Usage: `deop {nick}`
 
-* `ahop` Adds the nick to the Auto HOP List.
+* `ahop` Adds the nick to the Auto HOP List.<br>
 Usage: `ahop {nick}`
 
-* `deahop` Removes the nick from the Auto HOP List.
+* `deahop` Removes the nick from the Auto HOP List.<br>
 Usage: `deahop {nick}`
 
-* `avoice` Adds the nick to the Auto Voice List.
+* `avoice` Adds the nick to the Auto Voice List.<br>
 Usage: `avoice {nick}`
 
-* `deavoice` Removes the nick from the Auto Voice List.
+* `deavoice` Removes the nick from the Auto Voice List.<br>
 Usage: `deavoice {nick}`
 
-* `mode` Sets or unsets a channel mode.
+* `mode` Sets or unsets a channel mode.<br>
 Usage: `mode +/-{flags}`
 
-* `topic` Sets the channels topic.
+* `topic` Sets the channels topic.<br>
 Usage: `topic {topic}`
 
-* `invite` Invites the specified nick into the channel.
+* `invite` Invites the specified nick into the channel.<br>
 Usage: `invite {nick}`
 
-* `ak` Adds the specified nick to the auto kick list.
+* `ak` Adds the specified nick to the auto kick list.<br>
 Usage: `ak {nick} [{reason}]`
 
-* `ab` Adds the specified nick to the auto ban list.
+* `ab` Adds the specified nick to the auto ban list.<br>
 Usage: `ab {nick} [{reason}]`
 
-* `akb` Adds the specified nick to the auto kick-ban list.
+* `akb` Adds the specified nick to the auto kick-ban list.<br>
 Usage: `akb {nick} [{reason}]`
 
-* `deak` Removes the specified nick to the auto kick list.
+* `deak` Removes the specified nick to the auto kick list.<br>
 Usage: `deak {nick} [{reason}]`
 
-* `deab` Removes the specified nick to the auto ban list.
+* `deab` Removes the specified nick to the auto ban list.<br>
 Usage: `deab {nick} [{reason}]`
 
-* `deakb` Removes the specified nick to the auto kick-ban list.
+* `deakb` Removes the specified nick to the auto kick-ban list.<br>
 Usage: `deakb {nick} [{reason}]`
 
-* `hop` Sets the nick as Half Op.
+* `hop` Sets the nick as Half Op.<br>
 Usage: `hop {nick}`
 
-* `dehop` Removes the nick as Half Op.
+* `dehop` Removes the nick as Half Op.<br>
 Usage: `dehop {nick}`
 
-* `b` Bans the specified nick.
+* `b` Bans the specified nick.<br>
 Usage: `b {nick}`
 
-* `ub` Unbans the specified nick.
+* `ub` Unbans the specified nick.<br>
 Usage: `ub {nick}`
 
-* `clearban` Clears all the bans in the channel.
+* `clearban` Clears all the bans in the channel.<br>
 Usage: `clearban`
 
-* `kb` Bans and then Kicks the specified nick.
+* `kb` Bans and then Kicks the specified nick.<br>
 Usage: `kb {nick} [{reason}]`
 
-* `tb` Bans the specified nick for the amount of time specified.
+* `tb` Bans the specified nick for the amount of time specified.<br>
 Usage: `tb {ban_time} {nick} [{reason}]`
 
-* `tkb` Bans and then Kicks the specified nick for the amount of time specified.
+* `tkb` Bans and then Kicks the specified nick for the amount of time specified.<br>
 Usage: `tkb {ban_time} {nick} [{reason}]`
 
-* `k` Kicks the nick from the channel.
+* `k` Kicks the nick from the channel.<br>
 Usage: `k {nick} [{reason}]`
 
-* `voice` Sets the nick as Voiced.
+* `voice` Sets the nick as Voiced.<br>
 Usage: `voice {nick}`
 
-* `devoice` Removes the nick as Voiced.
+* `devoice` Removes the nick as Voiced.<br>
 Usage: `devoice {nick}`
 
-* `kme` Kicks the requesting nick from the channel.
+* `kme` Kicks the requesting nick from the channel.<br>
 Usage: `kme`
 
 ### Owner
 
-* `owner` Identifies the nick as the Bot's Owner.
+* `owner` Identifies the nick as the Bot's Owner.<br>
 Usage: `owner {password}`
 
-* `addowner` Adds the defined nick as an owner.
+* `addowner` Adds the defined nick as an owner.<br>
 Usage: `addowner {nick}`
 
-* `delowner` Removes the defined nick from the owners list.
+* `delowner` Removes the defined nick from the owners list.<br>
 Usage: `delowner {nick}`
 
-* `nick` Changes the Bot's nickname to the one specified.
+* `nick` Changes the Bot's nickname to the one specified.<br>
 Usage: `nick {new_nick}`
 
-* `id` Has the Bot identify to nickserv.
+* `id` Has the Bot identify to nickserv.<br>
 Usage: `id`
 
-* `join` Tells the Bot to join the specified channel.
+* `join` Tells the Bot to join the specified channel.<br>
 Usage: `join {channel}`
 
-* `part` Tells the Bot to part the channel.
+* `part` Tells the Bot to part the channel.<br>
 Usage: `part [{channel}]`
 
-* `say` Has the Bot say the specified message to the channel.
+* `say` Has the Bot say the specified message to the channel.<br>
 Usage: `say [{channel}] {message}`
 
-* `action` Displays the specified message as an action  in the channel.
-Alternate Commands: `me`
+* `action` Displays the specified message as an action  in the channel.<br>
+Alternate Commands: `me`<br>
 Usage: `action [{channel}] {message}`
 
-* `query` Private messages the specified nick.
+* `query` Private messages the specified nick.<br>
 Usage: `query {nick} {message}`
 
-* `quit` Quits the server instance.
+* `quit` Quits the server instance.<br>
 Usage: `quit`
 
-* `quitall` Quits all of the connected server instances.
+* `quitall` Quits all of the connected server instances.<br>
 Usage: `quitall`
 
-* `restart` Restarts the server instance.
+* `restart` Restarts the server instance.<br>
 Usage: `restart`
 
-* `restartall` Restarts all of the connected server instances.
+* `restartall` Restarts all of the connected server instances.<br>
 Usage: `restartall`
 
-* `ignore` Adds the specified nick/chan to the ignore list.
+* `ignore` Adds the specified nick/chan to the ignore list.<br>
 Usage: `ignore {nick|channel}`
 
-* `unignore` Removes the specified nick/chan from the ignore list.
+* `unignore` Removes the specified nick/chan from the ignore list.<br>
 Usage: `unignore {nick|channel}`
 
-* `ignoremodule` Adds the specified nick/chan to a modules ignore list.
+* `ignoremodule` Adds the specified nick/chan to a modules ignore list.<br>
 Usage: `ignoremodule {module} {nick|chan}`
 
-* `unignoremodule` Removes the specified nick/chan from a modules ignore list.
+* `unignoremodule` Removes the specified nick/chan from a modules ignore list.<br>
 Usage: `unignoremodule {module} {nick|chan}`
 
-* `ignorecmd` Adds the specified nick/chan to a commands ignore list.
+* `ignorecmd` Adds the specified nick/chan to a commands ignore list.<br>
 Usage: `ignorecmd {command} {nick|chan}
 
-* `unignorecmd` Removes the specified nick/chan from a commands ignore list.
+* `unignorecmd` Removes the specified nick/chan from a commands ignore list.<br>
 Usage: `unignorecmd {command} {nick|chan}`
 
-* `blacklist` Adds the specified channel to the bot blacklist.
+* `blacklist` Adds the specified channel to the bot blacklist.<br>
 Usage: `blacklist {channel}`
 
-* `unblacklist` Removes the specified channel from the bot blacklist.
+* `unblacklist` Removes the specified channel from the bot blacklist.<br>
 Usage: `unblacklist {channel}`
 
-* `update` Updates the Modules and Configurations on all server instances.
+* `update` Updates the Modules and Configurations on all server instances.<br>
 Usage: `update`
 
-* `modules` Displays the loaded modules.
+* `modules` Displays the loaded modules.<br>
 Usage: `modules`
 
-* `loadmodule` Loads the specified module into the bot.
-Aliases: `load`, `addmodule`
+* `loadmodule` Loads the specified module into the bot.<br>
+Aliases: `load`, `addmodule`<br>
 Usage: `loadmodule {module_class_name}`
 
-* `delmodule` Unloads the specified module from the bot.
-Aliases: `unload`, `unloadmodule`
+* `delmodule` Unloads the specified module from the bot.<br>
+Aliases: `unload`, `unloadmodule`<br>
 Usage: `delmodule {module_class_name}`
 
-* `addchan`Invites the bot to a specified channel.
+* `addchan`Invites the bot to a specified channel.<br>
 Usage: `addchan {channel}`
 
-* `addchanlist` Adds the specified channel to the auto-join list.
+* `addchanlist` Adds the specified channel to the auto-join list.<br>
 Usage: `addchanlist {channel}`
 
-* `delchanlist` Removes the specified channel to the auto-join list.
+* `delchanlist` Removes the specified channel to the auto-join list.<br>
 Usage: `delchanlist {channel}`
 
-* `channels` Lists the channels the bot is in on that server.
+* `channels` Lists the channels the bot is in on that server.<br>
 Usage: `channels`
 
-* `servers` Lists the servers the bot is connected to.
+* `servers` Lists the servers the bot is connected to.<br>
 Usage: `servers`
 
-* `conf` Lists the bot's current configuration settings.
+* `conf` Lists the bot's current configuration settings.<br>
 Usage: `conf [module_config]`
 
-* `resources` Displays the current CPU and RAM used by the bot.
+* `resources` Displays the current CPU and RAM used by the bot.<br>
 Usage: `resources`
 
-* `clear` Kicks everyone from the channel except the initiator and the bot.
+* `clear` Kicks everyone from the channel except the initiator and the bot.<br>
 Usage: `clear [{channel}]`
 
 ### Help
 
-* `help` Displays the modules available to the nick.  Viewing a specific module shows the commands.  Viewing a specific command shows the command properties.
+* `help` Displays the modules available to the nick.  Viewing a specific module shows the commands.  Viewing a specific command shows the command properties.<br>
 Usage: `help [{module}] [{command}]`
 
 ### Rules
 
-* `rules` Displays the channel rules.
+* `rules` Displays the channel rules.<br>
 Usage: `rules`
 
-* `addrule` Adds the specified rule to the end of the channel rules.
+* `addrule` Adds the specified rule to the end of the channel rules.<br>
 Usage: `addrule {rule}`
 
-* `delrule` Removes the specified rule from the channel rules.
+* `delrule` Removes the specified rule from the channel rules.<br>
 Usage: `delrule {rule_number}`
 
 ### Messaging
 
-* `message` Leaves a message for the specified nick.  Will be delivered once the nick joins or speaks in a channel the bot is in.
-Aliases: `msg`
+* `message` Leaves a message for the specified nick.  Will be delivered once the nick joins or speaks in a channel the bot is in.<br>
+Aliases: `msg`<br>
 Usage: `message {nick} {message}`
 
-* `anonmessage` Leaves a message for the specified nick without displaying the sender's nick.  Will be delivered once the nick joins or speaks in a channel the bot is in.
-Aliases: `amsg`, `anonmsg`
+* `anonmessage` Leaves a message for the specified nick without displaying the sender's nick.  Will be delivered once the nick joins or speaks in a channel the bot is in.<br>
+Aliases: `amsg`, `anonmsg`<br>
 Usage: `anonmessage {nick} {message}`
 
 ### Intro
 
-* `intro` Adds a personal greeting for whenever you enter the channel.
+* `intro` Adds a personal greeting for whenever you enter the channel.<br>
 Usage: `intro {greeting_1|greeting_2}`
 
-* `introdelete` Deletes yoru itnroductions for that channel.
-Aliases: `delintro`, `deleteintro`
+* `introdelete` Deletes yoru itnroductions for that channel.<br>
+Aliases: `delintro`, `deleteintro`<br>
 Usage: `introdelete`
 
 ### Quote
 
-* `quote` Displays a random quote from the channel.  If a nick is specified, it will get a quote from that nick.
+* `quote` Displays a random quote from the channel.  If a nick is specified, it will get a quote from that nick.<br>
 Usage: `quote [{nick}]`
 
 ### Weather
 
-* `weather` Displays the current weather conditions for the specified city.
-Aliases: `w`
+* `weather` Displays the current weather conditions for the specified city.<br>
+Aliases: `w`<br>
 Usage: `weather {zip_code|city_name}`
 
-* `forecast` Displays the weather forecast for the specified city.
-Aliases: `f`
+* `forecast` Displays the weather forecast for the specified city.<br>
+Aliases: `f`<br>
 Usage: `forecast {zip_code|city_name}`
 
 ### Search
 
-* `google` Displays the first result from Google.
-Aliases: `g`
+* `google` Displays the first result from Google.<br>
+Aliases: `g`<br>
 Usage: `google {query}`
 
 ### 8-Ball
 
-* `8ball` Answers any yes/no question.
+* `8ball` Answers any yes/no question.<br>
 Usage: `8ball {question}`
 
 ### HBomb
 
-* `hbomb` Initiates a new game of pass the HBomb.
+* `hbomb` Initiates a new game of pass the HBomb.<br>
 Usage: `hbomb`
 
-* `pass` Passes the HBomb to the specified nick.
+* `pass` Passes the HBomb to the specified nick.<br>
 Usage: `pass {nick}`
 
-* `lock_bomb` Locks the bomb to the current holder, or passes it and then locks it.
-Aliases: `lb`
+* `lock_bomb` Locks the bomb to the current holder, or passes it and then locks it.<br>
+Aliases: `lb`<br>
 Usage: `lock_bomb [{nick}]`
 
-* `unlock_bomb` Unlocks the bomb from the current holder.
-Aliases: `unlb`
+* `unlock_bomb` Unlocks the bomb from the current holder.<br>
+Aliases: `unlb`<br>
 Usage: `unlock_bomb`
 
-* `set_bomb` Sets the bomb holder to the specified nick.
-Aliases: `sb`
+* `set_bomb` Sets the bomb holder to the specified nick.<br>
+Aliases: `sb`<br>
 Usage: `set_bomb {nick}`
 
-* `detonate` Detonates the current active bomb.
+* `detonate` Detonates the current active bomb.<br>
 Usage: `detonate`
 
-* `stop_bomb` Stops the bomb without it blowing up.
+* `stop_bomb` Stops the bomb without it blowing up.<br>
 Usage: `stop_bomb`
 
-* `defuse` Cuts a wire of the HBomb.  If it is the correct wire, it will defuse the bomb and kick the previous holder.  If not, it will detonate.
+* `defuse` Cuts a wire of the HBomb.  If it is the correct wire, it will defuse the bomb and kick the previous holder.  If not, it will detonate.<br>
 Usage: `defuse {wire_color}`
 
 ### Fun
 
-* `love` Sends some love to the specified nick or requesting nick.
+* `love` Sends some love to the specified nick or requesting nick.<br>
 Usage: `love [{nick}]`
 
-* `hug` Sends a hug to the specified nick or requesting nick.
+* `hug` Sends a hug to the specified nick or requesting nick.<br>
 Usage: `hug [{nick}]`
 
-* `slap` Slaps the specified nick or requesting nick.
+* `slap` Slaps the specified nick or requesting nick.<br>
 Usage: `slap [{nick}]`
 
-* `bots` Checks in to the channel.
+* `bots` Checks in to the channel.<br>
 Usage: `bots`
 
-* `br` Responds with HUEHUEHUE.
+* `br` Responds with HUEHUEHUE.<br>
 Usage: `br`
 
-* `net` Talks about the quality .NET Framework.
+* `net` Talks about the quality .NET Framework.<br>
 Usage: `net`
 
 ### Response
 
-* `addresponse` Adds a new response to the dictionary.
+* `addresponse` Adds a new response to the dictionary.<br>
 Usage: `addresponse {allowed_chan}[,{allowed_chan}]:{trigger}[|{trigger}]:{response}[|[response}]`
 
-* `delresponse` Removes the specified response from the dictionary.
+* `delresponse` Removes the specified response from the dictionary.<br>
 Usage: `delresponse {response_number}`
 
-* `listresponse` Lists all of the responses in the dictionary.
+* `listresponse` Lists all of the responses in the dictionary.<br>
 Usage: `listresponse`
 
 ### Chat
 
-* `stopchat` Stops the bot from chatting in that channel.
+* `stopchat` Stops the bot from chatting in that channel.<br>
 Usage: `stopchat`
 
 ### Poll
 
-* `poll` Creates a poll in the channel.
+* `poll` Creates a poll in the channel.<br>
 Usage: `poll {question}|{answer}[|{answer}...]`
 
-* `addanswer` Adds an answer to the active poll.
+* `addanswer` Adds an answer to the active poll.<br>
 Usage: `addanswer {answer}`
 
-* `delanswer` Removes the specified answer from the active poll.
+* `delanswer` Removes the specified answer from the active poll.<br>
 Usage: `delanswer {answer_number}`
 
-* `stoppoll` Stops the active poll and displays the results.
+* `stoppoll` Stops the active poll and displays the results.<br>
 Usage: `stoppoll`
 
-* `results` Displays the results of the current poll.
+* `results` Displays the results of the current poll.<br>
 Usage: `results`
 
-* `vote` Votes for the specified answer.
+* `vote` Votes for the specified answer.<br>
 Usage: `vote {answer_number}`
 
 ### Roll Call
 
-* `rollcall` Displays every nick in the channel.
+* `rollcall` Displays every nick in the channel.<br>
 Usage: `rollcall [{channel}]`
 
 ### Version Response
 
-* `ver` Sends a version request and displays the response.
+* `ver` Sends a version request and displays the response.<br>
 Usage: `ver {nick}`
 
 ### Idle
 
-* `idle` Sets you as idle.  Protects from certain games and actions.
+* `idle` Sets you as idle.  Protects from certain games and actions.<br>
 Usage: `idle`
 
-* `deidle` Returns you from idle.
+* `deidle` Returns you from idle.<br>
 Usage: `deidle`
 
 ### Roll Dice
 
-* `roll` Rolls a specified number of dice with certain s amount of sides and displays the results.
+* `roll` Rolls a specified number of dice with certain s amount of sides and displays the results.<br>
 Usage: `roll [{number_of_dice}] [{number_of_sides}]`
 
 ### Wolfram Alpha
 
-* `wa` Returns the results of your query from Wolfram Alpha.
+* `wa` Returns the results of your query from Wolfram Alpha.<br>
 Usage: `wa {query}`
 
 ### GitHub
 
-* `bug` Creates a new issue with a ''Bug'' label.
+* `bug` Creates a new issue with a ''Bug'' label.<br>
 Usage: `bug {title}[|{description}]`
 
-* `request` Creates a new issue with a ''Issue'' label.
+* `request` Creates a new issue with a ''Issue'' label.<br>
 Usage: `request {title}[|{description}]`
 
 ### About
 
-* `about` Displays the bots current version, creator, and owners.
+* `about` Displays the bots current version, creator, and owners.<br>
 Usage: `about`
 
-* `uptime` Displays how long the bot has been connected to the server.
+* `uptime` Displays how long the bot has been connected to the server.<br>
 Usage: `uptime`
 
-* `runtime` Displays how long the bot program has been running.
+* `runtime` Displays how long the bot program has been running.<br>
 Usage: `runtime`
 
 ### Logging
 
-* `last` Displays information of the usage of specified commands.
+* `last` Displays information of the usage of specified commands.<br>
 Usage: `last [{command}] [{nick}] [{number_of_results}]`
 
 ### Alarms
 
-* `alarm` Sets an alarm for the time specified.
+* `alarm` Sets an alarm for the time specified.<br>
 Usage: `alarm {time} {message or command}`
 
 ### Surveys
 
-* `survey` Starts a survey session for the requesting nick.
+* `survey` Starts a survey session for the requesting nick.<br>
 Usage: `survey {survey_number}`
 
-* `surveys` Lists all available surveys, nicks who have taken the specified survey, or answers of the specified nick for the specified survey.
+* `surveys` Lists all available surveys, nicks who have taken the specified survey, or answers of the specified nick for the specified survey.<br>
 Usage: `surveys [{survey_number}] [{nick}]`
 
-* `nextquestion` Submits your entered text as an answer and displays the next question.
+* `nextquestion` Submits your entered text as an answer and displays the next question.<br>
 Usage: `nextquestion`
 
-* `addsurvey` Begins the add new survey wizard.
+* `addsurvey` Begins the add new survey wizard.<br>
 Usage: `addsurvey {survey_access_level} {survey_name}`
 
-* `delsurvey` Deletes the specified survey.
+* `delsurvey` Deletes the specified survey.<br>
 Usage: `delsurvey {survey_number}`
 
-* `finishsurvey` Finalizes the submitted survey and adds it to the list.
+* `finishsurvey` Finalizes the submitted survey and adds it to the list.<br>
 Usage: `finishsurvey`
 
-*  `cancelsurvey` Cancels the current survey and erases the answers.
+*  `cancelsurvey` Cancels the current survey and erases the answers.<br>
 Usage: `cancelsurvey`
 
-* `addsurveyowner` Adds an owner to the specified survey.
+* `addsurveyowner` Adds an owner to the specified survey.<br>
 Usage: `addsurveyowner {survey_number} {new_owner}[,{new-owner}]`
 
-* `delsurveyowner` Deletes an owner to the specified survey.
+* `delsurveyowner` Deletes an owner to the specified survey.<br>
 Usage: `delsurveyowner {survey_number} {owner}[,{owner}]`
 
 ## Bugs/Feature Requests
@@ -641,8 +641,8 @@ Please report all bugs you find to me so I can fix them as soon as possible.  Al
 
 ## Contact Info
 
-Email: admin@inb4u.com
-IRC: (irc.inb4u.com)#IRCBot
+Email: admin@inb4u.com<br>
+IRC: (irc.inb4u.com)#IRCBot<br>
 Nick: Uncled1023
 
 ## Acknowledgements

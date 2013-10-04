@@ -84,28 +84,35 @@ namespace IRCBot.Modules
                                             {
                                                 if (line.GetUpperBound(0) > 3)
                                                 {
-                                                    poll_info temp_poll = new poll_info();
-                                                    poll_active = true;
                                                     string[] lines = line[4].Split('|');
-                                                    temp_poll.question = lines[0];
-                                                    temp_poll.owner = nick;
-                                                    temp_poll.channel = channel;
-                                                    temp_poll.answers = new List<List<string>>();
-                                                    temp_poll.nick_responses = new List<List<string>>();
-                                                    for (int x = 1; x <= lines.GetUpperBound(0); x++)
+                                                    if (lines.GetUpperBound(0) > 0)
                                                     {
-                                                        List<string> tmp_list = new List<string>();
-                                                        tmp_list.Add(lines[x]);
-                                                        tmp_list.Add("0");
-                                                        temp_poll.answers.Add(tmp_list);
+                                                        poll_info temp_poll = new poll_info();
+                                                        poll_active = true;
+                                                        temp_poll.question = lines[0];
+                                                        temp_poll.owner = nick;
+                                                        temp_poll.channel = channel;
+                                                        temp_poll.answers = new List<List<string>>();
+                                                        temp_poll.nick_responses = new List<List<string>>();
+                                                        for (int x = 1; x <= lines.GetUpperBound(0); x++)
+                                                        {
+                                                            List<string> tmp_list = new List<string>();
+                                                            tmp_list.Add(lines[x]);
+                                                            tmp_list.Add("0");
+                                                            temp_poll.answers.Add(tmp_list);
+                                                        }
+                                                        ircbot.sendData("PRIVMSG", channel + " :Poll has been started by " + temp_poll.owner + ": " + temp_poll.question);
+                                                        for (int x = 0; x < temp_poll.answers.Count(); x++)
+                                                        {
+                                                            ircbot.sendData("PRIVMSG", channel + " :" + (x + 1).ToString() + ") " + temp_poll.answers[x][0]);
+                                                        }
+                                                        ircbot.sendData("PRIVMSG", channel + " :To Vote, type " + ircbot.conf.command + "vote <answer_number>.  You may only vote once per poll.  You can change your vote by voting for a different answer.");
+                                                        poll_list.Add(temp_poll);
                                                     }
-                                                    ircbot.sendData("PRIVMSG", channel + " :Poll has been started by " + temp_poll.owner + ": " + temp_poll.question);
-                                                    for (int x = 0; x < temp_poll.answers.Count(); x++)
+                                                    else
                                                     {
-                                                        ircbot.sendData("PRIVMSG", channel + " :" + (x + 1).ToString() + ") " + temp_poll.answers[x][0]);
+                                                        ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
                                                     }
-                                                    ircbot.sendData("PRIVMSG", channel + " :To Vote, type " + ircbot.conf.command + "vote <answer_number>.  You may only vote once per poll.  You can change your vote by voting for a different answer.");
-                                                    poll_list.Add(temp_poll);
                                                 }
                                                 else
                                                 {

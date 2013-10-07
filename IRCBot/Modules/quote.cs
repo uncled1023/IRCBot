@@ -130,15 +130,19 @@ namespace IRCBot.Modules
                 if (number_of_lines > 0)
                 {
                     string line = "";
-                    while (line == "")
+                    Random random = new Random();
+                    int index = random.Next(0, number_of_lines);
+                    line = log_file[index];
+                    if (!line.Equals(string.Empty))
                     {
-                        Random random = new Random();
-                        int index = random.Next(0, number_of_lines);
-                        line = log_file[index];
+                        char[] charSep = new char[] { '*' };
+                        string[] lines = line.Split(charSep, 2);
+                        ircbot.sendData("PRIVMSG", channel + " :" + lines[1] + " [" + lines[0] + "]");
                     }
-                    char[] charSep = new char[] { '*' };
-                    string[] lines = line.Split(charSep, 2);
-                    ircbot.sendData("PRIVMSG", channel + " :" + lines[1] + " [" + lines[0] + "]");
+                    else
+                    {
+                        ircbot.sendData("PRIVMSG", channel + " :There was an issue getting logs for " + channel);
+                    }
                 }
                 else
                 {
@@ -182,16 +186,20 @@ namespace IRCBot.Modules
                     line = "";
                     if (nick_found == true)
                     {
-                        while (line == "")
+                        Random random = new Random();
+                        number_of_lines = quote_list.Count();
+                        int index = random.Next(0, number_of_lines);
+                        line = quote_list[index - 1];
+                        if (!line.Equals(string.Empty))
                         {
-                            Random random = new Random();
-                            number_of_lines = quote_list.Count();
-                            int index = random.Next(1, number_of_lines + 1);
-                            line = quote_list[index - 1];
+                            char[] charSep = new char[] { '*' };
+                            string[] lines = line.Split(charSep, 2);
+                            ircbot.sendData("PRIVMSG", channel + " :" + lines[1] + " [" + lines[0] + "]");
                         }
-                        char[] charSep = new char[] { '*' };
-                        string[] lines = line.Split(charSep, 2);
-                        ircbot.sendData("PRIVMSG", channel + " :" + lines[1] + " [" + lines[0] + "]");
+                        else
+                        {
+                            ircbot.sendData("PRIVMSG", channel + " :There was an issue getting logs for " + nick);
+                        }
                     }
                     else
                     {

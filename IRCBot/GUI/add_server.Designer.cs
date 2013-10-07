@@ -926,6 +926,7 @@
             this.Controls.Add(this.save_server_button);
             this.MaximizeBox = false;
             this.Name = "add_server";
+            this.ShowIcon = false;
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Add New Server";

@@ -95,6 +95,10 @@
             this.user_level_box = new System.Windows.Forms.TextBox();
             this.label15 = new System.Windows.Forms.Label();
             this.Advanced = new System.Windows.Forms.TabPage();
+            this.spam_enable = new System.Windows.Forms.CheckBox();
+            this.label28 = new System.Windows.Forms.Label();
+            this.spam_ignore = new System.Windows.Forms.TextBox();
+            this.label39 = new System.Windows.Forms.Label();
             this.label16 = new System.Windows.Forms.Label();
             this.max_message_length_box = new System.Windows.Forms.TextBox();
             this.label32 = new System.Windows.Forms.Label();
@@ -110,10 +114,6 @@
             this.label37 = new System.Windows.Forms.Label();
             this.channel_blacklist_box = new System.Windows.Forms.TextBox();
             this.label38 = new System.Windows.Forms.Label();
-            this.spam_enable = new System.Windows.Forms.CheckBox();
-            this.label28 = new System.Windows.Forms.Label();
-            this.spam_ignore = new System.Windows.Forms.TextBox();
-            this.label39 = new System.Windows.Forms.Label();
             this.Advanced_tab.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -770,6 +770,40 @@
             this.Advanced.Text = "Advanced";
             this.Advanced.UseVisualStyleBackColor = true;
             // 
+            // spam_enable
+            // 
+            this.spam_enable.AutoSize = true;
+            this.spam_enable.Location = new System.Drawing.Point(165, 150);
+            this.spam_enable.Name = "spam_enable";
+            this.spam_enable.Size = new System.Drawing.Size(15, 14);
+            this.spam_enable.TabIndex = 5;
+            this.spam_enable.UseVisualStyleBackColor = true;
+            // 
+            // label28
+            // 
+            this.label28.AutoSize = true;
+            this.label28.Location = new System.Drawing.Point(6, 150);
+            this.label28.Name = "label28";
+            this.label28.Size = new System.Drawing.Size(119, 13);
+            this.label28.TabIndex = 61;
+            this.label28.Text = "Enable Spam Detection";
+            // 
+            // spam_ignore
+            // 
+            this.spam_ignore.Location = new System.Drawing.Point(165, 170);
+            this.spam_ignore.Name = "spam_ignore";
+            this.spam_ignore.Size = new System.Drawing.Size(301, 20);
+            this.spam_ignore.TabIndex = 6;
+            // 
+            // label39
+            // 
+            this.label39.AutoSize = true;
+            this.label39.Location = new System.Drawing.Point(6, 173);
+            this.label39.Name = "label39";
+            this.label39.Size = new System.Drawing.Size(143, 13);
+            this.label39.TabIndex = 60;
+            this.label39.Text = "Ignore List (chans and nicks)";
+            // 
             // label16
             // 
             this.label16.AutoSize = true;
@@ -892,40 +926,6 @@
             this.label38.TabIndex = 45;
             this.label38.Text = "Channel Blacklist";
             // 
-            // spam_enable
-            // 
-            this.spam_enable.AutoSize = true;
-            this.spam_enable.Location = new System.Drawing.Point(165, 150);
-            this.spam_enable.Name = "spam_enable";
-            this.spam_enable.Size = new System.Drawing.Size(15, 14);
-            this.spam_enable.TabIndex = 5;
-            this.spam_enable.UseVisualStyleBackColor = true;
-            // 
-            // label28
-            // 
-            this.label28.AutoSize = true;
-            this.label28.Location = new System.Drawing.Point(6, 150);
-            this.label28.Name = "label28";
-            this.label28.Size = new System.Drawing.Size(119, 13);
-            this.label28.TabIndex = 61;
-            this.label28.Text = "Enable Spam Detection";
-            // 
-            // spam_ignore
-            // 
-            this.spam_ignore.Location = new System.Drawing.Point(165, 170);
-            this.spam_ignore.Name = "spam_ignore";
-            this.spam_ignore.Size = new System.Drawing.Size(301, 20);
-            this.spam_ignore.TabIndex = 6;
-            // 
-            // label39
-            // 
-            this.label39.AutoSize = true;
-            this.label39.Location = new System.Drawing.Point(6, 173);
-            this.label39.Name = "label39";
-            this.label39.Size = new System.Drawing.Size(143, 13);
-            this.label39.TabIndex = 60;
-            this.label39.Text = "Ignore List (chans and nicks)";
-            // 
             // edit_server
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -937,6 +937,7 @@
             this.Controls.Add(this.save_server_button);
             this.MaximizeBox = false;
             this.Name = "edit_server";
+            this.ShowIcon = false;
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Edit Server";

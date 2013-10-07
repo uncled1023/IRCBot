@@ -44,7 +44,6 @@ namespace IRCBot
                 {
                     System.Diagnostics.Process.Start(Application.ExecutablePath); // to start new instance of application
                 }
-                Application.Exit();
             }
             catch
             {
@@ -84,9 +83,9 @@ namespace IRCBot
                 finally
                 {
                     System.Diagnostics.Process.Start(Application.ExecutablePath); // to start new instance of application
-                    Application.Exit();
                 }
             }
+            Application.Exit();
         }
 
         /// 

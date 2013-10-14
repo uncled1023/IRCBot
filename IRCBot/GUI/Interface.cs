@@ -1668,9 +1668,12 @@ namespace IRCBot
 
         private void Interface_FormClosing(object sender, FormClosingEventArgs e)
         {
-            foreach (bot bot_instance in irc_conf.bot_instances)
+            if (irc_conf.bot_instances != null)
             {
-                bot_instance.worker.CancelAsync();
+                foreach (bot bot_instance in irc_conf.bot_instances)
+                {
+                    bot_instance.worker.CancelAsync();
+                }
             }
             MyNotifyIcon.Visible = false;
             updateOutput.Stop();

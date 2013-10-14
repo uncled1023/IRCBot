@@ -45,9 +45,7 @@ The IRCBot is designed to provide an all-in-one solution for those who wish to r
 1) Install mono and libgdiplus packages.<br>
 1) Download the Release.7z from the latest release and extract the files to a directory of your choice.<br>
 3) Open a terminal emulator and cd it to the directory with the IRCBot.exe.<br>
-4) Type: `mono IRCBot.exe`<br>
-3) Click Tools>Configuration and configure your bot's settings<br>
-4) Select the Server you added from the server list and click Connect, or restart the Bot application.<br>
+4) Type: `mono IRCBot.exe`
 
 * Current Limitations: Does not display any output, some functions may not work, buggy.
 
@@ -335,11 +333,17 @@ Usage: `quit`
 * `quitall` Quits all of the connected server instances.<br>
 Usage: `quitall`
 
-* `restart` Restarts the server instance.<br>
+* `cycle` Restarts the server instance.<br>
+Usage: `cycle`
+
+* `cycleall` Restarts all of the connected server instances.<br>
+Usage: `cycleall`
+
+* `exit` Closes the client.<br>
 Usage: `restart`
 
-* `restartall` Restarts all of the connected server instances.<br>
-Usage: `restartall`
+* `restart` Restarts the client.<br>
+Usage: `restart`
 
 * `ignore` Adds the specified nick/chan to the ignore list.<br>
 Usage: `ignore {nick|channel}`

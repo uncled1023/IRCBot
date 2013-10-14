@@ -92,13 +92,17 @@ namespace IRCBot.Modules
                 if (number_of_lines > 0)
                 {
                     string line = "";
-                    while (line == "")
+                    Random random = new Random();
+                    int index = random.Next(0, number_of_lines);
+                    line = answer_file[index];
+                    if (!line.Equals(string.Empty))
                     {
-                        Random random = new Random();
-                        int index = random.Next(0, number_of_lines);
-                        line = answer_file[index];
+                        ircbot.sendData("PRIVMSG", channel + " :" + line);
                     }
-                    ircbot.sendData("PRIVMSG", channel + " :" + line);
+                    else
+                    {
+                        ircbot.sendData("PRIVMSG", channel + " :I don't know!");
+                    }
                 }
                 else
                 {

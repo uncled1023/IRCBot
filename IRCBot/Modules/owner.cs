@@ -12,6 +12,7 @@ using System.Management;
 using System.Reflection;
 using System.Diagnostics;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace IRCBot.Modules
 {
@@ -404,7 +405,7 @@ namespace IRCBot.Modules
                                             ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
                                         }
                                         break;
-                                    case "restart":
+                                    case "cycle":
                                         if (spam_check == true)
                                         {
                                             ircbot.add_spam_count(channel);
@@ -419,7 +420,7 @@ namespace IRCBot.Modules
                                             ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
                                         }
                                         break;
-                                    case "restartall":
+                                    case "cycleall":
                                         if (spam_check == true)
                                         {
                                             ircbot.add_spam_count(channel);
@@ -431,6 +432,35 @@ namespace IRCBot.Modules
                                                 bot.restart = true;
                                                 bot.worker.CancelAsync();
                                             }
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                        }
+                                        break;
+                                    case "exit":
+                                        if (spam_check == true)
+                                        {
+                                            ircbot.add_spam_count(channel);
+                                        }
+                                        if (nick_access >= command_access)
+                                        {
+                                            Application.Exit();
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                        }
+                                        break;
+                                    case "restart":
+                                        if (spam_check == true)
+                                        {
+                                            ircbot.add_spam_count(channel);
+                                        }
+                                        if (nick_access >= command_access)
+                                        {
+                                            System.Diagnostics.Process.Start(Application.ExecutablePath); // to start new instance of application
+                                            Application.Exit();
                                         }
                                         else
                                         {
@@ -1081,8 +1111,11 @@ namespace IRCBot.Modules
                                             pc1.CategoryName = "Processor";
                                             pc1.CounterName = "% Processor Time";
                                             pc1.InstanceName = "_Total";
-                                            pc1.NextValue();
-                                            Thread.Sleep(500);
+                                            for (int x = 0; x < 10; x++)
+                                            {
+                                                pc1.NextValue();
+                                                Thread.Sleep(100);
+                                            }
                                             float totalCPUUsage = pc1.NextValue();
                                             if (type.Equals("channel"))
                                             {

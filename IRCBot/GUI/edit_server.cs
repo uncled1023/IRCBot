@@ -249,6 +249,41 @@ namespace IRCBot
                             }
                         }
                     }
+
+                    xnNode = xmlDocModules.SelectSingleNode("/modules");
+                    xnList = xnNode.ChildNodes;
+                    bool cmd_found = false;
+                    foreach (XmlNode xn in xnList)
+                    {
+                        XmlNodeList optionList = xn.ChildNodes;
+                        foreach (XmlNode option in optionList)
+                        {
+                            if (option.Name.Equals("commands"))
+                            {
+                                XmlNodeList Options = option.ChildNodes;
+                                foreach (XmlNode options in Options)
+                                {
+                                    if (options["name"].InnerText.Equals(command_label.Text))
+                                    {
+                                        cmd_found = true;
+                                        options["name"].InnerText = command_name.Text;
+                                        options["triggers"].InnerText = command_triggers.Text;
+                                        options["syntax"].InnerText = command_arguments.Text;
+                                        options["description"].InnerText = command_description.Text;
+                                        options["access_level"].InnerText = command_access_level.Text;
+                                        options["blacklist"].InnerText = channel_blacklist.Text;
+                                        options["show_help"].InnerText = show_in_help.Checked.ToString();
+                                        options["spam_check"].InnerText = spam_counter.Checked.ToString();
+                                        break;
+                                    }
+                                }
+                            }
+                            if (cmd_found)
+                            {
+                                break;
+                            }
+                        }
+                    }
                     xmlDocModules.Save(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + server_module_folder + Path.DirectorySeparatorChar + "modules.xml");
                     m_parent.update_conf();
                     this.Close();

@@ -333,11 +333,17 @@ Usage: `quit`
 * `quitall` Quits all of the connected server instances.<br>
 Usage: `quitall`
 
-* `restart` Restarts the server instance.<br>
+* `cycle` Restarts the server instance.<br>
+Usage: `cycle`
+
+* `cycleall` Restarts all of the connected server instances.<br>
+Usage: `cycleall`
+
+* `exit` Closes the client.<br>
 Usage: `restart`
 
-* `restartall` Restarts all of the connected server instances.<br>
-Usage: `restartall`
+* `restart` Restarts the client.<br>
+Usage: `restart`
 
 * `ignore` Adds the specified nick/chan to the ignore list.<br>
 Usage: `ignore {nick|channel}`

@@ -125,7 +125,6 @@ namespace IRCBot.Modules
                                                                 {
                                                                     ircbot.sendData("NOTICE", nick + " :Response removed successfully.");
                                                                     response_found = true;
-                                                                    break;
                                                                 }
                                                                 else
                                                                 {

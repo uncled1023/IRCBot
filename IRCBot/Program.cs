@@ -39,8 +39,44 @@ namespace IRCBot
             try
             {
                 // Exit the program if the user clicks Abort.
-                Exception result = ShowThreadExceptionDialog(sender, e.Exception);
-                if (result.GetType() != typeof(OutOfMemoryException))
+                try
+                {
+                    string logs_path = "";
+                    string file_name = "Errors.log";
+                    string time_stamp = DateTime.Now.ToString("hh:mm tt");
+                    string date_stamp = DateTime.Now.ToString("yyyy-MM-dd");
+                    string cur_dir = Directory.GetCurrentDirectory();
+                    XmlDocument xmlDoc = new XmlDocument();
+                    xmlDoc.Load(cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
+                    XmlNode list = xmlDoc.SelectSingleNode("/bot_settings/global_settings");
+                    if (Directory.Exists(list["logs_path"].InnerText))
+                    {
+                        logs_path = list["logs_path"].InnerText;
+                    }
+                    else
+                    {
+                        logs_path = cur_dir + Path.DirectorySeparatorChar + "logs";
+                    }
+                    if (Directory.Exists(logs_path + Path.DirectorySeparatorChar + "errors"))
+                    {
+                        StreamWriter log_file = File.AppendText(logs_path + Path.DirectorySeparatorChar + "errors" + Path.DirectorySeparatorChar + file_name);
+                        log_file.WriteLine("[" + date_stamp + " " + time_stamp + "] " + e.Exception.Message);
+                        log_file.WriteLine("Stack Trace:");
+                        log_file.WriteLine(e.Exception.StackTrace);
+                        log_file.Close();
+                    }
+                    else
+                    {
+                        Directory.CreateDirectory(logs_path + Path.DirectorySeparatorChar + "errors");
+                        StreamWriter log_file = File.AppendText(logs_path + Path.DirectorySeparatorChar + "errors" + Path.DirectorySeparatorChar + file_name);
+                        log_file.WriteLine("[" + date_stamp + " " + time_stamp + "] " + e.Exception.Message);
+                        log_file.WriteLine("Stack Trace:");
+                        log_file.WriteLine(e.Exception.StackTrace);
+                        log_file.Close();
+                    }
+                }
+                catch { }
+                if (e.GetType() != typeof(OutOfMemoryException))
                 {
                     System.Diagnostics.Process.Start(Application.ExecutablePath); // to start new instance of application
                 }

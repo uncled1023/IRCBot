@@ -1111,8 +1111,11 @@ namespace IRCBot.Modules
                                             pc1.CategoryName = "Processor";
                                             pc1.CounterName = "% Processor Time";
                                             pc1.InstanceName = "_Total";
-                                            pc1.NextValue();
-                                            Thread.Sleep(500);
+                                            for (int x = 0; x < 10; x++)
+                                            {
+                                                pc1.NextValue();
+                                                Thread.Sleep(100);
+                                            }
                                             float totalCPUUsage = pc1.NextValue();
                                             if (type.Equals("channel"))
                                             {

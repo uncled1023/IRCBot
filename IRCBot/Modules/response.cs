@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -397,7 +398,7 @@ namespace IRCBot.Modules
                                                         }
                                                     }
                                                 }
-                                                ircbot.parse_stream(data);
+                                                ircbot.parse_stream(data.Trim());
                                             }
                                             else if (events[y].StartsWith("<delay>") == true)
                                             {

@@ -36,137 +36,52 @@ namespace IRCBot
         /// 
         public void Application_ThreadException(object sender, ThreadExceptionEventArgs e)
         {
+            // Exit the program if the user clicks Abort.
             try
             {
-                // Exit the program if the user clicks Abort.
-                try
+                string errorMessage =
+                    "Unhandled Exception:\n\n" +
+                    e.Exception.Message + "\n\n" +
+                    e.Exception.GetType() +
+                    "\n\nStack Trace:\n" +
+                    e.Exception.StackTrace;
+
+                string logs_path = "";
+                string file_name = "Errors.log";
+                string time_stamp = DateTime.Now.ToString("hh:mm tt");
+                string date_stamp = DateTime.Now.ToString("yyyy-MM-dd");
+                string cur_dir = Directory.GetCurrentDirectory();
+                XmlDocument xmlDoc = new XmlDocument();
+                xmlDoc.Load(cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
+                XmlNode list = xmlDoc.SelectSingleNode("/bot_settings/global_settings");
+                if (Directory.Exists(list["logs_path"].InnerText))
                 {
-                    string logs_path = "";
-                    string file_name = "Errors.log";
-                    string time_stamp = DateTime.Now.ToString("hh:mm tt");
-                    string date_stamp = DateTime.Now.ToString("yyyy-MM-dd");
-                    string cur_dir = Directory.GetCurrentDirectory();
-                    XmlDocument xmlDoc = new XmlDocument();
-                    xmlDoc.Load(cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
-                    XmlNode list = xmlDoc.SelectSingleNode("/bot_settings/global_settings");
-                    if (Directory.Exists(list["logs_path"].InnerText))
-                    {
-                        logs_path = list["logs_path"].InnerText;
-                    }
-                    else
-                    {
-                        logs_path = cur_dir + Path.DirectorySeparatorChar + "logs";
-                    }
-                    if (Directory.Exists(logs_path + Path.DirectorySeparatorChar + "errors"))
-                    {
-                        StreamWriter log_file = File.AppendText(logs_path + Path.DirectorySeparatorChar + "errors" + Path.DirectorySeparatorChar + file_name);
-                        log_file.WriteLine("[" + date_stamp + " " + time_stamp + "] " + e.Exception.Message);
-                        log_file.WriteLine("Stack Trace:");
-                        log_file.WriteLine(e.Exception.StackTrace);
-                        log_file.Close();
-                    }
-                    else
-                    {
-                        Directory.CreateDirectory(logs_path + Path.DirectorySeparatorChar + "errors");
-                        StreamWriter log_file = File.AppendText(logs_path + Path.DirectorySeparatorChar + "errors" + Path.DirectorySeparatorChar + file_name);
-                        log_file.WriteLine("[" + date_stamp + " " + time_stamp + "] " + e.Exception.Message);
-                        log_file.WriteLine("Stack Trace:");
-                        log_file.WriteLine(e.Exception.StackTrace);
-                        log_file.Close();
-                    }
+                    logs_path = list["logs_path"].InnerText;
                 }
-                catch { }
-                if (e.GetType() != typeof(OutOfMemoryException))
+                else
                 {
-                    System.Diagnostics.Process.Start(Application.ExecutablePath); // to start new instance of application
+                    logs_path = cur_dir + Path.DirectorySeparatorChar + "logs";
+                }
+                if (Directory.Exists(logs_path + Path.DirectorySeparatorChar + "errors"))
+                {
+                    StreamWriter log_file = File.AppendText(logs_path + Path.DirectorySeparatorChar + "errors" + Path.DirectorySeparatorChar + file_name);
+                    log_file.WriteLine("[" + date_stamp + " " + time_stamp + "] " + e.Exception.Message);
+                    log_file.WriteLine("Stack Trace:");
+                    log_file.WriteLine(e.Exception.StackTrace);
+                    log_file.Close();
+                }
+                else
+                {
+                    Directory.CreateDirectory(logs_path + Path.DirectorySeparatorChar + "errors");
+                    StreamWriter log_file = File.AppendText(logs_path + Path.DirectorySeparatorChar + "errors" + Path.DirectorySeparatorChar + file_name);
+                    log_file.WriteLine("[" + date_stamp + " " + time_stamp + "] " + e.Exception.Message);
+                    log_file.WriteLine("Stack Trace:");
+                    log_file.WriteLine(e.Exception.StackTrace);
+                    log_file.Close();
                 }
             }
-            catch
-            {
-                // Fatal error, terminate program
-                try
-                {
-                    string logs_path = "";
-                    string file_name = "Errors.log";
-                    string time_stamp = DateTime.Now.ToString("hh:mm tt");
-                    string date_stamp = DateTime.Now.ToString("yyyy-MM-dd");
-                    string cur_dir = Directory.GetCurrentDirectory();
-                    XmlDocument xmlDoc = new XmlDocument();
-                    xmlDoc.Load(cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
-                    XmlNode list = xmlDoc.SelectSingleNode("/bot_settings/global_settings");
-                    if (Directory.Exists(list["logs_path"].InnerText))
-                    {
-                        logs_path = list["logs_path"].InnerText;
-                    }
-                    else
-                    {
-                        logs_path = cur_dir + Path.DirectorySeparatorChar + "logs";
-                    }
-                    if (Directory.Exists(logs_path + Path.DirectorySeparatorChar + "errors"))
-                    {
-                        StreamWriter log_file = File.AppendText(logs_path + Path.DirectorySeparatorChar + "errors" + Path.DirectorySeparatorChar + file_name);
-                        log_file.WriteLine("[" + date_stamp + " " + time_stamp + "] " + "Fatal Error");
-                        log_file.Close();
-                    }
-                    else
-                    {
-                        Directory.CreateDirectory(logs_path + Path.DirectorySeparatorChar + "errors");
-                        StreamWriter log_file = File.AppendText(logs_path + Path.DirectorySeparatorChar + "errors" + Path.DirectorySeparatorChar + file_name);
-                        log_file.WriteLine("[" + date_stamp + " " + time_stamp + "] " + "Fatal Error");
-                        log_file.Close();
-                    }
-                }
-                finally
-                {
-                    System.Diagnostics.Process.Start(Application.ExecutablePath); // to start new instance of application
-                }
-            }
+            catch { }
             Application.Exit();
-        }
-
-        /// 
-        /// Creates and displays the error message.
-        /// 
-        private Exception ShowThreadExceptionDialog(object sender, Exception ex)
-        {
-            string errorMessage =
-                "Unhandled Exception:\n\n" +
-                ex.Message + "\n\n" +
-                ex.GetType() +
-                "\n\nStack Trace:\n" +
-                ex.StackTrace;
-
-            string file_name = "Errors.log";
-            string logs_path = "";
-            string time_stamp = DateTime.Now.ToString("hh:mm tt");
-            string date_stamp = DateTime.Now.ToString("yyyy-MM-dd");
-            string cur_dir = Directory.GetCurrentDirectory();
-            XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.Load(cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
-            XmlNode list = xmlDoc.SelectSingleNode("/bot_settings/global_settings");
-            if (Directory.Exists(list["logs_path"].InnerText))
-            {
-                logs_path = list["logs_path"].InnerText;
-            }
-            else
-            {
-                logs_path = cur_dir + Path.DirectorySeparatorChar + "logs";
-            }
-            if (Directory.Exists(logs_path + Path.DirectorySeparatorChar + "errors"))
-            {
-                StreamWriter log_file = File.AppendText(logs_path + Path.DirectorySeparatorChar + "errors" + Path.DirectorySeparatorChar + file_name);
-                log_file.WriteLine("[" + date_stamp + " " + time_stamp + "] " + errorMessage);
-                log_file.Close();
-            }
-            else
-            {
-                Directory.CreateDirectory(logs_path + Path.DirectorySeparatorChar + "errors");
-                StreamWriter log_file = File.AppendText(logs_path + Path.DirectorySeparatorChar + "errors" + Path.DirectorySeparatorChar + file_name);
-                log_file.WriteLine("[" + date_stamp + " " + time_stamp + "] " + errorMessage);
-                log_file.Close();
-            }
-
-            return ex;
         }
     } // End ThreadExceptionHandler
 }

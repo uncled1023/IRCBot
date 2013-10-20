@@ -20,8 +20,9 @@ namespace IRCBot_GUI
         private Interface m_parent;
         public configuration(Interface frmctrl)
         {
-            InitializeComponent();
             m_parent = frmctrl;
+            this.Icon = new Icon(m_parent.GetType(), "Bot.ico");
+            InitializeComponent();
 
             XmlDocument xmlDoc = new XmlDocument();
             if (System.IO.File.Exists(m_parent.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml"))
@@ -155,6 +156,9 @@ namespace IRCBot_GUI
             m_parent.controller.delete_server_xml(server_name);
             server_list.Items.RemoveAt(server_list.SelectedIndex);
             server_list.SelectedIndexChanged += server_changed;
+            edit_server_button.Enabled = false;
+            delete_server_button.Enabled = false;
+            connect_button.Enabled = false;
         }
 
         private void connect_button_Click(object sender, EventArgs e)
@@ -164,7 +168,16 @@ namespace IRCBot_GUI
                 if (connect_button.Text.Equals("Connect"))
                 {
                     connect_button.Text = "Connecting...";
-                    bool connected = m_parent.controller.start_bot(server_list.SelectedItem.ToString());
+                    bool connected = false;
+                    Bot.bot bot = m_parent.controller.get_bot_instance(server_list.SelectedItem.ToString());
+                    if (bot == null)
+                    {
+                        connected = m_parent.connect(server_list.SelectedItem.ToString(), true);
+                    }
+                    else
+                    {
+                        connected = m_parent.controller.start_bot(server_list.SelectedItem.ToString());
+                    }
                     if (connected == true)
                     {
                         connect_button.Text = "Disconnect";

@@ -25,8 +25,9 @@ namespace IRCBot_GUI
 
         public server_config(Interface frmctrl, configuration config, string tmp_server_name, bool add_server)
         {
-            InitializeComponent();
             m_parent = frmctrl;
+            this.Icon = new Icon(m_parent.GetType(), "Bot.ico");
+            InitializeComponent();
             config_form = config;
             server_name = tmp_server_name;
             old_server_name = tmp_server_name;

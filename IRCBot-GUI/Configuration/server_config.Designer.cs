@@ -106,6 +106,11 @@
             this.spam_count_box = new System.Windows.Forms.TextBox();
             this.label35 = new System.Windows.Forms.Label();
             this.Advanced_tab = new System.Windows.Forms.TabPage();
+            this.label16 = new System.Windows.Forms.Label();
+            this.browse_button = new System.Windows.Forms.Button();
+            this.log_folder_box = new System.Windows.Forms.TextBox();
+            this.label40 = new System.Windows.Forms.Label();
+            this.keep_logs_box = new System.Windows.Forms.CheckBox();
             this.max_message_length_box = new System.Windows.Forms.TextBox();
             this.label32 = new System.Windows.Forms.Label();
             this.command_prefix_box = new System.Windows.Forms.TextBox();
@@ -114,11 +119,6 @@
             this.label37 = new System.Windows.Forms.Label();
             this.channel_blacklist_box = new System.Windows.Forms.TextBox();
             this.label38 = new System.Windows.Forms.Label();
-            this.label16 = new System.Windows.Forms.Label();
-            this.browse_button = new System.Windows.Forms.Button();
-            this.log_folder_box = new System.Windows.Forms.TextBox();
-            this.label40 = new System.Windows.Forms.Label();
-            this.keep_logs_box = new System.Windows.Forms.CheckBox();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.tabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -874,6 +874,50 @@
             this.Advanced_tab.Text = "Advanced";
             this.Advanced_tab.UseVisualStyleBackColor = true;
             // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(6, 120);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(95, 13);
+            this.label16.TabIndex = 69;
+            this.label16.Text = "Keep logs of chats";
+            // 
+            // browse_button
+            // 
+            this.browse_button.Location = new System.Drawing.Point(315, 140);
+            this.browse_button.Name = "browse_button";
+            this.browse_button.Size = new System.Drawing.Size(65, 23);
+            this.browse_button.TabIndex = 67;
+            this.browse_button.Text = "Browse";
+            this.browse_button.UseVisualStyleBackColor = true;
+            this.browse_button.Click += new System.EventHandler(this.browse_button_Click);
+            // 
+            // log_folder_box
+            // 
+            this.log_folder_box.Location = new System.Drawing.Point(165, 142);
+            this.log_folder_box.Name = "log_folder_box";
+            this.log_folder_box.Size = new System.Drawing.Size(144, 20);
+            this.log_folder_box.TabIndex = 66;
+            // 
+            // label40
+            // 
+            this.label40.AutoSize = true;
+            this.label40.Location = new System.Drawing.Point(6, 145);
+            this.label40.Name = "label40";
+            this.label40.Size = new System.Drawing.Size(85, 13);
+            this.label40.TabIndex = 68;
+            this.label40.Text = "Log Save Folder";
+            // 
+            // keep_logs_box
+            // 
+            this.keep_logs_box.AutoSize = true;
+            this.keep_logs_box.Location = new System.Drawing.Point(165, 119);
+            this.keep_logs_box.Name = "keep_logs_box";
+            this.keep_logs_box.Size = new System.Drawing.Size(15, 14);
+            this.keep_logs_box.TabIndex = 65;
+            this.keep_logs_box.UseVisualStyleBackColor = true;
+            // 
             // max_message_length_box
             // 
             this.max_message_length_box.Location = new System.Drawing.Point(165, 93);
@@ -938,51 +982,7 @@
             this.label38.TabIndex = 61;
             this.label38.Text = "Channel Blacklist";
             // 
-            // label16
-            // 
-            this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(6, 120);
-            this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(95, 13);
-            this.label16.TabIndex = 69;
-            this.label16.Text = "Keep logs of chats";
-            // 
-            // browse_button
-            // 
-            this.browse_button.Location = new System.Drawing.Point(315, 140);
-            this.browse_button.Name = "browse_button";
-            this.browse_button.Size = new System.Drawing.Size(65, 23);
-            this.browse_button.TabIndex = 67;
-            this.browse_button.Text = "Browse";
-            this.browse_button.UseVisualStyleBackColor = true;
-            this.browse_button.Click += new System.EventHandler(this.browse_button_Click);
-            // 
-            // log_folder_box
-            // 
-            this.log_folder_box.Location = new System.Drawing.Point(165, 142);
-            this.log_folder_box.Name = "log_folder_box";
-            this.log_folder_box.Size = new System.Drawing.Size(144, 20);
-            this.log_folder_box.TabIndex = 66;
-            // 
-            // label40
-            // 
-            this.label40.AutoSize = true;
-            this.label40.Location = new System.Drawing.Point(6, 145);
-            this.label40.Name = "label40";
-            this.label40.Size = new System.Drawing.Size(85, 13);
-            this.label40.TabIndex = 68;
-            this.label40.Text = "Log Save Folder";
-            // 
-            // keep_logs_box
-            // 
-            this.keep_logs_box.AutoSize = true;
-            this.keep_logs_box.Location = new System.Drawing.Point(165, 119);
-            this.keep_logs_box.Name = "keep_logs_box";
-            this.keep_logs_box.Size = new System.Drawing.Size(15, 14);
-            this.keep_logs_box.TabIndex = 65;
-            this.keep_logs_box.UseVisualStyleBackColor = true;
-            // 
-            // edit_server
+            // server_config
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -992,8 +992,7 @@
             this.Controls.Add(this.cancel_button);
             this.Controls.Add(this.save_server_button);
             this.MaximizeBox = false;
-            this.Name = "edit_server";
-            this.ShowIcon = false;
+            this.Name = "server_config";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Edit Server";

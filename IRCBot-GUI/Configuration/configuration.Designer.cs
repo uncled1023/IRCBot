@@ -37,14 +37,14 @@
             this.label1 = new System.Windows.Forms.Label();
             this.server_list = new System.Windows.Forms.ListBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.label3 = new System.Windows.Forms.Label();
+            this.server_config_box = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.minimize_to_tray = new System.Windows.Forms.CheckBox();
             this.label12 = new System.Windows.Forms.Label();
             this.windows_start_box = new System.Windows.Forms.CheckBox();
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
-            this.server_config_box = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -154,6 +154,22 @@
             this.tabPage2.Text = "Advanced";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(6, 61);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(90, 13);
+            this.label3.TabIndex = 31;
+            this.label3.Text = "Server Config File";
+            // 
+            // server_config_box
+            // 
+            this.server_config_box.Location = new System.Drawing.Point(177, 58);
+            this.server_config_box.Name = "server_config_box";
+            this.server_config_box.Size = new System.Drawing.Size(226, 20);
+            this.server_config_box.TabIndex = 30;
+            // 
             // label2
             // 
             this.label2.AutoSize = true;
@@ -210,22 +226,6 @@
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
-            // server_config_box
-            // 
-            this.server_config_box.Location = new System.Drawing.Point(177, 58);
-            this.server_config_box.Name = "server_config_box";
-            this.server_config_box.Size = new System.Drawing.Size(226, 20);
-            this.server_config_box.TabIndex = 30;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(6, 61);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(90, 13);
-            this.label3.TabIndex = 31;
-            this.label3.Text = "Server Config File";
-            // 
             // configuration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -238,7 +238,6 @@
             this.Controls.Add(this.tabControl1);
             this.MaximizeBox = false;
             this.Name = "configuration";
-            this.ShowIcon = false;
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Configuration";

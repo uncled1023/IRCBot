@@ -230,8 +230,6 @@ namespace IRCBot_GUI
                 int index = 0;
                 connectToolStripMenuItem.Enabled = false;
                 
-                connectToolStripMenuItem.Text = "Disconnect";
-                connectToolStripMenuItem.Enabled = true;
                 bool server_started = false;
                 if (!irc_conf.config_path.Trim().Equals(string.Empty))
                 {
@@ -242,6 +240,8 @@ namespace IRCBot_GUI
                         server_started = connect(server, false);
                         if (server_started)
                         {
+                            connectToolStripMenuItem.Text = "Disconnect";
+                            connectToolStripMenuItem.Enabled = true;
                             index++;
                         }
                     }

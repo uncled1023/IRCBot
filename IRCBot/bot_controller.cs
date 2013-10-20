@@ -82,7 +82,8 @@ namespace IRCBot
         public bool init_server(string server_name, bool manual)
         {
             bool server_initiated = false;
-            if (File.Exists(servers_config_path))
+            bot bot = get_bot_instance(server_name);
+            if (File.Exists(servers_config_path) && bot == null)
             {
                 BotConfig bot_conf = get_bot_conf(server_name);
                 if (bot_conf.auto_connect || manual)
@@ -99,21 +100,15 @@ namespace IRCBot
         public bool start_bot(string server_name)
         {
             int index = 0;
-            bool server_found = false;
             bool server_started = false;
-            foreach (Bot.bot bot in bot_instances)
+            bot bot = get_bot_instance(server_name);
+            if (bot != null)
             {
                 if (bot.connected == false && bot.connecting == false && bot.disconnected == true && bot.conf.server.Equals(server_name))
                 {
-                    server_found = true;
-                    break;
+                    server_started = true;
+                    bot_instances[index].start_bot();
                 }
-                index++;
-            }
-            if (server_found == true)
-            {
-                server_started = true;
-                bot_instances[index].start_bot();
             }
             return server_started;
         }
@@ -260,6 +255,7 @@ namespace IRCBot
                     }
                 }
             }
+            servers.Save(servers_config_path);
             return deleted;
         }
 

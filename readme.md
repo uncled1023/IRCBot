@@ -46,10 +46,11 @@ The IRCBot is designed to provide an all-in-one solution for those who wish to r
 
 1) Install mono and libgdiplus packages.<br>
 2) Download the Release.7z from the latest release and extract the files to a directory of your choice.<br>
-3) Download the files from here: https://github.com/uncled1023/IRCBot/tree/master/IRCBot/lib/Config and put them in the config folder alongside your config.xml.
-* servers.xml contains all the server settings for the bot.  Edit the default server and add more <server></server> if you want.
-* modules.xml contains all the module config settings.  It is usually a good idea to separate them into separate folders/files for each server.  You specify the modules.xml file in the server config.
-** Atm, find the <chat></chat> module and set ''enabled'' to False.
+3) Download the files from here: https://github.com/uncled1023/IRCBot/tree/master/IRCBot/lib/Config and put them in the config folder alongside your config.xml.<br>
+* servers.xml contains all the server settings for the bot.  Edit the default server and add more <server></server> if you want.<br>
+* modules.xml contains all the module config settings.  It is usually a good idea to separate them into separate folders/files for each server.  You specify the modules.xml file in the server config.<br>
+* Atm, find the <chat></chat> module and set ''enabled'' to False.<br>
+
 4) Open a terminal emulator and cd it to the directory with the IRCBot-Console.exe.<br>
 5) Type: `mono IRCBot-Console.exe`
 

@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("IRCBot")]
+[assembly: AssemblyTitle("IRCBot-Console")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("IRCBot")]
+[assembly: AssemblyProduct("IRCBot-Console")]
 [assembly: AssemblyCopyright("Copyright ©  2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("2397bfb0-5fe1-4093-98df-3b02e78b9a26")]
+[assembly: Guid("619cdb6d-9560-4d30-b324-cb0a2ae7e6fc")]
 
 // Version information for an assembly consists of the following four values:
 //

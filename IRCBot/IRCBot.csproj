@@ -1,19 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{C9C52AD9-F387-4027-8DCC-7417ACADBF29}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <ProjectGuid>{12D8164D-B315-423B-AEBB-5701867C84E4}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>IRCBot</RootNamespace>
     <AssemblyName>IRCBot</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
+    <TargetFrameworkProfile />
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -26,11 +24,11 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -38,95 +36,55 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>x86</PlatformTarget>
     <DebugType>pdbonly</DebugType>
-    <Optimize>false</Optimize>
+    <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>
-    </DefineConstants>
+    <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-    <UseVSHostingProcess>true</UseVSHostingProcess>
-  </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject>
-    </StartupObject>
-  </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationIcon>Bot.ico</ApplicationIcon>
-  </PropertyGroup>
-  <PropertyGroup>
-    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x86\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <OutputPath>bin\x86\Release\</OutputPath>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AIMLbot">
+    <Reference Include="AIMLbot, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>Resources\AIMLbot.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="Google.GData.Client, Version=1.8.0.0, Culture=neutral, PublicKeyToken=04a59ca9b0273830, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Resources\Google.GData.Client.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="Google.GData.Extensions, Version=1.8.0.0, Culture=neutral, PublicKeyToken=0b4c5df2ebf20876, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Resources\Google.GData.Extensions.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="Google.GData.YouTube, Version=1.8.0.0, Culture=neutral, PublicKeyToken=af04a32718ae8833, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Resources\Google.GData.YouTube.dll</HintPath>
-      <Private>False</Private>
     </Reference>
-    <Reference Include="HtmlAgilityPack">
+    <Reference Include="HtmlAgilityPack, Version=1.4.6.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>Resources\HtmlAgilityPack.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="IronPython, Version=2.7.0.40, Culture=neutral, PublicKeyToken=7f709c5b713576e1, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Resources\IronPython.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="IronPython.Modules, Version=2.7.0.40, Culture=neutral, PublicKeyToken=7f709c5b713576e1, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Resources\IronPython.Modules.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.Dynamic, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7f709c5b713576e1, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Resources\Microsoft.Dynamic.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.Scripting, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7f709c5b713576e1, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Resources\Microsoft.Scripting.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Resources\Newtonsoft.Json.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -136,154 +94,65 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="WolframAlpha.WrapperCore">
+    <Reference Include="WolframAlpha.WrapperCore, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>Resources\WolframAlpha.WrapperCore.dll</HintPath>
-      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Modules\chat.cs" />
-    <Compile Include="GUI\add_server.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\add_server.Designer.cs">
-      <DependentUpon>add_server.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Modules\air.cs" />
-    <Compile Include="Modules\fortune.cs" />
-    <Compile Include="Modules\invite.cs" />
-    <Compile Include="Modules\4chan.cs" />
-    <Compile Include="lib\json.cs" />
-    <Compile Include="Modules\about.cs" />
-    <Compile Include="Modules\alarm.cs" />
-    <Compile Include="Modules\check_connection.cs" />
-    <Compile Include="Modules\fix_sentance.cs" />
-    <Compile Include="Modules\github.cs" />
-    <Compile Include="Modules\logging.cs" />
-    <Compile Include="Modules\flood_control.cs" />
-    <Compile Include="Modules\survey.cs" />
-    <Compile Include="Modules\trivia.cs" />
-    <Compile Include="Modules\url.cs" />
-    <Compile Include="Modules\wolfram_alpha.cs" />
-    <Compile Include="Bot\module.cs" />
-    <Compile Include="Modules\scripts.cs" />
-    <Compile Include="Modules\8ball.cs" />
-    <Compile Include="GUI\AboutBox1.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\AboutBox1.Designer.cs">
-      <DependentUpon>AboutBox1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Modules\access.cs" />
-    <Compile Include="Modules\response.cs" />
     <Compile Include="Bot\bot.cs" />
-    <Compile Include="GUI\configuration.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\configuration.Designer.cs">
-      <DependentUpon>configuration.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\edit_server.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\edit_server.Designer.cs">
-      <DependentUpon>edit_server.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Modules\fun.cs" />
-    <Compile Include="Modules\search.cs" />
-    <Compile Include="Modules\hbomb.cs" />
-    <Compile Include="Modules\help.cs" />
-    <Compile Include="Modules\idle.cs" />
-    <Compile Include="GUI\Interface.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\Interface.Designer.cs">
-      <DependentUpon>Interface.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Modules\intro.cs" />
-    <Compile Include="Modules\messaging.cs" />
-    <Compile Include="Modules\moderation.cs" />
-    <Compile Include="Modules\owner.cs" />
-    <Compile Include="Modules\pingme.cs" />
-    <Compile Include="Modules\poll.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="bot_controller.cs" />
+    <Compile Include="lib\json.cs" />
+    <Compile Include="Bot\module.cs" />
+    <Compile Include="Bot\Modules\4chan.cs" />
+    <Compile Include="Bot\Modules\8ball.cs" />
+    <Compile Include="Bot\Modules\about.cs" />
+    <Compile Include="Bot\Modules\access.cs" />
+    <Compile Include="Bot\Modules\air.cs" />
+    <Compile Include="Bot\Modules\alarm.cs" />
+    <Compile Include="Bot\Modules\chat.cs" />
+    <Compile Include="Bot\Modules\check_connection.cs" />
+    <Compile Include="Bot\Modules\fix_sentence.cs" />
+    <Compile Include="Bot\Modules\flood_control.cs" />
+    <Compile Include="Bot\Modules\fortune.cs" />
+    <Compile Include="Bot\Modules\fun.cs" />
+    <Compile Include="Bot\Modules\github.cs" />
+    <Compile Include="Bot\Modules\hbomb.cs" />
+    <Compile Include="Bot\Modules\help.cs" />
+    <Compile Include="Bot\Modules\idle.cs" />
+    <Compile Include="Bot\Modules\intro.cs" />
+    <Compile Include="Bot\Modules\invite.cs" />
+    <Compile Include="Bot\Modules\logging.cs" />
+    <Compile Include="Bot\Modules\messaging.cs" />
+    <Compile Include="Bot\Modules\moderation.cs" />
+    <Compile Include="Bot\Modules\owner.cs" />
+    <Compile Include="Bot\Modules\pingme.cs" />
+    <Compile Include="Bot\Modules\poll.cs" />
+    <Compile Include="Bot\Modules\quote.cs" />
+    <Compile Include="Bot\Modules\response.cs" />
+    <Compile Include="Bot\Modules\roll.cs" />
+    <Compile Include="Bot\Modules\roll_call.cs" />
+    <Compile Include="Bot\Modules\rules.cs" />
+    <Compile Include="Bot\Modules\scripts.cs" />
+    <Compile Include="Bot\Modules\search.cs" />
+    <Compile Include="Bot\Modules\seen.cs" />
+    <Compile Include="Bot\Modules\survey.cs" />
+    <Compile Include="Bot\Modules\trivia.cs" />
+    <Compile Include="Bot\Modules\url.cs" />
+    <Compile Include="Bot\Modules\version.cs" />
+    <Compile Include="Bot\Modules\weather.cs" />
+    <Compile Include="Bot\Modules\wolfram_alpha.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Modules\quote.cs" />
-    <Compile Include="Modules\roll.cs" />
-    <Compile Include="Modules\roll_call.cs" />
-    <Compile Include="Modules\rules.cs" />
-    <Compile Include="Modules\seen.cs" />
-    <Compile Include="Modules\version.cs" />
-    <Compile Include="Modules\weather.cs" />
-    <Compile Include="Settings.cs" />
-    <EmbeddedResource Include="GUI\AboutBox1.resx">
-      <DependentUpon>AboutBox1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\configuration.resx">
-      <DependentUpon>configuration.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\add_server.resx">
-      <DependentUpon>add_server.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\edit_server.resx">
-      <DependentUpon>edit_server.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Interface.resx">
-      <DependentUpon>Interface.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <SubType>Designer</SubType>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <None Include="ClassDiagram1.cd" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config">
-      <SubType>Designer</SubType>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <BootstrapperPackage Include=".NETFramework,Version=v4.5">
-      <Visible>False</Visible>
-      <ProductName>Microsoft .NET Framework 4.5 %28x86 and x64%29</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Service References\" />
-  </ItemGroup>
-  <ItemGroup />
-  <ItemGroup>
-    <Content Include="Bot.ico" />
+    <EmbeddedResource Include="lib\Config\modules.xml" />
+    <EmbeddedResource Include="lib\Config\servers.xml" />
     <Content Include="Resources\AIMLbot.dll" />
     <Content Include="Resources\Google.GData.Client.dll" />
     <Content Include="Resources\Google.GData.Extensions.dll" />
@@ -297,27 +166,48 @@
     <Content Include="Resources\WolframAlpha.WrapperCore.dll" />
   </ItemGroup>
   <ItemGroup>
-    <COMReference Include="IWshRuntimeLibrary">
-      <Guid>{F935DC20-1CF0-11D0-ADB9-00C04FD58A0B}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </COMReference>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.0">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.4.5">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 4.5</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>$(SolutionDir)util\ProjectBuildCounter.exe $(SolutionDir)IRCBot\properties\AssemblyInfo.cs B
+$(SolutionDir)util\ProjectBuildCounter.exe $(SolutionDir)IRCBot-Console\properties\AssemblyInfo.cs B
+$(SolutionDir)util\ProjectBuildCounter.exe $(SolutionDir)IRCBot-GUI\properties\AssemblyInfo.cs B
+copy /Y "$(ProjectDir)Resources\*" "$(TargetDir)Resources"</PostBuildEvent>
+  </PropertyGroup>
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties BuildVersion_BuildVersioningStyle="None.None.Increment.Increment" BuildVersion_BuildAction="Build" BuildVersion_AssemblyInfoFilename="..\..\..\..\..\Documents\GitHub\IRCBot\IRCBot\Properties\AssemblyInfo.cs" />
+      <UserProperties BuildVersion_BuildVersioningStyle="None.None.Increment.Increment" BuildVersion_AssemblyInfoFilename="Properties\AssemblyInfo.cs" BuildVersion_UpdateFileVersion="True" BuildVersion_UpdateAssemblyVersion="True" />
     </VisualStudio>
   </ProjectExtensions>
-  <PropertyGroup>
-    <PostBuildEvent>$(ProjectDir)util\ProjectBuildCounter.exe $(ProjectDir)properties\AssemblyInfo.cs B
-copy /Y "$(ProjectDir)Resources\*" "$(TargetDir)Resources"
-copy /Y "$(ProjectDir)bot.ico" "$(TargetDir)"</PostBuildEvent>
-  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

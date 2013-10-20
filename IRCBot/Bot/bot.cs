@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
+using System.Timers;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.IO;
@@ -21,60 +20,99 @@ using System.Runtime.InteropServices;
 using System.Management;
 using System.Reflection;
 
-namespace IRCBot
+namespace Bot
 {
     public class bot
     {
-        public TcpClient IRCConnection;
-        public NetworkStream ns;
-        public StreamReader sr;
-        public StreamWriter sw;
-
-        public System.Windows.Forms.Timer checkRegisterationTimer;
-        public System.Windows.Forms.Timer Spam_Check_Timer;
-        public System.Windows.Forms.Timer Spam_Threshold_Check;
-        public List<timer_info> Spam_Timers;
-        public List<string> data_queue;
-        public List<string> stream_queue;
-        public int disconnect_count = 0;
-        
-        public bool restart;
-        public int restart_attempts;
-        public bool connected;
-        public bool connecting;
-        public bool disconnected;
-        public bool shouldRun;
-        public bool first_run;
-        public List<List<string>> nick_list;
-        public List<string> channel_list;
-        public string cur_dir;
-        public string nick;
-        public BackgroundWorker worker;
-        public BackgroundWorker irc_worker;
-        public BackgroundWorker save_stream_worker;
-        public BackgroundWorker check_connect_worker;
-        public List<Modules.Module> module_list;
-        public List<string> modules_loaded;
-        public List<string> modules_error;
-        public DateTime start_time;
-
-        public Interface ircbot;
-        public BotConfig conf;
-
-        public readonly object timerlock = new object();
-        public readonly object spamlock = new object();
-        public readonly object queuelock = new object();
-        public readonly object streamlock = new object();
-
-        public bot(Interface main, BotConfig new_conf)
+        private BotConfig Conf;
+        public BotConfig conf
         {
-            ircbot = main;
+            get
+            {
+                return Conf;
+            }
+
+            internal set
+            {
+                Conf = value;
+            }
+        }
+
+        private string Nick;
+        public string nick
+        {
+            get
+            {
+                return Nick;
+            }
+
+            internal set
+            {
+                Nick = value;
+            }
+        }
+
+        private List<List<string>> Nick_List;
+        public List<List<string>> nick_list
+        {
+            get
+            {
+                return Nick_List;
+            }
+
+            internal set
+            {
+                Nick_List = value;
+            }
+        }
+
+        internal TcpClient IRCConnection;
+        internal NetworkStream ns;
+        internal StreamReader sr;
+        internal StreamWriter sw;
+
+        internal System.Timers.Timer checkRegisterationTimer;
+        internal System.Timers.Timer Spam_Check_Timer;
+        internal System.Timers.Timer Spam_Threshold_Check;
+        internal List<timer_info> Spam_Timers;
+        internal List<string> data_queue;
+        internal List<string> stream_queue;
+        internal int disconnect_count = 0;
+
+        internal bool restart;
+        internal int restart_attempts;
+        internal bool connected;
+        internal bool connecting;
+        internal bool disconnected;
+        internal bool shouldRun;
+        internal bool first_run;
+        internal List<string> channel_list;
+        internal string cur_dir;
+        internal BackgroundWorker worker;
+        internal BackgroundWorker irc_worker;
+        internal BackgroundWorker save_stream_worker;
+        internal BackgroundWorker check_connect_worker;
+        internal List<Modules.Module> module_list;
+        internal List<string> modules_loaded;
+        internal List<string> modules_error;
+        internal DateTime start_time;
+
+        internal IRCBot.bot_controller controller;
+
+        internal readonly object timerlock = new object();
+        internal readonly object spamlock = new object();
+        internal readonly object queuelock = new object();
+        internal readonly object streamlock = new object();
+
+        internal bot(IRCBot.bot_controller main, BotConfig new_conf)
+        {
+            controller = main;
             conf = new_conf;
 
             init_bot();
         }
 
-        public void start_bot()
+        internal void start_bot()
         {
             init_bot();
 
@@ -83,7 +121,14 @@ namespace IRCBot
             worker.RunWorkerAsync();
         }
 
-        private void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        private void delay_start(object delay_sender, DoWorkEventArgs delay_e, int delay)
+        {
+            BackgroundWorker bw = delay_sender as BackgroundWorker;
+            Thread.Sleep(delay);
+            start_bot();
+        }
+
+        internal void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             try
             {
@@ -102,9 +147,9 @@ namespace IRCBot
             {
                 restart = true;
 
-                lock (ircbot.errorlock)
+                lock (controller.errorlock)
                 {
-                    ircbot.log_error(ex);
+                    controller.log_error(ex, conf.logs_path);
                 }
             }
             e.Cancel = true;
@@ -112,44 +157,50 @@ namespace IRCBot
 
         private void backgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            disconnect();
-
-            stop_timers();
-
             if (restart == true)
             {
                 string output = Environment.NewLine + conf.server + ":" + "Restart Attempt " + restart_attempts + " [" + Math.Pow(2, Convert.ToDouble(restart_attempts)) + " Seconds Delay]";
-                lock (ircbot.listLock)
+                lock (controller.listLock)
                 {
-                    if (ircbot.queue_text.Count >= 1000)
+                    if (controller.queue_text.Count >= 1000)
                     {
-                        ircbot.queue_text.RemoveAt(0);
+                        controller.queue_text.RemoveAt(0);
                     }
-                    ircbot.queue_text.Add(output);
+                    controller.queue_text.Add(output);
                 }
-                Thread.Sleep(Convert.ToInt32(Math.Pow(2, Convert.ToDouble(restart_attempts))) * 1000);
+
+                stop_timers();
+                disconnect();
+
+                int delay = Convert.ToInt32(Math.Pow(2, Convert.ToDouble(restart_attempts))) * 1000;
                 restart_attempts++;
-                start_bot();
+                BackgroundWorker work = new BackgroundWorker();
+                work.DoWork += (delay_sender, delay_e) => delay_start(delay_sender, delay_e, delay);
+                work.RunWorkerAsync(2000);
             }
             else
             {
                 if (conf.server.Equals("No_Server_Specified"))
                 {
                     string output = Environment.NewLine + conf.server + ":" + "Please add a server to connect to.";
-                    lock (ircbot.listLock)
+                    lock (controller.listLock)
                     {
-                        if (ircbot.queue_text.Count >= 1000)
+                        if (controller.queue_text.Count >= 1000)
                         {
-                            ircbot.queue_text.RemoveAt(0);
+                            controller.queue_text.RemoveAt(0);
                         }
-                        ircbot.queue_text.Add(output);
+                        controller.queue_text.Add(output);
                     }
                 }
+
+                stop_timers();
+                disconnect();
+
                 restart_attempts = 0;
             }
         }
 
-        public void IRCBot(object sender, DoWorkEventArgs e)
+        internal void IRCBot(object sender, DoWorkEventArgs e)
         {
             start_timers();
 
@@ -165,7 +216,7 @@ namespace IRCBot
             }
         }
 
-        public void IRCWork()
+        internal void IRCWork()
         {
             save_stream_worker.RunWorkerAsync();
             check_connect_worker.RunWorkerAsync();
@@ -357,6 +408,9 @@ namespace IRCBot
                     shouldRun = false;
                 }
             }
+
+            connected = false;
+            disconnected = true;
         }
 
         private void init_bot()
@@ -373,7 +427,7 @@ namespace IRCBot
             first_run = true;
             restart = false;
             start_time = DateTime.Now;
-            cur_dir = ircbot.cur_dir;
+            cur_dir = controller.cur_dir;
             nick = conf.nick;
             nick_list = new List<List<string>>();
             channel_list = new List<string>();
@@ -386,16 +440,16 @@ namespace IRCBot
 
             Spam_Timers = new List<timer_info>();
 
-            Spam_Check_Timer = new System.Windows.Forms.Timer();
-            Spam_Check_Timer.Tick += new EventHandler(spam_tick);
+            Spam_Check_Timer = new System.Timers.Timer();
+            Spam_Check_Timer.Elapsed += spam_tick;
             Spam_Check_Timer.Interval = conf.spam_threshold;
 
-            Spam_Threshold_Check = new System.Windows.Forms.Timer();
-            Spam_Threshold_Check.Tick += new EventHandler(spam_check);
+            Spam_Threshold_Check = new System.Timers.Timer();
+            Spam_Threshold_Check.Elapsed += spam_check;
             Spam_Threshold_Check.Interval = 100;
 
-            checkRegisterationTimer = new System.Windows.Forms.Timer();
-            checkRegisterationTimer.Tick += new EventHandler(checkRegistration);
+            checkRegisterationTimer = new System.Timers.Timer();
+            checkRegisterationTimer.Elapsed += checkRegistration;
             checkRegisterationTimer.Interval = 120000;
 
             save_stream_worker = new BackgroundWorker();
@@ -425,8 +479,8 @@ namespace IRCBot
                 IRCConnection = new TcpClient(conf.server_address, conf.port);
                 IRCConnection.NoDelay = true;
                 ns = IRCConnection.GetStream();
-                sr = new StreamReader(ns);
-                sw = new StreamWriter(ns);
+                sr = new StreamReader(ns, Encoding.UTF8);
+                sw = new StreamWriter(ns, Encoding.UTF8);
                 sw.AutoFlush = true;
 
                 if (conf.pass != "")
@@ -446,9 +500,9 @@ namespace IRCBot
             }
             catch (Exception ex)
             {
-                lock (ircbot.errorlock)
+                lock (controller.errorlock)
                 {
-                    ircbot.log_error(ex);
+                    controller.log_error(ex, conf.logs_path);
                 }
             }
             return bot_connected;
@@ -480,17 +534,17 @@ namespace IRCBot
 
             string output = Environment.NewLine + conf.server + ":" + "Disconnected";
 
-            lock (ircbot.listLock)
+            lock (controller.listLock)
             {
-                if (ircbot.queue_text.Count >= 1000)
+                if (controller.queue_text.Count >= 1000)
                 {
-                    ircbot.queue_text.RemoveAt(0);
+                    controller.queue_text.RemoveAt(0);
                 }
-                ircbot.queue_text.Add(output);
+                controller.queue_text.Add(output);
             }
         }
 
-        public void check_connection(object sender, DoWorkEventArgs e)
+        internal void check_connection(object sender, DoWorkEventArgs e)
         {
             bool is_connected = true;
             BackgroundWorker bw = sender as BackgroundWorker;
@@ -530,7 +584,7 @@ namespace IRCBot
             }
         }
        
-        public void load_modules()
+        internal void load_modules()
         {
             module_list.Clear();
             modules_loaded.Clear();
@@ -561,13 +615,13 @@ namespace IRCBot
                     msg += ", " + module_name;
                 }
                 string output = Environment.NewLine + conf.server + ":Loaded Modules: " + msg.TrimStart(',').Trim();
-                lock (ircbot.listLock)
+                lock (controller.listLock)
                 {
-                    if (ircbot.queue_text.Count >= 1000)
+                    if (controller.queue_text.Count >= 1000)
                     {
-                        ircbot.queue_text.RemoveAt(0);
+                        controller.queue_text.RemoveAt(0);
                     }
-                    ircbot.queue_text.Add(output);
+                    controller.queue_text.Add(output);
                 }
             }
             if (modules_error.Count > 0)
@@ -578,24 +632,24 @@ namespace IRCBot
                     msg += ", " + module_name;
                 }
                 string output = Environment.NewLine + conf.server + ":Error Loading Modules: " + msg.TrimStart(',').Trim();
-                lock (ircbot.listLock)
+                lock (controller.listLock)
                 {
-                    if (ircbot.queue_text.Count >= 1000)
+                    if (controller.queue_text.Count >= 1000)
                     {
-                        ircbot.queue_text.RemoveAt(0);
+                        controller.queue_text.RemoveAt(0);
                     }
-                    ircbot.queue_text.Add(output);
+                    controller.queue_text.Add(output);
                 }
             }
         }
 
-        public bool load_module(string class_name)
+        internal bool load_module(string class_name)
         {
             bool module_found = false;
             bool module_loaded = false;
             foreach (Modules.Module module in module_list)
             {
-                if (module.ToString().Equals("IRCBot.Modules." + class_name))
+                if (module.ToString().Equals("Bot.Modules." + class_name))
                 {
                     module_found = true;
                     break;
@@ -606,7 +660,7 @@ namespace IRCBot
                 //create the class base on string
                 //note : include the namespace and class name (namespace=IRCBot.Modules, class name=<class_name>)
                 Assembly a = Assembly.Load("IRCBot");
-                Type t = a.GetType("IRCBot.Modules." + class_name);
+                Type t = a.GetType("Bot.Modules." + class_name);
 
                 //check to see if the class is instantiated or not
                 if (t != null)
@@ -619,13 +673,13 @@ namespace IRCBot
             return module_loaded;
         }
 
-        public bool unload_module(string class_name)
+        internal bool unload_module(string class_name)
         {
             bool module_found = false;
             int index = 0;
             foreach (Modules.Module module in module_list)
             {
-                if (module.ToString().Equals("IRCBot.Modules." + class_name))
+                if (module.ToString().Equals("Bot.Modules." + class_name))
                 {
                     module_list.RemoveAt(index);
                     module_found = true;
@@ -669,7 +723,7 @@ namespace IRCBot
             }
         }
 
-        public void parse_stream(string data_line)
+        internal void parse_stream(string data_line)
         {
             string[] ex;
             string type = "base";
@@ -782,9 +836,9 @@ namespace IRCBot
                         List<string> tmp_list = new List<string>();
                         tmp_list.Add(channel.TrimStart(':'));
                         string line = "";
-                        if (sw != null)
+                        lock (queuelock)
                         {
-                            sw.WriteLine("WHO " + channel.TrimStart(':'));
+                            sendData("WHO", channel.TrimStart(':'));
                             line = read_queue();
                             while (!line.Contains("352 " + nick + " " + channel))
                             {
@@ -827,6 +881,18 @@ namespace IRCBot
                 if (ex[1].Equals("quit", StringComparison.InvariantCultureIgnoreCase))
                 {
                     type = "quit";
+                    for (int x = 0; x < nick_list.Count(); x++)
+                    {
+                        for (int i = 2; i < nick_list[x].Count(); i++)
+                        {
+                            string[] split = nick_list[x][i].Split(':');
+                            if (split[1].Equals(line_nick, StringComparison.InvariantCultureIgnoreCase))
+                            {
+                                nick_list[x].RemoveAt(i);
+                                break;
+                            }
+                        }
+                    }
                 }
 
                 // On user PART events
@@ -1006,7 +1072,7 @@ namespace IRCBot
                     string module_blacklist = "";
                     foreach (List<string> conf_module in conf.module_config)
                     {
-                        if (module.ToString().Equals("IRCBot.Modules." + conf_module[0]))
+                        if (module.ToString().Equals("Bot.Modules." + conf_module[0]))
                         {
                             module_blacklist = conf_module[2];
                             module_found = true;
@@ -1051,10 +1117,10 @@ namespace IRCBot
         {
             BackgroundWorker bw = sender as BackgroundWorker;
 
-            module.control(parent, ref conf, index, ex, command, nick_access, nick, channel, bot_command, type);
+            module.control(parent, conf, index, ex, command, nick_access, nick, channel, bot_command, type);
         }
 
-        public void sendData(string cmd, string param)
+        internal void sendData(string cmd, string param)
         {
             bool display_output = true;
             cmd = cmd.ToLower();
@@ -1075,13 +1141,13 @@ namespace IRCBot
 
                     if (display_output)
                     {
-                        lock (ircbot.listLock)
+                        lock (controller.listLock)
                         {
-                            if (ircbot.queue_text.Count >= 1000)
+                            if (controller.queue_text.Count >= 1000)
                             {
-                                ircbot.queue_text.RemoveAt(0);
+                                controller.queue_text.RemoveAt(0);
                             }
-                            ircbot.queue_text.Add(output);
+                            controller.queue_text.Add(output);
                         }
                     }
                 }
@@ -1115,13 +1181,13 @@ namespace IRCBot
                                         string output = Environment.NewLine + conf.server + ":" + ":" + nick + " " + first + ":" + msg;
                                         if (display_output)
                                         {
-                                            lock (ircbot.listLock)
+                                            lock (controller.listLock)
                                             {
-                                                if (ircbot.queue_text.Count >= 1000)
+                                                if (controller.queue_text.Count >= 1000)
                                                 {
-                                                    ircbot.queue_text.RemoveAt(0);
+                                                    controller.queue_text.RemoveAt(0);
                                                 }
-                                                ircbot.queue_text.Add(output);
+                                                controller.queue_text.Add(output);
                                             }
                                         }
                                         msg = " " + word;
@@ -1134,13 +1200,13 @@ namespace IRCBot
                                     string output = Environment.NewLine + conf.server + ":" + ":" + nick + " " + first + ":" + msg;
                                     if (display_output)
                                     {
-                                        lock (ircbot.listLock)
+                                        lock (controller.listLock)
                                         {
-                                            if (ircbot.queue_text.Count >= 1000)
+                                            if (controller.queue_text.Count >= 1000)
                                             {
-                                                ircbot.queue_text.RemoveAt(0);
+                                                controller.queue_text.RemoveAt(0);
                                             }
-                                            ircbot.queue_text.Add(output);
+                                            controller.queue_text.Add(output);
                                         }
                                     }
                                 }
@@ -1152,13 +1218,13 @@ namespace IRCBot
 
                                 if (display_output)
                                 {
-                                    lock (ircbot.listLock)
+                                    lock (controller.listLock)
                                     {
-                                        if (ircbot.queue_text.Count >= 1000)
+                                        if (controller.queue_text.Count >= 1000)
                                         {
-                                            ircbot.queue_text.RemoveAt(0);
+                                            controller.queue_text.RemoveAt(0);
                                         }
-                                        ircbot.queue_text.Add(output);
+                                        controller.queue_text.Add(output);
                                     }
                                 }
                             }
@@ -1175,13 +1241,13 @@ namespace IRCBot
 
                             if (display_output)
                             {
-                                lock (ircbot.listLock)
+                                lock (controller.listLock)
                                 {
-                                    if (ircbot.queue_text.Count >= 1000)
+                                    if (controller.queue_text.Count >= 1000)
                                     {
-                                        ircbot.queue_text.RemoveAt(0);
+                                        controller.queue_text.RemoveAt(0);
                                     }
-                                    ircbot.queue_text.Add(output);
+                                    controller.queue_text.Add(output);
                                 }
                             }
                         }
@@ -1192,6 +1258,7 @@ namespace IRCBot
 
         private void save_stream(Object sender, EventArgs e)
         {
+            int blank_count = 0;
             while (shouldRun && !worker.CancellationPending)
             {
                 try
@@ -1199,28 +1266,41 @@ namespace IRCBot
                     if (sr != null)
                     {
                         string line = sr.ReadLine();
-                        lock (streamlock)
-                        {
-                            string output = Environment.NewLine + conf.server + ":" + line;
-                            lock (ircbot.listLock)
-                            {
-                                if (ircbot.queue_text.Count >= 1000)
-                                {
-                                    ircbot.queue_text.RemoveAt(0);
-                                }
-                                ircbot.queue_text.Add(output);
-                            }
 
-                            data_queue.Add(line);
-                            stream_queue.Add(line);
+                        if (line.Equals(string.Empty))
+                        {
+                            blank_count++;
+                        }
+                        else
+                        {
+                            lock (streamlock)
+                            {
+                                string output = Environment.NewLine + conf.server + ":" + line;
+                                lock (controller.listLock)
+                                {
+                                    if (controller.queue_text.Count >= 1000)
+                                    {
+                                        controller.queue_text.RemoveAt(0);
+                                    }
+                                    controller.queue_text.Add(output);
+                                }
+
+                                data_queue.Add(line);
+                                stream_queue.Add(line);
+                            }
+                        }
+                        if (blank_count >= 5)
+                        {
+                            restart = true;
+                            shouldRun = false;
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    lock (ircbot.errorlock)
+                    lock (controller.errorlock)
                     {
-                        ircbot.log_error(ex);
+                        controller.log_error(ex, conf.logs_path);
                     }
                     restart = true;
                     shouldRun = false;
@@ -1228,7 +1308,7 @@ namespace IRCBot
             }
         }
 
-        public string read_stream_queue()
+        internal string read_stream_queue()
         {
             string response = "";
             lock (streamlock)
@@ -1246,7 +1326,7 @@ namespace IRCBot
             return response;
         }
 
-        public string read_queue()
+        internal string read_queue()
         {
             string response = "";
             lock (streamlock)
@@ -1303,13 +1383,13 @@ namespace IRCBot
                 {
                     string output = Environment.NewLine + conf.server + ":You are missing an username and/or password.  Please add those to the server configuration so I can register this nick.";
 
-                    lock (ircbot.listLock)
+                    lock (controller.listLock)
                     {
-                        if (ircbot.queue_text.Count >= 1000)
+                        if (controller.queue_text.Count >= 1000)
                         {
-                            ircbot.queue_text.RemoveAt(0);
+                            controller.queue_text.RemoveAt(0);
                         }
-                        ircbot.queue_text.Add(output);
+                        controller.queue_text.Add(output);
                     }
                 }
             }
@@ -1349,9 +1429,9 @@ namespace IRCBot
                     {
                         if (!spam.activated)
                         {
-                            System.Windows.Forms.Timer new_timer = new System.Windows.Forms.Timer();
-                            new_timer.Interval = conf.spam_timout;
-                            new_timer.Tick += (new_sender, new_e) => spam_deactivate(new_sender, new_e, spam.channel);
+                            System.Timers.Timer new_timer = new System.Timers.Timer();
+                            new_timer.Interval = conf.spam_timeout;
+                            new_timer.Elapsed += (new_sender, new_e) => spam_deactivate(new_sender, new_e, spam.channel);
                             new_timer.Enabled = true;
                             timer_info tmp_timer = new timer_info();
                             tmp_timer.channel = spam.channel;
@@ -1369,7 +1449,7 @@ namespace IRCBot
             }
         }
 
-        public void spam_deactivate(object sender, EventArgs e, string channel)
+        internal void spam_deactivate(object sender, EventArgs e, string channel)
         {
             lock (spamlock)
             {
@@ -1410,7 +1490,7 @@ namespace IRCBot
             }
         }
 
-        public void add_spam_count(string channel)
+        internal void add_spam_count(string channel)
         {
             lock (spamlock)
             {
@@ -1445,7 +1525,7 @@ namespace IRCBot
             }
         }
 
-        public bool get_spam_status(string channel)
+        internal bool get_spam_status(string channel)
         {
             bool active = false;
             lock (spamlock)
@@ -1465,7 +1545,7 @@ namespace IRCBot
             return active;
         }
 
-        public bool get_spam_check(string channel, string nick, bool enabled)
+        internal bool get_spam_check(string channel, string nick, bool enabled)
         {
             bool active = conf.spam_enable;
             if (active)
@@ -1486,16 +1566,16 @@ namespace IRCBot
             sendData("PRIVMSG", "NickServ :register " + password + " " + email);
         }
 
-        public string get_user_host(string tmp_nick)
+        internal string get_user_host(string tmp_nick)
         {
             string access = "";
             string line = "";
             //sendData("ISON", nick);
             //line = sr.ReadLine();
             string[] new_nick = tmp_nick.Split(' ');
-            if (sw != null)
+            lock (queuelock)
             {
-                sw.WriteLine("USERHOST " + new_nick[0]);
+                sendData("USERHOST ", new_nick[0]);
                 line = read_queue();
                 while (line == "")
                 {
@@ -1526,7 +1606,7 @@ namespace IRCBot
             return access;
         }
 
-        public int get_access_num(string type, bool letter_mode)
+        internal int get_access_num(string type, bool letter_mode)
         {
             int access = conf.default_level;
             if (type.Equals("~") || (type.Equals("q") && letter_mode == true))
@@ -1556,13 +1636,13 @@ namespace IRCBot
             return access;
         }
 
-        public bool get_user_auto(string type, string channel, string tmp_nick)
+        internal bool get_user_auto(string type, string channel, string tmp_nick)
         {
             bool auto = true;
-            if (sw != null)
+            string line = "";
+            lock (queuelock)
             {
-                string line = "";
-                sw.WriteLine("PRIVMSG chanserv :" + type + " " + channel + " list " + tmp_nick);
+                sendData("PRIVMSG", "chanserv :" + type + " " + channel + " list " + tmp_nick);
                 line = read_queue();
                 bool cont = true;
                 while (cont)
@@ -1587,13 +1667,13 @@ namespace IRCBot
             return auto;
         }
 
-        public bool get_user_ident(string tmp_nick)
+        internal bool get_user_ident(string tmp_nick)
         {
             bool identified = false;
-            if (sw != null)
+            string line = "";
+            lock (queuelock)
             {
-                string line = "";
-                sw.WriteLine("PRIVMSG nickserv :STATUS " + tmp_nick);
+                sendData("PRIVMSG", "nickserv :STATUS " + tmp_nick);
                 line = read_queue();
                 while (!line.Contains(":STATUS"))
                 {
@@ -1607,13 +1687,13 @@ namespace IRCBot
             return identified;
         }
 
-        public int get_user_op(string tmp_nick, string channel)
+        internal int get_user_op(string tmp_nick, string channel)
         {
             int new_access = conf.default_level;
             string line = "";
-            if (sw != null)
+            lock (queuelock)
             {
-                sw.WriteLine("WHO " + channel.TrimStart(':'));
+                sendData("WHO", channel.TrimStart(':'));
                 line = read_queue();
                 while (!line.Contains("352 " + nick + " " + channel))
                 {
@@ -1657,7 +1737,7 @@ namespace IRCBot
             return new_access;
         }
 
-        public int get_user_access(string tmp_nick, string channel)
+        internal int get_user_access(string tmp_nick, string channel)
         {
             int access_num = conf.default_level;
             try
@@ -1778,9 +1858,9 @@ namespace IRCBot
             }
             catch (Exception ex)
             {
-                lock (ircbot.errorlock)
+                lock (controller.errorlock)
                 {
-                    ircbot.log_error(ex);
+                    controller.log_error(ex, conf.logs_path);
                 }
             }
             return access_num;
@@ -1789,50 +1869,557 @@ namespace IRCBot
 
     public class BotConfig
     {
-        public string server { get; set; }
-        public string server_address { get; set; }
-        public IPAddress[] server_ip { get; set; }
-        public string chans { get; set; }
-        public string chan_blacklist { get; set; }
-        public string ignore_list { get; set; }
-        public int port { get; set; }
-        public string nick { get; set; }
-        public string secondary_nicks { get; set; }
-        public string pass { get; set; }
-        public string email { get; set; }
-        public string name { get; set; }
-        public string owner { get; set; }
-        public int default_level { get; set; }
-        public int user_level { get; set; }
-        public int voice_level { get; set; }
-        public int hop_level { get; set; }
-        public int op_level { get; set; }
-        public int sop_level { get; set; }
-        public int founder_level { get; set; }
-        public int owner_level { get; set; }
-        public bool auto_connect { get; set; }
-        public string command { get; set; }
-        public bool spam_enable { get; set; }
-        public string spam_ignore { get; set; }
-        public int spam_count_max { get; set; }
-        public int spam_threshold { get; set; }
-        public int spam_timout { get; set; }
-        public int max_message_length { get; set; }
-        public List<List<string>> module_config { get; set; }
-        public List<List<string>> command_list { get; set; }
-        public List<spam_info> spam_check { get; set; }
+        private string Server;
+        public string server 
+        { 
+            get
+            {
+                return Server;
+            }
+
+            internal set
+            {
+                Server = value;
+            } 
+        }
+
+        private string Server_Address;
+        public string server_address
+        {
+            get
+            {
+                return Server_Address;
+            }
+
+            internal set
+            {
+                Server_Address = value;
+            }
+        }
+
+        private IPAddress[] Server_IP;
+        public IPAddress[] server_ip
+        {
+            get
+            {
+                return Server_IP;
+            }
+
+            internal set
+            {
+                Server_IP = value;
+            }
+        }
+
+        private string Chans;
+        public string chans
+        {
+            get
+            {
+                return Chans;
+            }
+
+            internal set
+            {
+                Chans = value;
+            }
+        }
+
+        private string Chan_Blacklist;
+        public string chan_blacklist
+        {
+            get
+            {
+                return Chan_Blacklist;
+            }
+
+            internal set
+            {
+                Chan_Blacklist = value;
+            }
+        }
+
+        private string Ignore_List;
+        public string ignore_list
+        {
+            get
+            {
+                return Ignore_List;
+            }
+
+            internal set
+            {
+                Ignore_List = value;
+            }
+        }
+
+        private int Port;
+        public int port
+        {
+            get
+            {
+                return Port;
+            }
+
+            internal set
+            {
+                Port = value;
+            }
+        }
+
+        private string Nick;
+        public string nick
+        {
+            get
+            {
+                return Nick;
+            }
+
+            internal set
+            {
+                Nick = value;
+            }
+        }
+
+        private string Secondary_Nicks;
+        public string secondary_nicks
+        {
+            get
+            {
+                return Secondary_Nicks;
+            }
+
+            internal set
+            {
+                Secondary_Nicks = value;
+            }
+        }
+
+        private string Pass;
+        public string pass
+        {
+            get
+            {
+                return Pass;
+            }
+
+            internal set
+            {
+                Pass = value;
+            }
+        }
+
+        private string Email;
+        public string email
+        {
+            get
+            {
+                return Email;
+            }
+
+            internal set
+            {
+                Email = value;
+            }
+        }
+
+        private string Name;
+        public string name
+        {
+            get
+            {
+                return Name;
+            }
+
+            internal set
+            {
+                Name = value;
+            }
+        }
+
+        private string Owner;
+        public string owner
+        {
+            get
+            {
+                return Owner;
+            }
+
+            internal set
+            {
+                Owner = value;
+            }
+        }
+
+        private int Default_Level;
+        public int default_level
+        {
+            get
+            {
+                return Default_Level;
+            }
+
+            internal set
+            {
+                Default_Level = value;
+            }
+        }
+
+        private int User_Level;
+        public int user_level
+        {
+            get
+            {
+                return User_Level;
+            }
+
+            internal set
+            {
+                User_Level = value;
+            }
+        }
+
+        private int Voice_Level;
+        public int voice_level
+        {
+            get
+            {
+                return Voice_Level;
+            }
+
+            internal set
+            {
+                Voice_Level = value;
+            }
+        }
+
+        private int Hop_Level;
+        public int hop_level
+        {
+            get
+            {
+                return Hop_Level;
+            }
+
+            internal set
+            {
+                Hop_Level = value;
+            }
+        }
+
+        private int Op_Level;
+        public int op_level
+        {
+            get
+            {
+                return Op_Level;
+            }
+
+            internal set
+            {
+                Op_Level = value;
+            }
+        }
+
+        private int Sop_Level;
+        public int sop_level
+        {
+            get
+            {
+                return Sop_Level;
+            }
+
+            internal set
+            {
+                Sop_Level = value;
+            }
+        }
+
+        private int Founder_Level;
+        public int founder_level
+        {
+            get
+            {
+                return Founder_Level;
+            }
+
+            internal set
+            {
+                Founder_Level = value;
+            }
+        }
+
+        private int Owner_Level;
+        public int owner_level
+        {
+            get
+            {
+                return Owner_Level;
+            }
+
+            internal set
+            {
+                Owner_Level = value;
+            }
+        }
+
+        private bool Auto_Connect;
+        public bool auto_connect
+        {
+            get
+            {
+                return Auto_Connect;
+            }
+
+            internal set
+            {
+                Auto_Connect = value;
+            }
+        }
+
+        private string Command;
+        public string command
+        {
+            get
+            {
+                return Command;
+            }
+
+            internal set
+            {
+                Command = value;
+            }
+        }
+
+        private bool Spam_Enable;
+        public bool spam_enable
+        {
+            get
+            {
+                return Spam_Enable;
+            }
+
+            internal set
+            {
+                Spam_Enable = value;
+            }
+        }
+
+        private string Spam_Ignore;
+        public string spam_ignore
+        {
+            get
+            {
+                return Spam_Ignore;
+            }
+
+            internal set
+            {
+                Spam_Ignore = value;
+            }
+        }
+
+        private int Spam_Count_Max;
+        public int spam_count_max
+        {
+            get
+            {
+                return Spam_Count_Max;
+            }
+
+            internal set
+            {
+                Spam_Count_Max = value;
+            }
+        }
+
+        private int Spam_Threshold;
+        public int spam_threshold
+        {
+            get
+            {
+                return Spam_Threshold;
+            }
+
+            internal set
+            {
+                Spam_Threshold = value;
+            }
+        }
+
+        private int Spam_Timeout;
+        public int spam_timeout
+        {
+            get
+            {
+                return Spam_Timeout;
+            }
+
+            internal set
+            {
+                Spam_Timeout = value;
+            }
+        }
+
+        private int Max_Message_Length;
+        public int max_message_length
+        {
+            get
+            {
+                return Max_Message_Length;
+            }
+
+            internal set
+            {
+                Max_Message_Length = value;
+            }
+        }
+
+        private string Keep_Logs;
+        public string keep_logs
+        {
+            get
+            {
+                return Keep_Logs;
+            }
+
+            internal set
+            {
+                Keep_Logs = value;
+            }
+        }
+
+        private string Logs_Path;
+        public string logs_path
+        {
+            get
+            {
+                return Logs_Path;
+            }
+
+            internal set
+            {
+                Logs_Path = value;
+            }
+        }
+
+        private List<List<string>> Module_Config;
+        public List<List<string>> module_config
+        {
+            get
+            {
+                return Module_Config;
+            }
+
+            internal set
+            {
+                Module_Config = value;
+            }
+        }
+
+        private List<List<string>> Command_List;
+        public List<List<string>> command_list
+        {
+            get
+            {
+                return Command_List;
+            }
+
+            internal set
+            {
+                Command_List = value;
+            }
+        }
+
+        private List<spam_info> Spam_Check;
+        public List<spam_info> spam_check
+        {
+            get
+            {
+                return Spam_Check;
+            }
+
+            internal set
+            {
+                Spam_Check = value;
+            }
+        }
     }
 }
 
 public class spam_info
 {
-    public string channel { get; set; }
-    public int count { get; set; }
-    public bool activated { get; set; }
+    private string Channel;
+    public string channel
+    {
+        get
+        {
+            return Channel;
+        }
+
+        internal set
+        {
+            Channel = value;
+        }
+    }
+
+    private int Count;
+    public int count
+    {
+        get
+        {
+            return Count;
+        }
+
+        internal set
+        {
+            Count = value;
+        }
+    }
+
+    private bool Activated;
+    public bool activated
+    {
+        get
+        {
+            return Activated;
+        }
+
+        internal set
+        {
+            Activated = value;
+        }
+    }
 }
 
 public class timer_info
 {
-    public string channel { get; set; }
-    public System.Windows.Forms.Timer spam_timer { get; set; }
+    private string Channel;
+    public string channel
+    {
+        get
+        {
+            return Channel;
+        }
+
+        internal set
+        {
+            Channel = value;
+        }
+    }
+
+    private System.Timers.Timer Spam_Timer;
+    public System.Timers.Timer spam_timer
+    {
+        get
+        {
+            return Spam_Timer;
+        }
+
+        internal set
+        {
+            Spam_Timer = value;
+        }
+    }
+
 }

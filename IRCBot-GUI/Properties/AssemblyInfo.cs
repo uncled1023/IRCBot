@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("IRCBot")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("IRCBot-GUI")]
+[assembly: AssemblyDescription("IRCBot is an all in one IRC Bot solution for Windows.  For more information, please visit https://github.com/uncled1023/IRCBot")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("IRCBot")]
-[assembly: AssemblyCopyright("Copyright ©  2013")]
+[assembly: AssemblyCompany("Jimmy Rustlers, Inc.")]
+[assembly: AssemblyProduct("IRCBot-GUI")]
+[assembly: AssemblyCopyright("Copyright ©  2012-2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("2397bfb0-5fe1-4093-98df-3b02e78b9a26")]
+[assembly: Guid("a3ded8e0-2c04-4754-a431-c948cd1526d1")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -31,6 +31,6 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
-// [assembly: AssemblyVersion("1.0.154")]
+// [assembly: AssemblyVersion("1.0.636")]
 [assembly: AssemblyVersion("5.2.1.2148")]
 [assembly: AssemblyFileVersion("5.2.1.2148")]

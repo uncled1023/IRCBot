@@ -1,0 +1,34 @@
+<server_list>
+  <server>
+    <name></name>
+    <nick></nick>
+    <sec_nicks></sec_nicks>
+    <password></password>
+    <email></email>
+    <owner></owner>
+    <port>6667</port>
+    <server_name></server_name>
+    <server_address></server_address>
+    <module_path>modules.xml</module_path>
+    <chan_list></chan_list>
+    <chan_blacklist></chan_blacklist>
+    <ignore_list></ignore_list>
+    <auto_connect>True</auto_connect>
+    <user_level>1</user_level>
+    <voice_level>3</voice_level>
+    <hop_level>6</hop_level>
+    <op_level>7</op_level>
+    <sop_level>8</sop_level>
+    <founder_level>9</founder_level>
+    <owner_level>10</owner_level>
+    <command_prefix>.</command_prefix>
+    <spam_enable>True</spam_enable>
+    <spam_ignore></spam_ignore>
+    <spam_count>5</spam_count>
+    <spam_threshold>1000</spam_threshold>
+    <spam_timeout>10000</spam_timeout>
+    <max_message_length>450</max_message_length>
+    <keep_logs>True</keep_logs>
+    <logs_path></logs_path>
+  </server>
+</server_list>

@@ -8,7 +8,9 @@ The IRCBot is designed to provide an all-in-one solution for those who wish to r
 
 * Channel Moderation
 * Custom Access Levels
-* Full GUI configuration
+* Full GUI Interface
+* Console Interface
+* Bot API for making custom interfaces
 * Owner Control Functions
 * Automatic nick registration
 * Ghost on Nick in Use
@@ -38,14 +40,14 @@ The IRCBot is designed to provide an all-in-one solution for those who wish to r
 ## Installation - Windows
 
 1) Download the Release.7z from the latest release and extract the files to a directory of your choice.<br>
-2) Run IRCBot.exe
+2) Run IRCBot-GUI.exe or IRCBot-Console.exe
 
 ## Installation - Linux (Alpha)
 
 1) Install mono and libgdiplus packages.<br>
 1) Download the Release.7z from the latest release and extract the files to a directory of your choice.<br>
 3) Open a terminal emulator and cd it to the directory with the IRCBot.exe.<br>
-4) Type: `mono IRCBot.exe`
+4) Type: `mono IRCBot-Console.exe`
 
 * Current Limitations: Does not display any output, some functions may not work, buggy.
 
@@ -593,6 +595,9 @@ Usage: `request {title}[|{description}]`
 
 * `about` Displays the bots current version, creator, and owners.<br>
 Usage: `about`
+
+* `source` Displays the url for the source code of IRCBot.<br>
+Usage: `source`
 
 * `uptime` Displays how long the bot has been connected to the server.<br>
 Usage: `uptime`

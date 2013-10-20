@@ -28,7 +28,7 @@
     <spam_threshold>1000</spam_threshold>
     <spam_timeout>10000</spam_timeout>
     <max_message_length>450</max_message_length>
-    <keep_logs>True</keep_logs>
+    <keep_logs>False</keep_logs>
     <logs_path></logs_path>
   </server>
 </server_list>

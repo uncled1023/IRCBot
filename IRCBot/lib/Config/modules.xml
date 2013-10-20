@@ -124,12 +124,12 @@
       </ban_msg>
     </options>
   </flood_control>
-  <fix_sentance>
+  <fix_sentence>
     <name>Find and Replace</name>
-    <class_name>fix_sentance</class_name>
+    <class_name>fix_sentence</class_name>
     <enabled>True</enabled>
     <blacklist></blacklist>
-  </fix_sentance>
+  </fix_sentence>
   <_4chan>
     <name>4chan Browser</name>
     <class_name>_4chan</class_name>

@@ -660,3 +660,5 @@ Nick: Uncled1023
 ## Acknowledgements
 
 Cameron Lucas
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/uncled1023/ircbot/trend.png)](https://bitdeli.com/free "Bitdeli Badge")

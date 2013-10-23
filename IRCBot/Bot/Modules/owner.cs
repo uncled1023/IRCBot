@@ -8,7 +8,6 @@ using System.Xml;
 using System.IO;
 using Microsoft.Win32;
 using System.Runtime.InteropServices;
-using System.Management;
 using System.Reflection;
 using System.Diagnostics;
 using System.Threading;

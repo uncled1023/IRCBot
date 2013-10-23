@@ -17,7 +17,6 @@ using System.Text.RegularExpressions;
 using Microsoft.Win32;
 using System.Runtime;
 using System.Runtime.InteropServices;
-using System.Management;
 using System.Reflection;
 
 namespace Bot

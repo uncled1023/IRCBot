@@ -225,17 +225,20 @@ namespace IRCBot
             servers.Save(servers_config_path);
         }
 
-        public void save_server_xml(string server_name, XmlNode server_xml)
+        public bool save_server_xml(string server_name, XmlNode server_xml)
         {
+            bool saved = false;
             XmlNodeList xnList = servers.SelectNodes("/server_list/server");
             foreach (XmlNode xn in xnList)
             {
                 if (xn["server_name"].InnerText.Equals(server_name))
                 {
                     xn.ParentNode.ReplaceChild(server_xml, xn);
+                    saved = true;
                 }
             }
             servers.Save(servers_config_path);
+            return saved;
         }
 
         public bool delete_server_xml(string server_name)

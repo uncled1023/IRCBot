@@ -88,6 +88,37 @@ namespace Bot.Modules
             }
         }
 
+        public DateTime get_seen_time(string nick, string channel, bot ircbot)
+        {
+            string tab_name = channel.TrimStart('#');
+            string pattern = "[^a-zA-Z0-9]"; //regex pattern
+            tab_name = Regex.Replace(tab_name, pattern, "_");
+            string file_name = ircbot.conf.server + "_#" + tab_name + ".log";
+            DateTime past_date = new DateTime();
+            if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "seen" + Path.DirectorySeparatorChar + file_name))
+            {
+                string[] log_file = System.IO.File.ReadAllLines(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "seen" + Path.DirectorySeparatorChar + file_name);
+                int number_of_lines = log_file.GetUpperBound(0) + 1;
+                if (number_of_lines > 0)
+                {
+                    foreach (string line in log_file)
+                    {
+                        char[] sep = new char[] { '*' };
+                        string[] new_line = line.Split(sep, 4);
+                        if (new_line.GetUpperBound(0) > 0)
+                        {
+                            if (new_line[0].Equals(nick, StringComparison.InvariantCultureIgnoreCase) && new_line[1].Equals(channel, StringComparison.InvariantCultureIgnoreCase))
+                            {
+                                past_date = DateTime.Parse(new_line[2]);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            return past_date;
+        }
+
         private void display_seen(string nick, string channel, bot ircbot)
         {
             string tab_name = channel.TrimStart('#');

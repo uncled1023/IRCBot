@@ -62,16 +62,7 @@ namespace Bot.Modules
                                         }
                                         if (nick_access >= command_access)
                                         {
-                                            bool nick_found = false;
-                                            foreach (string idle_nick in idle_list)
-                                            {
-                                                if (idle_nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase))
-                                                {
-                                                    nick_found = true;
-                                                    break;
-                                                }
-                                            }
-                                            if (nick_found == false)
+                                            if (check_idle(nick) == false)
                                             {
                                                 idle_list.Add(nick);
                                                 ircbot.sendData("NOTICE", nick + " :You are now set as idle.  Type " + ircbot.conf.command + "deidle to come back.");
@@ -93,16 +84,7 @@ namespace Bot.Modules
                                         }
                                         if (nick_access >= command_access)
                                         {
-                                            bool nick_found = false;
-                                            foreach (string idle_nick in idle_list)
-                                            {
-                                                if (idle_nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase))
-                                                {
-                                                    nick_found = true;
-                                                    break;
-                                                }
-                                            }
-                                            if (nick_found == true)
+                                            if (check_idle(nick) == true)
                                             {
                                                 idle_list.Remove(nick);
                                                 ircbot.sendData("NOTICE", nick + " :Welcome back!");

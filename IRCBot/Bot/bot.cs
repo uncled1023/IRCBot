@@ -1559,7 +1559,7 @@ namespace Bot
         internal bool get_spam_check(string channel, string nick, bool enabled)
         {
             bool active = conf.spam_enable;
-            if (active)
+            if (active && enabled)
             {
                 foreach (string part in conf.spam_ignore.Split(','))
                 {

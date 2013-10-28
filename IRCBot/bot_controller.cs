@@ -225,17 +225,20 @@ namespace IRCBot
             servers.Save(servers_config_path);
         }
 
-        public void save_server_xml(string server_name, XmlNode server_xml)
+        public bool save_server_xml(string server_name, XmlNode server_xml)
         {
+            bool saved = false;
             XmlNodeList xnList = servers.SelectNodes("/server_list/server");
             foreach (XmlNode xn in xnList)
             {
                 if (xn["server_name"].InnerText.Equals(server_name))
                 {
                     xn.ParentNode.ReplaceChild(server_xml, xn);
+                    saved = true;
                 }
             }
             servers.Save(servers_config_path);
+            return saved;
         }
 
         public bool delete_server_xml(string server_name)
@@ -485,6 +488,53 @@ namespace IRCBot
                     if (module_found == true)
                     {
                         module.control(bot, bot.conf, module_index, ex, command, bot.conf.owner_level, bot.nick, channel, bot_command, type);
+                    }
+                }
+            }
+        }
+
+        public void run_command(string server_name, string nick, string channel, string command, string[] args)
+        {
+            bool bot_command = true;
+            char[] charSeparator = new char[] { ' ' };
+            string type = "channel";
+            string msg = "";
+            if (!channel.StartsWith("#"))
+            {
+                type = "query";
+            }
+            bot bot = get_bot_instance(server_name);
+            if (bot != null)
+            {
+                if (args != null)
+                {
+                    foreach (string arg in args)
+                    {
+                        msg += " " + arg;
+                    }
+                }
+                string line = ":" + nick + " PRIVMSG " + channel + " :" + bot.conf.command + command + msg;
+                string[] ex = line.Split(charSeparator, 5);
+                //Run Enabled Modules
+                List<Bot.Modules.Module> tmp_module_list = new List<Bot.Modules.Module>();
+                tmp_module_list.AddRange(bot.module_list);
+                int module_index = 0;
+                foreach (Bot.Modules.Module module in tmp_module_list)
+                {
+                    module_index = 0;
+                    bool module_found = false;
+                    foreach (List<string> conf_module in bot.conf.module_config)
+                    {
+                        if (module.ToString().Equals("Bot.Modules." + conf_module[0]))
+                        {
+                            module_found = true;
+                            break;
+                        }
+                        module_index++;
+                    }
+                    if (module_found == true)
+                    {
+                        module.control(bot, bot.conf, module_index, ex, command, bot.get_user_access(nick, channel), nick, channel, bot_command, type);
                     }
                 }
             }

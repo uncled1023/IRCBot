@@ -8,7 +8,6 @@ using System.Xml;
 using System.IO;
 using Microsoft.Win32;
 using System.Runtime.InteropServices;
-using System.Management;
 using System.Reflection;
 using System.Diagnostics;
 using System.Threading;
@@ -1234,485 +1233,362 @@ namespace Bot.Modules
 
         private void add_blacklist(string channel, string nick, bot ircbot, BotConfig conf)
         {
-            XmlDocument xmlDoc = new XmlDocument();
-            bool added = false;
-            if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml"))
+            XmlNode node = ircbot.controller.get_server_xml(conf.server);
+            string new_blacklist = node["chan_blacklist"].InnerText + "," + channel;
+            node["chan_blacklist"].InnerText = new_blacklist.TrimStart(',');
+            bool added = ircbot.controller.save_server_xml(conf.server, node);
+            if (added)
             {
-                xmlDoc.Load(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
-                XmlNodeList ServerxnList = xmlDoc.SelectNodes("/bot_settings/server_list/server");
-                foreach (XmlNode xn in ServerxnList)
-                {
-                    string tmp_server = xn["server_name"].InnerText;
-                    if (tmp_server.Equals(conf.server))
-                    {
-                        string new_blacklist = xn["chan_blacklist"].InnerText + "," + channel;
-                        xn["chan_blacklist"].InnerText = new_blacklist.TrimStart(',');
-                        added = true;
-                        break;
-                    }
-                }
-                xmlDoc.Save(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
-                if (added)
-                {
-                    conf.chan_blacklist += "," + channel;
-                    conf.chan_blacklist = conf.chan_blacklist.TrimStart(',');
-                    ircbot.controller.update_conf();
-                    ircbot.sendData("NOTICE", nick + " :" + channel + " successfully added to the blacklist.");
-                }
-                else
-                {
-                    ircbot.sendData("NOTICE", nick + " :" + channel + " was not added to the blacklist.");
-                }
+                conf.chan_blacklist += "," + channel;
+                conf.chan_blacklist = conf.chan_blacklist.TrimStart(',');
+                ircbot.controller.update_conf();
+                ircbot.sendData("NOTICE", nick + " :" + channel + " successfully added to the blacklist.");
+            }
+            else
+            {
+                ircbot.sendData("NOTICE", nick + " :" + channel + " was not added to the blacklist.");
             }
         }
 
         private void unblacklist(string channel, string nick, bot ircbot, BotConfig conf)
         {
-            XmlDocument xmlDoc = new XmlDocument();
+            XmlNode node = ircbot.controller.get_server_xml(conf.server);
+            string new_blacklist = "";
+            conf.chan_blacklist = "";
             bool removed = false;
-            if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml"))
+            foreach (string list_blacklist in node["chan_blacklist"].InnerText.Split(','))
             {
-                xmlDoc.Load(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
-                XmlNodeList ServerxnList = xmlDoc.SelectNodes("/bot_settings/server_list/server");
-                foreach (XmlNode xn in ServerxnList)
+                if (!list_blacklist.Equals(channel))
                 {
-                    string tmp_server = xn["server_name"].InnerText;
-                    if (tmp_server.Equals(conf.server))
-                    {
-                        string new_blacklist = "";
-                        conf.chan_blacklist = "";
-                        foreach (string list_blacklist in xn["chan_blacklist"].InnerText.Split(','))
-                        {
-                            if (!list_blacklist.Equals(channel))
-                            {
-                                new_blacklist += list_blacklist + ",";
-                                conf.ignore_list += list_blacklist + ",";
-                            }
-                            else
-                            {
-                                removed = true;
-                            }
-                        }
-                        xn["chan_blacklist"].InnerText = new_blacklist.TrimEnd(',');
-                        conf.chan_blacklist = conf.chan_blacklist.TrimEnd(',');
-                        break;
-                    }
-                }
-                xmlDoc.Save(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
-                if (removed)
-                {
-                    ircbot.controller.update_conf();
-                    ircbot.sendData("NOTICE", nick + " :" + channel + " successfully removed from the blacklist.");
+                    new_blacklist += list_blacklist + ",";
+                    conf.ignore_list += list_blacklist + ",";
                 }
                 else
                 {
-                    ircbot.sendData("NOTICE", nick + " :" + channel + " was not removed from the blacklist.");
+                    removed = true;
                 }
+            }
+            node["chan_blacklist"].InnerText = new_blacklist.TrimEnd(',');
+            conf.chan_blacklist = conf.chan_blacklist.TrimEnd(',');
+            ircbot.controller.save_server_xml(conf.server, node);
+            if (removed)
+            {
+                ircbot.controller.update_conf();
+                ircbot.sendData("NOTICE", nick + " :" + channel + " successfully removed from the blacklist.");
+            }
+            else
+            {
+                ircbot.sendData("NOTICE", nick + " :" + channel + " was not removed from the blacklist.");
             }
         }
 
         private void ignorecmd(string cmd, string ignore_nick, string nick, bot ircbot, BotConfig conf)
         {
-            XmlDocument xmlDoc = new XmlDocument();
-            if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + ircbot.conf.server + Path.DirectorySeparatorChar + "modules.xml"))
+            XmlDocument xmlDoc = ircbot.controller.get_module_xml(conf.server);            
+            bool cmd_found_file = false;
+            bool cmd_found_conf = false;
+            XmlNode Serverxn = xmlDoc.SelectSingleNode("/modules");
+            XmlNodeList ServerxnList = Serverxn.ChildNodes;
+            foreach (XmlNode xn in ServerxnList)
             {
-                xmlDoc.Load(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + ircbot.conf.server + Path.DirectorySeparatorChar + "modules.xml");
-                bool cmd_found_file = false;
-                bool cmd_found_conf = false;
-                XmlNode Serverxn = xmlDoc.SelectSingleNode("/modules");
-                XmlNodeList ServerxnList = Serverxn.ChildNodes;
-                foreach (XmlNode xn in ServerxnList)
+                XmlNodeList cmd_nodes = xn.SelectNodes("commands");
+                foreach (XmlNode cmd_node in cmd_nodes)
                 {
-                    XmlNodeList cmd_nodes = xn.SelectNodes("commands");
-                    foreach (XmlNode cmd_node in cmd_nodes)
-                    {
-                        string[] triggers = cmd_node["triggers"].InnerText.Split('|');
-                        foreach (string trigger in triggers)
-                        {
-                            if (trigger.Equals(cmd))
-                            {
-                                string old_ignore = cmd_node["blacklist"].InnerText;
-                                string new_ignore = old_ignore + "," + ignore_nick;
-                                cmd_node["blacklist"].InnerText = new_ignore.TrimStart(',');
-                                cmd_found_file = true;
-                                break;
-                            }
-                        }
-                    }
-                    break;
-                }
-                foreach (List<string> tmp_command in conf.command_list)
-                {
-                    string[] triggers = tmp_command[3].Split('|');
+                    string[] triggers = cmd_node["triggers"].InnerText.Split('|');
                     foreach (string trigger in triggers)
                     {
                         if (trigger.Equals(cmd))
                         {
-                            tmp_command[6] += "," + ignore_nick;
-                            cmd_found_conf = true;
+                            string old_ignore = cmd_node["blacklist"].InnerText;
+                            string new_ignore = old_ignore + "," + ignore_nick;
+                            cmd_node["blacklist"].InnerText = new_ignore.TrimStart(',');
+                            cmd_found_file = true;
                             break;
                         }
                     }
                 }
-                if (cmd_found_file && cmd_found_conf)
+                break;
+            }
+            foreach (List<string> tmp_command in conf.command_list)
+            {
+                string[] triggers = tmp_command[3].Split('|');
+                foreach (string trigger in triggers)
                 {
-                    xmlDoc.Save(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + ircbot.conf.server + Path.DirectorySeparatorChar + "modules.xml");
-                    ircbot.controller.update_conf();
-                    ircbot.sendData("NOTICE", nick + " :" + ignore_nick + " added successfully to the " + ircbot.conf.command + cmd + " ignore list!");
+                    if (trigger.Equals(cmd))
+                    {
+                        tmp_command[6] += "," + ignore_nick;
+                        cmd_found_conf = true;
+                        break;
+                    }
                 }
-                else
-                {
-                    ircbot.sendData("NOTICE", nick + " :" + ircbot.conf.command + cmd + " does not exist.");
-                }
+            }
+            if (cmd_found_file && cmd_found_conf)
+            {
+                ircbot.controller.save_module_xml(conf.server, xmlDoc);
+                ircbot.controller.update_conf();
+                ircbot.sendData("NOTICE", nick + " :" + ignore_nick + " added successfully to the " + ircbot.conf.command + cmd + " ignore list!");
+            }
+            else
+            {
+                ircbot.sendData("NOTICE", nick + " :" + ircbot.conf.command + cmd + " does not exist.");
             }
         }
 
         private void unignorecmd(string cmd, string ignore_nick, string nick, bot ircbot, BotConfig conf)
         {
-            XmlDocument xmlDoc = new XmlDocument();
-            if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + ircbot.conf.server + Path.DirectorySeparatorChar + "modules.xml"))
+            XmlDocument xmlDoc = ircbot.controller.get_module_xml(conf.server);   
+            bool cmd_found_file = false;
+            bool cmd_found_conf = false;
+            XmlNode Serverxn = xmlDoc.SelectSingleNode("/modules");
+            XmlNodeList ServerxnList = Serverxn.ChildNodes;
+            foreach (XmlNode xn in ServerxnList)
             {
-                xmlDoc.Load(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + ircbot.conf.server + Path.DirectorySeparatorChar + "modules.xml");
-                bool cmd_found_file = false;
-                bool cmd_found_conf = false;
-                XmlNode Serverxn = xmlDoc.SelectSingleNode("/modules");
-                XmlNodeList ServerxnList = Serverxn.ChildNodes;
-                foreach (XmlNode xn in ServerxnList)
+                XmlNodeList cmd_nodes = xn.SelectNodes("commands");
+                foreach (XmlNode cmd_node in cmd_nodes)
                 {
-                    XmlNodeList cmd_nodes = xn.SelectNodes("commands");
-                    foreach (XmlNode cmd_node in cmd_nodes)
-                    {
-                        string[] triggers = cmd_node["triggers"].InnerText.Split('|');
-                        foreach (string trigger in triggers)
-                        {
-                            if (trigger.Equals(cmd))
-                            {
-                                string new_ignore = "";
-                                foreach (string list_ignore in cmd_node["blacklist"].InnerText.Split(','))
-                                {
-                                    if (!list_ignore.Equals(ignore_nick, StringComparison.InvariantCultureIgnoreCase))
-                                    {
-                                        new_ignore += list_ignore + ",";
-                                    }
-                                }
-                                cmd_node["blacklist"].InnerText = new_ignore.TrimEnd(',');
-                                cmd_found_file = true;
-                                break;
-                            }
-                        }
-                    }
-                    break;
-                }
-                foreach (List<string> tmp_command in conf.command_list)
-                {
-                    string[] triggers = tmp_command[3].Split('|');
+                    string[] triggers = cmd_node["triggers"].InnerText.Split('|');
                     foreach (string trigger in triggers)
                     {
                         if (trigger.Equals(cmd))
                         {
                             string new_ignore = "";
-                            foreach (string list_ignore in tmp_command[6].Split(','))
+                            foreach (string list_ignore in cmd_node["blacklist"].InnerText.Split(','))
                             {
                                 if (!list_ignore.Equals(ignore_nick, StringComparison.InvariantCultureIgnoreCase))
                                 {
                                     new_ignore += list_ignore + ",";
                                 }
                             }
-                            tmp_command[6] = new_ignore.TrimEnd(',');
-                            cmd_found_conf = true;
+                            cmd_node["blacklist"].InnerText = new_ignore.TrimEnd(',');
+                            cmd_found_file = true;
                             break;
                         }
                     }
                 }
-                if (cmd_found_file && cmd_found_conf)
+                break;
+            }
+            foreach (List<string> tmp_command in conf.command_list)
+            {
+                string[] triggers = tmp_command[3].Split('|');
+                foreach (string trigger in triggers)
                 {
-                    xmlDoc.Save(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + ircbot.conf.server + Path.DirectorySeparatorChar + "modules.xml");
-                    ircbot.controller.update_conf();
-                    ircbot.sendData("NOTICE", nick + " :" + ignore_nick + " removed successfully from the " + ircbot.conf.command + cmd + " ignore list!");
+                    if (trigger.Equals(cmd))
+                    {
+                        string new_ignore = "";
+                        foreach (string list_ignore in tmp_command[6].Split(','))
+                        {
+                            if (!list_ignore.Equals(ignore_nick, StringComparison.InvariantCultureIgnoreCase))
+                            {
+                                new_ignore += list_ignore + ",";
+                            }
+                        }
+                        tmp_command[6] = new_ignore.TrimEnd(',');
+                        cmd_found_conf = true;
+                        break;
+                    }
                 }
-                else
-                {
-                    ircbot.sendData("NOTICE", nick + " :" + ircbot.conf.command + cmd + " does not exist.");
-                }
+            }
+            if (cmd_found_file && cmd_found_conf)
+            {
+                ircbot.controller.save_module_xml(conf.server, xmlDoc);
+                ircbot.controller.update_conf();
+                ircbot.sendData("NOTICE", nick + " :" + ignore_nick + " removed successfully from the " + ircbot.conf.command + cmd + " ignore list!");
+            }
+            else
+            {
+                ircbot.sendData("NOTICE", nick + " :" + ircbot.conf.command + cmd + " does not exist.");
             }
         }
 
         private void ignoremodule(string module, string ignore_nick, string nick, bot ircbot, BotConfig conf)
         {
-            XmlDocument xmlDoc = new XmlDocument();
-            if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + ircbot.conf.server + Path.DirectorySeparatorChar + "modules.xml"))
+            XmlDocument xmlDoc = ircbot.controller.get_module_xml(conf.server);   
+            bool module_found_file = false;
+            bool module_found_conf = false;
+            XmlNode Serverxn = xmlDoc.SelectSingleNode("/modules");
+            XmlNodeList ServerxnList = Serverxn.ChildNodes;
+            foreach (XmlNode xn in ServerxnList)
             {
-                xmlDoc.Load(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + ircbot.conf.server + Path.DirectorySeparatorChar + "modules.xml");
-                bool module_found_file = false;
-                bool module_found_conf = false;
-                XmlNode Serverxn = xmlDoc.SelectSingleNode("/modules");
-                XmlNodeList ServerxnList = Serverxn.ChildNodes;
-                foreach (XmlNode xn in ServerxnList)
+                if (xn["class_name"].InnerText.Equals(module))
                 {
-                    if (xn["class_name"].InnerText.Equals(module))
-                    {
-                        string old_ignore = xn["blacklist"].InnerText;
-                        string new_ignore = old_ignore + "," + ignore_nick;
-                        xn["blacklist"].InnerText = new_ignore.TrimStart(',');
-                        module_found_file = true;
-                        break;
-                    }
+                    string old_ignore = xn["blacklist"].InnerText;
+                    string new_ignore = old_ignore + "," + ignore_nick;
+                    xn["blacklist"].InnerText = new_ignore.TrimStart(',');
+                    module_found_file = true;
+                    break;
                 }
-                foreach (List<string> conf_module in conf.module_config)
+            }
+            foreach (List<string> conf_module in conf.module_config)
+            {
+                if (module.ToString().Equals(conf_module[0]))
                 {
-                    if (module.ToString().Equals(conf_module[0]))
-                    {
-                        conf_module[2] += "," + ignore_nick;
-                        module_found_conf = true;
-                        break;
-                    }
+                    conf_module[2] += "," + ignore_nick;
+                    module_found_conf = true;
+                    break;
                 }
-                if (module_found_file && module_found_conf)
-                {
-                    xmlDoc.Save(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + ircbot.conf.server + Path.DirectorySeparatorChar + "modules.xml");
-                    ircbot.controller.update_conf();
-                    ircbot.sendData("NOTICE", nick + " :" + ignore_nick + " added successfully to the " + module + " module ignore list!");
-                }
-                else
-                {
-                    ircbot.sendData("NOTICE", nick + " :Module " + module + " does not exist.");
-                }
+            }
+            if (module_found_file && module_found_conf)
+            {
+                ircbot.controller.save_module_xml(conf.server, xmlDoc);
+                ircbot.controller.update_conf();
+                ircbot.sendData("NOTICE", nick + " :" + ignore_nick + " added successfully to the " + module + " module ignore list!");
+            }
+            else
+            {
+                ircbot.sendData("NOTICE", nick + " :Module " + module + " does not exist.");
             }
         }
 
         private void unignoremodule(string module, string ignore_nick, string nick, bot ircbot, BotConfig conf)
         {
-            XmlDocument xmlDoc = new XmlDocument();
-            if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + ircbot.conf.server + Path.DirectorySeparatorChar + "modules.xml"))
+            XmlDocument xmlDoc = ircbot.controller.get_module_xml(conf.server);   
+            bool module_found_file = false;
+            bool module_found_conf = false;
+            XmlNode Serverxn = xmlDoc.SelectSingleNode("/modules");
+            XmlNodeList ServerxnList = Serverxn.ChildNodes;
+            foreach (XmlNode xn in ServerxnList)
             {
-                xmlDoc.Load(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + ircbot.conf.server + Path.DirectorySeparatorChar + "modules.xml");
-                bool module_found_file = false;
-                bool module_found_conf = false;
-                XmlNode Serverxn = xmlDoc.SelectSingleNode("/modules");
-                XmlNodeList ServerxnList = Serverxn.ChildNodes;
-                foreach (XmlNode xn in ServerxnList)
+                if (xn["class_name"].InnerText.Equals(module))
                 {
-                    if (xn["class_name"].InnerText.Equals(module))
+                    string new_ignore = "";
+                    foreach (string list_ignore in xn["blacklist"].InnerText.Split(','))
                     {
-                        string new_ignore = "";
-                        foreach (string list_ignore in xn["blacklist"].InnerText.Split(','))
+                        if (!list_ignore.Equals(ignore_nick, StringComparison.InvariantCultureIgnoreCase))
                         {
-                            if (!list_ignore.Equals(ignore_nick, StringComparison.InvariantCultureIgnoreCase))
-                            {
-                                new_ignore += list_ignore + ",";
-                            }
+                            new_ignore += list_ignore + ",";
                         }
-                        xn["blacklist"].InnerText = new_ignore.TrimEnd(',');
-                        module_found_file = true;
-                        break;
                     }
+                    xn["blacklist"].InnerText = new_ignore.TrimEnd(',');
+                    module_found_file = true;
+                    break;
                 }
-                foreach (List<string> conf_module in conf.module_config)
+            }
+            foreach (List<string> conf_module in conf.module_config)
+            {
+                if (module.ToString().Equals(conf_module[0]))
                 {
-                    if (module.ToString().Equals(conf_module[0]))
-                    {
-                        conf_module[2] += "," + ignore_nick;
-                        module_found_conf = true;
-                        break;
-                    }
+                    conf_module[2] += "," + ignore_nick;
+                    module_found_conf = true;
+                    break;
                 }
-                if (module_found_file && module_found_conf)
-                {
-                    xmlDoc.Save(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "Module_Config" + Path.DirectorySeparatorChar + ircbot.conf.server + Path.DirectorySeparatorChar + "modules.xml");
-                    ircbot.controller.update_conf();
-                    ircbot.sendData("NOTICE", nick + " :" + ignore_nick + " removed successfully from the " + module + " module ignore list!");
-                }
-                else
-                {
-                    ircbot.sendData("NOTICE", nick + " :Module " + module + " does not exist.");
-                }
+            }
+            if (module_found_file && module_found_conf)
+            {
+                ircbot.controller.save_module_xml(conf.server, xmlDoc);
+                ircbot.controller.update_conf();
+                ircbot.sendData("NOTICE", nick + " :" + ignore_nick + " removed successfully from the " + module + " module ignore list!");
+            }
+            else
+            {
+                ircbot.sendData("NOTICE", nick + " :Module " + module + " does not exist.");
             }
         }
 
         private void ignore(string ignore_nick, string nick, bot ircbot, BotConfig conf)
         {
-            XmlDocument xmlDoc = new XmlDocument();
             bool added = false;
-            if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml"))
+            XmlNode xn = ircbot.controller.get_server_xml(conf.server);
+            string new_ignore = xn["ignore_list"].InnerText + "," + ignore_nick;
+            xn["ignore_list"].InnerText = new_ignore.TrimStart(',');
+            added = ircbot.controller.save_server_xml(conf.server, xn);
+            if (added)
             {
-                xmlDoc.Load(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
-                XmlNodeList ServerxnList = xmlDoc.SelectNodes("/bot_settings/server_list/server");
-                foreach (XmlNode xn in ServerxnList)
-                {
-                    string tmp_server = xn["server_name"].InnerText;
-                    if (tmp_server.Equals(conf.server))
-                    {
-                        string new_ignore = xn["ignore_list"].InnerText + "," + ignore_nick;
-                        xn["ignore_list"].InnerText = new_ignore.TrimStart(',');
-                        added = true;
-                        break;
-                    }
-                }
-                xmlDoc.Save(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
-                if (added)
-                {
-                    conf.ignore_list += "," + nick;
-                    ircbot.controller.update_conf();
-                    ircbot.sendData("NOTICE", nick + " :" + ignore_nick + " successfully added to the ignore list!");
-                }
-                else
-                {
-                    ircbot.sendData("NOTICE", nick + " :" + ignore_nick + " was not added to the ignore list.");
-                }
+                conf.ignore_list += "," + nick;
+                ircbot.controller.update_conf();
+                ircbot.sendData("NOTICE", nick + " :" + ignore_nick + " successfully added to the ignore list!");
+            }
+            else
+            {
+                ircbot.sendData("NOTICE", nick + " :" + ignore_nick + " was not added to the ignore list.");
             }
         }
 
         private void unignore(string ignore_nick, string nick, bot ircbot, BotConfig conf)
         {
-            XmlDocument xmlDoc = new XmlDocument();
             bool removed = false;
-            if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml"))
+            XmlNode xn = ircbot.controller.get_server_xml(conf.server);
+            string new_ignore = "";
+            conf.ignore_list = "";
+            foreach (string list_ignore in xn["ignore_list"].InnerText.Split(','))
             {
-                xmlDoc.Load(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
-                XmlNodeList ServerxnList = xmlDoc.SelectNodes("/bot_settings/server_list/server");
-                foreach (XmlNode xn in ServerxnList)
+                if (!list_ignore.Equals(ignore_nick, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    string tmp_server = xn["server_name"].InnerText;
-                    if (tmp_server.Equals(conf.server))
-                    {
-                        string new_ignore = "";
-                        conf.ignore_list = "";
-                        foreach (string list_ignore in xn["ignore_list"].InnerText.Split(','))
-                        {
-                            if (!list_ignore.Equals(ignore_nick, StringComparison.InvariantCultureIgnoreCase))
-                            {
-                                new_ignore += list_ignore + ",";
-                                conf.ignore_list += list_ignore + ",";
-                            }
-                            else
-                            {
-                                removed = true;
-                            }
-                        }
-                        xn["ignore_list"].InnerText = new_ignore.TrimEnd(',');
-                        conf.ignore_list = conf.ignore_list.TrimEnd(',');
-                        break;
-                    }
-                }
-                xmlDoc.Save(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
-                if (removed)
-                {
-                    ircbot.controller.update_conf();
-                    ircbot.sendData("NOTICE", nick + " :" + ignore_nick + " successfully removed from the ignore list!");
+                    new_ignore += list_ignore + ",";
+                    conf.ignore_list += list_ignore + ",";
                 }
                 else
                 {
-                    ircbot.sendData("NOTICE", nick + " :" + ignore_nick + " was not removed from the ignore list.");
+                    removed = true;
                 }
+            }
+            xn["ignore_list"].InnerText = new_ignore.TrimEnd(',');
+            conf.ignore_list = conf.ignore_list.TrimEnd(',');
+            ircbot.controller.save_server_xml(conf.server, xn);
+            if (removed)
+            {
+                ircbot.controller.update_conf();
+                ircbot.sendData("NOTICE", nick + " :" + ignore_nick + " successfully removed from the ignore list!");
+            }
+            else
+            {
+                ircbot.sendData("NOTICE", nick + " :" + ignore_nick + " was not removed from the ignore list.");
             }
         }
 
         private void add_channel_list(string channel, bot ircbot, BotConfig conf)
         {
-            XmlDocument xmlDoc = new XmlDocument();
-            if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml"))
-            {
-                xmlDoc.Load(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
-                XmlNodeList ServerxnList = xmlDoc.SelectNodes("/bot_settings/server_list/server");
-                foreach (XmlNode xn in ServerxnList)
-                {
-                    string tmp_server = xn["server_name"].InnerText;
-                    if (tmp_server.Equals(conf.server))
-                    {
-                        string new_channel = xn["chan_list"].InnerText + "," + channel;
-                        xn["chan_list"].InnerText = new_channel;
-                        break;
-                    }
-                }
-                xmlDoc.Save(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
-                conf.chans += "," + channel;
-            }
+            XmlNode xn = ircbot.controller.get_server_xml(conf.server);
+            string new_channel = xn["chan_list"].InnerText + "," + channel;
+            xn["chan_list"].InnerText = new_channel;
+            conf.chans += "," + channel;
+            ircbot.controller.save_server_xml(conf.server, xn);
         }
 
         private void del_channel_list(string channel, bot ircbot, BotConfig conf)
         {
-            XmlDocument xmlDoc = new XmlDocument();
-            if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml"))
+            XmlNode xn = ircbot.controller.get_server_xml(conf.server);
+            string new_channel = "";
+            conf.chans = "";
+            foreach (string list_chan in xn["chan_list"].InnerText.Split(','))
             {
-                xmlDoc.Load(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
-                XmlNodeList ServerxnList = xmlDoc.SelectNodes("/bot_settings/server_list/server");
-                foreach (XmlNode xn in ServerxnList)
+                if (!list_chan.Equals(channel))
                 {
-                    string tmp_server = xn["server_name"].InnerText;
-                    if (tmp_server.Equals(conf.server))
-                    {
-                        string new_channel = "";
-                        conf.chans = "";
-                        foreach (string list_chan in xn["chan_list"].InnerText.Split(','))
-                        {
-                            if (!list_chan.Equals(channel))
-                            {
-                                new_channel += list_chan + ",";
-                                conf.chans += list_chan + ",";
-                            }
-                        }
-                        xn["chan_list"].InnerText = new_channel.TrimEnd(',');
-                        conf.chans = conf.chans.TrimEnd(',');
-                        break;
-                    }
+                    new_channel += list_chan + ",";
+                    conf.chans += list_chan + ",";
                 }
-                xmlDoc.Save(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
             }
+            xn["chan_list"].InnerText = new_channel.TrimEnd(',');
+            conf.chans = conf.chans.TrimEnd(',');
+            ircbot.controller.save_server_xml(conf.server, xn);
         }
 
         private void add_owner(string nick, bot ircbot, BotConfig conf)
         {
-            XmlDocument xmlDoc = new XmlDocument();
-            if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml"))
-            {
-                xmlDoc.Load(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
-                XmlNodeList ServerxnList = xmlDoc.SelectNodes("/bot_settings/server_list/server");
-                foreach (XmlNode xn in ServerxnList)
-                {
-                    string tmp_server = xn["server_name"].InnerText;
-                    if (tmp_server.Equals(conf.server))
-                    {
-                        string new_owner = xn["owner"].InnerText + "," + nick;
-                        xn["owner"].InnerText = new_owner;
-                        break;
-                    }
-                }
-                xmlDoc.Save(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
-                conf.owner += "," + nick;
-            }
+            XmlNode xn = ircbot.controller.get_server_xml(conf.server);
+            string new_owner = xn["owner"].InnerText + "," + nick;
+            xn["owner"].InnerText = new_owner;
+            conf.owner += "," + nick;
+            ircbot.controller.save_server_xml(conf.server, xn);
         }
 
         private void del_owner(string nick, bot ircbot, BotConfig conf)
         {
-            XmlDocument xmlDoc = new XmlDocument();
             string new_owner = "";
-            if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml"))
+            XmlNode xn = ircbot.controller.get_server_xml(conf.server);
+            string[] new_owner_tmp = xn["owner"].InnerText.Split(',');
+            for (int x = 0; x <= new_owner_tmp.GetUpperBound(0); x++)
             {
-                xmlDoc.Load(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
-                XmlNodeList ServerxnList = xmlDoc.SelectNodes("/bot_settings/server_list/server");
-                foreach (XmlNode xn in ServerxnList)
+                if (new_owner_tmp[x].Equals(nick, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    string tmp_server = xn["server_name"].InnerText;
-                    if (tmp_server.Equals(conf.server))
-                    {
-                        string[] new_owner_tmp = xn["owner"].InnerText.Split(',');
-                        for (int x = 0; x <= new_owner_tmp.GetUpperBound(0); x++)
-                        {
-                            if (new_owner_tmp[x].Equals(nick, StringComparison.InvariantCultureIgnoreCase))
-                            {
-                            }
-                            else
-                            {
-                                new_owner += new_owner_tmp[x] + ",";
-                            }
-                        }
-                        xn["owner"].InnerText = new_owner.TrimEnd(',');
-                        break;
-                    }
                 }
-                xmlDoc.Save(ircbot.cur_dir + Path.DirectorySeparatorChar + "config" + Path.DirectorySeparatorChar + "config.xml");
-                conf.owner = new_owner.TrimEnd(',');
+                else
+                {
+                    new_owner += new_owner_tmp[x] + ",";
+                }
             }
+            xn["owner"].InnerText = new_owner.TrimEnd(',');
+            conf.owner = new_owner.TrimEnd(',');
+            ircbot.controller.save_server_xml(conf.server, xn);
         }
     }
 }

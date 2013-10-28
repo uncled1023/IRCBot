@@ -183,78 +183,28 @@ namespace Bot.Modules
             alarm_trigger.Enabled = false;
             if (msg.StartsWith(ircbot.conf.command))
             {
-                bool bot_command = true;
-                string line = "";
+                string chan = "";
                 if (type.Equals("channel"))
                 {
-                    line = ":" + full_nick + " PRIVMSG " + channel + " :" + msg;
+                    chan = channel;
                 }
                 else
                 {
-                    line = ":" + full_nick + " PRIVMSG " + conf.nick + " :" + msg;
+                    chan = conf.nick;
                 }
 
                 char[] charSplit = new char[] { ' ' };
-                string[] ex = line.Split(charSplit, 5);
-                string[] ignored_nicks = conf.ignore_list.Split(',');
-                bool run_modules = true;
-                foreach (string ignore_nick in ignored_nicks)
+                string[] ex = msg.TrimStart(Convert.ToChar(conf.command)).Split(charSplit, 2);
+                string[] args;
+                if (ex.GetUpperBound(0) > 0)
                 {
-                    if (ignore_nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        run_modules = false;
-                        break;
-                    }
+                    args = ex[1].Split(charSplit);
                 }
-                if (run_modules)
+                else
                 {
-                    //Run Enabled Modules
-                    List<Modules.Module> tmp_module_list = new List<Modules.Module>();
-                    tmp_module_list.AddRange(ircbot.module_list);
-                    foreach (Modules.Module module in tmp_module_list)
-                    {
-                        int index = 0;
-                        bool module_found = false;
-                        string module_blacklist = "";
-                        foreach (List<string> conf_module in conf.module_config)
-                        {
-                            if (module.ToString().Equals("IRCBot.Modules." + conf_module[0]))
-                            {
-                                module_blacklist = conf_module[2];
-                                module_found = true;
-                                break;
-                            }
-                            index++;
-                        }
-                        if (module_found == true)
-                        {
-                            char[] sepComma = new char[] { ',' };
-                            char[] sepSpace = new char[] { ' ' };
-                            string[] blacklist = module_blacklist.Split(sepComma, StringSplitOptions.RemoveEmptyEntries);
-                            bool module_allowed = true;
-                            foreach (string blacklist_node in blacklist)
-                            {
-                                string[] nodes = blacklist_node.Split(sepSpace, StringSplitOptions.RemoveEmptyEntries);
-                                foreach (string node in nodes)
-                                {
-                                    if (node.Equals(nick, StringComparison.InvariantCultureIgnoreCase) || node.TrimStart('#').Equals(channel.TrimStart('#')))
-                                    {
-                                        module_allowed = false;
-                                        break;
-                                    }
-                                }
-                                if (module_allowed == false)
-                                {
-                                    break;
-                                }
-                            }
-                            if (module_allowed == true)
-                            {
-                                module.control(ircbot, conf, index, ex, ex[3].TrimStart(':').TrimStart(Convert.ToChar(ircbot.conf.command)), nick_access, nick, channel, bot_command, type);
-                            }
-                        }
-                    }
+                    args = null;
                 }
+                ircbot.controller.run_command(conf.server, nick, chan, ex[0], args);
             }
             else
             {

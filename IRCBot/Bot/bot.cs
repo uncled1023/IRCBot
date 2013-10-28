@@ -17,7 +17,6 @@ using System.Text.RegularExpressions;
 using Microsoft.Win32;
 using System.Runtime;
 using System.Runtime.InteropServices;
-using System.Management;
 using System.Reflection;
 
 namespace Bot
@@ -688,6 +687,18 @@ namespace Bot
                 index++;
             }
             return module_found;
+        }
+
+        internal Modules.Module get_module(string class_name)
+        {
+            foreach (Modules.Module module in module_list)
+            {
+                if (module.ToString().Equals("Bot.Modules." + class_name))
+                {
+                    return module;
+                }
+            }
+            return null;
         }
 
         private void start_timers()

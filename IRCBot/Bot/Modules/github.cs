@@ -178,6 +178,37 @@ namespace Bot.Modules
             }
             return reply;
         } // end HttpPost 
+
+        private string get_user_info(bot ircbot, int module_id, string uri, string title, string description, string assignee, List<string> labels)
+        {
+            Issues issue = new Issues { title = title, body = description, assignee = assignee, labels = labels.ToArray() };
+
+            string jsonString = issue.ToJSON();
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
+            request.Method = "POST";
+            request.Headers.Add("Authorization: Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes(ircbot.conf.module_config[module_id][3] + ":" + ircbot.conf.module_config[module_id][4])));
+            request.UserAgent = "IRCBot";
+            byte[] postBytes = Encoding.ASCII.GetBytes(jsonString);
+            // this is important - make sure you specify type this way
+            request.ContentLength = postBytes.Length;
+
+            Stream requestStream = request.GetRequestStream();
+            requestStream.Write(postBytes, 0, postBytes.Length);
+            requestStream.Close();
+
+            string reply = "";
+            try
+            {
+                // grab te response and print it out to the console along with the status code
+                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                new StreamReader(response.GetResponseStream()).ReadToEnd();
+            }
+            catch (WebException ex)
+            {
+                reply = ex.Message;
+            }
+            return reply;
+        } // end HttpPost 
     }
 
     public class Issues

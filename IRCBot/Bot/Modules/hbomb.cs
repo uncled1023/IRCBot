@@ -78,28 +78,7 @@ namespace Bot.Modules
                                         }
                                         if (nick_access >= command_access)
                                         {
-                                            int module_index = 0;
-                                            foreach (Modules.Module module in ircbot.module_list)
-                                            {
-                                                string module_type = module.GetType().ToString();
-                                                if (module_type.Equals("IRCBot.Modules.idle"))
-                                                {
-                                                    break;
-                                                }
-                                                else
-                                                {
-                                                    module_index++;
-                                                }
-                                            }
-                                            Modules.idle idle;
-                                            if (module_index < ircbot.module_list.Count())
-                                            {
-                                                idle = (Modules.idle)ircbot.module_list[module_index];
-                                            }
-                                            else
-                                            {
-                                                idle = new Modules.idle();
-                                            }
+                                            Modules.idle idle = (Modules.idle)ircbot.get_module("idle");
                                             if (idle.check_idle(nick) == false)
                                             {
                                                 bool hbomb_active = false;
@@ -192,28 +171,7 @@ namespace Bot.Modules
                                             {
                                                 if (!tmp_info.bomb_locked)
                                                 {
-                                                    int module_index = 0;
-                                                    foreach (Modules.Module module in ircbot.module_list)
-                                                    {
-                                                        string module_type = module.GetType().ToString();
-                                                        if (module_type.Equals("IRCBot.Modules.idle"))
-                                                        {
-                                                            break;
-                                                        }
-                                                        else
-                                                        {
-                                                            module_index++;
-                                                        }
-                                                    }
-                                                    Modules.idle idle;
-                                                    if (module_index < ircbot.module_list.Count())
-                                                    {
-                                                        idle = (Modules.idle)ircbot.module_list[module_index];
-                                                    }
-                                                    else
-                                                    {
-                                                        idle = new Modules.idle();
-                                                    }
+                                                    Modules.idle idle = (Modules.idle)ircbot.get_module("idle");
                                                     if (idle.check_idle(nick) == false)
                                                     {
                                                         if (tmp_info.bomb_holder.Equals(nick, StringComparison.InvariantCultureIgnoreCase))
@@ -507,28 +465,7 @@ namespace Bot.Modules
                                             {
                                                 if (!tmp_info.bomb_locked)
                                                 {
-                                                    int module_index = 0;
-                                                    foreach (Modules.Module module in ircbot.module_list)
-                                                    {
-                                                        string module_type = module.GetType().ToString();
-                                                        if (module_type.Equals("IRCBot.Modules.idle"))
-                                                        {
-                                                            break;
-                                                        }
-                                                        else
-                                                        {
-                                                            module_index++;
-                                                        }
-                                                    }
-                                                    Modules.idle idle;
-                                                    if (module_index < ircbot.module_list.Count())
-                                                    {
-                                                        idle = (Modules.idle)ircbot.module_list[module_index];
-                                                    }
-                                                    else
-                                                    {
-                                                        idle = new Modules.idle();
-                                                    }
+                                                    Modules.idle idle = (Modules.idle)ircbot.get_module("idle");
                                                     if (idle.check_idle(nick) == false)
                                                     {
                                                         if (tmp_info.bomb_holder.Equals(nick, StringComparison.InvariantCultureIgnoreCase))
@@ -649,35 +586,16 @@ namespace Bot.Modules
             string pattern = "[^a-zA-Z0-9]"; //regex pattern
             tab_name = Regex.Replace(tab_name, pattern, "_");
             string file_name = ircbot.conf.server + "_#" + tab_name + ".log";
-            bool nick_idle = true;
+            bool nick_idle = false;
 
-            if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "seen" + Path.DirectorySeparatorChar + file_name))
+            Modules.seen seen = (Modules.seen)ircbot.get_module("seen");
+            DateTime current_date = DateTime.Now;
+            DateTime past_date = seen.get_seen_time(nick, channel, ircbot);
+            double difference_second = 0;
+            difference_second = current_date.Subtract(past_date).TotalSeconds;
+            if (difference_second >= 600)
             {
-                string[] log_file = System.IO.File.ReadAllLines(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "seen" + Path.DirectorySeparatorChar + file_name);
-                int number_of_lines = log_file.GetUpperBound(0) + 1;
-                if (number_of_lines > 0)
-                {
-                    foreach (string file_line in log_file)
-                    {
-                        char[] sep = new char[] { '*' };
-                        string[] new_line = file_line.Split(sep, 4);
-                        if (new_line.GetUpperBound(0) > 0)
-                        {
-                            if (new_line[0].Equals(pass_nick) && new_line[1].Equals(channel))
-                            {
-                                DateTime current_date = DateTime.Now;
-                                DateTime past_date = DateTime.Parse(new_line[2]);
-                                double difference_second = 0;
-                                difference_second = current_date.Subtract(past_date).TotalSeconds;
-                                if (difference_second <= 600)
-                                {
-                                    nick_idle = false;
-                                }
-                                break;
-                            }
-                        }
-                    }
-                }
+                nick_idle = true;
             }
             if (nick_idle == false)
             {

@@ -227,13 +227,10 @@ namespace Bot.Modules
                         {
                             foreach (string tmp_new_line in file)
                             {
-                                string file_line = tmp_new_line.Replace("<nick>", nick);
-                                file_line = file_line.Replace("<me>", conf.nick);
-                                file_line = file_line.Replace("<chan>", channel);
                                 char[] split_type = new char[] { ':' };
                                 char[] trigger_split = new char[] { '*' };
                                 char[] triggered_split = new char[] { '&' };
-                                string[] split = file_line.Split(split_type, 3);
+                                string[] split = tmp_new_line.Split(split_type, 3);
                                 string[] channels = split[0].Split(',');
                                 string[] triggers = split[1].Split('|');
                                 string[] responses = split[2].Split('|');
@@ -328,77 +325,26 @@ namespace Bot.Modules
                                         int number_of_responses = responses.GetUpperBound(0) + 1;
                                         Random random = new Random();
                                         index = random.Next(0, number_of_responses);
-                                        string[] events = responses[index].Split(triggered_split, StringSplitOptions.RemoveEmptyEntries);
+                                        string file_line = responses[index].Replace("<nick>", nick);
+                                        file_line = file_line.Replace("<me>", conf.nick);
+                                        file_line = file_line.Replace("<chan>", channel);
+                                        string[] events = file_line.Split(triggered_split, StringSplitOptions.RemoveEmptyEntries);
                                         for (int y = 0; y <= events.GetUpperBound(0); y++)
                                         {
                                             if (events[y].StartsWith("<cmd>") == true)
                                             {
-                                                bot_command = true;
-                                                string data = "";
-                                                data = ":" + ircbot.nick + " PRIVMSG " + channel + " :" + ircbot.conf.command + events[y].Remove(0, 5);
-
                                                 char[] charSplit = new char[] { ' ' };
-                                                string[] ex = data.Split(charSplit, 5);
-                                                string[] ignored_nicks = conf.ignore_list.Split(',');
-                                                bool run_modules = true;
-                                                foreach (string ignore_nick in ignored_nicks)
+                                                string[] ex = events[y].Remove(0, 5).Split(charSplit, 2);
+                                                string[] args;
+                                                if (ex.GetUpperBound(0) > 0)
                                                 {
-                                                    if (ignore_nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase))
-                                                    {
-                                                        run_modules = false;
-                                                        break;
-                                                    }
+                                                    args = ex[1].Split(charSplit);
                                                 }
-                                                if (run_modules)
+                                                else
                                                 {
-                                                    //Run Enabled Modules
-                                                    List<Modules.Module> tmp_module_list = new List<Modules.Module>();
-                                                    tmp_module_list.AddRange(ircbot.module_list);
-                                                    foreach (Modules.Module module in tmp_module_list)
-                                                    {
-                                                        int mod_index = 0;
-                                                        bool module_found = false;
-                                                        string module_blacklist = "";
-                                                        foreach (List<string> conf_module in conf.module_config)
-                                                        {
-                                                            if (module.ToString().Equals("IRCBot.Modules." + conf_module[0]))
-                                                            {
-                                                                module_blacklist = conf_module[2];
-                                                                module_found = true;
-                                                                break;
-                                                            }
-                                                            mod_index++;
-                                                        }
-                                                        if (module_found == true)
-                                                        {
-                                                            char[] sepComma = new char[] { ',' };
-                                                            char[] sepSpace = new char[] { ' ' };
-                                                            string[] blacklist = module_blacklist.Split(sepComma, StringSplitOptions.RemoveEmptyEntries);
-                                                            bool module_allowed = true;
-                                                            foreach (string blacklist_node in blacklist)
-                                                            {
-                                                                string[] nodes = blacklist_node.Split(sepSpace, StringSplitOptions.RemoveEmptyEntries);
-                                                                foreach (string node in nodes)
-                                                                {
-                                                                    if (node.Equals(nick, StringComparison.InvariantCultureIgnoreCase) || node.TrimStart('#').Equals(channel.TrimStart('#')))
-                                                                    {
-                                                                        module_allowed = false;
-                                                                        break;
-                                                                    }
-                                                                }
-                                                                if (module_allowed == false)
-                                                                {
-                                                                    break;
-                                                                }
-                                                            }
-                                                            if (module_allowed == true)
-                                                            {
-                                                                module.control(ircbot, conf, mod_index, ex, ex[3].TrimStart(':').TrimStart(Convert.ToChar(ircbot.conf.command)), conf.owner_level, nick, channel, bot_command, type);
-                                                            }
-                                                        }
-                                                    }
+                                                    args = null;
                                                 }
-                                                ircbot.parse_stream(data.Trim());
+                                                ircbot.controller.run_command(conf.server, channel, ex[0], args);
                                             }
                                             else if (events[y].StartsWith("<delay>") == true)
                                             {

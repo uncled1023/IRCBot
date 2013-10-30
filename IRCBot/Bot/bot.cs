@@ -1462,6 +1462,7 @@ namespace Bot
                 {
                     if (line.Contains("Please wait a while and try again."))
                     {
+                        Thread.Sleep(1000);
                         sendData("USERHOST ", new_nick[0]);
                     }
                     line = read_queue();
@@ -1544,6 +1545,7 @@ namespace Bot
                     }
                     else if (line.Contains("Please wait a while and try again."))
                     {
+                        Thread.Sleep(1000);
                         sendData("PRIVMSG", "chanserv :" + type + " " + channel + " list " + tmp_nick);
                         cont = true;
                         line = read_queue();
@@ -1575,6 +1577,7 @@ namespace Bot
                 {
                     if (line.Contains("Please wait a while and try again."))
                     {
+                        Thread.Sleep(1000);
                         sendData("PRIVMSG", "nickserv :STATUS " + tmp_nick);
                     }
                     line = read_queue();
@@ -1599,6 +1602,7 @@ namespace Bot
                 {
                     if (line.Contains("Please wait a while and try again."))
                     {
+                        Thread.Sleep(1000);
                         sendData("WHO", channel.TrimStart(':'));
                     }
                     line = read_queue();
@@ -1811,6 +1815,7 @@ namespace Bot
                 {
                     if (line.Contains("Please wait a while and try again."))
                     {
+                        Thread.Sleep(1000);
                         sendData("LIST", channel.TrimStart(':'));
                     }
                     line = read_queue();

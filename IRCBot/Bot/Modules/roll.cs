@@ -8,12 +8,12 @@ namespace Bot.Modules
 {
     class roll : Module
     {
-        public override void control(bot ircbot, BotConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, BotConfig Conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
-            string module_name = ircbot.conf.module_config[module_id][0];
+            string module_name = ircbot.Conf.Module_Config[module_id][0];
             if (type.Equals("channel") && bot_command == true)
             {
-                foreach (List<string> tmp_command in conf.command_list)
+                foreach (List<string> tmp_command in Conf.Command_List)
                 {
                     if (module_name.Equals(tmp_command[0]))
                     {
@@ -90,13 +90,13 @@ namespace Bot.Modules
                                                             num_sides = 6;
                                                         }
                                                     }
-                                                    if (num_dice > Convert.ToInt32(conf.module_config[module_id][3]))
+                                                    if (num_dice > Convert.ToInt32(Conf.Module_Config[module_id][3]))
                                                     {
-                                                        num_dice = Convert.ToInt32(conf.module_config[module_id][3]);
+                                                        num_dice = Convert.ToInt32(Conf.Module_Config[module_id][3]);
                                                     }
-                                                    if (num_sides > Convert.ToInt32(conf.module_config[module_id][4]))
+                                                    if (num_sides > Convert.ToInt32(Conf.Module_Config[module_id][4]))
                                                     {
-                                                        num_sides = Convert.ToInt32(conf.module_config[module_id][4]);
+                                                        num_sides = Convert.ToInt32(Conf.Module_Config[module_id][4]);
                                                     }
                                                     for (int x = 0; x < num_dice; x++)
                                                     {
@@ -143,9 +143,9 @@ namespace Bot.Modules
                                                             num_dice = 1;
                                                         }
                                                     }
-                                                    if (num_dice > Convert.ToInt32(conf.module_config[module_id][3]))
+                                                    if (num_dice > Convert.ToInt32(Conf.Module_Config[module_id][3]))
                                                     {
-                                                        num_dice = Convert.ToInt32(conf.module_config[module_id][3]);
+                                                        num_dice = Convert.ToInt32(Conf.Module_Config[module_id][3]);
                                                     }
                                                     for (int x = 0; x < num_dice; x++)
                                                     {

@@ -200,17 +200,33 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>$(SolutionDir)util\IncBuildNo.exe $(SolutionDir)IRCBot\properties\AssemblyInfo.cs
+    <PostBuildEvent>if $(ConfigurationName) == Debug goto :debug
+
+:release
+copy "$(ProjectDir)Resources\*" "$(SolutionDir)Release\Resources" /y
+copy $(TargetPath) "$(SolutionDir)Release" /y
+copy "$(SolutionDir)IRCBot-GUI\bin\x86\Release\IRCBot-GUI.exe" "$(SolutionDir)Release" /y
+copy "$(SolutionDir)IRCBot-Console\bin\x86\Release\IRCBot-Console.exe" "$(SolutionDir)Release" /y
+copy $(TargetPath) "$(SolutionDir)Release-Mono" /y
+copy "$(SolutionDir)IRCBot-GUI\bin\x86\Release\IRCBot-GUI.exe" "$(SolutionDir)Release-Mono" /y
+copy "$(SolutionDir)IRCBot-Console\bin\x86\Release\IRCBot-Console.exe" "$(SolutionDir)Release-Mono" /y
+
+goto :exit
+
+:debug
+$(SolutionDir)util\IncBuildNo.exe $(SolutionDir)IRCBot\properties\AssemblyInfo.cs
 $(SolutionDir)util\IncBuildNo.exe $(SolutionDir)IRCBot-Console\properties\AssemblyInfo.cs
 $(SolutionDir)util\IncBuildNo.exe $(SolutionDir)IRCBot-GUI\properties\AssemblyInfo.cs
 $(SolutionDir)util\ProjectBuildCounter.exe $(SolutionDir)IRCBot\properties\AssemblyInfo.cs B
 $(SolutionDir)util\ProjectBuildCounter.exe $(SolutionDir)IRCBot-Console\properties\AssemblyInfo.cs B
 $(SolutionDir)util\ProjectBuildCounter.exe $(SolutionDir)IRCBot-GUI\properties\AssemblyInfo.cs B
-copy /Y "$(ProjectDir)Resources\*" "$(TargetDir)Resources"</PostBuildEvent>
+copy "$(ProjectDir)Resources\*" "$(TargetDir)Resources" /y
+
+:exit</PostBuildEvent>
   </PropertyGroup>
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties BuildVersion_UpdateAssemblyVersion="True" BuildVersion_UpdateFileVersion="True" BuildVersion_AssemblyInfoFilename="Properties\AssemblyInfo.cs" BuildVersion_BuildVersioningStyle="None.None.Increment.Increment" />
+      <UserProperties BuildVersion_BuildVersioningStyle="None.None.Increment.Increment" BuildVersion_AssemblyInfoFilename="Properties\AssemblyInfo.cs" BuildVersion_UpdateFileVersion="True" BuildVersion_UpdateAssemblyVersion="True" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

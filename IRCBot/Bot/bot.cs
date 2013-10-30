@@ -23,45 +23,31 @@ namespace Bot
 {
     public class bot
     {
-        private BotConfig Conf;
-        public BotConfig conf
+        private BotConfig conf;
+        public BotConfig Conf
         {
             get
             {
-                return Conf;
+                return conf;
             }
 
             internal set
             {
-                Conf = value;
+                conf = value;
             }
         }
 
-        private string Nick;
-        public string nick
+        private string nick;
+        public string Nick
         {
             get
             {
-                return Nick;
+                return nick;
             }
 
             internal set
             {
-                Nick = value;
-            }
-        }
-
-        private List<List<string>> Nick_List;
-        public List<List<string>> nick_list
-        {
-            get
-            {
-                return Nick_List;
-            }
-
-            internal set
-            {
-                Nick_List = value;
+                nick = value;
             }
         }
 
@@ -85,7 +71,6 @@ namespace Bot
         internal bool disconnected;
         internal bool shouldRun;
         internal bool first_run;
-        internal List<string> channel_list;
         internal string cur_dir;
         internal BackgroundWorker worker;
         internal BackgroundWorker irc_worker;
@@ -106,7 +91,7 @@ namespace Bot
         internal bot(IRCBot.bot_controller main, BotConfig new_conf)
         {
             controller = main;
-            conf = new_conf;
+            Conf = new_conf;
 
             init_bot();
         }
@@ -148,7 +133,7 @@ namespace Bot
 
                 lock (controller.errorlock)
                 {
-                    controller.log_error(ex, conf.logs_path);
+                    controller.log_error(ex, Conf.Logs_Path);
                 }
             }
             e.Cancel = true;
@@ -158,7 +143,7 @@ namespace Bot
         {
             if (restart == true)
             {
-                string output = Environment.NewLine + conf.server + ":" + "Restart Attempt " + restart_attempts + " [" + Math.Pow(2, Convert.ToDouble(restart_attempts)) + " Seconds Delay]";
+                string output = Environment.NewLine + Conf.Server_Name + ":" + "Restart Attempt " + restart_attempts + " [" + Math.Pow(2, Convert.ToDouble(restart_attempts)) + " Seconds Delay]";
                 lock (controller.listLock)
                 {
                     if (controller.queue_text.Count >= 1000)
@@ -179,9 +164,9 @@ namespace Bot
             }
             else
             {
-                if (conf.server.Equals("No_Server_Specified"))
+                if (Conf.Server_Name.Equals("No_Server_Specified"))
                 {
-                    string output = Environment.NewLine + conf.server + ":" + "Please add a server to connect to.";
+                    string output = Environment.NewLine + Conf.Server_Name + ":" + "Please add a server to connect to.";
                     lock (controller.listLock)
                     {
                         if (controller.queue_text.Count >= 1000)
@@ -227,7 +212,7 @@ namespace Bot
             string main_nick = nick;
             int cur_alt_nick = 0;
             char[] sep = new char[] { ',' };
-            string[] nicks = conf.secondary_nicks.Split(sep, StringSplitOptions.RemoveEmptyEntries);
+            string[] nicks = Conf.Secondary_Nicks.Split(sep, StringSplitOptions.RemoveEmptyEntries);
             int bot_state = 0;
             int pre_state = 0;
             int next_state = 1;
@@ -315,16 +300,16 @@ namespace Bot
                         break;
                     case 3: // ghost state
                         ghost_sent = true;
-                        if (!conf.pass.Equals(string.Empty))
+                        if (!Conf.Pass.Equals(string.Empty))
                         {
-                            sendData("PRIVMSG", "NickServ :ghost " + main_nick + " " + conf.pass);
+                            sendData("PRIVMSG", "NickServ :ghost " + main_nick + " " + Conf.Pass);
                         }
                         bot_state = pre_state;
                         break;
                     case 4: // identify state
-                        if (!conf.pass.Equals(string.Empty))
+                        if (!Conf.Pass.Equals(string.Empty))
                         {
-                            sendData("PRIVMSG", "NickServ :Identify " + conf.pass);
+                            sendData("PRIVMSG", "NickServ :Identify " + Conf.Pass);
                             pre_state = bot_state;
                             bot_state = 5;
                         }
@@ -427,9 +412,7 @@ namespace Bot
             restart = false;
             start_time = DateTime.Now;
             cur_dir = controller.cur_dir;
-            nick = conf.nick;
-            nick_list = new List<List<string>>();
-            channel_list = new List<string>();
+            nick = Conf.Nick;
             module_list = new List<Modules.Module>();
             modules_loaded = new List<string>();
             modules_error = new List<string>();
@@ -441,7 +424,7 @@ namespace Bot
 
             Spam_Check_Timer = new System.Timers.Timer();
             Spam_Check_Timer.Elapsed += spam_tick;
-            Spam_Check_Timer.Interval = conf.spam_threshold;
+            Spam_Check_Timer.Interval = Conf.Spam_Threshold;
 
             Spam_Threshold_Check = new System.Timers.Timer();
             Spam_Threshold_Check.Elapsed += spam_check;
@@ -475,24 +458,24 @@ namespace Bot
             bool bot_connected = false;
             try
             {
-                IRCConnection = new TcpClient(conf.server_address, conf.port);
+                IRCConnection = new TcpClient(Conf.Server_Address, Conf.Port);
                 IRCConnection.NoDelay = true;
                 ns = IRCConnection.GetStream();
                 sr = new StreamReader(ns, Encoding.UTF8);
                 sw = new StreamWriter(ns, Encoding.UTF8);
                 sw.AutoFlush = true;
 
-                if (conf.pass != "")
+                if (Conf.Pass != "")
                 {
-                    sendData("PASS", conf.pass);
+                    sendData("PASS", Conf.Pass);
                 }
-                if (conf.email != "")
+                if (Conf.Email != "")
                 {
-                    sendData("USER", nick + " " + conf.email + " " + conf.email + " :" + conf.name);
+                    sendData("USER", nick + " " + Conf.Email + " " + Conf.Email + " :" + Conf.Name);
                 }
                 else
                 {
-                    sendData("USER", nick + " default_host default_server :" + conf.name);
+                    sendData("USER", nick + " default_host default_server :" + Conf.Name);
                 }
                 disconnected = false;
                 bot_connected = true;
@@ -501,7 +484,7 @@ namespace Bot
             {
                 lock (controller.errorlock)
                 {
-                    controller.log_error(ex, conf.logs_path);
+                    controller.log_error(ex, Conf.Logs_Path);
                 }
             }
             return bot_connected;
@@ -531,7 +514,7 @@ namespace Bot
             if (IRCConnection != null)
                 IRCConnection.Close();
 
-            string output = Environment.NewLine + conf.server + ":" + "Disconnected";
+            string output = Environment.NewLine + Conf.Server_Name + ":" + "Disconnected";
 
             lock (controller.listLock)
             {
@@ -557,7 +540,7 @@ namespace Bot
                     Socket s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                     try
                     {
-                        s.Connect(conf.server_address, conf.port);
+                        s.Connect(Conf.Server_Address, Conf.Port);
                     }
                     catch
                     {
@@ -588,7 +571,7 @@ namespace Bot
             module_list.Clear();
             modules_loaded.Clear();
             modules_error.Clear();
-            foreach (List<string> module in conf.module_config)
+            foreach (List<string> module in Conf.Module_Config)
             {
                 bool module_loaded = false;
                 string module_name = module[1];
@@ -613,7 +596,7 @@ namespace Bot
                 {
                     msg += ", " + module_name;
                 }
-                string output = Environment.NewLine + conf.server + ":Loaded Modules: " + msg.TrimStart(',').Trim();
+                string output = Environment.NewLine + Conf.Server_Name + ":Loaded Modules: " + msg.TrimStart(',').Trim();
                 lock (controller.listLock)
                 {
                     if (controller.queue_text.Count >= 1000)
@@ -630,7 +613,7 @@ namespace Bot
                 {
                     msg += ", " + module_name;
                 }
-                string output = Environment.NewLine + conf.server + ":Error Loading Modules: " + msg.TrimStart(',').Trim();
+                string output = Environment.NewLine + Conf.Server_Name + ":Error Loading Modules: " + msg.TrimStart(',').Trim();
                 lock (controller.listLock)
                 {
                     if (controller.queue_text.Count >= 1000)
@@ -711,7 +694,7 @@ namespace Bot
 
             foreach (timer_info timer in Spam_Timers)
             {
-                timer.spam_timer.Start();
+                timer.Spam_Timer.Start();
             }
 
         }
@@ -729,8 +712,8 @@ namespace Bot
 
             foreach (timer_info timer in Spam_Timers)
             {
-                timer.spam_timer.Stop();
-                timer.spam_timer.Dispose();
+                timer.Spam_Timer.Stop();
+                timer.Spam_Timer.Dispose();
             }
         }
 
@@ -738,7 +721,7 @@ namespace Bot
         {
             string[] ex;
             string type = "base";
-            int nick_access = conf.user_level;
+            int nick_access = Conf.User_Level;
             string line_nick = "";
             string channel = "";
             string nick_host = "";
@@ -769,7 +752,7 @@ namespace Bot
                     {
                         command = ex[3].ToLower(); //grab the command sent
                         string msg_type = command.TrimStart(':');
-                        if (msg_type.StartsWith(conf.command) == true)
+                        if (msg_type.StartsWith(Conf.Command) == true)
                         {
                             bot_command = true;
                             command = command.Remove(0, 2);
@@ -777,12 +760,12 @@ namespace Bot
 
                         if (ex[2].StartsWith("#") == true) // From Channel
                         {
-                            nick_access = get_user_access(line_nick, channel);
+                            nick_access = get_nick_access(line_nick, channel);
                             type = "channel";
                         }
                         else // From Query
                         {
-                            nick_access = get_user_access(line_nick, null);
+                            nick_access = get_nick_access(line_nick, null);
                             type = "query";
                         }
                     }
@@ -792,99 +775,13 @@ namespace Bot
                 if (ex[1].Equals("join", StringComparison.InvariantCultureIgnoreCase))
                 {
                     type = "join";
-                    bool chan_found = false;
-                    foreach (string tmp_channel in channel_list)
+                    Nick_Info info = get_nick_info(line_nick, channel);
+                    if (info == null)
                     {
-                        if (channel.Equals(tmp_channel, StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            chan_found = true;
-                            break;
-                        }
-                    }
-                    if (chan_found == false)
-                    {
-                        channel_list.Add(channel);
-                    }
-                    chan_found = false;
-                    for (int x = 0; x < nick_list.Count(); x++)
-                    {
-                        if (nick_list[x][0].Equals(channel.TrimStart(':'), StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            bool nick_found = false;
-                            chan_found = true;
-                            int new_access = get_access_num(line_nick, false);
-                            for (int i = 2; i < nick_list[x].Count(); i++)
-                            {
-                                string[] split = nick_list[x][i].Split(':');
-                                if (split.GetUpperBound(0) > 0)
-                                {
-                                    if (split[1].Equals(line_nick, StringComparison.InvariantCultureIgnoreCase))
-                                    {
-                                        nick_found = true;
-                                        int old_access = Convert.ToInt32(split[0]);
-                                        bool identified = get_user_ident(line_nick);
-                                        if (identified == true)
-                                        {
-                                            if (old_access > new_access)
-                                            {
-                                                new_access = old_access;
-                                            }
-                                        }
-                                        nick_list[x][i] = new_access.ToString() + ":" + line_nick;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (nick_found == false)
-                            {
-                                nick_list[x].Add(new_access + ":" + line_nick);
-                            }
-                        }
-                    }
-                    if (chan_found == false)
-                    {
-                        bool channel_found = false;
-                        List<string> tmp_list = new List<string>();
-                        tmp_list.Add(channel.TrimStart(':'));
-                        string line = "";
-                        lock (queuelock)
-                        {
-                            sendData("WHO", channel.TrimStart(':'));
-                            line = read_queue();
-                            while (!line.Contains("352 " + nick + " " + channel))
-                            {
-                                line = read_queue();
-                            }
-                            tmp_list.Add(channel);
-                            while (!line.Contains("315 " + nick + " " + channel + " :End of /WHO list."))
-                            {
-                                if (line.Contains("352 " + nick + " " + channel))
-                                {
-                                    channel_found = true;
-                                    char[] sep = new char[] { ' ' };
-                                    string[] name_line = line.Split(sep, StringSplitOptions.RemoveEmptyEntries);
-                                    char[] arr = name_line[8].ToCharArray();
-                                    int user_access = conf.user_level;
-                                    foreach (char c in arr)
-                                    {
-                                        if (c.Equals('~') || c.Equals('&') || c.Equals('@') || c.Equals('%') || c.Equals('+'))
-                                        {
-                                            int tmp_access = get_access_num(c.ToString(), false);
-                                            if (tmp_access > user_access)
-                                            {
-                                                user_access = tmp_access;
-                                            }
-                                        }
-                                    }
-                                    tmp_list.Add(user_access + ":" + name_line[7].TrimStart('~'));
-                                }
-                                line = read_queue();
-                            }
-                            if (channel_found == true)
-                            {
-                                nick_list.Add(tmp_list);
-                            }
-                        }
+                        info = new Nick_Info();
+                        info.Nick = line_nick;
+                        info.Access = get_nick_chan_access(line_nick, channel);
+                        add_nick_info(info, channel);
                     }
                 }
 
@@ -892,16 +789,16 @@ namespace Bot
                 if (ex[1].Equals("quit", StringComparison.InvariantCultureIgnoreCase))
                 {
                     type = "quit";
-                    for (int x = 0; x < nick_list.Count(); x++)
+                    if (line_nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase))
                     {
-                        for (int i = 2; i < nick_list[x].Count(); i++)
+                        del_chan_info(channel);
+                    }
+                    else
+                    {
+                        Nick_Info info = get_nick_info(line_nick, channel);
+                        if (info != null)
                         {
-                            string[] split = nick_list[x][i].Split(':');
-                            if (split[1].Equals(line_nick, StringComparison.InvariantCultureIgnoreCase))
-                            {
-                                nick_list[x].RemoveAt(i);
-                                break;
-                            }
+                            del_nick_info(info, channel);
                         }
                     }
                 }
@@ -910,19 +807,16 @@ namespace Bot
                 if (ex[1].Equals("part", StringComparison.InvariantCultureIgnoreCase))
                 {
                     type = "part";
-                    for (int x = 0; x < nick_list.Count(); x++)
+                    if (line_nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase))
                     {
-                        if (nick_list[x][0].Equals(ex[2], StringComparison.InvariantCultureIgnoreCase))
+                        del_chan_info(channel);
+                    }
+                    else
+                    {
+                        Nick_Info info = get_nick_info(line_nick, channel);
+                        if (info != null)
                         {
-                            for (int i = 2; i < nick_list[x].Count(); i++)
-                            {
-                                string[] split = nick_list[x][i].Split(':');
-                                if (split[1].Equals(line_nick, StringComparison.InvariantCultureIgnoreCase))
-                                {
-                                    nick_list[x].RemoveAt(i);
-                                    break;
-                                }
-                            }
+                            del_nick_info(info, channel);
                         }
                     }
                 }
@@ -931,27 +825,16 @@ namespace Bot
                 if (ex[1].Equals("kick", StringComparison.InvariantCultureIgnoreCase))
                 {
                     type = "kick";
-                    for (int x = 0; x < nick_list.Count(); x++)
+                    if (ex[3].Equals(nick, StringComparison.InvariantCultureIgnoreCase))
                     {
-                        if (nick_list[x][0].Equals(ex[2], StringComparison.InvariantCultureIgnoreCase))
+                        del_chan_info(channel);
+                    }
+                    else
+                    {
+                        Nick_Info info = get_nick_info(line_nick, channel);
+                        if (info != null)
                         {
-                            if (ex[3].Equals(nick, StringComparison.InvariantCultureIgnoreCase))
-                            {
-                                nick_list.RemoveAt(x);
-                                channel_list.RemoveAt(x);
-                            }
-                            else
-                            {
-                                for (int i = 2; i < nick_list[x].Count(); i++)
-                                {
-                                    string[] split = nick_list[x][i].Split(':');
-                                    if (split[1].Equals(line_nick, StringComparison.InvariantCultureIgnoreCase))
-                                    {
-                                        nick_list[x].RemoveAt(i);
-                                        break;
-                                    }
-                                }
-                            }
+                            del_nick_info(info, channel);
                         }
                     }
                 }
@@ -960,20 +843,17 @@ namespace Bot
                 if (ex[1].Equals("nick", StringComparison.InvariantCultureIgnoreCase))
                 {
                     type = "nick";
-                    for (int x = 0; x < nick_list.Count(); x++)
+                    Nick_Info info = get_nick_info(line_nick, channel);
+                    if (info != null)
                     {
-                        for (int i = 2; i < nick_list[x].Count(); i++)
-                        {
-                            string[] split = nick_list[x][i].Split(':');
-                            if (split.GetUpperBound(0) > 0)
-                            {
-                                if (split[1].Equals(line_nick, StringComparison.InvariantCultureIgnoreCase))
-                                {
-                                    nick_list[x][i] = split[0] + ":" + ex[2].TrimStart(':');
-                                    break;
-                                }
-                            }
-                        }
+                        info.Nick = ex[2].TrimStart(':');
+                    }
+                    else
+                    {
+                        info = new Nick_Info();
+                        info.Nick = ex[2].TrimStart(':');
+                        info.Access = get_nick_chan_access(ex[2].TrimStart(':'), channel);
+                        add_nick_info(info, channel);
                     }
                 }
 
@@ -983,76 +863,66 @@ namespace Bot
                     type = "mode";
                     if (ex.GetUpperBound(0) > 3)
                     {
-                        char[] arr = ex[3].TrimStart('-').TrimStart('+').ToCharArray();
-                        bool user_mode = false;
+                        char[] arr = ex[3].ToCharArray();
+                        string[] change_nicks = ex[4].Split(charSeparator, StringSplitOptions.RemoveEmptyEntries);
+                        int nick_index = 0;
+                        bool add_sub = true;
                         foreach (char c in arr)
                         {
-                            if (c.Equals('q') || c.Equals('a') || c.Equals('o') || c.Equals('h') || c.Equals('v'))
+                            if (c.Equals('+'))
                             {
-                                user_mode = true;
-                                break;
+                                add_sub = true;
                             }
-                        }
-                        if (user_mode == true)
-                        {
-                            for (int x = 0; x < nick_list.Count(); x++)
+                            else if (c.Equals('-'))
                             {
-                                if (nick_list[x][0].Equals(ex[2], StringComparison.InvariantCultureIgnoreCase))
+                                add_sub = false;
+                            }
+                            else if (c.Equals('q') || c.Equals('a') || c.Equals('o') || c.Equals('h') || c.Equals('v'))
+                            {
+                                Nick_Info nick_info = get_nick_info(change_nicks[nick_index], channel);
+                                if (nick_info != null)
                                 {
-                                    bool nick_found = false;
-                                    string[] new_nick = ex[4].Split(charSeparator, StringSplitOptions.RemoveEmptyEntries);
-                                    for (int y = 0; y <= new_nick.GetUpperBound(0); y++)
+                                    int change_access = get_access_num(c.ToString(), true);
+                                    if (add_sub)
                                     {
-                                        int new_access = conf.user_level;
-                                        if (ex[3].StartsWith("-"))
+                                        if (change_access > nick_info.Access)
                                         {
-                                            for (int i = 2; i < nick_list[x].Count(); i++)
-                                            {
-                                                string[] split = nick_list[x][i].Split(':');
-                                                if (split.GetUpperBound(0) > 0)
-                                                {
-                                                    if (split[1].Equals(new_nick[y], StringComparison.InvariantCultureIgnoreCase))
-                                                    {
-                                                        nick_list[x][i] = get_user_op(new_nick[y], channel).ToString() + ":" + new_nick[y];
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                            new_access = get_user_access(new_nick[y], channel);
+                                            nick_info.Access = change_access;
                                         }
-                                        else
-                                        {
-                                            int tmp_access = 0;
-                                            char[] tmp_arr = ex[3].TrimStart('-').TrimStart('+').ToCharArray();
-                                            foreach (char c in arr)
-                                            {
-                                                if (c.Equals('q') || c.Equals('a') || c.Equals('o') || c.Equals('h') || c.Equals('v'))
-                                                {
-                                                    tmp_access = get_access_num(c.ToString(), true);
-                                                    if (tmp_access > new_access)
-                                                    {
-                                                        new_access = tmp_access;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        for (int i = 2; i < nick_list[x].Count(); i++)
-                                        {
-                                            string[] split = nick_list[x][i].Split(':');
-                                            if (split.GetUpperBound(0) > 0)
-                                            {
-                                                if (split[1].Equals(new_nick[y], StringComparison.InvariantCultureIgnoreCase))
-                                                {
-                                                    nick_found = true;
-                                                    nick_list[x][i] = new_access.ToString() + ":" + new_nick[y];
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                        if (nick_found == false)
-                                        {
-                                            nick_list[x].Add(new_access.ToString() + ":" + new_nick[y]);
-                                        }
+                                    }
+                                    else
+                                    {
+                                        nick_info.Access = get_nick_chan_access(change_nicks[nick_index], channel);
+                                    }
+                                }
+                                else
+                                {
+                                    Nick_Info info = new Nick_Info();
+                                    info.Nick = line_nick;
+                                    if (add_sub)
+                                    {
+                                        info.Access = get_access_num(c.ToString(), true);
+                                    }
+                                    else
+                                    {
+                                        info.Access = get_nick_chan_access(change_nicks[nick_index], channel);
+                                    }
+                                    add_nick_info(info, channel);
+                                }
+                                nick_index++;
+                            }
+                            else if (c.Equals('p') || c.Equals('s'))
+                            {
+                                Channel_Info chan_info = get_chan_info(channel);
+                                if (chan_info != null)
+                                {
+                                    if (add_sub)
+                                    {
+                                        chan_info.Show = false;
+                                    }
+                                    else
+                                    {
+                                        chan_info.Show = true;
                                     }
                                 }
                             }
@@ -1061,7 +931,7 @@ namespace Bot
                 }
             }
 
-            string[] ignored_nicks = conf.ignore_list.Split(',');
+            string[] ignored_nicks = Conf.Ignore_List.Split(',');
             bool run_modules = true;
             foreach (string ignore_nick in ignored_nicks)
             {
@@ -1081,7 +951,7 @@ namespace Bot
                     int index = 0;
                     bool module_found = false;
                     string module_blacklist = "";
-                    foreach (List<string> conf_module in conf.module_config)
+                    foreach (List<string> conf_module in Conf.Module_Config)
                     {
                         if (module.ToString().Equals("Bot.Modules." + conf_module[0]))
                         {
@@ -1128,7 +998,7 @@ namespace Bot
         {
             BackgroundWorker bw = sender as BackgroundWorker;
 
-            module.control(parent, conf, index, ex, command, nick_access, nick, channel, bot_command, type);
+            module.control(parent, Conf, index, ex, command, nick_access, nick, channel, bot_command, type);
         }
 
         internal void sendData(string cmd, string param)
@@ -1148,7 +1018,7 @@ namespace Bot
                 if (param == null)
                 {
                     sw.WriteLine(cmd);
-                    string output = Environment.NewLine + conf.server + ":" + ":" + nick + " " + cmd;
+                    string output = Environment.NewLine + Conf.Server_Name + ":" + ":" + nick + " " + cmd;
 
                     if (display_output)
                     {
@@ -1175,13 +1045,13 @@ namespace Bot
                         string[] lines = second.Split(stringSeparators, StringSplitOptions.RemoveEmptyEntries);
                         for (int x = 0; x <= lines.GetUpperBound(0); x++)
                         {
-                            if ((first.Length + 1 + lines[x].Length) > conf.max_message_length)
+                            if ((first.Length + 1 + lines[x].Length) > Conf.Max_Message_Length)
                             {
                                 string msg = "";
                                 string[] par = lines[x].Split(' ');
                                 foreach (string word in par)
                                 {
-                                    if ((first.Length + msg.Length + word.Length + 1) < conf.max_message_length)
+                                    if ((first.Length + msg.Length + word.Length + 1) < Conf.Max_Message_Length)
                                     {
                                         msg += " " + word;
                                     }
@@ -1189,7 +1059,7 @@ namespace Bot
                                     {
                                         msg = msg.Remove(0, 1);
                                         sw.WriteLine(first + ":" + msg);
-                                        string output = Environment.NewLine + conf.server + ":" + ":" + nick + " " + first + ":" + msg;
+                                        string output = Environment.NewLine + Conf.Server_Name + ":" + ":" + nick + " " + first + ":" + msg;
                                         if (display_output)
                                         {
                                             lock (controller.listLock)
@@ -1208,7 +1078,7 @@ namespace Bot
                                 {
                                     msg = msg.Remove(0, 1);
                                     sw.WriteLine(first + ":" + msg);
-                                    string output = Environment.NewLine + conf.server + ":" + ":" + nick + " " + first + ":" + msg;
+                                    string output = Environment.NewLine + Conf.Server_Name + ":" + ":" + nick + " " + first + ":" + msg;
                                     if (display_output)
                                     {
                                         lock (controller.listLock)
@@ -1225,7 +1095,7 @@ namespace Bot
                             else
                             {
                                 sw.WriteLine(first + ":" + lines[x]);
-                                string output = Environment.NewLine + conf.server + ":" + ":" + nick + " " + first + ":" + lines[x];
+                                string output = Environment.NewLine + Conf.Server_Name + ":" + ":" + nick + " " + first + ":" + lines[x];
 
                                 if (display_output)
                                 {
@@ -1248,7 +1118,7 @@ namespace Bot
                         for (int x = 0; x <= lines.GetUpperBound(0); x++)
                         {
                             sw.WriteLine(cmd + " " + lines[x]);
-                            string output = Environment.NewLine + conf.server + ":" + ":" + nick + " " + cmd + " " + lines[x];
+                            string output = Environment.NewLine + Conf.Server_Name + ":" + ":" + nick + " " + cmd + " " + lines[x];
 
                             if (display_output)
                             {
@@ -1286,7 +1156,7 @@ namespace Bot
                         {
                             lock (streamlock)
                             {
-                                string output = Environment.NewLine + conf.server + ":" + line;
+                                string output = Environment.NewLine + Conf.Server_Name + ":" + line;
                                 lock (controller.listLock)
                                 {
                                     if (controller.queue_text.Count >= 1000)
@@ -1311,7 +1181,7 @@ namespace Bot
                 {
                     lock (controller.errorlock)
                     {
-                        controller.log_error(ex, conf.logs_path);
+                        controller.log_error(ex, Conf.Logs_Path);
                     }
                     restart = true;
                     shouldRun = false;
@@ -1358,13 +1228,13 @@ namespace Bot
         private void joinChannels()
         {
             // Joins all the channels in the channel list
-            if (conf.chans != "")
+            if (Conf.Chans != "")
             {
-                string[] channels = conf.chans.Split(',');
+                string[] channels = Conf.Chans.Split(',');
                 foreach (string channel in channels)
                 {
                     bool chan_blocked = false;
-                    string[] channels_blacklist = conf.chan_blacklist.Split(',');
+                    string[] channels_blacklist = Conf.Chan_Blacklist.Split(',');
                     for (int i = 0; i <= channels_blacklist.GetUpperBound(0); i++)
                     {
                         if (channel.Equals(channels_blacklist[i], StringComparison.InvariantCultureIgnoreCase))
@@ -1386,13 +1256,13 @@ namespace Bot
             if (connected == true)
             {
                 checkRegisterationTimer.Enabled = false;
-                if (nick != "" && conf.pass != "" && conf.email != "")
+                if (nick != "" && Conf.Pass != "" && Conf.Email != "")
                 {
-                    register_nick(conf.pass, conf.email);
+                    register_nick(Conf.Pass, Conf.Email);
                 }
                 else
                 {
-                    string output = Environment.NewLine + conf.server + ":You are missing an username and/or password.  Please add those to the server configuration so I can register this nick.";
+                    string output = Environment.NewLine + Conf.Server_Name + ":You are missing an username and/or password.  Please add those to the server configuration so I can register this nick.";
 
                     lock (controller.listLock)
                     {
@@ -1412,9 +1282,9 @@ namespace Bot
             {
                 List<int> spam_index = new List<int>();
                 int index = 0;
-                foreach (spam_info spam in conf.spam_check)
+                foreach (spam_info spam in Conf.Spam_Check)
                 {
-                    if (spam.count < conf.spam_count_max)
+                    if (spam.Count < Conf.Spam_Count_Max)
                     {
                         spam_index.Add(index);
                     }
@@ -1422,9 +1292,9 @@ namespace Bot
                 }
                 foreach (int x in spam_index)
                 {
-                    if (conf.spam_check.Count() <= x)
+                    if (Conf.Spam_Check.Count() <= x)
                     {
-                        conf.spam_check.RemoveAt(x);
+                        Conf.Spam_Check.RemoveAt(x);
                     }
                 }
             }
@@ -1434,26 +1304,26 @@ namespace Bot
         {
             lock (spamlock)
             {
-                foreach (spam_info spam in conf.spam_check)
+                foreach (spam_info spam in Conf.Spam_Check)
                 {
-                    if (spam.count > conf.spam_count_max)
+                    if (spam.Count > Conf.Spam_Count_Max)
                     {
-                        if (!spam.activated)
+                        if (!spam.Activated)
                         {
                             System.Timers.Timer new_timer = new System.Timers.Timer();
-                            new_timer.Interval = conf.spam_timeout;
-                            new_timer.Elapsed += (new_sender, new_e) => spam_deactivate(new_sender, new_e, spam.channel);
+                            new_timer.Interval = Conf.Spam_Timeout;
+                            new_timer.Elapsed += (new_sender, new_e) => spam_deactivate(new_sender, new_e, spam.Channel);
                             new_timer.Enabled = true;
                             timer_info tmp_timer = new timer_info();
-                            tmp_timer.channel = spam.channel;
-                            tmp_timer.spam_timer = new_timer;
+                            tmp_timer.Channel = spam.Channel;
+                            tmp_timer.Spam_Timer = new_timer;
                             lock (timerlock)
                             {
                                 Spam_Timers.Add(tmp_timer);
                             }
-                            spam.activated = true;
-                            spam.count++;
-                            Spam_Timers[Spam_Timers.Count - 1].spam_timer.Start();
+                            spam.Activated = true;
+                            spam.Count++;
+                            Spam_Timers[Spam_Timers.Count - 1].Spam_Timer.Start();
                         }
                     }
                 }
@@ -1466,9 +1336,9 @@ namespace Bot
             {
                 int index = 0;
                 bool spam_found = false;
-                foreach (spam_info spam in conf.spam_check)
+                foreach (spam_info spam in Conf.Spam_Check)
                 {
-                    if (spam.activated && spam.channel.Equals(channel, StringComparison.InvariantCultureIgnoreCase))
+                    if (spam.Activated && spam.Channel.Equals(channel, StringComparison.InvariantCultureIgnoreCase))
                     {
                         spam_found = true;
                         break;
@@ -1477,7 +1347,7 @@ namespace Bot
                 }
                 if (spam_found)
                 {
-                    conf.spam_check.RemoveAt(index);
+                    Conf.Spam_Check.RemoveAt(index);
                 }
             }
             lock (timerlock)
@@ -1486,7 +1356,7 @@ namespace Bot
                 bool spam_found = false;
                 foreach (timer_info spam in Spam_Timers)
                 {
-                    if (spam.channel.Equals(channel, StringComparison.InvariantCultureIgnoreCase))
+                    if (spam.Channel.Equals(channel, StringComparison.InvariantCultureIgnoreCase))
                     {
                         spam_found = true;
                         break;
@@ -1495,7 +1365,7 @@ namespace Bot
                 }
                 if (spam_found)
                 {
-                    Spam_Timers[index].spam_timer.Stop();
+                    Spam_Timers[index].Spam_Timer.Stop();
                     Spam_Timers.RemoveAt(index);
                 }
             }
@@ -1508,11 +1378,11 @@ namespace Bot
                 bool spam_added = false;
                 bool spam_found = false;
                 int index = 0;
-                foreach (spam_info spam in conf.spam_check)
+                foreach (spam_info spam in Conf.Spam_Check)
                 {
-                    if (spam.channel.Equals(channel, StringComparison.InvariantCultureIgnoreCase))
+                    if (spam.Channel.Equals(channel, StringComparison.InvariantCultureIgnoreCase))
                     {
-                        if (spam.count > conf.spam_count_max + 1)
+                        if (spam.Count > Conf.Spam_Count_Max + 1)
                         {
                             spam_added = true;
                         }
@@ -1523,15 +1393,15 @@ namespace Bot
                 }
                 if (!spam_added && spam_found)
                 {
-                    conf.spam_check[index].count++;
+                    Conf.Spam_Check[index].Count++;
                 }
                 else if (!spam_found)
                 {
                     spam_info new_spam = new spam_info();
-                    new_spam.channel = channel;
-                    new_spam.activated = false;
-                    new_spam.count = 1;
-                    conf.spam_check.Add(new_spam);
+                    new_spam.Channel = channel;
+                    new_spam.Activated = false;
+                    new_spam.Count = 1;
+                    Conf.Spam_Check.Add(new_spam);
                 }
             }
         }
@@ -1541,11 +1411,11 @@ namespace Bot
             bool active = false;
             lock (spamlock)
             {
-                foreach (spam_info spam in conf.spam_check)
+                foreach (spam_info spam in Conf.Spam_Check)
                 {
-                    if (spam.channel.Equals(channel, StringComparison.InvariantCultureIgnoreCase))
+                    if (spam.Channel.Equals(channel, StringComparison.InvariantCultureIgnoreCase))
                     {
-                        if (spam.activated)
+                        if (spam.Activated)
                         {
                             active = true;
                         }
@@ -1558,10 +1428,10 @@ namespace Bot
 
         internal bool get_spam_check(string channel, string nick, bool enabled)
         {
-            bool active = conf.spam_enable;
+            bool active = Conf.Spam_Enable;
             if (active && enabled)
             {
-                foreach (string part in conf.spam_ignore.Split(','))
+                foreach (string part in Conf.Spam_Ignore.Split(','))
                 {
                     if (part.Equals(channel, StringComparison.InvariantCultureIgnoreCase) || part.Equals(nick, StringComparison.InvariantCultureIgnoreCase))
                     {
@@ -1590,6 +1460,10 @@ namespace Bot
                 line = read_queue();
                 while (line == "")
                 {
+                    if (line.Contains("Please wait a while and try again."))
+                    {
+                        sendData("USERHOST ", new_nick[0]);
+                    }
                     line = read_queue();
                 }
                 char[] charSeparator = new char[] { ' ' };
@@ -1619,35 +1493,35 @@ namespace Bot
 
         internal int get_access_num(string type, bool letter_mode)
         {
-            int access = conf.default_level;
+            int access = Conf.Default_Level;
             if (type.Equals("~") || (type.Equals("q") && letter_mode == true))
             {
-                access = conf.founder_level;
+                access = Conf.Founder_Level;
             }
             else if (type.Equals("&") || (type.Equals("a") && letter_mode == true))
             {
-                access = conf.sop_level;
+                access = Conf.Sop_Level;
             }
             else if (type.Equals("@") || (type.Equals("o") && letter_mode == true))
             {
-                access = conf.op_level;
+                access = Conf.Op_Level;
             }
             else if (type.Equals("%") || (type.Equals("h") && letter_mode == true))
             {
-                access = conf.hop_level;
+                access = Conf.Hop_Level;
             }
             else if (type.Equals("+") || (type.Equals("v") && letter_mode == true))
             {
-                access = conf.voice_level;
+                access = Conf.Voice_Level;
             }
             else
             {
-                access = conf.user_level;
+                access = Conf.User_Level;
             }
             return access;
         }
 
-        internal bool get_user_auto(string type, string channel, string tmp_nick)
+        internal bool get_nick_auto(string type, string channel, string tmp_nick)
         {
             bool auto = true;
             string line = "";
@@ -1668,6 +1542,17 @@ namespace Bot
                         auto = true;
                         cont = false;
                     }
+                    else if (line.Contains("Please wait a while and try again."))
+                    {
+                        sendData("PRIVMSG", "chanserv :" + type + " " + channel + " list " + tmp_nick);
+                        cont = true;
+                        line = read_queue();
+                    }
+                    else if (line.Contains("No such nick/channel"))
+                    {
+                        auto = false;
+                        cont = false;
+                    }
                     else
                     {
                         cont = true;
@@ -1678,7 +1563,7 @@ namespace Bot
             return auto;
         }
 
-        internal bool get_user_ident(string tmp_nick)
+        internal bool get_nick_ident(string tmp_nick)
         {
             bool identified = false;
             string line = "";
@@ -1686,8 +1571,12 @@ namespace Bot
             {
                 sendData("PRIVMSG", "nickserv :STATUS " + tmp_nick);
                 line = read_queue();
-                while (!line.Contains(":STATUS"))
+                while (!line.Contains(":STATUS") && !line.Contains("No such nick/channel"))
                 {
+                    if (line.Contains("Please wait a while and try again."))
+                    {
+                        sendData("PRIVMSG", "nickserv :STATUS " + tmp_nick);
+                    }
                     line = read_queue();
                 }
                 if (line.Contains(":STATUS " + tmp_nick + " 3"))
@@ -1698,9 +1587,9 @@ namespace Bot
             return identified;
         }
 
-        internal int get_user_op(string tmp_nick, string channel)
+        internal int get_nick_chan_access(string tmp_nick, string channel)
         {
-            int new_access = conf.default_level;
+            int new_access = Conf.Default_Level;
             string line = "";
             lock (queuelock)
             {
@@ -1708,6 +1597,10 @@ namespace Bot
                 line = read_queue();
                 while (!line.Contains("352 " + nick + " " + channel))
                 {
+                    if (line.Contains("Please wait a while and try again."))
+                    {
+                        sendData("WHO", channel.TrimStart(':'));
+                    }
                     line = read_queue();
                 }
                 char[] Separator = new char[] { ' ' };
@@ -1736,7 +1629,7 @@ namespace Bot
                                 }
                                 if (!char_found)
                                 {
-                                    new_access = conf.user_level;
+                                    new_access = Conf.User_Level;
                                 }
                                 break;
                             }
@@ -1748,26 +1641,26 @@ namespace Bot
             return new_access;
         }
 
-        internal int get_user_access(string tmp_nick, string channel)
+        internal int get_nick_access(string tmp_nick, string channel)
         {
-            int access_num = conf.default_level;
+            List<int> access_num = new List<int>();
+            int top_access = Conf.Default_Level;
+            access_num.Add(Conf.Default_Level);
             try
             {
-                string access = access_num.ToString();
-                string tmp_custom_access = "";
                 if (tmp_nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    access = conf.owner_level.ToString();
+                    access_num.Add(Conf.Owner_Level);
                 }
-                bool user_identified = get_user_ident(tmp_nick);
+                bool user_identified = get_nick_ident(tmp_nick);
                 if (user_identified == true)
                 {
-                    for (int x = 0; x < conf.module_config.Count(); x++)
+                    for (int x = 0; x < Conf.Module_Config.Count(); x++)
                     {
-                        if (conf.module_config[x][0].Equals("access"))
+                        if (Conf.Module_Config[x][0].Equals("access"))
                         {
                             bool chan_allowed = true;
-                            foreach (string blacklist in conf.module_config[x][2].Split(','))
+                            foreach (string blacklist in Conf.Module_Config[x][2].Split(','))
                             {
                                 if (blacklist.Equals(channel, StringComparison.InvariantCultureIgnoreCase))
                                 {
@@ -1780,90 +1673,45 @@ namespace Bot
                                 if (channel != null)
                                 {
                                     Modules.access acc = new Modules.access();
-                                    tmp_custom_access = acc.get_access_list(tmp_nick, channel, this);
-                                    access = tmp_custom_access;
+                                    access_num.AddRange(acc.get_access_list(tmp_nick, channel, this));
                                 }
                             }
                             break;
                         }
                     }
                 }
-                for (int x = 0; x < nick_list.Count(); x++)
+                Nick_Info nick_info = get_nick_info(tmp_nick, channel);
+                if (nick_info != null)
                 {
-                    if (nick_list[x][0].Equals(channel, StringComparison.InvariantCultureIgnoreCase) || channel == null)
-                    {
-                        for (int i = 2; i < nick_list[x].Count(); i++)
-                        {
-                            string[] lists = nick_list[x][i].Split(':');
-                            if (lists.GetUpperBound(0) > 0)
-                            {
-                                if (lists[1].Equals(tmp_nick, StringComparison.InvariantCultureIgnoreCase))
-                                {
-                                    access += "," + lists[0];
-                                    break;
-                                }
-                            }
-                        }
-                        break;
-                    }
+                    access_num.Add(nick_info.Access);
                 }
                 if (user_identified == true)
                 {
-                    string[] owners = conf.owner.Split(','); // Get list of owners
+                    string[] owners = Conf.Owner.Split(','); // Get list of owners
                     for (int x = 0; x <= owners.GetUpperBound(0); x++)
                     {
                         if (tmp_nick.Equals(owners[x], StringComparison.InvariantCultureIgnoreCase))
                         {
-                            access += "," + conf.owner_level.ToString();
+                            access_num.Add(Conf.Owner_Level);
                         }
                     }
                 }
-                string[] tmp_access = access.TrimStart(',').TrimEnd(',').Split(',');
-                foreach (string access_line in tmp_access)
+                foreach (int access in access_num)
                 {
-                    if (access_line != "")
+                    if (access > top_access)
                     {
-                        if (Convert.ToInt32(access_line) > access_num)
-                        {
-                            access_num = Convert.ToInt32(access_line);
-                        }
+                        top_access = access;
                     }
                 }
-                if (access_num == conf.default_level && channel != null)
+                if (top_access == Conf.Default_Level && channel != null)
                 {
-                    bool nick_found = false;
-                    access_num = get_user_op(tmp_nick, channel);
-                    if (access_num != conf.default_level)
+                    top_access = get_nick_chan_access(tmp_nick, channel);
+                    if (top_access != Conf.Default_Level)
                     {
-                        for (int x = 0; x < nick_list.Count(); x++)
-                        {
-                            if (nick_list[x][0].Equals(channel, StringComparison.InvariantCultureIgnoreCase))
-                            {
-                                for (int i = 2; i < nick_list[x].Count(); i++)
-                                {
-                                    string[] lists = nick_list[x][i].Split(':');
-                                    if (lists.GetUpperBound(0) > 0)
-                                    {
-                                        if (lists[1].Equals(tmp_nick, StringComparison.InvariantCultureIgnoreCase))
-                                        {
-                                            nick_found = true;
-                                            string new_nick = access_num.ToString();
-                                            for (int z = 1; z < lists.Count(); z++)
-                                            {
-                                                new_nick += ":" + lists[z];
-                                            }
-                                            nick_list[x][i] = new_nick;
-                                            break;
-                                        }
-                                    }
-                                }
-                                if (nick_found == false)
-                                {
-                                    nick_list[x].Add(access_num + ":" + tmp_nick);
-                                }
-                                break;
-                            }
-                        }
+                        Nick_Info new_nick = new Nick_Info();
+                        new_nick.Access = top_access;
+                        new_nick.Nick = tmp_nick;
+                        add_nick_info(new_nick, channel);
                     }
                 }
             }
@@ -1871,566 +1719,768 @@ namespace Bot
             {
                 lock (controller.errorlock)
                 {
-                    controller.log_error(ex, conf.logs_path);
+                    controller.log_error(ex, Conf.Logs_Path);
                 }
             }
-            return access_num;
+            return top_access;
+        }
+
+        internal Nick_Info get_nick_info(string nick, string channel)
+        {
+            Nick_Info nick_info = null;
+            Channel_Info chan = get_chan_info(channel);
+            if (chan != null)
+            {
+                foreach (Nick_Info info in chan.Nicks)
+                {
+                    if (info.Nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        nick_info = info;
+                        break;
+                    }
+                }
+            }
+            return nick_info;
+        }
+
+        internal void add_nick_info(Nick_Info nick, string channel)
+        {
+            Channel_Info chan = get_chan_info(channel);
+            if (chan != null)
+            {
+                chan.Nicks.Add(nick);
+            }
+            else
+            {
+                add_chan_info(channel);
+                chan = get_chan_info(channel);
+                chan.Nicks.Add(nick);
+            }
+        }
+
+        internal void del_nick_info(Nick_Info nick, string channel)
+        {
+            Channel_Info chan = get_chan_info(channel);
+            if (chan != null)
+            {
+                chan.Nicks.Remove(nick);
+            }
+        }
+
+        internal Channel_Info get_chan_info(string channel)
+        {
+            Channel_Info chan_info = null;
+            foreach (Channel_Info chan in Conf.Channel_List)
+            {
+                if (chan.Channel.Equals(channel, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    chan_info = chan;
+                    break;
+                }
+            }
+            return chan_info;
+        }
+
+        internal void add_chan_info(string channel)
+        {
+            Channel_Info chan_info = new Channel_Info();
+            chan_info.Channel = channel;
+            chan_info.Nicks = new List<Nick_Info>();
+            chan_info.Show = get_chan_access(channel);
+            Conf.Channel_List.Add(chan_info);
+        }
+
+        internal void del_chan_info(string channel)
+        {
+            Channel_Info chan = get_chan_info(channel);
+            if (chan != null)
+            {
+                Conf.Channel_List.Remove(chan);
+            }
+        }
+
+        internal bool get_chan_access(string channel)
+        {
+            bool display_chan = true;
+            string line = "";
+            lock (queuelock)
+            {
+                sendData("LIST", channel.TrimStart(':'));
+                line = read_queue();
+                while (!line.Contains("322 " + nick + " " + channel))
+                {
+                    if (line.Contains("Please wait a while and try again."))
+                    {
+                        sendData("LIST", channel.TrimStart(':'));
+                    }
+                    line = read_queue();
+                }
+                char[] Separator = new char[] { ' ' };
+                string[] name_line = line.Split(Separator, StringSplitOptions.RemoveEmptyEntries);
+                if (name_line.GetUpperBound(0) >= 5)
+                {
+                    char[] arr = name_line[5].TrimStart(':').TrimStart('[').TrimEnd(']').TrimStart('+').ToCharArray();
+                    foreach (char c in arr)
+                    {
+                        if (c.Equals('p') || c.Equals('s'))
+                        {
+                            display_chan = false;
+                            break;
+                        }
+                    }
+                }
+            }
+            return display_chan;
         }
     }
 
     public class BotConfig
     {
-        private string Server;
-        public string server 
+        private string server_name;
+        public string Server_Name 
         { 
             get
             {
-                return Server;
+                return server_name;
             }
 
             internal set
             {
-                Server = value;
+                server_name = value;
             } 
         }
 
-        private string Server_Address;
-        public string server_address
+        private string server_address;
+        public string Server_Address
         {
             get
             {
-                return Server_Address;
+                return server_address;
             }
 
             internal set
             {
-                Server_Address = value;
+                server_address = value;
             }
         }
 
-        private IPAddress[] Server_IP;
-        public IPAddress[] server_ip
+        private IPAddress[] server_ip;
+        public IPAddress[] Server_IP
         {
             get
             {
-                return Server_IP;
+                return server_ip;
             }
 
             internal set
             {
-                Server_IP = value;
+                server_ip = value;
             }
         }
 
-        private string Chans;
-        public string chans
+        private string chans;
+        public string Chans
         {
             get
             {
-                return Chans;
+                return chans;
             }
 
             internal set
             {
-                Chans = value;
+                chans = value;
             }
         }
 
-        private string Chan_Blacklist;
-        public string chan_blacklist
+        private string chan_blacklist;
+        public string Chan_Blacklist
         {
             get
             {
-                return Chan_Blacklist;
+                return chan_blacklist;
             }
 
             internal set
             {
-                Chan_Blacklist = value;
+                chan_blacklist = value;
             }
         }
 
-        private string Ignore_List;
-        public string ignore_list
+        private string ignore_list;
+        public string Ignore_List
         {
             get
             {
-                return Ignore_List;
+                return ignore_list;
             }
 
             internal set
             {
-                Ignore_List = value;
+                ignore_list = value;
             }
         }
 
-        private int Port;
-        public int port
+        private int port;
+        public int Port
         {
             get
             {
-                return Port;
+                return port;
             }
 
             internal set
             {
-                Port = value;
+                port = value;
             }
         }
 
-        private string Nick;
-        public string nick
+        private string nick;
+        public string Nick
         {
             get
             {
-                return Nick;
+                return nick;
             }
 
             internal set
             {
-                Nick = value;
+                nick = value;
             }
         }
 
-        private string Secondary_Nicks;
-        public string secondary_nicks
+        private string secondary_nicks;
+        public string Secondary_Nicks
         {
             get
             {
-                return Secondary_Nicks;
+                return secondary_nicks;
             }
 
             internal set
             {
-                Secondary_Nicks = value;
+                secondary_nicks = value;
             }
         }
 
-        private string Pass;
-        public string pass
+        private string pass;
+        public string Pass
         {
             get
             {
-                return Pass;
+                return pass;
             }
 
             internal set
             {
-                Pass = value;
+                pass = value;
             }
         }
 
-        private string Email;
-        public string email
+        private string email;
+        public string Email
         {
             get
             {
-                return Email;
+                return email;
             }
 
             internal set
             {
-                Email = value;
+                email = value;
             }
         }
 
-        private string Name;
-        public string name
+        private string name;
+        public string Name
         {
             get
             {
-                return Name;
+                return name;
             }
 
             internal set
             {
-                Name = value;
+                name = value;
             }
         }
 
-        private string Owner;
-        public string owner
+        private string owner;
+        public string Owner
         {
             get
             {
-                return Owner;
+                return owner;
             }
 
             internal set
             {
-                Owner = value;
+                owner = value;
             }
         }
 
-        private int Default_Level;
-        public int default_level
+        private int default_level;
+        public int Default_Level
         {
             get
             {
-                return Default_Level;
+                return default_level;
             }
 
             internal set
             {
-                Default_Level = value;
+                default_level = value;
             }
         }
 
-        private int User_Level;
-        public int user_level
+        private int user_level;
+        public int User_Level
         {
             get
             {
-                return User_Level;
+                return user_level;
             }
 
             internal set
             {
-                User_Level = value;
+                user_level = value;
             }
         }
 
-        private int Voice_Level;
-        public int voice_level
+        private int voice_level;
+        public int Voice_Level
         {
             get
             {
-                return Voice_Level;
+                return voice_level;
             }
 
             internal set
             {
-                Voice_Level = value;
+                voice_level = value;
             }
         }
 
-        private int Hop_Level;
-        public int hop_level
+        private int hop_level;
+        public int Hop_Level
         {
             get
             {
-                return Hop_Level;
+                return hop_level;
             }
 
             internal set
             {
-                Hop_Level = value;
+                hop_level = value;
             }
         }
 
-        private int Op_Level;
-        public int op_level
+        private int op_level;
+        public int Op_Level
         {
             get
             {
-                return Op_Level;
+                return op_level;
             }
 
             internal set
             {
-                Op_Level = value;
+                op_level = value;
             }
         }
 
-        private int Sop_Level;
-        public int sop_level
+        private int sop_level;
+        public int Sop_Level
         {
             get
             {
-                return Sop_Level;
+                return sop_level;
             }
 
             internal set
             {
-                Sop_Level = value;
+                sop_level = value;
             }
         }
 
-        private int Founder_Level;
-        public int founder_level
+        private int founder_level;
+        public int Founder_Level
         {
             get
             {
-                return Founder_Level;
+                return founder_level;
             }
 
             internal set
             {
-                Founder_Level = value;
+                founder_level = value;
             }
         }
 
-        private int Owner_Level;
-        public int owner_level
+        private int owner_level;
+        public int Owner_Level
         {
             get
             {
-                return Owner_Level;
+                return owner_level;
             }
 
             internal set
             {
-                Owner_Level = value;
+                owner_level = value;
             }
         }
 
-        private bool Auto_Connect;
-        public bool auto_connect
+        private bool auto_connect;
+        public bool Auto_Connect
         {
             get
             {
-                return Auto_Connect;
+                return auto_connect;
             }
 
             internal set
             {
-                Auto_Connect = value;
+                auto_connect = value;
             }
         }
 
-        private string Command;
-        public string command
+        private string command;
+        public string Command
         {
             get
             {
-                return Command;
+                return command;
             }
 
             internal set
             {
-                Command = value;
+                command = value;
             }
         }
 
-        private bool Spam_Enable;
-        public bool spam_enable
+        private bool spam_enable;
+        public bool Spam_Enable
         {
             get
             {
-                return Spam_Enable;
+                return spam_enable;
             }
 
             internal set
             {
-                Spam_Enable = value;
+                spam_enable = value;
             }
         }
 
-        private string Spam_Ignore;
-        public string spam_ignore
+        private string spam_ignore;
+        public string Spam_Ignore
         {
             get
             {
-                return Spam_Ignore;
+                return spam_ignore;
             }
 
             internal set
             {
-                Spam_Ignore = value;
+                spam_ignore = value;
             }
         }
 
-        private int Spam_Count_Max;
-        public int spam_count_max
+        private int spam_count_max;
+        public int Spam_Count_Max
         {
             get
             {
-                return Spam_Count_Max;
+                return spam_count_max;
             }
 
             internal set
             {
-                Spam_Count_Max = value;
+                spam_count_max = value;
             }
         }
 
-        private int Spam_Threshold;
-        public int spam_threshold
+        private int spam_threshold;
+        public int Spam_Threshold
         {
             get
             {
-                return Spam_Threshold;
+                return spam_threshold;
             }
 
             internal set
             {
-                Spam_Threshold = value;
+                spam_threshold = value;
             }
         }
 
-        private int Spam_Timeout;
-        public int spam_timeout
+        private int spam_timeout;
+        public int Spam_Timeout
         {
             get
             {
-                return Spam_Timeout;
+                return spam_timeout;
             }
 
             internal set
             {
-                Spam_Timeout = value;
+                spam_timeout = value;
             }
         }
 
-        private int Max_Message_Length;
-        public int max_message_length
+        private int max_message_length;
+        public int Max_Message_Length
         {
             get
             {
-                return Max_Message_Length;
+                return max_message_length;
             }
 
             internal set
             {
-                Max_Message_Length = value;
+                max_message_length = value;
             }
         }
 
-        private string Keep_Logs;
-        public string keep_logs
+        private string keep_logs;
+        public string Keep_Logs
         {
             get
             {
-                return Keep_Logs;
+                return keep_logs;
             }
 
             internal set
             {
-                Keep_Logs = value;
+                keep_logs = value;
             }
         }
 
-        private string Logs_Path;
-        public string logs_path
+        private string logs_path;
+        public string Logs_Path
         {
             get
             {
-                return Logs_Path;
+                return logs_path;
             }
 
             internal set
             {
-                Logs_Path = value;
+                logs_path = value;
             }
         }
 
-        private List<List<string>> Module_Config;
-        public List<List<string>> module_config
+        private List<List<string>> module_config;
+        public List<List<string>> Module_Config
         {
             get
             {
-                return Module_Config;
+                return module_config;
             }
 
             internal set
             {
-                Module_Config = value;
+                module_config = value;
             }
         }
 
-        private List<List<string>> Command_List;
-        public List<List<string>> command_list
+        private List<List<string>> command_list;
+        public List<List<string>> Command_List
         {
             get
             {
-                return Command_List;
+                return command_list;
             }
 
             internal set
             {
-                Command_List = value;
+                command_list = value;
             }
         }
 
-        private List<spam_info> Spam_Check;
-        public List<spam_info> spam_check
+        private List<spam_info> spam_check;
+        public List<spam_info> Spam_Check
         {
             get
             {
-                return Spam_Check;
+                return spam_check;
             }
 
             internal set
             {
-                Spam_Check = value;
+                spam_check = value;
+            }
+        }
+        
+        private List<Channel_Info> channel_list;
+        public List<Channel_Info> Channel_List
+        {
+            get
+            {
+                return channel_list;
+            }
+
+            internal set
+            {
+                channel_list = value;
             }
         }
     }
-}
 
-public class spam_info
-{
-    private string Channel;
-    public string channel
+    public class Nick_Info
     {
-        get
+        private string nick;
+        public string Nick
         {
-            return Channel;
+            get
+            {
+                return nick;
+            }
+
+            internal set
+            {
+                nick = value;
+            }
         }
 
-        internal set
+        private int access;
+        public int Access
         {
-            Channel = value;
+            get
+            {
+                return access;
+            }
+
+            internal set
+            {
+                access = value;
+            }
         }
     }
 
-    private int Count;
-    public int count
+    public class Channel_Info
     {
-        get
+        public Channel_Info()
         {
-            return Count;
+            nicks = new List<Nick_Info>();
+        }
+        private string channel;
+        public string Channel
+        {
+            get
+            {
+                return channel;
+            }
+
+            internal set
+            {
+                channel = value;
+            }
         }
 
-        internal set
+        private bool show;
+        public bool Show
         {
-            Count = value;
+            get
+            {
+                return show;
+            }
+
+            internal set
+            {
+                show = value;
+            }
+        }
+
+        private List<Nick_Info> nicks;
+        public List<Nick_Info> Nicks
+        {
+            get
+            {
+                return nicks;
+            }
+
+            internal set
+            {
+                nicks = value;
+            }
         }
     }
 
-    private bool Activated;
-    public bool activated
+    public class spam_info
     {
-        get
+        private string channel;
+        public string Channel
         {
-            return Activated;
+            get
+            {
+                return channel;
+            }
+
+            internal set
+            {
+                channel = value;
+            }
         }
 
-        internal set
+        private int count;
+        public int Count
         {
-            Activated = value;
+            get
+            {
+                return count;
+            }
+
+            internal set
+            {
+                count = value;
+            }
+        }
+
+        private bool activated;
+        public bool Activated
+        {
+            get
+            {
+                return activated;
+            }
+
+            internal set
+            {
+                activated = value;
+            }
         }
     }
-}
 
-public class timer_info
-{
-    private string Channel;
-    public string channel
+    public class timer_info
     {
-        get
+        private string channel;
+        public string Channel
         {
-            return Channel;
+            get
+            {
+                return channel;
+            }
+
+            internal set
+            {
+                channel = value;
+            }
         }
 
-        internal set
+        private System.Timers.Timer spam_timer;
+        public System.Timers.Timer Spam_Timer
         {
-            Channel = value;
+            get
+            {
+                return spam_timer;
+            }
+
+            internal set
+            {
+                spam_timer = value;
+            }
         }
+
     }
-
-    private System.Timers.Timer Spam_Timer;
-    public System.Timers.Timer spam_timer
-    {
-        get
-        {
-            return Spam_Timer;
-        }
-
-        internal set
-        {
-            Spam_Timer = value;
-        }
-    }
-
 }

@@ -86,7 +86,7 @@ namespace IRCBot
             if (File.Exists(servers_config_path) && bot == null)
             {
                 BotConfig bot_conf = get_bot_conf(server_name);
-                if (bot_conf.auto_connect || manual)
+                if (bot_conf.Auto_Connect || manual)
                 {
                     bot bot_instance = new bot(this, bot_conf);
                     bot_instance.start_bot();
@@ -104,7 +104,7 @@ namespace IRCBot
             bot bot = get_bot_instance(server_name);
             if (bot != null)
             {
-                if (bot.connected == false && bot.connecting == false && bot.disconnected == true && bot.conf.server.Equals(server_name))
+                if (bot.connected == false && bot.connecting == false && bot.disconnected == true && bot.Conf.Server_Name.Equals(server_name))
                 {
                     server_started = true;
                     bot_instances[index].start_bot();
@@ -119,7 +119,7 @@ namespace IRCBot
             int index = 0;
             foreach (Bot.bot bot in bot_instances)
             {
-                if ((bot.connected == true || bot.connecting == true) && bot.conf.server.Equals(server_name))
+                if ((bot.connected == true || bot.connecting == true) && bot.Conf.Server_Name.Equals(server_name))
                 {
                     server_terminated = true;
                     bot.worker.CancelAsync();
@@ -134,7 +134,7 @@ namespace IRCBot
         {
             foreach (Bot.bot bot in bot_instances)
             {
-                if (server_name.Equals(bot.conf.server))
+                if (server_name.Equals(bot.Conf.Server_Name))
                 {
                     return bot;
                 }
@@ -148,7 +148,7 @@ namespace IRCBot
             int index = 0;
             foreach (Bot.bot bot in bot_instances)
             {
-                if (server_name.Equals(bot.conf.server))
+                if (server_name.Equals(bot.Conf.Server_Name))
                 {
                     server_found = true;
                     break;
@@ -170,7 +170,7 @@ namespace IRCBot
         {
             foreach (Bot.bot bot in bot_instances)
             {
-                if (bot.connected == true && bot.conf.server.Equals(server_name))
+                if (bot.connected == true && bot.Conf.Server_Name.Equals(server_name))
                 {
                     return bot.connected;
                 }
@@ -300,7 +300,7 @@ namespace IRCBot
         {
             foreach (bot bot_instance in bot_instances)
             {
-                bot_instance.conf = get_bot_conf(bot_instance.conf.server);
+                bot_instance.Conf = get_bot_conf(bot_instance.Conf.Server_Name);
             }
         }
 
@@ -308,9 +308,9 @@ namespace IRCBot
         {
             foreach (bot bot_instance in bot_instances)
             {
-                if (bot_instance.conf.server.Equals(server_name))
+                if (bot_instance.Conf.Server_Name.Equals(server_name))
                 {
-                    bot_instance.conf = get_bot_conf(bot_instance.conf.server);
+                    bot_instance.Conf = get_bot_conf(bot_instance.Conf.Server_Name);
                     break;
                 }
             }
@@ -320,9 +320,9 @@ namespace IRCBot
         {
             foreach (bot bot_instance in bot_instances)
             {
-                if (bot_instance.conf.server.Equals(old_server_name))
+                if (bot_instance.Conf.Server_Name.Equals(old_server_name))
                 {
-                    bot_instance.conf = get_bot_conf(new_server_name);
+                    bot_instance.Conf = get_bot_conf(new_server_name);
                     break;
                 }
             }
@@ -335,54 +335,55 @@ namespace IRCBot
             if (xn != null)
             {
                 string module_path = Path.GetDirectoryName(servers_config_path) + Path.DirectorySeparatorChar + xn["module_path"].InnerText;
-                bot_conf.module_config = new List<List<string>>();
-                bot_conf.command_list = new List<List<string>>();
-                bot_conf.spam_check = new List<spam_info>();
-                bot_conf.name = xn["name"].InnerText;
-                bot_conf.nick = xn["nick"].InnerText;
-                bot_conf.secondary_nicks = xn["sec_nicks"].InnerText;
-                bot_conf.pass = xn["password"].InnerText;
-                bot_conf.email = xn["email"].InnerText;
-                bot_conf.owner = xn["owner"].InnerText;
-                bot_conf.port = Convert.ToInt32(xn["port"].InnerText);
-                bot_conf.server = xn["server_name"].InnerText;
-                bot_conf.server_address = xn["server_address"].InnerText;
-                bot_conf.chans = xn["chan_list"].InnerText;
-                bot_conf.chan_blacklist = xn["chan_blacklist"].InnerText;
-                bot_conf.ignore_list = xn["ignore_list"].InnerText;
-                bot_conf.user_level = Convert.ToInt32(xn["user_level"].InnerText);
-                bot_conf.voice_level = Convert.ToInt32(xn["voice_level"].InnerText);
-                bot_conf.hop_level = Convert.ToInt32(xn["hop_level"].InnerText);
-                bot_conf.op_level = Convert.ToInt32(xn["op_level"].InnerText);
-                bot_conf.sop_level = Convert.ToInt32(xn["sop_level"].InnerText);
-                bot_conf.founder_level = Convert.ToInt32(xn["founder_level"].InnerText);
-                bot_conf.owner_level = Convert.ToInt32(xn["owner_level"].InnerText);
-                bot_conf.auto_connect = Convert.ToBoolean(xn["auto_connect"].InnerText);
-                bot_conf.command = xn["command_prefix"].InnerText;
-                bot_conf.spam_enable = Convert.ToBoolean(xn["spam_enable"].InnerText);
-                bot_conf.spam_ignore = xn["spam_ignore"].InnerText;
-                bot_conf.spam_count_max = Convert.ToInt32(xn["spam_count"].InnerText);
-                bot_conf.spam_threshold = Convert.ToInt32(xn["spam_threshold"].InnerText);
-                bot_conf.spam_timeout = Convert.ToInt32(xn["spam_timeout"].InnerText);
-                bot_conf.max_message_length = Convert.ToInt32(xn["max_message_length"].InnerText);
-                bot_conf.keep_logs = xn["keep_logs"].InnerText;
+                bot_conf.Module_Config = new List<List<string>>();
+                bot_conf.Command_List = new List<List<string>>();
+                bot_conf.Spam_Check = new List<spam_info>();
+                bot_conf.Channel_List = new List<Channel_Info>();
+                bot_conf.Name = xn["name"].InnerText;
+                bot_conf.Nick = xn["nick"].InnerText;
+                bot_conf.Secondary_Nicks = xn["sec_nicks"].InnerText;
+                bot_conf.Pass = xn["password"].InnerText;
+                bot_conf.Email = xn["email"].InnerText;
+                bot_conf.Owner = xn["owner"].InnerText;
+                bot_conf.Port = Convert.ToInt32(xn["port"].InnerText);
+                bot_conf.Server_Name = xn["server_name"].InnerText;
+                bot_conf.Server_Address = xn["server_address"].InnerText;
+                bot_conf.Chans = xn["chan_list"].InnerText;
+                bot_conf.Chan_Blacklist = xn["chan_blacklist"].InnerText;
+                bot_conf.Ignore_List = xn["ignore_list"].InnerText;
+                bot_conf.User_Level = Convert.ToInt32(xn["user_level"].InnerText);
+                bot_conf.Voice_Level = Convert.ToInt32(xn["voice_level"].InnerText);
+                bot_conf.Hop_Level = Convert.ToInt32(xn["hop_level"].InnerText);
+                bot_conf.Op_Level = Convert.ToInt32(xn["op_level"].InnerText);
+                bot_conf.Sop_Level = Convert.ToInt32(xn["sop_level"].InnerText);
+                bot_conf.Founder_Level = Convert.ToInt32(xn["founder_level"].InnerText);
+                bot_conf.Owner_Level = Convert.ToInt32(xn["owner_level"].InnerText);
+                bot_conf.Auto_Connect = Convert.ToBoolean(xn["auto_connect"].InnerText);
+                bot_conf.Command = xn["command_prefix"].InnerText;
+                bot_conf.Spam_Enable = Convert.ToBoolean(xn["spam_enable"].InnerText);
+                bot_conf.Spam_Ignore = xn["spam_ignore"].InnerText;
+                bot_conf.Spam_Count_Max = Convert.ToInt32(xn["spam_count"].InnerText);
+                bot_conf.Spam_Threshold = Convert.ToInt32(xn["spam_threshold"].InnerText);
+                bot_conf.Spam_Timeout = Convert.ToInt32(xn["spam_timeout"].InnerText);
+                bot_conf.Max_Message_Length = Convert.ToInt32(xn["max_message_length"].InnerText);
+                bot_conf.Keep_Logs = xn["keep_logs"].InnerText;
                 if (Directory.Exists(xn["logs_path"].InnerText))
                 {
-                    bot_conf.logs_path = xn["logs_path"].InnerText;
+                    bot_conf.Logs_Path = xn["logs_path"].InnerText;
                 }
                 else
                 {
-                    bot_conf.logs_path = cur_dir + Path.DirectorySeparatorChar + "logs";
+                    bot_conf.Logs_Path = cur_dir + Path.DirectorySeparatorChar + "logs";
                 }
-                bot_conf.default_level = Math.Min(bot_conf.user_level, Math.Min(bot_conf.voice_level, Math.Min(bot_conf.hop_level, Math.Min(bot_conf.op_level, Math.Min(bot_conf.sop_level, Math.Min(bot_conf.founder_level, bot_conf.owner_level)))))) - 1;
+                bot_conf.Default_Level = Math.Min(bot_conf.User_Level, Math.Min(bot_conf.Voice_Level, Math.Min(bot_conf.Hop_Level, Math.Min(bot_conf.Op_Level, Math.Min(bot_conf.Sop_Level, Math.Min(bot_conf.Founder_Level, bot_conf.Owner_Level)))))) - 1;
 
                 try
                 {
-                    bot_conf.server_ip = Dns.GetHostAddresses(bot_conf.server_address);
+                    bot_conf.Server_IP = Dns.GetHostAddresses(bot_conf.Server_Address);
                 }
                 catch
                 {
-                    bot_conf.server_ip = null;
+                    bot_conf.Server_IP = null;
                 }
 
                 XmlDocument xmlDocModules = new XmlDocument();
@@ -419,7 +420,7 @@ namespace IRCBot
                                     tmp2_list.Add(options["blacklist"].InnerText);
                                     tmp2_list.Add(options["show_help"].InnerText);
                                     tmp2_list.Add(options["spam_check"].InnerText);
-                                    bot_conf.command_list.Add(tmp2_list);
+                                    bot_conf.Command_List.Add(tmp2_list);
                                 }
                             }
                             if (option.Name.Equals("options"))
@@ -439,7 +440,7 @@ namespace IRCBot
                                 }
                             }
                         }
-                        bot_conf.module_config.Add(tmp_list);
+                        bot_conf.Module_Config.Add(tmp_list);
                     }
                 }
             }
@@ -466,7 +467,7 @@ namespace IRCBot
                         msg += " " + arg;
                     }
                 }
-                string line = ":" + bot.nick + " PRIVMSG " + channel + " :" + bot.conf.command + command + msg;
+                string line = ":" + bot.Nick + " PRIVMSG " + channel + " :" + bot.Conf.Command + command + msg;
                 string[] ex = line.Split(charSeparator, 5);
                 //Run Enabled Modules
                 List<Bot.Modules.Module> tmp_module_list = new List<Bot.Modules.Module>();
@@ -476,7 +477,7 @@ namespace IRCBot
                 {
                     module_index = 0;
                     bool module_found = false;
-                    foreach (List<string> conf_module in bot.conf.module_config)
+                    foreach (List<string> conf_module in bot.Conf.Module_Config)
                     {
                         if (module.ToString().Equals("Bot.Modules." + conf_module[0]))
                         {
@@ -487,7 +488,7 @@ namespace IRCBot
                     }
                     if (module_found == true)
                     {
-                        module.control(bot, bot.conf, module_index, ex, command, bot.conf.owner_level, bot.nick, channel, bot_command, type);
+                        module.control(bot, bot.Conf, module_index, ex, command, bot.Conf.Owner_Level, bot.Nick, channel, bot_command, type);
                     }
                 }
             }
@@ -513,7 +514,7 @@ namespace IRCBot
                         msg += " " + arg;
                     }
                 }
-                string line = ":" + nick + " PRIVMSG " + channel + " :" + bot.conf.command + command + msg;
+                string line = ":" + nick + " PRIVMSG " + channel + " :" + bot.Conf.Command + command + msg;
                 string[] ex = line.Split(charSeparator, 5);
                 //Run Enabled Modules
                 List<Bot.Modules.Module> tmp_module_list = new List<Bot.Modules.Module>();
@@ -523,7 +524,7 @@ namespace IRCBot
                 {
                     module_index = 0;
                     bool module_found = false;
-                    foreach (List<string> conf_module in bot.conf.module_config)
+                    foreach (List<string> conf_module in bot.Conf.Module_Config)
                     {
                         if (module.ToString().Equals("Bot.Modules." + conf_module[0]))
                         {
@@ -534,7 +535,7 @@ namespace IRCBot
                     }
                     if (module_found == true)
                     {
-                        module.control(bot, bot.conf, module_index, ex, command, bot.get_user_access(nick, channel), nick, channel, bot_command, type);
+                        module.control(bot, bot.Conf, module_index, ex, command, bot.get_nick_access(nick, channel), nick, channel, bot_command, type);
                     }
                 }
             }
@@ -625,17 +626,17 @@ namespace IRCBot
 
         public void log(string log, bot bot, string channel, string date_stamp, string time_stamp)
         {
-            if (bot != null && bot.conf.keep_logs.Equals("True") && !log.Trim().Equals(string.Empty))
+            if (bot != null && bot.Conf.Keep_Logs.Equals("True") && !log.Trim().Equals(string.Empty))
             {
                 string file_name = "";
-                file_name = bot.conf.server + "-" + channel + ".log";
-                if (bot.conf.logs_path == "")
+                file_name = bot.Conf.Server_Name + "-" + channel + ".log";
+                if (bot.Conf.Logs_Path == "")
                 {
-                    bot.conf.logs_path = cur_dir + Path.DirectorySeparatorChar + "logs";
+                    bot.Conf.Logs_Path = cur_dir + Path.DirectorySeparatorChar + "logs";
                 }
-                if (Directory.Exists(bot.conf.logs_path))
+                if (Directory.Exists(bot.Conf.Logs_Path))
                 {
-                    StreamWriter log_file = File.AppendText(bot.conf.logs_path + Path.DirectorySeparatorChar + file_name);
+                    StreamWriter log_file = File.AppendText(bot.Conf.Logs_Path + Path.DirectorySeparatorChar + file_name);
                     log_file.WriteLine("[" + date_stamp + " " + time_stamp + "] " + log);
                     log_file.Close();
                 }
@@ -652,7 +653,7 @@ namespace IRCBot
         public void log_error(Exception ex, string server_name)
         {
             bot bot = get_bot_instance(server_name);
-            if (bot != null && bot.conf.keep_logs.Equals("True") && ex != null)
+            if (bot != null && bot.Conf.Keep_Logs.Equals("True") && ex != null)
             {
                 string errorMessage =
                     "Unhandled Exception:\n\n" +

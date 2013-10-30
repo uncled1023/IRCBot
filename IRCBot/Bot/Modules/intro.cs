@@ -9,12 +9,12 @@ namespace Bot.Modules
 {
     class intro : Module
     {
-        public override void control(bot ircbot, BotConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, BotConfig Conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
-            string module_name = ircbot.conf.module_config[module_id][0];
+            string module_name = ircbot.Conf.Module_Config[module_id][0];
             if (type.Equals("channel") && bot_command == true)
             {
-                foreach (List<string> tmp_command in conf.command_list)
+                foreach (List<string> tmp_command in Conf.Command_List)
                 {
                     if (module_name.Equals(tmp_command[0]))
                     {
@@ -64,7 +64,7 @@ namespace Bot.Modules
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 // Add introduction
-                                                string char_limit = ircbot.conf.module_config[module_id][3];
+                                                string char_limit = ircbot.Conf.Module_Config[module_id][3];
                                                 add_intro(nick, line[2], line, ircbot, Convert.ToInt32(char_limit));
                                             }
                                             else
@@ -106,7 +106,7 @@ namespace Bot.Modules
 
         public void check_intro(string nick, string channel, bot ircbot)
         {
-            string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "intro" + Path.DirectorySeparatorChar + ircbot.conf.server + "_list.txt";
+            string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "intro" + Path.DirectorySeparatorChar + ircbot.Conf.Server_Name + "_list.txt";
             if (File.Exists(list_file))
             {
                 string line;
@@ -132,7 +132,7 @@ namespace Bot.Modules
 
         private void add_intro(string nick, string channel, string[] line, bot ircbot, int char_limit)
         {
-            string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "intro" + Path.DirectorySeparatorChar + ircbot.conf.server + "_list.txt";
+            string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "intro" + Path.DirectorySeparatorChar + ircbot.Conf.Server_Name + "_list.txt";
             string add_line = nick + ":" + channel + ":";
             bool found_nick = false;
             if (line.GetUpperBound(0) > 3)
@@ -184,7 +184,7 @@ namespace Bot.Modules
 
         private void delete_intro(string nick, string channel, bot ircbot)
         {
-            string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "intro" + Path.DirectorySeparatorChar + ircbot.conf.server + "_list.txt";
+            string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "intro" + Path.DirectorySeparatorChar + ircbot.Conf.Server_Name + "_list.txt";
             if (File.Exists(list_file))
             {
                 string[] old_file = System.IO.File.ReadAllLines(list_file);

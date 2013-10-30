@@ -10,12 +10,12 @@ namespace Bot.Modules
 {
     class seen : Module
     {
-        public override void control(bot ircbot, BotConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, BotConfig Conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
-            string module_name = ircbot.conf.module_config[module_id][0];
+            string module_name = ircbot.Conf.Module_Config[module_id][0];
             if (type.Equals("channel") && bot_command == true)
             {
-                foreach (List<string> tmp_command in conf.command_list)
+                foreach (List<string> tmp_command in Conf.Command_List)
                 {
                     if (module_name.Equals(tmp_command[0]))
                     {
@@ -93,7 +93,7 @@ namespace Bot.Modules
             string tab_name = channel.TrimStart('#');
             string pattern = "[^a-zA-Z0-9]"; //regex pattern
             tab_name = Regex.Replace(tab_name, pattern, "_");
-            string file_name = ircbot.conf.server + "_#" + tab_name + ".log";
+            string file_name = ircbot.Conf.Server_Name + "_#" + tab_name + ".log";
             DateTime past_date = new DateTime();
             if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "seen" + Path.DirectorySeparatorChar + file_name))
             {
@@ -124,7 +124,7 @@ namespace Bot.Modules
             string tab_name = channel.TrimStart('#');
             string pattern = "[^a-zA-Z0-9]"; //regex pattern
             tab_name = Regex.Replace(tab_name, pattern, "_");
-            string file_name = ircbot.conf.server + "_#" + tab_name + ".log";
+            string file_name = ircbot.Conf.Server_Name + "_#" + tab_name + ".log";
             bool nick_found = false;
             if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "seen" + Path.DirectorySeparatorChar + file_name))
             {
@@ -197,7 +197,7 @@ namespace Bot.Modules
             string file_name = "";
             if (channel.StartsWith("#"))
             {
-                file_name = ircbot.conf.server + "_#" + tab_name + ".log";
+                file_name = ircbot.Conf.Server_Name + "_#" + tab_name + ".log";
                 DateTime current_date = DateTime.Now;
                 string msg = "";
                 line[1] = line[1];

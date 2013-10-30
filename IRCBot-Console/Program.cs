@@ -226,7 +226,7 @@ namespace IRCBot_Console
                         nickname = tmp_lines[0].TrimStart(':').Split('!')[0];
                         message = tmp_lines[3].Remove(0, 1);
                         nick_sep = " ";
-                        if (channel.Equals(bot.nick))
+                        if (channel.Equals(bot.Nick))
                         {
                             if (nickname.Equals("nickserv", StringComparison.InvariantCultureIgnoreCase) || nickname.Equals("chanserv", StringComparison.InvariantCultureIgnoreCase))
                             {
@@ -242,14 +242,14 @@ namespace IRCBot_Console
                                 postfix = " --->";
                             }
                         }
-                        else if (channel.Equals("nickserv", StringComparison.InvariantCultureIgnoreCase) && nickname.Equals(bot.nick))
+                        else if (channel.Equals("nickserv", StringComparison.InvariantCultureIgnoreCase) && nickname.Equals(bot.Nick))
                         {
                             channel = "System";
                             prefix = "<---";
                             postfix = "";
                             nickname = "";
                         }
-                        else if (channel.Equals("chanserv", StringComparison.InvariantCultureIgnoreCase) && nickname.Equals(bot.nick))
+                        else if (channel.Equals("chanserv", StringComparison.InvariantCultureIgnoreCase) && nickname.Equals(bot.Nick))
                         {
                             channel = "System";
                             prefix = "<---";
@@ -277,7 +277,7 @@ namespace IRCBot_Console
                             }
                             else
                             {
-                                if (nickname.Equals(bot.nick))
+                                if (nickname.Equals(bot.Nick))
                                 {
                                     prefix = "<<";
                                     postfix = "<<";
@@ -317,7 +317,7 @@ namespace IRCBot_Console
                         postfix = "";
                         if (channel.StartsWith("#"))
                         {
-                            if (nickname.Equals(bot.nick))
+                            if (nickname.Equals(bot.Nick))
                             {
                                 display_message = false;
                             }
@@ -331,24 +331,16 @@ namespace IRCBot_Console
                     {
                         nickname = tmp_lines[0].TrimStart(':').Split('!')[0];
                         channel = "";
-                        int index = 0;
-                        foreach (List<string> nicks in bot.nick_list)
+                        foreach (Bot.Channel_Info chan_info in bot.Conf.Channel_List)
                         {
-                            int nick_index = 0;
-                            foreach (string nick in nicks)
+                            foreach (var nick_info in chan_info.Nicks)
                             {
-                                string[] sep_nick = nick.Split(':');
-                                if (sep_nick.GetUpperBound(0) > 0)
+                                if (nick_info.Nick.Equals(nickname, StringComparison.InvariantCultureIgnoreCase))
                                 {
-                                    if (sep_nick[1].Equals(nickname, StringComparison.InvariantCultureIgnoreCase))
-                                    {
-                                        channel += "," + nicks[0];
-                                        break;
-                                    }
+                                    channel += "," + chan_info.Channel;
+                                    break;
                                 }
-                                nick_index++;
                             }
-                            index++;
                         }
                         channel = channel.TrimStart(',');
                         if (tmp_lines.GetUpperBound(0) > 2)
@@ -366,22 +358,16 @@ namespace IRCBot_Console
                     {
                         nickname = tmp_lines[2].TrimStart(':');
                         channel = "";
-                        int index = 0;
-                        foreach (List<string> nicks in bot.nick_list)
+                        foreach (Bot.Channel_Info chan_info in bot.Conf.Channel_List)
                         {
-                            foreach (string nick in nicks)
+                            foreach (var nick_info in chan_info.Nicks)
                             {
-                                string[] sep_nick = nick.Split(':');
-                                if (sep_nick.GetUpperBound(0) > 0)
+                                if (nick_info.Nick.Equals(nickname, StringComparison.InvariantCultureIgnoreCase))
                                 {
-                                    if (sep_nick[1].Equals(nickname, StringComparison.InvariantCultureIgnoreCase))
-                                    {
-                                        channel += "," + nicks[0];
-                                        break;
-                                    }
+                                    channel += "," + chan_info.Channel;
+                                    break;
                                 }
                             }
-                            index++;
                         }
                         channel = channel.TrimStart(',');
                         message = tmp_lines[0].TrimStart(':').Split('!')[0] + " is now known as " + nickname;
@@ -396,11 +382,11 @@ namespace IRCBot_Console
                         if (channel.StartsWith("#"))
                         {
                         }
-                        else if (channel.Equals(bot.nick))
+                        else if (channel.Equals(bot.Nick))
                         {
                             channel = "System";
                         }
-                        if (nickname.Equals(bot.nick))
+                        if (nickname.Equals(bot.Nick))
                         {
                             display_message = false;
                         }
@@ -426,7 +412,7 @@ namespace IRCBot_Console
                         if (channel.StartsWith("#"))
                         {
                         }
-                        else if (channel.Equals(bot.nick))
+                        else if (channel.Equals(bot.Nick))
                         {
                             channel = "System";
                         }
@@ -443,7 +429,7 @@ namespace IRCBot_Console
                         if (tmp_lines.GetUpperBound(0) > 2)
                         {
                             string[] new_lines = tmp_lines[3].Split(charSeparator, 2);
-                            if (tmp_lines[2].Equals(bot.nick) && tmp_lines[3].StartsWith("#") && new_lines.GetUpperBound(0) > 0)
+                            if (tmp_lines[2].Equals(bot.Nick) && tmp_lines[3].StartsWith("#") && new_lines.GetUpperBound(0) > 0)
                             {
                                 if (new_lines[1] != ":End of /NAMES list.")
                                 {
@@ -510,7 +496,7 @@ namespace IRCBot_Console
                 }
                 if (display_message)
                 {
-                    string line = "[" + time_stamp + "] [" + bot.conf.server + "] [" + channel + "] " + prefix + nickname + postfix + nick_sep + message;
+                    string line = "[" + time_stamp + "] [" + bot.Conf.Server_Name + "] [" + channel + "] " + prefix + nickname + postfix + nick_sep + message;
                     int line_length = line.Length;
 
                     //Append line to end of outbox

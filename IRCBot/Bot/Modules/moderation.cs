@@ -20,16 +20,16 @@ namespace Bot.Modules
             ban_info = new List<List<string>>();
         }
 
-        public override void control(bot ircbot, BotConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, BotConfig Conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
             access access = new access();
 
             char[] charS = new char[] { ' ' };
-            string module_name = ircbot.conf.module_config[module_id][0];
-            string disallowed_modes = ircbot.conf.module_config[module_id][3];
+            string module_name = ircbot.Conf.Module_Config[module_id][0];
+            string disallowed_modes = ircbot.Conf.Module_Config[module_id][3];
             if (type.Equals("channel") && bot_command == true)
             {
-                foreach (List<string> tmp_command in conf.command_list)
+                foreach (List<string> tmp_command in Conf.Command_List)
                 {
                     if (module_name.Equals(tmp_command[0]))
                     {
@@ -79,7 +79,7 @@ namespace Bot.Modules
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 ircbot.sendData("MODE", line[2] + " +q " + line[4]);
-                                                access.set_access_list(line[4], line[2], conf.founder_level.ToString(), ircbot);
+                                                access.set_access_list(line[4], line[2], Conf.Founder_Level.ToString(), ircbot);
                                             }
                                             else
                                             {
@@ -101,7 +101,7 @@ namespace Bot.Modules
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 ircbot.sendData("MODE", line[2] + " -q " + line[4]);
-                                                access.del_access_list(line[4], line[2], conf.founder_level.ToString(), ircbot);
+                                                access.del_access_list(line[4], line[2], Conf.Founder_Level.ToString(), ircbot);
                                             }
                                             else
                                             {
@@ -123,7 +123,7 @@ namespace Bot.Modules
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 ircbot.sendData("MODE", line[2] + " +a " + line[4]);
-                                                access.set_access_list(line[4], line[2], conf.sop_level.ToString(), ircbot);
+                                                access.set_access_list(line[4], line[2], Conf.Sop_Level.ToString(), ircbot);
                                             }
                                             else
                                             {
@@ -146,7 +146,7 @@ namespace Bot.Modules
                                             {
                                                 ircbot.sendData("MODE", line[2] + " +a " + line[4]);
                                                 ircbot.sendData("PRIVMSG", "chanserv :SOP " + line[2] + " add " + line[4]);
-                                                access.set_access_list(line[4], line[2], conf.sop_level.ToString(), ircbot);
+                                                access.set_access_list(line[4], line[2], Conf.Sop_Level.ToString(), ircbot);
                                             }
                                             else
                                             {
@@ -169,7 +169,7 @@ namespace Bot.Modules
                                             {
                                                 ircbot.sendData("MODE", line[2] + " -a " + line[4]);
                                                 ircbot.sendData("PRIVMSG", "chanserv :SOP " + line[2] + " del " + line[4]);
-                                                access.del_access_list(line[4], line[2], conf.sop_level.ToString(), ircbot);
+                                                access.del_access_list(line[4], line[2], Conf.Sop_Level.ToString(), ircbot);
                                             }
                                             else
                                             {
@@ -191,7 +191,7 @@ namespace Bot.Modules
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 ircbot.sendData("MODE", line[2] + " -a " + line[4]);
-                                                access.del_access_list(line[4], line[2], conf.sop_level.ToString(), ircbot);
+                                                access.del_access_list(line[4], line[2], Conf.Sop_Level.ToString(), ircbot);
                                             }
                                             else
                                             {
@@ -213,7 +213,7 @@ namespace Bot.Modules
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 ircbot.sendData("MODE", line[2] + " +o " + line[4]);
-                                                access.set_access_list(line[4], line[2], conf.op_level.ToString(), ircbot);
+                                                access.set_access_list(line[4], line[2], Conf.Op_Level.ToString(), ircbot);
                                             }
                                             else
                                             {
@@ -235,11 +235,11 @@ namespace Bot.Modules
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 ircbot.sendData("MODE", line[2] + " +o " + line[4]);
-                                                if (!ircbot.get_user_auto("SOP", line[2], line[4]))
+                                                if (!ircbot.get_nick_auto("SOP", line[2], line[4]))
                                                 {
                                                     ircbot.sendData("PRIVMSG", "chanserv :AOP " + line[2] + " add " + line[4]);
                                                 }
-                                                access.set_access_list(line[4], line[2], conf.op_level.ToString(), ircbot);
+                                                access.set_access_list(line[4], line[2], Conf.Op_Level.ToString(), ircbot);
                                             }
                                             else
                                             {
@@ -262,7 +262,7 @@ namespace Bot.Modules
                                             {
                                                 ircbot.sendData("MODE", line[2] + " -o " + line[4]);
                                                 ircbot.sendData("PRIVMSG", "chanserv :AOP " + line[2] + " del " + line[4]);
-                                                access.del_access_list(line[4], line[2], conf.op_level.ToString(), ircbot);
+                                                access.del_access_list(line[4], line[2], Conf.Op_Level.ToString(), ircbot);
                                             }
                                             else
                                             {
@@ -284,7 +284,7 @@ namespace Bot.Modules
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 ircbot.sendData("MODE", line[2] + " -o " + line[4]);
-                                                access.del_access_list(line[4], line[2], conf.op_level.ToString(), ircbot);
+                                                access.del_access_list(line[4], line[2], Conf.Op_Level.ToString(), ircbot);
                                             }
                                             else
                                             {
@@ -306,11 +306,11 @@ namespace Bot.Modules
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 ircbot.sendData("MODE", line[2] + " +h " + line[4]);
-                                                if (!ircbot.get_user_auto("AOP", line[2], line[4]) && !ircbot.get_user_auto("SOP", line[2], line[4]))
+                                                if (!ircbot.get_nick_auto("AOP", line[2], line[4]) && !ircbot.get_nick_auto("SOP", line[2], line[4]))
                                                 {
                                                     ircbot.sendData("PRIVMSG", "chanserv :HOP " + line[2] + " add " + line[4]);
                                                 }
-                                                access.set_access_list(line[4], line[2], conf.hop_level.ToString(), ircbot);
+                                                access.set_access_list(line[4], line[2], Conf.Hop_Level.ToString(), ircbot);
                                             }
                                             else
                                             {
@@ -333,7 +333,7 @@ namespace Bot.Modules
                                             {
                                                 ircbot.sendData("MODE", line[2] + " -h " + line[4]);
                                                 ircbot.sendData("PRIVMSG", "chanserv :HOP " + line[2] + " del " + line[4]);
-                                                access.del_access_list(line[4], line[2], conf.hop_level.ToString(), ircbot);
+                                                access.del_access_list(line[4], line[2], Conf.Hop_Level.ToString(), ircbot);
                                             }
                                             else
                                             {
@@ -355,7 +355,7 @@ namespace Bot.Modules
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 ircbot.sendData("MODE", line[2] + " +h " + line[4]);
-                                                access.set_access_list(line[4], line[2], conf.hop_level.ToString(), ircbot);
+                                                access.set_access_list(line[4], line[2], Conf.Hop_Level.ToString(), ircbot);
                                             }
                                             else
                                             {
@@ -377,7 +377,7 @@ namespace Bot.Modules
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 ircbot.sendData("MODE", line[2] + " -h " + line[4]);
-                                                access.del_access_list(line[4], line[2], conf.hop_level.ToString(), ircbot);
+                                                access.del_access_list(line[4], line[2], Conf.Hop_Level.ToString(), ircbot);
                                             }
                                             else
                                             {
@@ -399,11 +399,11 @@ namespace Bot.Modules
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 ircbot.sendData("MODE", line[2] + " +v " + line[4]);
-                                                if (!ircbot.get_user_auto("AOP", line[2], line[4]) && !ircbot.get_user_auto("SOP", line[2], line[4]) && !ircbot.get_user_auto("VOP", line[2], line[4]))
+                                                if (!ircbot.get_nick_auto("AOP", line[2], line[4]) && !ircbot.get_nick_auto("SOP", line[2], line[4]) && !ircbot.get_nick_auto("VOP", line[2], line[4]))
                                                 {
                                                     ircbot.sendData("PRIVMSG", "chanserv :VOP " + line[2] + " add " + line[4]);
                                                 }
-                                                access.set_access_list(line[4], line[2], conf.voice_level.ToString(), ircbot);
+                                                access.set_access_list(line[4], line[2], Conf.Voice_Level.ToString(), ircbot);
                                             }
                                             else
                                             {
@@ -426,7 +426,7 @@ namespace Bot.Modules
                                             {
                                                 ircbot.sendData("MODE", line[2] + " -v " + line[4]);
                                                 ircbot.sendData("PRIVMSG", "chanserv :VOP " + line[2] + " del " + line[4]);
-                                                access.del_access_list(line[4], line[2], conf.voice_level.ToString(), ircbot);
+                                                access.del_access_list(line[4], line[2], Conf.Voice_Level.ToString(), ircbot);
                                             }
                                             else
                                             {
@@ -448,7 +448,7 @@ namespace Bot.Modules
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 ircbot.sendData("MODE", line[2] + " +v " + line[4]);
-                                                access.set_access_list(line[4], line[2], conf.voice_level.ToString(), ircbot);
+                                                access.set_access_list(line[4], line[2], Conf.Voice_Level.ToString(), ircbot);
                                             }
                                             else
                                             {
@@ -470,7 +470,7 @@ namespace Bot.Modules
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 ircbot.sendData("MODE", line[2] + " -v " + line[4]);
-                                                access.del_access_list(line[4], line[2], conf.voice_level.ToString(), ircbot);
+                                                access.del_access_list(line[4], line[2], Conf.Voice_Level.ToString(), ircbot);
                                             }
                                             else
                                             {
@@ -649,17 +649,17 @@ namespace Bot.Modules
                                                 string nicks = new_line[0].TrimStart(':');
                                                 char[] charSep = new char[] { ',' };
                                                 string[] total_nicks = new_line[0].Split(charSep, StringSplitOptions.RemoveEmptyEntries);
-                                                int sent_nick_access = ircbot.get_user_access(total_nicks[0], line[2]);
+                                                int sent_nick_access = ircbot.get_nick_access(total_nicks[0], line[2]);
 
                                                 bool tmp_me = false;
                                                 for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
                                                 {
-                                                    if (total_nicks[y].Equals(conf.name, StringComparison.OrdinalIgnoreCase))
+                                                    if (total_nicks[y].Equals(Conf.Name, StringComparison.OrdinalIgnoreCase))
                                                     {
                                                         tmp_me = true;
                                                     }
                                                 }
-                                                if (sent_nick_access == conf.owner_level)
+                                                if (sent_nick_access == Conf.Owner_Level)
                                                 {
                                                     ircbot.sendData("PRIVMSG", line[2] + " :You can't ban my owner!");
                                                 }
@@ -714,7 +714,7 @@ namespace Bot.Modules
                                                 string[] new_line = line[4].Split(charS, 2);
                                                 char[] charSep = new char[] { ',' };
                                                 string[] total_nicks = new_line[0].Split(charSep, StringSplitOptions.RemoveEmptyEntries);
-                                                int sent_nick_access = ircbot.get_user_access(total_nicks[0].TrimStart(':'), line[2]);
+                                                int sent_nick_access = ircbot.get_nick_access(total_nicks[0].TrimStart(':'), line[2]);
 
                                                 if (nick_access >= sent_nick_access)
                                                 {
@@ -775,17 +775,17 @@ namespace Bot.Modules
                                                 string nicks = new_line[0].TrimStart(':');
                                                 char[] charSep = new char[] { ',' };
                                                 string[] total_nicks = nicks.Split(charSep, StringSplitOptions.RemoveEmptyEntries);
-                                                int sent_nick_access = ircbot.get_user_access(total_nicks[0], line[2]);
+                                                int sent_nick_access = ircbot.get_nick_access(total_nicks[0], line[2]);
 
                                                 bool tmp_me = false;
                                                 for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
                                                 {
-                                                    if (total_nicks[y].Equals(conf.name, StringComparison.InvariantCultureIgnoreCase))
+                                                    if (total_nicks[y].Equals(Conf.Name, StringComparison.InvariantCultureIgnoreCase))
                                                     {
                                                         tmp_me = true;
                                                     }
                                                 }
-                                                if (sent_nick_access == conf.owner_level)
+                                                if (sent_nick_access == Conf.Owner_Level)
                                                 {
                                                     ircbot.sendData("PRIVMSG", line[2] + " :You can't kick-ban my owner!");
                                                 }
@@ -847,17 +847,17 @@ namespace Bot.Modules
                                                     char[] charSep = new char[] { ',' };
                                                     string[] total_nicks = nicks.Split(charSep, StringSplitOptions.RemoveEmptyEntries);
                                                     string target_host = ircbot.get_user_host(total_nicks[0]);
-                                                    int sent_nick_access = ircbot.get_user_access(total_nicks[0], line[2]);
+                                                    int sent_nick_access = ircbot.get_nick_access(total_nicks[0], line[2]);
 
                                                     bool tmp_me = false;
                                                     for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
                                                     {
-                                                        if (total_nicks[y].Equals(conf.name, StringComparison.InvariantCultureIgnoreCase))
+                                                        if (total_nicks[y].Equals(Conf.Name, StringComparison.InvariantCultureIgnoreCase))
                                                         {
                                                             tmp_me = true;
                                                         }
                                                     }
-                                                    if (sent_nick_access == conf.owner_level)
+                                                    if (sent_nick_access == Conf.Owner_Level)
                                                     {
                                                         ircbot.sendData("PRIVMSG", line[2] + " :You can't ban my owner!");
                                                     }
@@ -927,18 +927,18 @@ namespace Bot.Modules
                                                     string nicks = new_line[1];
                                                     char[] charSep = new char[] { ',' };
                                                     string[] total_nicks = nicks.Split(charSep, StringSplitOptions.RemoveEmptyEntries);
-                                                    int sent_nick_access = ircbot.get_user_access(total_nicks[0], line[2]);
+                                                    int sent_nick_access = ircbot.get_nick_access(total_nicks[0], line[2]);
                                                     string target_host = ircbot.get_user_host(total_nicks[0]);
 
                                                     bool tmp_me = false;
                                                     for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
                                                     {
-                                                        if (total_nicks[y].Trim().Equals(conf.name, StringComparison.InvariantCultureIgnoreCase))
+                                                        if (total_nicks[y].Trim().Equals(Conf.Name, StringComparison.InvariantCultureIgnoreCase))
                                                         {
                                                             tmp_me = true;
                                                         }
                                                     }
-                                                    if (sent_nick_access == conf.owner_level)
+                                                    if (sent_nick_access == Conf.Owner_Level)
                                                     {
                                                         ircbot.sendData("PRIVMSG", line[2] + " :You can't kick-ban my owner!");
                                                     }
@@ -1007,16 +1007,16 @@ namespace Bot.Modules
                                                 string nicks = new_line[0].TrimStart(':');
                                                 char[] charSep = new char[] { ',' };
                                                 string[] total_nicks = nicks.Split(charSep, StringSplitOptions.RemoveEmptyEntries);
-                                                int sent_nick_access = ircbot.get_user_access(total_nicks[0], line[2]);
+                                                int sent_nick_access = ircbot.get_nick_access(total_nicks[0], line[2]);
                                                 bool tmp_me = false;
                                                 for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
                                                 {
-                                                    if (total_nicks[y].Trim().Equals(conf.name, StringComparison.InvariantCultureIgnoreCase))
+                                                    if (total_nicks[y].Trim().Equals(Conf.Name, StringComparison.InvariantCultureIgnoreCase))
                                                     {
                                                         tmp_me = true;
                                                     }
                                                 }
-                                                if (sent_nick_access == conf.owner_level)
+                                                if (sent_nick_access == Conf.Owner_Level)
                                                 {
                                                     ircbot.sendData("PRIVMSG", line[2] + " :You can't kick my owner!");
                                                 }
@@ -1068,16 +1068,16 @@ namespace Bot.Modules
                                                 string nicks = new_line[0].TrimStart(':');
                                                 char[] charSep = new char[] { ',' };
                                                 string[] total_nicks = nicks.Split(charSep, StringSplitOptions.RemoveEmptyEntries);
-                                                int sent_nick_access = ircbot.get_user_access(total_nicks[0], line[2]);
+                                                int sent_nick_access = ircbot.get_nick_access(total_nicks[0], line[2]);
                                                 bool tmp_me = false;
                                                 for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
                                                 {
-                                                    if (total_nicks[y].Trim().Equals(conf.name, StringComparison.InvariantCultureIgnoreCase))
+                                                    if (total_nicks[y].Trim().Equals(Conf.Name, StringComparison.InvariantCultureIgnoreCase))
                                                     {
                                                         tmp_me = true;
                                                     }
                                                 }
-                                                if (sent_nick_access == conf.owner_level)
+                                                if (sent_nick_access == Conf.Owner_Level)
                                                 {
                                                     ircbot.sendData("PRIVMSG", line[2] + " :You can't ban my owner!");
                                                 }
@@ -1128,16 +1128,16 @@ namespace Bot.Modules
                                                 string nicks = new_line[0].TrimStart(':');
                                                 char[] charSep = new char[] { ',' };
                                                 string[] total_nicks = nicks.Split(charSep, StringSplitOptions.RemoveEmptyEntries);
-                                                int sent_nick_access = ircbot.get_user_access(total_nicks[0], line[2]);
+                                                int sent_nick_access = ircbot.get_nick_access(total_nicks[0], line[2]);
                                                 bool tmp_me = false;
                                                 for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
                                                 {
-                                                    if (total_nicks[y].Trim().Equals(conf.name, StringComparison.InvariantCultureIgnoreCase))
+                                                    if (total_nicks[y].Trim().Equals(Conf.Name, StringComparison.InvariantCultureIgnoreCase))
                                                     {
                                                         tmp_me = true;
                                                     }
                                                 }
-                                                if (sent_nick_access == conf.owner_level)
+                                                if (sent_nick_access == Conf.Owner_Level)
                                                 {
                                                     ircbot.sendData("PRIVMSG", line[2] + " :You can't kick-ban my owner!");
                                                 }
@@ -1253,16 +1253,16 @@ namespace Bot.Modules
                                                 string nicks = new_line[0].TrimStart(':');
                                                 char[] charSep = new char[] { ',' };
                                                 string[] total_nicks = nicks.Split(charSep, StringSplitOptions.RemoveEmptyEntries);
-                                                int sent_nick_access = ircbot.get_user_access(total_nicks[0], line[2]);
+                                                int sent_nick_access = ircbot.get_nick_access(total_nicks[0], line[2]);
                                                 bool tmp_me = false;
                                                 for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
                                                 {
-                                                    if (total_nicks[y].Trim().Equals(conf.name, StringComparison.InvariantCultureIgnoreCase))
+                                                    if (total_nicks[y].Trim().Equals(Conf.Name, StringComparison.InvariantCultureIgnoreCase))
                                                     {
                                                         tmp_me = true;
                                                     }
                                                 }
-                                                if (sent_nick_access == conf.owner_level)
+                                                if (sent_nick_access == Conf.Owner_Level)
                                                 {
                                                     ircbot.sendData("PRIVMSG", line[2] + " :You can't kick my owner!");
                                                 }
@@ -1332,7 +1332,7 @@ namespace Bot.Modules
 
         public void check_auto(string nick, string channel, string hostname, bot ircbot)
         {
-            string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "auto_kb" + Path.DirectorySeparatorChar + ircbot.conf.server + "_list.txt";
+            string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "auto_kb" + Path.DirectorySeparatorChar + ircbot.Conf.Server_Name + "_list.txt";
             if (File.Exists(list_file))
             {
                 int counter = 0;
@@ -1396,7 +1396,7 @@ namespace Bot.Modules
 
         private void add_auto(string nick, string channel, string hostname, string type, string reason, bot ircbot)
         {
-            string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "auto_kb" + Path.DirectorySeparatorChar + ircbot.conf.server + "_list.txt";
+            string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "auto_kb" + Path.DirectorySeparatorChar + ircbot.Conf.Server_Name + "_list.txt";
             string add_line = nick + "*" + hostname + "*" + channel + "*" + type + "*" + reason + "*" + DateTime.Now.ToString("MMMM d, yyyy h:mm:ss tt");
             bool found_nick = false;
             if (File.Exists(list_file))
@@ -1453,7 +1453,7 @@ namespace Bot.Modules
 
         private void del_auto(string nick, string channel, string hostname, string type, bot ircbot)
         {
-            string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "auto_kb" + Path.DirectorySeparatorChar + ircbot.conf.server + "_list.txt";
+            string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "auto_kb" + Path.DirectorySeparatorChar + ircbot.Conf.Server_Name + "_list.txt";
             bool found_nick = false;
             if (File.Exists(list_file))
             {

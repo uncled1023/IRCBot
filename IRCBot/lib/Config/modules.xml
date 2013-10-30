@@ -1125,8 +1125,8 @@
       <list_conf>
         <name>List Configuration</name>
         <description>Displays the different values for my current configuration.</description>
-        <triggers>conf</triggers>
-        <syntax>conf [module_config|bot_instances]</syntax>
+        <triggers>Conf</triggers>
+        <syntax>Conf [module_config|bot_instances]</syntax>
         <access_level>10</access_level>
         <blacklist>
         </blacklist>

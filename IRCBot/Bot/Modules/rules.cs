@@ -10,12 +10,12 @@ namespace Bot.Modules
 {
     class rules : Module
     {
-        public override void control(bot ircbot, BotConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, BotConfig Conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
-            string module_name = ircbot.conf.module_config[module_id][0];
+            string module_name = ircbot.Conf.Module_Config[module_id][0];
             if (type.Equals("channel") && bot_command == true)
             {
-                foreach (List<string> tmp_command in conf.command_list)
+                foreach (List<string> tmp_command in Conf.Command_List)
                 {
                     if (module_name.Equals(tmp_command[0]))
                     {
@@ -127,17 +127,17 @@ namespace Bot.Modules
             {
                 Directory.CreateDirectory(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "rules");
             }
-            if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "rules" + Path.DirectorySeparatorChar + ircbot.conf.server + "_" + tab_name + "_rules.txt"))
+            if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "rules" + Path.DirectorySeparatorChar + ircbot.Conf.Server_Name + "_" + tab_name + "_rules.txt"))
             {
-                List<string> rules_file = System.IO.File.ReadAllLines(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "rules" + Path.DirectorySeparatorChar + ircbot.conf.server + "_" + tab_name + "_rules.txt").ToList();
+                List<string> rules_file = System.IO.File.ReadAllLines(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "rules" + Path.DirectorySeparatorChar + ircbot.Conf.Server_Name + "_" + tab_name + "_rules.txt").ToList();
                 rules_file.Add(rule);
-                System.IO.File.WriteAllLines(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "rules" + Path.DirectorySeparatorChar + ircbot.conf.server + "_" + tab_name + "_rules.txt", rules_file);
+                System.IO.File.WriteAllLines(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "rules" + Path.DirectorySeparatorChar + ircbot.Conf.Server_Name + "_" + tab_name + "_rules.txt", rules_file);
             }
             else
             {
                 List<string> rules_file = new List<string>();
                 rules_file.Add(rule);
-                System.IO.File.WriteAllLines(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "rules" + Path.DirectorySeparatorChar + ircbot.conf.server + "_" + tab_name + "_rules.txt", rules_file);
+                System.IO.File.WriteAllLines(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "rules" + Path.DirectorySeparatorChar + ircbot.Conf.Server_Name + "_" + tab_name + "_rules.txt", rules_file);
             }
             ircbot.sendData("PRIVMSG", channel + " :Rule added successfully");
         }
@@ -146,9 +146,9 @@ namespace Bot.Modules
         {
             string pattern = "[^a-zA-Z0-9]"; //regex pattern
             string tab_name = Regex.Replace(channel, pattern, "_");
-            if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "rules" + Path.DirectorySeparatorChar + ircbot.conf.server + "_" + tab_name + "_rules.txt"))
+            if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "rules" + Path.DirectorySeparatorChar + ircbot.Conf.Server_Name + "_" + tab_name + "_rules.txt"))
             {
-                List<string> rules_file = System.IO.File.ReadAllLines(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "rules" + Path.DirectorySeparatorChar + ircbot.conf.server + "_" + tab_name + "_rules.txt").ToList();
+                List<string> rules_file = System.IO.File.ReadAllLines(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "rules" + Path.DirectorySeparatorChar + ircbot.Conf.Server_Name + "_" + tab_name + "_rules.txt").ToList();
                 int number_of_lines = rules_file.Count + 1;
                 if (number_of_lines > 0)
                 {
@@ -171,7 +171,7 @@ namespace Bot.Modules
                     }
                     else
                     {
-                        System.IO.File.WriteAllLines(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "rules" + Path.DirectorySeparatorChar + ircbot.conf.server + "_" + tab_name + "_rules.txt", rules_file);
+                        System.IO.File.WriteAllLines(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "rules" + Path.DirectorySeparatorChar + ircbot.Conf.Server_Name + "_" + tab_name + "_rules.txt", rules_file);
                     }
                 }
                 else
@@ -189,9 +189,9 @@ namespace Bot.Modules
         {
             string pattern = "[^a-zA-Z0-9]"; //regex pattern
             string tab_name = Regex.Replace(channel, pattern, "_");
-            if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "rules" + Path.DirectorySeparatorChar + ircbot.conf.server + "_" + tab_name + "_rules.txt"))
+            if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "rules" + Path.DirectorySeparatorChar + ircbot.Conf.Server_Name + "_" + tab_name + "_rules.txt"))
             {
-                string[] answer_file = System.IO.File.ReadAllLines(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "rules" + Path.DirectorySeparatorChar + ircbot.conf.server + "_" + tab_name + "_rules.txt");
+                string[] answer_file = System.IO.File.ReadAllLines(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "rules" + Path.DirectorySeparatorChar + ircbot.Conf.Server_Name + "_" + tab_name + "_rules.txt");
                 int number_of_lines = answer_file.GetUpperBound(0) + 1;
                 if (number_of_lines > 0)
                 {

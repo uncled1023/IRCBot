@@ -12,12 +12,12 @@ namespace Bot.Modules
 {
     class search : Module
     {
-        public override void control(bot ircbot, BotConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, BotConfig Conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
-            string module_name = ircbot.conf.module_config[module_id][0];
+            string module_name = ircbot.Conf.Module_Config[module_id][0];
             if (type.Equals("channel") && bot_command == true)
             {
-                foreach (List<string> tmp_command in conf.command_list)
+                foreach (List<string> tmp_command in Conf.Command_List)
                 {
                     if (module_name.Equals(tmp_command[0]))
                     {
@@ -81,7 +81,7 @@ namespace Bot.Modules
                                                             {
                                                                 ircbot.sendData("PRIVMSG", line[2] + " :" + searchType.title.Replace("<b>", "").Replace("</b>", "").Replace("&quot;", "\"").Replace("&#39", "'").Replace("&amp;", "&") + ": " + searchType.content.Replace("<b>", "").Replace("</b>", "").Replace("&quot;", "\"").Replace("&#39", "'").Replace("&amp;", "&"));
 
-                                                                if (conf.module_config[module_id][3].Equals("True"))
+                                                                if (Conf.Module_Config[module_id][3].Equals("True"))
                                                                 {
                                                                     ircbot.sendData("PRIVMSG", line[2] + " :" + HttpUtility.UrlDecode(searchType.url));
                                                                 }

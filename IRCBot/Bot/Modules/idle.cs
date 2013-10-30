@@ -10,12 +10,12 @@ namespace Bot.Modules
     {
         private List<string> idle_list = new List<string>();
 
-        public override void control(bot ircbot, BotConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, BotConfig Conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
-            string module_name = ircbot.conf.module_config[module_id][0];
+            string module_name = ircbot.Conf.Module_Config[module_id][0];
             if ((type.Equals("channel") || type.Equals("query")) && bot_command == true)
             {
-                foreach (List<string> tmp_command in conf.command_list)
+                foreach (List<string> tmp_command in Conf.Command_List)
                 {
                     if (module_name.Equals(tmp_command[0]))
                     {
@@ -65,11 +65,11 @@ namespace Bot.Modules
                                             if (check_idle(nick) == false)
                                             {
                                                 idle_list.Add(nick);
-                                                ircbot.sendData("NOTICE", nick + " :You are now set as idle.  Type " + ircbot.conf.command + "deidle to come back.");
+                                                ircbot.sendData("NOTICE", nick + " :You are now set as idle.  Type " + ircbot.Conf.Command + "deidle to come back.");
                                             }
                                             else
                                             {
-                                                ircbot.sendData("NOTICE", nick + " :You are already idle.  Type " + ircbot.conf.command + "deidle to come back.");
+                                                ircbot.sendData("NOTICE", nick + " :You are already idle.  Type " + ircbot.Conf.Command + "deidle to come back.");
                                             }
                                         }
                                         else
@@ -91,7 +91,7 @@ namespace Bot.Modules
                                             }
                                             else
                                             {
-                                                ircbot.sendData("NOTICE", nick + " :You aren't idle.  Type " + ircbot.conf.command + "idle to be set idle.");
+                                                ircbot.sendData("NOTICE", nick + " :You aren't idle.  Type " + ircbot.Conf.Command + "idle to be set idle.");
                                             }
                                         }
                                         else

@@ -17,13 +17,13 @@ namespace Bot.Modules
     class owner : Module
     {
         System.Timers.Timer invalid_pass_timeout = new System.Timers.Timer();
-        public override void control(bot ircbot, BotConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, BotConfig Conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
             char[] charS = new char[] { ' ' };
-            string module_name = ircbot.conf.module_config[module_id][0]; 
+            string module_name = ircbot.Conf.Module_Config[module_id][0]; 
             if ((type.Equals("channel") || type.Equals("query")) && bot_command == true)
             {
-                foreach (List<string> tmp_command in conf.command_list)
+                foreach (List<string> tmp_command in Conf.Command_List)
                 {
                     if (module_name.Equals(tmp_command[0]))
                     {
@@ -72,9 +72,9 @@ namespace Bot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                if (line[4].Equals(conf.pass))
+                                                if (line[4].Equals(Conf.Pass))
                                                 {
-                                                    add_owner(nick, ircbot, conf);
+                                                    add_owner(nick, ircbot, Conf);
                                                     ircbot.sendData("NOTICE", nick + " :You are now identified as an owner!");
                                                 }
                                                 else
@@ -101,7 +101,7 @@ namespace Bot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                add_owner(line[4], ircbot, conf);
+                                                add_owner(line[4], ircbot, Conf);
                                                 ircbot.sendData("NOTICE", nick + " :" + line[4] + " has been added as an owner.");
                                             }
                                             else
@@ -123,7 +123,7 @@ namespace Bot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                del_owner(line[4], ircbot, conf);
+                                                del_owner(line[4], ircbot, Conf);
                                                 ircbot.sendData("NOTICE", nick + " :" + line[4] + " has been removed as an owner.");
                                             }
                                             else
@@ -146,7 +146,7 @@ namespace Bot.Modules
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 ircbot.sendData("NICK", line[4]);
-                                                ircbot.nick = line[4];
+                                                ircbot.Nick = line[4];
                                             }
                                             else
                                             {
@@ -165,7 +165,7 @@ namespace Bot.Modules
                                         }
                                         if (nick_access >= command_access)
                                         {
-                                            ircbot.sendData("PRIVMSG", "NickServ :Identify " + conf.pass);
+                                            ircbot.sendData("PRIVMSG", "NickServ :Identify " + Conf.Pass);
                                             ircbot.sendData("NOTICE", nick + " :I have identified.");
                                         }
                                         else
@@ -211,23 +211,12 @@ namespace Bot.Modules
                                                 bool chan_found = false;
                                                 foreach (string tmp_chan in channels)
                                                 {
-                                                    bool part_chan = false;
-                                                    int index = 0;
-                                                    foreach (string chan in ircbot.channel_list)
+                                                    Channel_Info chan_info = ircbot.get_chan_info(tmp_chan);
+                                                    if (chan_info != null)
                                                     {
-                                                        if (chan.Equals(tmp_chan))
-                                                        {
-                                                            part_chan = true;
-                                                            chan_found = true;
-                                                            break;
-                                                        }
-                                                        index++;
-                                                    }
-                                                    if (part_chan == true)
-                                                    {
+                                                        chan_found = true;
                                                         ircbot.sendData("PART", tmp_chan);
-                                                        ircbot.nick_list.RemoveAt(index);
-                                                        ircbot.channel_list.RemoveAt(index);
+                                                        ircbot.del_chan_info(tmp_chan);
                                                     }
                                                 }
                                                 if (chan_found == false)
@@ -237,22 +226,11 @@ namespace Bot.Modules
                                             }
                                             else if (type.Equals("channel"))
                                             {
-                                                bool part_chan = false;
-                                                int index = 0;
-                                                foreach (string chan in ircbot.channel_list)
-                                                {
-                                                    if (chan.Equals(channel))
-                                                    {
-                                                        part_chan = true;
-                                                        break;
-                                                    }
-                                                    index++;
-                                                }
-                                                if (part_chan == true)
+                                                Channel_Info chan_info = ircbot.get_chan_info(channel);
+                                                if (chan_info != null)
                                                 {
                                                     ircbot.sendData("PART", channel);
-                                                    ircbot.nick_list.RemoveAt(index);
-                                                    ircbot.channel_list.RemoveAt(index);
+                                                    ircbot.del_chan_info(channel);
                                                 }
                                                 else
                                                 {
@@ -473,7 +451,7 @@ namespace Bot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                ignore(line[4], nick, ircbot, conf);
+                                                ignore(line[4], nick, ircbot, Conf);
                                             }
                                             else
                                             {
@@ -494,7 +472,7 @@ namespace Bot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                unignore(line[4], nick, ircbot, conf);
+                                                unignore(line[4], nick, ircbot, Conf);
                                             }
                                             else
                                             {
@@ -518,7 +496,7 @@ namespace Bot.Modules
                                                 string[] new_line = line[4].Split(charS, 2);
                                                 if (new_line.GetUpperBound(0) > 0)
                                                 {
-                                                    ignorecmd(new_line[0], new_line[1], nick, ircbot, conf);
+                                                    ignorecmd(new_line[0], new_line[1], nick, ircbot, Conf);
                                                 }
                                                 else
                                                 {
@@ -547,7 +525,7 @@ namespace Bot.Modules
                                                 string[] new_line = line[4].Split(charS, 2);
                                                 if (new_line.GetUpperBound(0) > 0)
                                                 {
-                                                    unignorecmd(new_line[0], new_line[1], nick, ircbot, conf);
+                                                    unignorecmd(new_line[0], new_line[1], nick, ircbot, Conf);
                                                 }
                                                 else
                                                 {
@@ -576,7 +554,7 @@ namespace Bot.Modules
                                                 string[] new_line = line[4].Split(charS, 2);
                                                 if (new_line.GetUpperBound(0) > 0)
                                                 {
-                                                    ignoremodule(new_line[0], new_line[1], nick, ircbot, conf);
+                                                    ignoremodule(new_line[0], new_line[1], nick, ircbot, Conf);
                                                 }
                                                 else
                                                 {
@@ -605,7 +583,7 @@ namespace Bot.Modules
                                                 string[] new_line = line[4].Split(charS, 2);
                                                 if (new_line.GetUpperBound(0) > 0)
                                                 {
-                                                    unignoremodule(new_line[0], new_line[1], nick, ircbot, conf);
+                                                    unignoremodule(new_line[0], new_line[1], nick, ircbot, Conf);
                                                 }
                                                 else
                                                 {
@@ -631,7 +609,7 @@ namespace Bot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                add_blacklist(line[4], nick, ircbot, conf);
+                                                add_blacklist(line[4], nick, ircbot, Conf);
                                             }
                                             else
                                             {
@@ -652,7 +630,7 @@ namespace Bot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                unblacklist(line[4], nick, ircbot, conf);
+                                                unblacklist(line[4], nick, ircbot, Conf);
                                             }
                                             else
                                             {
@@ -814,9 +792,8 @@ namespace Bot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                bool in_chan = false;
                                                 bool chan_allowed = true;
-                                                foreach (string chan in ircbot.conf.chan_blacklist.Split(','))
+                                                foreach (string chan in ircbot.Conf.Chan_Blacklist.Split(','))
                                                 {
                                                     if (chan.Equals(line[4]))
                                                     {
@@ -826,27 +803,23 @@ namespace Bot.Modules
                                                 }
                                                 if (chan_allowed == true)
                                                 {
-                                                    foreach (string in_channel in ircbot.channel_list)
+                                                    Channel_Info chan_info = ircbot.get_chan_info(line[4]);
+                                                    if (chan_info != null)
                                                     {
-                                                        if (line[4].Equals(in_channel))
+                                                        if (nick_access != Conf.Owner_Level)
                                                         {
-                                                            ircbot.sendData("NOTICE", nick + " :I'm already in that channel!");
-                                                            in_chan = true;
-                                                            break;
-                                                        }
-                                                    }
-                                                    if (in_chan == false)
-                                                    {
-                                                        if (nick_access != conf.owner_level)
-                                                        {
-                                                            string[] owners = conf.owner.Split(',');
+                                                            string[] owners = Conf.Owner.Split(',');
                                                             foreach (string owner_nick in owners)
                                                             {
                                                                 ircbot.sendData("NOTICE", owner_nick + " :" + nick + " has invited me to join " + line[4]);
-                                                                ircbot.sendData("NOTICE", owner_nick + " :If you would like to permanently add this channel, please type " + ircbot.conf.command + "addchanlist " + line[4]);
+                                                                ircbot.sendData("NOTICE", owner_nick + " :If you would like to permanently add this channel, please type " + ircbot.Conf.Command + "addchanlist " + line[4]);
                                                             }
                                                         }
                                                         ircbot.sendData("JOIN", line[4]);
+                                                    }
+                                                    else
+                                                    {
+                                                        ircbot.sendData("NOTICE", nick + " :I'm already in that channel!");
                                                     }
                                                 }
                                                 else
@@ -873,20 +846,12 @@ namespace Bot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                bool in_chan = false;
-                                                foreach (string in_channel in ircbot.channel_list)
-                                                {
-                                                    if (line[4].Equals(in_channel))
-                                                    {
-                                                        in_chan = true;
-                                                        break;
-                                                    }
-                                                }
-                                                if (in_chan == false)
+                                                Channel_Info chan_info = ircbot.get_chan_info(line[4]);
+                                                if (chan_info != null)
                                                 {
                                                     ircbot.sendData("JOIN", line[4]);
                                                 }
-                                                add_channel_list(line[4], ircbot, conf);
+                                                add_channel_list(line[4], ircbot, Conf);
                                                 ircbot.sendData("NOTICE", nick + " :" + line[4] + " successfully added to auto-join list.");
                                             }
                                             else
@@ -908,7 +873,7 @@ namespace Bot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                del_channel_list(line[4], ircbot, conf);
+                                                del_channel_list(line[4], ircbot, Conf);
                                                 ircbot.sendData("NOTICE", nick + " :" + line[4] + " successfully removed from auto-join list.");
                                             }
                                             else
@@ -930,25 +895,19 @@ namespace Bot.Modules
                                         {
                                             bool chan_found = false;
                                             string chan_list = "";
-                                            foreach (string in_channel in ircbot.channel_list)
+                                            foreach (Channel_Info chan_info in ircbot.Conf.Channel_List)
                                             {
-                                                if (conf.module_config[module_id][3].Equals("False") || nick_access == conf.owner_level) // if "hide 
+                                                if (Conf.Module_Config[module_id][3].Equals("False") || nick_access == Conf.Owner_Level) // if "hide on private/secret" is false
                                                 {
-                                                    chan_list += in_channel + ", ";
+                                                    chan_list += chan_info.Channel + ", ";
                                                     chan_found = true;
                                                 }
                                                 else
                                                 {
-                                                    foreach (List<string> chan_types in ircbot.nick_list)
+                                                    if (chan_info.Show || ircbot.get_nick_info(nick, channel) != null)
                                                     {
-                                                        if (chan_types[0].Equals(in_channel))
-                                                        {
-                                                            if (chan_types[1].Equals("="))
-                                                            {
-                                                                chan_list += in_channel + ", ";
-                                                                chan_found = true;
-                                                            }
-                                                        }
+                                                        chan_list += chan_info.Channel + ", ";
+                                                        chan_found = true;
                                                     }
                                                 }
                                             }
@@ -956,7 +915,7 @@ namespace Bot.Modules
                                             {
                                                 if (type.Equals("channel"))
                                                 {
-                                                    if (nick_access == conf.owner_level)
+                                                    if (nick_access == Conf.Owner_Level)
                                                     {
                                                         ircbot.sendData("NOTICE", nick + " :I am currently in the following channels: " + chan_list.Trim().TrimEnd(','));
                                                     }
@@ -999,7 +958,7 @@ namespace Bot.Modules
                                             {
                                                 if (bot.connected)
                                                 {
-                                                    server_list += bot.conf.server_address + ", ";
+                                                    server_list += bot.Conf.Server_Address + ", ";
                                                 }
                                             }
                                             if (type.Equals("channel"))
@@ -1034,7 +993,7 @@ namespace Bot.Modules
                                                         {
                                                             if (info.Name.Replace("k__BackingField", "").Equals("<module_config>"))
                                                             {
-                                                                List<List<string>> tmp_list = (List<List<string>>)info.GetValue(conf);
+                                                                List<List<string>> tmp_list = (List<List<string>>)info.GetValue(Conf);
                                                                 int index = 0;
                                                                 foreach (List<string> list in tmp_list)
                                                                 {
@@ -1063,13 +1022,13 @@ namespace Bot.Modules
                                                 var fields = myObjectType.GetType().GetFields(BindingFlags.NonPublic| BindingFlags.Public | BindingFlags.Instance);
                                                 foreach (var info in fields)
                                                 {
-                                                    if(info.GetValue(conf) == null)
+                                                    if(info.GetValue(Conf) == null)
                                                     {
                                                         ircbot.sendData("NOTICE", nick + " :" + info.Name.Replace("k__BackingField", "") + ": NULL");
                                                     }
-                                                    else if (info.GetValue(conf).ToString().Equals("System.Net.IPAddress[]"))
+                                                    else if (info.GetValue(Conf).ToString().Equals("System.Net.IPAddress[]"))
                                                     {
-                                                        System.Net.IPAddress[] tmp_list = (System.Net.IPAddress[])info.GetValue(conf);
+                                                        System.Net.IPAddress[] tmp_list = (System.Net.IPAddress[])info.GetValue(Conf);
                                                         int index = 0;
                                                         foreach (System.Net.IPAddress list in tmp_list)
                                                         {
@@ -1079,17 +1038,17 @@ namespace Bot.Modules
                                                     }
                                                     else if (info.Name.Replace("k__BackingField", "").Equals("<command_list>"))
                                                     {
-                                                        List<List<string>> tmp_list = (List<List<string>>)info.GetValue(conf);
+                                                        List<List<string>> tmp_list = (List<List<string>>)info.GetValue(Conf);
                                                         ircbot.sendData("NOTICE", nick + " :" + info.Name.Replace("k__BackingField", "") + ": " + tmp_list.Count().ToString());
                                                     }
                                                     else if (info.Name.Replace("k__BackingField", "").Equals("<module_config>"))
                                                     {
-                                                        List<List<string>> tmp_list = (List<List<string>>)info.GetValue(conf);
+                                                        List<List<string>> tmp_list = (List<List<string>>)info.GetValue(Conf);
                                                         ircbot.sendData("NOTICE", nick + " :" + info.Name.Replace("k__BackingField", "") + ": " + tmp_list.Count().ToString());
                                                     }
                                                     else
                                                     {
-                                                        ircbot.sendData("NOTICE", nick + " :" + info.Name.Replace("k__BackingField", "") + ": " + info.GetValue(conf).ToString());
+                                                        ircbot.sendData("NOTICE", nick + " :" + info.Name.Replace("k__BackingField", "") + ": " + info.GetValue(Conf).ToString());
                                                     }
                                                 }
                                             }
@@ -1142,46 +1101,29 @@ namespace Bot.Modules
                                             {
                                                 if (line.GetUpperBound(0) > 3)
                                                 {
-                                                    foreach (List<string> tmp_nick in ircbot.nick_list)
+                                                    Channel_Info chan_info = ircbot.get_chan_info(line[4]);
+                                                    if (chan_info != null)
                                                     {
-                                                        if (tmp_nick[0].Equals(line[4]))
+                                                        foreach (Nick_Info nick_info in chan_info.Nicks)
                                                         {
-                                                            for (int i = 1; i < tmp_nick.Count(); i++)
+                                                            if (!nick_info.Nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase) && !nick_info.Nick.Equals(ircbot.Nick, StringComparison.InvariantCultureIgnoreCase))
                                                             {
-                                                                string[] split = tmp_nick[i].Split(':');
-                                                                if (split.GetUpperBound(0) > 0)
-                                                                {
-                                                                    if (split[1].Equals(nick, StringComparison.InvariantCultureIgnoreCase) || split[1].Equals(ircbot.nick, StringComparison.InvariantCultureIgnoreCase))
-                                                                    {
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        ircbot.sendData("KICK", line[4] + " :" + split[1]);
-                                                                    }
-                                                                }
+                                                                ircbot.sendData("KICK", line[4] + " :" + nick_info.Nick);
                                                             }
-                                                            break;
                                                         }
                                                     }
                                                 }
                                                 else
                                                 {
-                                                    foreach (List<string> tmp_nick in ircbot.nick_list)
+                                                    Channel_Info chan_info = ircbot.get_chan_info(channel);
+                                                    if (chan_info != null)
                                                     {
-                                                        if (tmp_nick[0].Equals(channel))
+                                                        foreach (Nick_Info nick_info in chan_info.Nicks)
                                                         {
-                                                            for (int i = 1; i < tmp_nick.Count(); i++)
+                                                            if (!nick_info.Nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase) && !nick_info.Nick.Equals(ircbot.Nick, StringComparison.InvariantCultureIgnoreCase))
                                                             {
-                                                                string[] split = tmp_nick[i].Split(':');
-                                                                if (split.GetUpperBound(0) > 0)
-                                                                {
-                                                                    if (!split[1].Equals(nick, StringComparison.InvariantCultureIgnoreCase) && !split[1].Equals(ircbot.nick, StringComparison.InvariantCultureIgnoreCase))
-                                                                    {
-                                                                        ircbot.sendData("KICK", channel + " :" + split[1]);
-                                                                    }
-                                                                }
+                                                                ircbot.sendData("KICK", line[4] + " :" + nick_info.Nick);
                                                             }
-                                                            break;
                                                         }
                                                     }
                                                 }
@@ -1190,25 +1132,15 @@ namespace Bot.Modules
                                             {
                                                 if (line.GetUpperBound(0) > 3)
                                                 {
-                                                    foreach (List<string> tmp_nick in ircbot.nick_list)
+                                                    Channel_Info chan_info = ircbot.get_chan_info(line[4]);
+                                                    if (chan_info != null)
                                                     {
-                                                        if (tmp_nick[0].Equals(line[4]))
+                                                        foreach (Nick_Info nick_info in chan_info.Nicks)
                                                         {
-                                                            for (int i = 1; i < tmp_nick.Count(); i++)
+                                                            if (!nick_info.Nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase) && !nick_info.Nick.Equals(ircbot.Nick, StringComparison.InvariantCultureIgnoreCase))
                                                             {
-                                                                string[] split = tmp_nick[i].Split(':');
-                                                                if (split.GetUpperBound(0) > 0)
-                                                                {
-                                                                    if (split[1].Equals(nick, StringComparison.InvariantCultureIgnoreCase) || split[1].Equals(ircbot.nick, StringComparison.InvariantCultureIgnoreCase))
-                                                                    {
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        ircbot.sendData("KICK", line[4] + " :" + split[1]);
-                                                                    }
-                                                                }
+                                                                ircbot.sendData("KICK", line[4] + " :" + nick_info.Nick);
                                                             }
-                                                            break;
                                                         }
                                                     }
                                                 }
@@ -1231,16 +1163,16 @@ namespace Bot.Modules
             }
         }
 
-        private void add_blacklist(string channel, string nick, bot ircbot, BotConfig conf)
+        private void add_blacklist(string channel, string nick, bot ircbot, BotConfig Conf)
         {
-            XmlNode node = ircbot.controller.get_server_xml(conf.server);
+            XmlNode node = ircbot.controller.get_server_xml(Conf.Server_Name);
             string new_blacklist = node["chan_blacklist"].InnerText + "," + channel;
             node["chan_blacklist"].InnerText = new_blacklist.TrimStart(',');
-            bool added = ircbot.controller.save_server_xml(conf.server, node);
+            bool added = ircbot.controller.save_server_xml(Conf.Server_Name, node);
             if (added)
             {
-                conf.chan_blacklist += "," + channel;
-                conf.chan_blacklist = conf.chan_blacklist.TrimStart(',');
+                Conf.Chan_Blacklist += "," + channel;
+                Conf.Chan_Blacklist = Conf.Chan_Blacklist.TrimStart(',');
                 ircbot.controller.update_conf();
                 ircbot.sendData("NOTICE", nick + " :" + channel + " successfully added to the blacklist.");
             }
@@ -1250,18 +1182,18 @@ namespace Bot.Modules
             }
         }
 
-        private void unblacklist(string channel, string nick, bot ircbot, BotConfig conf)
+        private void unblacklist(string channel, string nick, bot ircbot, BotConfig Conf)
         {
-            XmlNode node = ircbot.controller.get_server_xml(conf.server);
+            XmlNode node = ircbot.controller.get_server_xml(Conf.Server_Name);
             string new_blacklist = "";
-            conf.chan_blacklist = "";
+            Conf.Chan_Blacklist = "";
             bool removed = false;
             foreach (string list_blacklist in node["chan_blacklist"].InnerText.Split(','))
             {
                 if (!list_blacklist.Equals(channel))
                 {
                     new_blacklist += list_blacklist + ",";
-                    conf.ignore_list += list_blacklist + ",";
+                    Conf.Ignore_List += list_blacklist + ",";
                 }
                 else
                 {
@@ -1269,8 +1201,8 @@ namespace Bot.Modules
                 }
             }
             node["chan_blacklist"].InnerText = new_blacklist.TrimEnd(',');
-            conf.chan_blacklist = conf.chan_blacklist.TrimEnd(',');
-            ircbot.controller.save_server_xml(conf.server, node);
+            Conf.Chan_Blacklist = Conf.Chan_Blacklist.TrimEnd(',');
+            ircbot.controller.save_server_xml(Conf.Server_Name, node);
             if (removed)
             {
                 ircbot.controller.update_conf();
@@ -1282,9 +1214,9 @@ namespace Bot.Modules
             }
         }
 
-        private void ignorecmd(string cmd, string ignore_nick, string nick, bot ircbot, BotConfig conf)
+        private void ignorecmd(string cmd, string ignore_nick, string nick, bot ircbot, BotConfig Conf)
         {
-            XmlDocument xmlDoc = ircbot.controller.get_module_xml(conf.server);            
+            XmlDocument xmlDoc = ircbot.controller.get_module_xml(Conf.Server_Name);            
             bool cmd_found_file = false;
             bool cmd_found_conf = false;
             XmlNode Serverxn = xmlDoc.SelectSingleNode("/modules");
@@ -1309,7 +1241,7 @@ namespace Bot.Modules
                 }
                 break;
             }
-            foreach (List<string> tmp_command in conf.command_list)
+            foreach (List<string> tmp_command in Conf.Command_List)
             {
                 string[] triggers = tmp_command[3].Split('|');
                 foreach (string trigger in triggers)
@@ -1324,19 +1256,19 @@ namespace Bot.Modules
             }
             if (cmd_found_file && cmd_found_conf)
             {
-                ircbot.controller.save_module_xml(conf.server, xmlDoc);
+                ircbot.controller.save_module_xml(Conf.Server_Name, xmlDoc);
                 ircbot.controller.update_conf();
-                ircbot.sendData("NOTICE", nick + " :" + ignore_nick + " added successfully to the " + ircbot.conf.command + cmd + " ignore list!");
+                ircbot.sendData("NOTICE", nick + " :" + ignore_nick + " added successfully to the " + ircbot.Conf.Command + cmd + " ignore list!");
             }
             else
             {
-                ircbot.sendData("NOTICE", nick + " :" + ircbot.conf.command + cmd + " does not exist.");
+                ircbot.sendData("NOTICE", nick + " :" + ircbot.Conf.Command + cmd + " does not exist.");
             }
         }
 
-        private void unignorecmd(string cmd, string ignore_nick, string nick, bot ircbot, BotConfig conf)
+        private void unignorecmd(string cmd, string ignore_nick, string nick, bot ircbot, BotConfig Conf)
         {
-            XmlDocument xmlDoc = ircbot.controller.get_module_xml(conf.server);   
+            XmlDocument xmlDoc = ircbot.controller.get_module_xml(Conf.Server_Name);   
             bool cmd_found_file = false;
             bool cmd_found_conf = false;
             XmlNode Serverxn = xmlDoc.SelectSingleNode("/modules");
@@ -1367,7 +1299,7 @@ namespace Bot.Modules
                 }
                 break;
             }
-            foreach (List<string> tmp_command in conf.command_list)
+            foreach (List<string> tmp_command in Conf.Command_List)
             {
                 string[] triggers = tmp_command[3].Split('|');
                 foreach (string trigger in triggers)
@@ -1390,19 +1322,19 @@ namespace Bot.Modules
             }
             if (cmd_found_file && cmd_found_conf)
             {
-                ircbot.controller.save_module_xml(conf.server, xmlDoc);
+                ircbot.controller.save_module_xml(Conf.Server_Name, xmlDoc);
                 ircbot.controller.update_conf();
-                ircbot.sendData("NOTICE", nick + " :" + ignore_nick + " removed successfully from the " + ircbot.conf.command + cmd + " ignore list!");
+                ircbot.sendData("NOTICE", nick + " :" + ignore_nick + " removed successfully from the " + ircbot.Conf.Command + cmd + " ignore list!");
             }
             else
             {
-                ircbot.sendData("NOTICE", nick + " :" + ircbot.conf.command + cmd + " does not exist.");
+                ircbot.sendData("NOTICE", nick + " :" + ircbot.Conf.Command + cmd + " does not exist.");
             }
         }
 
-        private void ignoremodule(string module, string ignore_nick, string nick, bot ircbot, BotConfig conf)
+        private void ignoremodule(string module, string ignore_nick, string nick, bot ircbot, BotConfig Conf)
         {
-            XmlDocument xmlDoc = ircbot.controller.get_module_xml(conf.server);   
+            XmlDocument xmlDoc = ircbot.controller.get_module_xml(Conf.Server_Name);   
             bool module_found_file = false;
             bool module_found_conf = false;
             XmlNode Serverxn = xmlDoc.SelectSingleNode("/modules");
@@ -1418,7 +1350,7 @@ namespace Bot.Modules
                     break;
                 }
             }
-            foreach (List<string> conf_module in conf.module_config)
+            foreach (List<string> conf_module in Conf.Module_Config)
             {
                 if (module.ToString().Equals(conf_module[0]))
                 {
@@ -1429,7 +1361,7 @@ namespace Bot.Modules
             }
             if (module_found_file && module_found_conf)
             {
-                ircbot.controller.save_module_xml(conf.server, xmlDoc);
+                ircbot.controller.save_module_xml(Conf.Server_Name, xmlDoc);
                 ircbot.controller.update_conf();
                 ircbot.sendData("NOTICE", nick + " :" + ignore_nick + " added successfully to the " + module + " module ignore list!");
             }
@@ -1439,9 +1371,9 @@ namespace Bot.Modules
             }
         }
 
-        private void unignoremodule(string module, string ignore_nick, string nick, bot ircbot, BotConfig conf)
+        private void unignoremodule(string module, string ignore_nick, string nick, bot ircbot, BotConfig Conf)
         {
-            XmlDocument xmlDoc = ircbot.controller.get_module_xml(conf.server);   
+            XmlDocument xmlDoc = ircbot.controller.get_module_xml(Conf.Server_Name);   
             bool module_found_file = false;
             bool module_found_conf = false;
             XmlNode Serverxn = xmlDoc.SelectSingleNode("/modules");
@@ -1463,7 +1395,7 @@ namespace Bot.Modules
                     break;
                 }
             }
-            foreach (List<string> conf_module in conf.module_config)
+            foreach (List<string> conf_module in Conf.Module_Config)
             {
                 if (module.ToString().Equals(conf_module[0]))
                 {
@@ -1474,7 +1406,7 @@ namespace Bot.Modules
             }
             if (module_found_file && module_found_conf)
             {
-                ircbot.controller.save_module_xml(conf.server, xmlDoc);
+                ircbot.controller.save_module_xml(Conf.Server_Name, xmlDoc);
                 ircbot.controller.update_conf();
                 ircbot.sendData("NOTICE", nick + " :" + ignore_nick + " removed successfully from the " + module + " module ignore list!");
             }
@@ -1484,16 +1416,16 @@ namespace Bot.Modules
             }
         }
 
-        private void ignore(string ignore_nick, string nick, bot ircbot, BotConfig conf)
+        private void ignore(string ignore_nick, string nick, bot ircbot, BotConfig Conf)
         {
             bool added = false;
-            XmlNode xn = ircbot.controller.get_server_xml(conf.server);
+            XmlNode xn = ircbot.controller.get_server_xml(Conf.Server_Name);
             string new_ignore = xn["ignore_list"].InnerText + "," + ignore_nick;
             xn["ignore_list"].InnerText = new_ignore.TrimStart(',');
-            added = ircbot.controller.save_server_xml(conf.server, xn);
+            added = ircbot.controller.save_server_xml(Conf.Server_Name, xn);
             if (added)
             {
-                conf.ignore_list += "," + nick;
+                Conf.Ignore_List += "," + nick;
                 ircbot.controller.update_conf();
                 ircbot.sendData("NOTICE", nick + " :" + ignore_nick + " successfully added to the ignore list!");
             }
@@ -1503,18 +1435,18 @@ namespace Bot.Modules
             }
         }
 
-        private void unignore(string ignore_nick, string nick, bot ircbot, BotConfig conf)
+        private void unignore(string ignore_nick, string nick, bot ircbot, BotConfig Conf)
         {
             bool removed = false;
-            XmlNode xn = ircbot.controller.get_server_xml(conf.server);
+            XmlNode xn = ircbot.controller.get_server_xml(Conf.Server_Name);
             string new_ignore = "";
-            conf.ignore_list = "";
+            Conf.Ignore_List = "";
             foreach (string list_ignore in xn["ignore_list"].InnerText.Split(','))
             {
                 if (!list_ignore.Equals(ignore_nick, StringComparison.InvariantCultureIgnoreCase))
                 {
                     new_ignore += list_ignore + ",";
-                    conf.ignore_list += list_ignore + ",";
+                    Conf.Ignore_List += list_ignore + ",";
                 }
                 else
                 {
@@ -1522,8 +1454,8 @@ namespace Bot.Modules
                 }
             }
             xn["ignore_list"].InnerText = new_ignore.TrimEnd(',');
-            conf.ignore_list = conf.ignore_list.TrimEnd(',');
-            ircbot.controller.save_server_xml(conf.server, xn);
+            Conf.Ignore_List = Conf.Ignore_List.TrimEnd(',');
+            ircbot.controller.save_server_xml(Conf.Server_Name, xn);
             if (removed)
             {
                 ircbot.controller.update_conf();
@@ -1535,46 +1467,46 @@ namespace Bot.Modules
             }
         }
 
-        private void add_channel_list(string channel, bot ircbot, BotConfig conf)
+        private void add_channel_list(string channel, bot ircbot, BotConfig Conf)
         {
-            XmlNode xn = ircbot.controller.get_server_xml(conf.server);
+            XmlNode xn = ircbot.controller.get_server_xml(Conf.Server_Name);
             string new_channel = xn["chan_list"].InnerText + "," + channel;
             xn["chan_list"].InnerText = new_channel;
-            conf.chans += "," + channel;
-            ircbot.controller.save_server_xml(conf.server, xn);
+            Conf.Chans += "," + channel;
+            ircbot.controller.save_server_xml(Conf.Server_Name, xn);
         }
 
-        private void del_channel_list(string channel, bot ircbot, BotConfig conf)
+        private void del_channel_list(string channel, bot ircbot, BotConfig Conf)
         {
-            XmlNode xn = ircbot.controller.get_server_xml(conf.server);
+            XmlNode xn = ircbot.controller.get_server_xml(Conf.Server_Name);
             string new_channel = "";
-            conf.chans = "";
+            Conf.Chans = "";
             foreach (string list_chan in xn["chan_list"].InnerText.Split(','))
             {
                 if (!list_chan.Equals(channel))
                 {
                     new_channel += list_chan + ",";
-                    conf.chans += list_chan + ",";
+                    Conf.Chans += list_chan + ",";
                 }
             }
             xn["chan_list"].InnerText = new_channel.TrimEnd(',');
-            conf.chans = conf.chans.TrimEnd(',');
-            ircbot.controller.save_server_xml(conf.server, xn);
+            Conf.Chans = Conf.Chans.TrimEnd(',');
+            ircbot.controller.save_server_xml(Conf.Server_Name, xn);
         }
 
-        private void add_owner(string nick, bot ircbot, BotConfig conf)
+        private void add_owner(string nick, bot ircbot, BotConfig Conf)
         {
-            XmlNode xn = ircbot.controller.get_server_xml(conf.server);
+            XmlNode xn = ircbot.controller.get_server_xml(Conf.Server_Name);
             string new_owner = xn["owner"].InnerText + "," + nick;
             xn["owner"].InnerText = new_owner;
-            conf.owner += "," + nick;
-            ircbot.controller.save_server_xml(conf.server, xn);
+            Conf.Owner += "," + nick;
+            ircbot.controller.save_server_xml(Conf.Server_Name, xn);
         }
 
-        private void del_owner(string nick, bot ircbot, BotConfig conf)
+        private void del_owner(string nick, bot ircbot, BotConfig Conf)
         {
             string new_owner = "";
-            XmlNode xn = ircbot.controller.get_server_xml(conf.server);
+            XmlNode xn = ircbot.controller.get_server_xml(Conf.Server_Name);
             string[] new_owner_tmp = xn["owner"].InnerText.Split(',');
             for (int x = 0; x <= new_owner_tmp.GetUpperBound(0); x++)
             {
@@ -1587,8 +1519,8 @@ namespace Bot.Modules
                 }
             }
             xn["owner"].InnerText = new_owner.TrimEnd(',');
-            conf.owner = new_owner.TrimEnd(',');
-            ircbot.controller.save_server_xml(conf.server, xn);
+            Conf.Owner = new_owner.TrimEnd(',');
+            ircbot.controller.save_server_xml(Conf.Server_Name, xn);
         }
     }
 }

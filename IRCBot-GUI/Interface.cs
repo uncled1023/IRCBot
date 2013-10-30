@@ -380,7 +380,7 @@ namespace IRCBot_GUI
                 Bot.bot bot = controller.get_bot_instance(tab_name[1]);
                 if (bot != null)
                 {
-                    tmp_server = bot.conf.server;
+                    tmp_server = bot.Conf.Server_Name;
                     string input_tmp = input_box.Text;
                     char[] charSeparator = new char[] { ' ' };
                     string[] input = input_tmp.Split(charSeparator, 2);
@@ -398,7 +398,7 @@ namespace IRCBot_GUI
                         {
                             args = null;
                         }
-                        controller.run_command(bot.conf.server, channel, input[0].TrimStart('/'), args);
+                        controller.run_command(bot.Conf.Server_Name, channel, input[0].TrimStart('/'), args);
                     }
                     else
                     {
@@ -416,11 +416,11 @@ namespace IRCBot_GUI
                         {
                             if (input.GetUpperBound(0) > 0)
                             {
-                                controller.send_data(bot.conf.server, "PRIVMSG", tabControl1.SelectedTab.Text + " :" + input[0] + " " + input[1]);
+                                controller.send_data(bot.Conf.Server_Name, "PRIVMSG", tabControl1.SelectedTab.Text + " :" + input[0] + " " + input[1]);
                             }
                             else
                             {
-                                controller.send_data(bot.conf.server, "PRIVMSG", tabControl1.SelectedTab.Text + " :" + input[0]);
+                                controller.send_data(bot.Conf.Server_Name, "PRIVMSG", tabControl1.SelectedTab.Text + " :" + input[0]);
                             }
                         }
                     }
@@ -526,7 +526,7 @@ namespace IRCBot_GUI
                             {
                                 char[] charSep = new char[] { ':' };
                                 string[] tab = tabControl1.SelectedTab.Name.ToString().Split(charSep, 4);
-                                if (tab[1].Equals(bot.conf.server))
+                                if (tab[1].Equals(bot.Conf.Server_Name))
                                 {
                                     if (!tab[3].Equals("system"))
                                     {
@@ -552,7 +552,7 @@ namespace IRCBot_GUI
                             sep_color = "#C73232";
                             nick_color = "#57799E";
                             message_color = "#000000";
-                            if (channel.Equals(bot.nick))
+                            if (channel.Equals(bot.Nick))
                             {
                                 if (nickname.Equals("nickserv", StringComparison.InvariantCultureIgnoreCase) || nickname.Equals("chanserv", StringComparison.InvariantCultureIgnoreCase))
                                 {
@@ -572,7 +572,7 @@ namespace IRCBot_GUI
                                     post_color = "#C73232";
                                 }
                             }
-                            else if (channel.Equals("nickserv", StringComparison.InvariantCultureIgnoreCase) && nickname.Equals(bot.nick))
+                            else if (channel.Equals("nickserv", StringComparison.InvariantCultureIgnoreCase) && nickname.Equals(bot.Nick))
                             {
                                 channel = "System";
                                 prefix = "<---";
@@ -581,7 +581,7 @@ namespace IRCBot_GUI
                                 post_color = "#C73232";
                                 nickname = "";
                             }
-                            else if (channel.Equals("chanserv", StringComparison.InvariantCultureIgnoreCase) && nickname.Equals(bot.nick))
+                            else if (channel.Equals("chanserv", StringComparison.InvariantCultureIgnoreCase) && nickname.Equals(bot.Nick))
                             {
                                 channel = "System";
                                 prefix = "<---";
@@ -615,7 +615,7 @@ namespace IRCBot_GUI
                                 }
                                 else
                                 {
-                                    if (nickname.Equals(bot.nick))
+                                    if (nickname.Equals(bot.Nick))
                                     {
                                         prefix = "<<";
                                         pre_color = "#DC5C63";
@@ -667,7 +667,7 @@ namespace IRCBot_GUI
                             message_color = "#8F3902";
                             if (channel.StartsWith("#"))
                             {
-                                if (nickname.Equals(bot.nick))
+                                if (nickname.Equals(bot.Nick))
                                 {
                                     display_message = false;
                                 }
@@ -681,24 +681,16 @@ namespace IRCBot_GUI
                         {
                             nickname = tmp_lines[0].TrimStart(':').Split('!')[0];
                             channel = "";
-                            int index = 0;
-                            foreach (List<string> nicks in bot.nick_list)
+                            foreach (Bot.Channel_Info chan_info in bot.Conf.Channel_List)
                             {
-                                int nick_index = 0;
-                                foreach (string nick in nicks)
+                                foreach (var nick_info in chan_info.Nicks)
                                 {
-                                    string[] sep_nick = nick.Split(':');
-                                    if (sep_nick.GetUpperBound(0) > 0)
+                                    if (nick_info.Nick.Equals(nickname, StringComparison.InvariantCultureIgnoreCase))
                                     {
-                                        if (sep_nick[1].Equals(nickname, StringComparison.InvariantCultureIgnoreCase))
-                                        {
-                                            channel += "," + nicks[0];
-                                            break;
-                                        }
+                                        channel += "," + chan_info.Channel;
+                                        break;
                                     }
-                                    nick_index++;
                                 }
-                                index++;
                             }
                             channel = channel.TrimStart(',');
                             if (tmp_lines.GetUpperBound(0) > 2)
@@ -720,22 +712,16 @@ namespace IRCBot_GUI
                         {
                             nickname = tmp_lines[2].TrimStart(':');
                             channel = "";
-                            int index = 0;
-                            foreach (List<string> nicks in bot.nick_list)
+                            foreach (Bot.Channel_Info chan_info in bot.Conf.Channel_List)
                             {
-                                foreach (string nick in nicks)
+                                foreach (var nick_info in chan_info.Nicks)
                                 {
-                                    string[] sep_nick = nick.Split(':');
-                                    if (sep_nick.GetUpperBound(0) > 0)
+                                    if (nick_info.Nick.Equals(nickname, StringComparison.InvariantCultureIgnoreCase))
                                     {
-                                        if (sep_nick[1].Equals(nickname, StringComparison.InvariantCultureIgnoreCase))
-                                        {
-                                            channel += "," + nicks[0];
-                                            break;
-                                        }
+                                        channel += "," + chan_info.Channel;
+                                        break;
                                     }
                                 }
-                                index++;
                             }
                             channel = channel.TrimStart(',');
                             message = tmp_lines[0].TrimStart(':').Split('!')[0] + " is now known as " + nickname;
@@ -754,11 +740,11 @@ namespace IRCBot_GUI
                             if (channel.StartsWith("#"))
                             {
                             }
-                            else if (channel.Equals(bot.nick))
+                            else if (channel.Equals(bot.Nick))
                             {
                                 channel = "System";
                             }
-                            if (nickname.Equals(bot.nick))
+                            if (nickname.Equals(bot.Nick))
                             {
                                 display_message = false;
                             }
@@ -792,7 +778,7 @@ namespace IRCBot_GUI
                             if (channel.StartsWith("#"))
                             {
                             }
-                            else if (channel.Equals(bot.nick))
+                            else if (channel.Equals(bot.Nick))
                             {
                                 channel = "System";
                             }
@@ -804,7 +790,7 @@ namespace IRCBot_GUI
                             nick_color = "#57799E";
                             message_color = "#C73232";
                         }
-                        else if (tmp_lines[1].Equals("352"))
+                        else if (tmp_lines[1].Equals("352") || tmp_lines[1].Equals("315") || tmp_lines[1].Equals("321") || tmp_lines[1].Equals("322") || tmp_lines[1].Equals("323"))
                         {
                             display_message = false;
                         }
@@ -813,7 +799,7 @@ namespace IRCBot_GUI
                             if (tmp_lines.GetUpperBound(0) > 2)
                             {
                                 string[] new_lines = tmp_lines[3].Split(charSeparator, 2);
-                                if (tmp_lines[2].Equals(bot.nick) && tmp_lines[3].StartsWith("#") && new_lines.GetUpperBound(0) > 0)
+                                if (tmp_lines[2].Equals(bot.Nick) && tmp_lines[3].StartsWith("#") && new_lines.GetUpperBound(0) > 0)
                                 {
                                     if (new_lines[1] != ":End of /NAMES list.")
                                     {
@@ -1167,7 +1153,7 @@ namespace IRCBot_GUI
         {
             foreach (Bot.bot bot_instance in controller.bot_instances)
             {
-                controller.stop_bot(bot_instance.conf.server);
+                controller.stop_bot(bot_instance.Conf.Server_Name);
             }
             updateOutput.Stop();
             this.Close();
@@ -1326,7 +1312,7 @@ namespace IRCBot_GUI
             {
                 foreach (Bot.bot bot_instance in controller.bot_instances)
                 {
-                    controller.stop_bot(bot_instance.conf.server);
+                    controller.stop_bot(bot_instance.Conf.Server_Name);
                 }
             }
             MyNotifyIcon.Visible = false;

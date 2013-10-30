@@ -8,12 +8,12 @@ namespace Bot.Modules
 {
     class roll_call : Module
     {
-        public override void control(bot ircbot, BotConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, BotConfig Conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
-            string module_name = ircbot.conf.module_config[module_id][0];
+            string module_name = ircbot.Conf.Module_Config[module_id][0];
             if (type.Equals("channel") && bot_command == true)
             {
-                foreach (List<string> tmp_command in conf.command_list)
+                foreach (List<string> tmp_command in Conf.Command_List)
                 {
                     if (module_name.Equals(tmp_command[0]))
                     {
@@ -72,22 +72,12 @@ namespace Bot.Modules
                                                 }
                                             }
                                             string nicks = "";
-                                            for (int x = 0; x < ircbot.nick_list.Count(); x++)
+                                            Channel_Info chan_info = ircbot.get_chan_info(channel);
+                                            foreach (Nick_Info info in chan_info.Nicks)
                                             {
-                                                if (ircbot.nick_list[x][0].Equals(channel))
-                                                {
-                                                    for (int i = 1; i < ircbot.nick_list[x].Count(); i++)
-                                                    {
-                                                        string[] split = ircbot.nick_list[x][i].Split(':');
-                                                        if (split.GetUpperBound(0) > 0)
-                                                        {
-                                                            nicks += split[1] + ", ";
-                                                        }
-                                                    }
-                                                    break;
-                                                }
+                                                nicks += info.Nick + ", ";
                                             }
-                                            ircbot.sendData("PRIVMSG", channel + " :" + conf.module_config[module_id][3] + ": " + nicks.Trim().TrimEnd(','));
+                                            ircbot.sendData("PRIVMSG", channel + " :" + Conf.Module_Config[module_id][3] + ": " + nicks.Trim().TrimEnd(','));
                                         }
                                         break;
                                 }

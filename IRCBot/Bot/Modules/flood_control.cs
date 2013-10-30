@@ -9,17 +9,17 @@ namespace Bot.Modules
     class flood_control : Module
     {
         private List<spam_check> spam_logs = new List<spam_check>();
-        public override void control(bot ircbot, BotConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, BotConfig Conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
-            string module_name = ircbot.conf.module_config[module_id][0];
-            int max_lines = Convert.ToInt32(ircbot.conf.module_config[module_id][3]);
-            int check_timeout = Convert.ToInt32(ircbot.conf.module_config[module_id][4]);
-            bool warn = Convert.ToBoolean(ircbot.conf.module_config[module_id][5]);
-            string warn_msg = ircbot.conf.module_config[module_id][6];
-            bool kick = Convert.ToBoolean(ircbot.conf.module_config[module_id][7]);
-            string kick_msg = ircbot.conf.module_config[module_id][8];
-            bool ban = Convert.ToBoolean(ircbot.conf.module_config[module_id][9]);
-            string ban_msg = ircbot.conf.module_config[module_id][10];
+            string module_name = ircbot.Conf.Module_Config[module_id][0];
+            int max_lines = Convert.ToInt32(ircbot.Conf.Module_Config[module_id][3]);
+            int check_timeout = Convert.ToInt32(ircbot.Conf.Module_Config[module_id][4]);
+            bool warn = Convert.ToBoolean(ircbot.Conf.Module_Config[module_id][5]);
+            string warn_msg = ircbot.Conf.Module_Config[module_id][6];
+            bool kick = Convert.ToBoolean(ircbot.Conf.Module_Config[module_id][7]);
+            string kick_msg = ircbot.Conf.Module_Config[module_id][8];
+            bool ban = Convert.ToBoolean(ircbot.Conf.Module_Config[module_id][9]);
+            string ban_msg = ircbot.Conf.Module_Config[module_id][10];
             if (type.Equals("channel"))
             {
                 bool nick_found = false;

@@ -18,15 +18,15 @@ namespace Bot.Modules
             alarms = new List<System.Timers.Timer>();
         }
 
-        public override void control(bot ircbot, BotConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, BotConfig Conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
             access access = new access();
 
             char[] charS = new char[] { ' ' };
-            string module_name = ircbot.conf.module_config[module_id][0];
+            string module_name = ircbot.Conf.Module_Config[module_id][0];
             if ((type.Equals("channel") || type.Equals("query")) && bot_command == true)
             {
-                foreach (List<string> tmp_command in conf.command_list)
+                foreach (List<string> tmp_command in Conf.Command_List)
                 {
                     if (module_name.Equals(tmp_command[0]))
                     {
@@ -96,7 +96,7 @@ namespace Bot.Modules
                                                     {
                                                         char[] charSplit = new char[] { ' ' };
                                                         string[] ex = new_line[1].Split(charSplit);
-                                                        if (ex[0].TrimStart(Convert.ToChar(ircbot.conf.command)).Equals("alarm"))
+                                                        if (ex[0].TrimStart(Convert.ToChar(ircbot.Conf.Command)).Equals("alarm"))
                                                         {
                                                             if (type.Equals("channel"))
                                                             {
@@ -109,7 +109,7 @@ namespace Bot.Modules
                                                         }
                                                         else
                                                         {
-                                                            tmp_conf = conf;
+                                                            tmp_conf = Conf;
                                                             Timer alarm_trigger = new Timer();
                                                             alarm_trigger.Interval = (time * 1000);
                                                             alarm_trigger.Enabled = true;
@@ -178,10 +178,10 @@ namespace Bot.Modules
 
         public void ring_alarm(object sender, EventArgs e, bot ircbot, string nick, string full_nick, int nick_access, string channel, string type, string msg)
         {
-            BotConfig conf = tmp_conf;
+            BotConfig Conf = tmp_conf;
             System.Timers.Timer alarm_trigger = (System.Timers.Timer)sender;
             alarm_trigger.Enabled = false;
-            if (msg.StartsWith(ircbot.conf.command))
+            if (msg.StartsWith(ircbot.Conf.Command))
             {
                 string chan = "";
                 if (type.Equals("channel"))
@@ -190,11 +190,11 @@ namespace Bot.Modules
                 }
                 else
                 {
-                    chan = conf.nick;
+                    chan = Conf.Nick;
                 }
 
                 char[] charSplit = new char[] { ' ' };
-                string[] ex = msg.TrimStart(Convert.ToChar(conf.command)).Split(charSplit, 2);
+                string[] ex = msg.TrimStart(Convert.ToChar(Conf.Command)).Split(charSplit, 2);
                 string[] args;
                 if (ex.GetUpperBound(0) > 0)
                 {
@@ -204,7 +204,7 @@ namespace Bot.Modules
                 {
                     args = null;
                 }
-                ircbot.controller.run_command(conf.server, nick, chan, ex[0], args);
+                ircbot.controller.run_command(Conf.Server_Name, nick, chan, ex[0], args);
             }
             else
             {

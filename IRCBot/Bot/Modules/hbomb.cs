@@ -26,12 +26,12 @@ namespace Bot.Modules
         private bot main;
         public List<hbomb_info> hbombs = new List<hbomb_info>();
 
-        public override void control(bot ircbot, BotConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, BotConfig Conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
-            string module_name = ircbot.conf.module_config[module_id][0];
+            string module_name = ircbot.Conf.Module_Config[module_id][0];
             if (type.Equals("channel") && bot_command == true)
             {
-                foreach (List<string> tmp_command in conf.command_list)
+                foreach (List<string> tmp_command in Conf.Command_List)
                 {
                     if (module_name.Equals(tmp_command[0]))
                     {
@@ -96,7 +96,7 @@ namespace Bot.Modules
                                                 {
                                                     tmp_info.bomb_locked = false;
                                                     tmp_info.bomb_trigger = new System.Timers.Timer();
-                                                    tmp_info.wire_colors = ircbot.conf.module_config[module_id][3].Split(',');
+                                                    tmp_info.wire_colors = ircbot.Conf.Module_Config[module_id][3].Split(',');
                                                     tmp_info.bomb_channel = channel;
 
                                                     Random random_color = new Random();
@@ -116,7 +116,7 @@ namespace Bot.Modules
                                                     tmp_info.previous_bomb_holder = nick;
                                                     tmp_info.bomb_holder = nick;
 
-                                                    ircbot.sendData("PRIVMSG", channel + " :" + nick + " has started the timer!  If the bomb gets passed to you, type " + ircbot.conf.command + "pass <nick> to pass it to someone else, or type " + ircbot.conf.command + "defuse <color> to try to defuse it.");
+                                                    ircbot.sendData("PRIVMSG", channel + " :" + nick + " has started the timer!  If the bomb gets passed to you, type " + ircbot.Conf.Command + "pass <nick> to pass it to someone else, or type " + ircbot.Conf.Command + "defuse <color> to try to defuse it.");
                                                     string colors = "";
                                                     foreach (string wire in tmp_info.wire_colors)
                                                     {
@@ -178,16 +178,16 @@ namespace Bot.Modules
                                                         {
                                                             if (line.GetUpperBound(0) > 3)
                                                             {
-                                                                if (line[4].Trim().Equals(ircbot.nick, StringComparison.InvariantCultureIgnoreCase))
+                                                                if (line[4].Trim().Equals(ircbot.Nick, StringComparison.InvariantCultureIgnoreCase))
                                                                 {
                                                                     ircbot.sendData("PRIVMSG", channel + " :" + nick + ", you can't pass it to me!");
                                                                 }
                                                                 else
                                                                 {
-                                                                    int user_access = ircbot.get_user_access(line[4].Trim(), channel);
+                                                                    int user_access = ircbot.get_nick_access(line[4].Trim(), channel);
                                                                     if (user_access > 0 && idle.check_idle(line[4].Trim()) == false)
                                                                     {
-                                                                        pass_hbomb(line[4].Trim(), channel, nick, ircbot, conf, ref tmp_info, index);
+                                                                        pass_hbomb(line[4].Trim(), channel, nick, ircbot, Conf, ref tmp_info, index);
                                                                     }
                                                                     else
                                                                     {
@@ -249,16 +249,16 @@ namespace Bot.Modules
                                             {
                                                 if (line.GetUpperBound(0) > 3)
                                                 {
-                                                    if (line[4].Trim().Equals(ircbot.nick, StringComparison.InvariantCultureIgnoreCase))
+                                                    if (line[4].Trim().Equals(ircbot.Nick, StringComparison.InvariantCultureIgnoreCase))
                                                     {
                                                         ircbot.sendData("PRIVMSG", channel + " :" + nick + ", you can't pass it to me!");
                                                     }
                                                     else
                                                     {
-                                                        int user_access = ircbot.get_user_access(line[4].Trim(), channel);
+                                                        int user_access = ircbot.get_nick_access(line[4].Trim(), channel);
                                                         if (user_access > 0)
                                                         {
-                                                            pass_hbomb(line[4].Trim(), channel, nick, ircbot, conf, ref tmp_info, index);
+                                                            pass_hbomb(line[4].Trim(), channel, nick, ircbot, Conf, ref tmp_info, index);
                                                         }
                                                         else
                                                         {
@@ -306,16 +306,16 @@ namespace Bot.Modules
                                             {
                                                 if (line.GetUpperBound(0) > 3)
                                                 {
-                                                    if (line[4].Trim().Equals(ircbot.nick, StringComparison.InvariantCultureIgnoreCase))
+                                                    if (line[4].Trim().Equals(ircbot.Nick, StringComparison.InvariantCultureIgnoreCase))
                                                     {
                                                         ircbot.sendData("PRIVMSG", channel + " :" + nick + ", you can't pass it to me!");
                                                     }
                                                     else
                                                     {
-                                                        int user_access = ircbot.get_user_access(line[4].Trim(), channel);
+                                                        int user_access = ircbot.get_nick_access(line[4].Trim(), channel);
                                                         if (user_access > 0)
                                                         {
-                                                            pass_hbomb(line[4].Trim(), channel, nick, ircbot, conf, ref tmp_info, index);
+                                                            pass_hbomb(line[4].Trim(), channel, nick, ircbot, Conf, ref tmp_info, index);
                                                             tmp_info.bomb_locked = true;
                                                         }
                                                         else
@@ -580,12 +580,12 @@ namespace Bot.Modules
             }
         }
 
-        private void pass_hbomb(string pass_nick, string channel, string nick, bot ircbot, BotConfig conf, ref hbomb_info tmp_info, int index)
+        private void pass_hbomb(string pass_nick, string channel, string nick, bot ircbot, BotConfig Conf, ref hbomb_info tmp_info, int index)
         {
             string tab_name = channel.TrimStart('#');
             string pattern = "[^a-zA-Z0-9]"; //regex pattern
             tab_name = Regex.Replace(tab_name, pattern, "_");
-            string file_name = ircbot.conf.server + "_#" + tab_name + ".log";
+            string file_name = ircbot.Conf.Server_Name + "_#" + tab_name + ".log";
             bool nick_idle = false;
 
             Modules.seen seen = (Modules.seen)ircbot.get_module("seen");
@@ -603,7 +603,7 @@ namespace Bot.Modules
                 tmp_info.previous_bomb_holder = nick;
                 hbombs[index] = tmp_info;
                 ircbot.sendData("PRIVMSG", channel + " :" + nick + " passed the bomb to " + pass_nick);
-                ircbot.sendData("NOTICE", pass_nick + " :You now have the bomb!  Type " + ircbot.conf.command + "pass <nick> to pass it to someone else, or type " + ircbot.conf.command + "defuse <color> to try to defuse it.");
+                ircbot.sendData("NOTICE", pass_nick + " :You now have the bomb!  Type " + ircbot.Conf.Command + "pass <nick> to pass it to someone else, or type " + ircbot.Conf.Command + "defuse <color> to try to defuse it.");
                 string colors = "";
                 foreach (string wire in tmp_info.wire_colors)
                 {

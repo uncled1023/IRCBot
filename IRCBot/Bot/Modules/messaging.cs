@@ -9,12 +9,12 @@ namespace Bot.Modules
 {
     class messaging : Module
     {
-        public override void control(bot ircbot, BotConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, BotConfig Conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
-            string module_name = ircbot.conf.module_config[module_id][0];
+            string module_name = ircbot.Conf.Module_Config[module_id][0];
             if (type.Equals("channel") || type.Equals("query") && bot_command == true)
             {
-                foreach (List<string> tmp_command in conf.command_list)
+                foreach (List<string> tmp_command in Conf.Command_List)
                 {
                     if (module_name.Equals(tmp_command[0]))
                     {
@@ -130,7 +130,7 @@ namespace Bot.Modules
 
         private void add_message(string nick, string[] line, string channel, bot ircbot, int module_id)
         {
-            string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "messaging" + Path.DirectorySeparatorChar + ircbot.conf.server + "_messages.txt";
+            string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "messaging" + Path.DirectorySeparatorChar + ircbot.Conf.Server_Name + "_messages.txt";
             char[] charS = new char[] { ' ' };
             string[] tmp = line[4].Split(charS, 2);
             string to_nick = tmp[0];
@@ -158,7 +158,7 @@ namespace Bot.Modules
                         }
                         new_file.Add(file_line);
                     }
-                    if (Convert.ToInt32(ircbot.conf.module_config[module_id][3]) > num_msg)
+                    if (Convert.ToInt32(ircbot.Conf.Module_Config[module_id][3]) > num_msg)
                     {
                         new_file.Add(add_line);
                         added_nick = true;
@@ -183,7 +183,7 @@ namespace Bot.Modules
 
         private void add_anonmessage(string nick, string[] line, string channel, bot ircbot, int module_id)
         {
-            string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "messaging" + Path.DirectorySeparatorChar + ircbot.conf.server + "_messages.txt";
+            string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "messaging" + Path.DirectorySeparatorChar + ircbot.Conf.Server_Name + "_messages.txt";
             char[] charS = new char[] { ' ' };
             string[] tmp = line[4].Split(charS, 2);
             string to_nick = tmp[0];
@@ -211,7 +211,7 @@ namespace Bot.Modules
                         }
                         new_file.Add(file_line);
                     }
-                    if (Convert.ToInt32(ircbot.conf.module_config[module_id][3]) > num_msg)
+                    if (Convert.ToInt32(ircbot.Conf.Module_Config[module_id][3]) > num_msg)
                     {
                         new_file.Add(add_line);
                         added_nick = true;
@@ -236,7 +236,7 @@ namespace Bot.Modules
 
         public void find_message(string nick, bot ircbot)
         {
-            string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "messaging" + Path.DirectorySeparatorChar + ircbot.conf.server + "_messages.txt";
+            string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "messaging" + Path.DirectorySeparatorChar + ircbot.Conf.Server_Name + "_messages.txt";
             if (File.Exists(list_file))
             {
                 string[] old_file = System.IO.File.ReadAllLines(list_file);

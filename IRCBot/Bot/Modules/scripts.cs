@@ -17,7 +17,7 @@ namespace Bot.Modules
         //private ScriptRuntime pyRuntime = null;
         private ScriptScope pyScope = null;
 
-        public void scripts_control(string[] line, bot ircbot, BotConfig conf, int conf_id, int nick_access, string nick, string channel, string event_type)
+        public void scripts_control(string[] line, bot ircbot, BotConfig Conf, int conf_id, int nick_access, string nick, string channel, string event_type)
         {
             if (pyEngine == null)
             {
@@ -38,7 +38,7 @@ namespace Bot.Modules
                 pyScope.SetVariable("nick", nick);
                 pyScope.SetVariable("channel", channel);
                 pyScope.SetVariable("bot", ircbot);
-                pyScope.SetVariable("conf", conf);
+                pyScope.SetVariable("conf", Conf);
             }
         }
 

@@ -19,12 +19,12 @@ namespace Bot.Modules
     {
         private List<poll_info> poll_list = new List<poll_info>();
 
-        public override void control(bot ircbot, BotConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, BotConfig Conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
-            string module_name = ircbot.conf.module_config[module_id][0];
+            string module_name = ircbot.Conf.Module_Config[module_id][0];
             if ((type.Equals("channel") || type.Equals("query")) && bot_command == true)
             {
-                foreach (List<string> tmp_command in conf.command_list)
+                foreach (List<string> tmp_command in Conf.Command_List)
                 {
                     if (module_name.Equals(tmp_command[0]))
                     {
@@ -106,7 +106,7 @@ namespace Bot.Modules
                                                         {
                                                             ircbot.sendData("PRIVMSG", channel + " :" + (x + 1).ToString() + ") " + temp_poll.answers[x][0]);
                                                         }
-                                                        ircbot.sendData("PRIVMSG", channel + " :To Vote, type " + ircbot.conf.command + "vote <answer_number>.  You may only vote once per poll.  You can change your vote by voting for a different answer.");
+                                                        ircbot.sendData("PRIVMSG", channel + " :To Vote, type " + ircbot.Conf.Command + "vote <answer_number>.  You may only vote once per poll.  You can change your vote by voting for a different answer.");
                                                         poll_list.Add(temp_poll);
                                                     }
                                                     else
@@ -121,7 +121,7 @@ namespace Bot.Modules
                                             }
                                             else
                                             {
-                                                ircbot.sendData("PRIVMSG", channel + " :There is currently a poll active right now.  To view the current results, type " + ircbot.conf.command + "results");
+                                                ircbot.sendData("PRIVMSG", channel + " :There is currently a poll active right now.  To view the current results, type " + ircbot.Conf.Command + "results");
                                             }
                                         }
                                         else
@@ -256,7 +256,7 @@ namespace Bot.Modules
                                             }
                                             if (poll_active == true)
                                             {
-                                                if (cur_poll.owner.Equals(nick, StringComparison.InvariantCultureIgnoreCase) || nick_access > Convert.ToInt32(ircbot.get_user_access(cur_poll.owner, channel)))
+                                                if (cur_poll.owner.Equals(nick, StringComparison.InvariantCultureIgnoreCase) || nick_access > Convert.ToInt32(ircbot.get_nick_access(cur_poll.owner, channel)))
                                                 {
                                                     poll_active = false;
 

@@ -10,12 +10,12 @@ namespace Bot.Modules
 {
     class quote : Module
     {
-        public override void control(bot ircbot, BotConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, BotConfig Conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
-            string module_name = ircbot.conf.module_config[module_id][0];
+            string module_name = ircbot.Conf.Module_Config[module_id][0];
             if (type.Equals("channel") && bot_command == true)
             {
-                foreach (List<string> tmp_command in conf.command_list)
+                foreach (List<string> tmp_command in Conf.Command_List)
                 {
                     if (module_name.Equals(tmp_command[0]))
                     {
@@ -62,20 +62,20 @@ namespace Bot.Modules
                                         }
                                         if (nick_access >= command_access)
                                         {
-                                            if (conf.module_config[module_id][3].Equals("True"))
+                                            if (Conf.Module_Config[module_id][3].Equals("True"))
                                             {
                                                 if (line.GetUpperBound(0) > 3)
                                                 {
-                                                    get_specific_quote(line[2], line[4], ircbot, conf);
+                                                    get_specific_quote(line[2], line[4], ircbot, Conf);
                                                 }
                                                 else
                                                 {
-                                                    get_quote(line[2], ircbot, conf);
+                                                    get_quote(line[2], ircbot, Conf);
                                                 }
                                             }
                                             else
                                             {
-                                                get_quote(line[2], ircbot, conf);
+                                                get_quote(line[2], ircbot, Conf);
                                             }
                                         }
                                         else
@@ -89,18 +89,18 @@ namespace Bot.Modules
                     }
                 }
             }
-            if (type.Equals("channel") && bot_command == false && !nick.Equals(conf.nick, StringComparison.InvariantCultureIgnoreCase))
+            if (type.Equals("channel") && bot_command == false && !nick.Equals(Conf.Nick, StringComparison.InvariantCultureIgnoreCase))
             {
-                add_quote(nick, channel, line, ircbot, conf);
+                add_quote(nick, channel, line, ircbot, Conf);
             }
         }
 
-        public void add_quote(string nick, string channel, string[] line, bot ircbot, BotConfig conf)
+        public void add_quote(string nick, string channel, string[] line, bot ircbot, BotConfig Conf)
         {
             string tab_name = channel.TrimStart('#');
             string pattern = "[^a-zA-Z0-9]"; //regex pattern
             string new_tab_name = Regex.Replace(tab_name, pattern, "_");
-            string file_name = ircbot.conf.server + "_#" + new_tab_name + ".log";
+            string file_name = ircbot.Conf.Server_Name + "_#" + new_tab_name + ".log";
             if (Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "quotes" + Path.DirectorySeparatorChar + "logs") == false)
             {
                 Directory.CreateDirectory(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "quotes" + Path.DirectorySeparatorChar + "logs");
@@ -117,12 +117,12 @@ namespace Bot.Modules
             log_file.Close();
         }
 
-        private void get_quote(string channel, bot ircbot, BotConfig conf)
+        private void get_quote(string channel, bot ircbot, BotConfig Conf)
         {
             string tab_name = channel.TrimStart('#');
             string pattern = "[^a-zA-Z0-9]"; //regex pattern
             tab_name = Regex.Replace(tab_name, pattern, "_");
-            string file_name = ircbot.conf.server + "_#" + tab_name + ".log";
+            string file_name = ircbot.Conf.Server_Name + "_#" + tab_name + ".log";
             if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "quotes" + Path.DirectorySeparatorChar + "logs" + Path.DirectorySeparatorChar + file_name))
             {
                 string[] log_file = System.IO.File.ReadAllLines(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "quotes" + Path.DirectorySeparatorChar + "logs" + Path.DirectorySeparatorChar + file_name);
@@ -155,12 +155,12 @@ namespace Bot.Modules
             }
         }
 
-        private void get_specific_quote(string channel, string nick, bot ircbot, BotConfig conf)
+        private void get_specific_quote(string channel, string nick, bot ircbot, BotConfig Conf)
         {
             string tab_name = channel.TrimStart('#');
             string pattern = "[^a-zA-Z0-9]"; //regex pattern
             tab_name = Regex.Replace(tab_name, pattern, "_");
-            string file_name = ircbot.conf.server + "_#" + tab_name + ".log";
+            string file_name = ircbot.Conf.Server_Name + "_#" + tab_name + ".log";
             if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "quotes" + Path.DirectorySeparatorChar + "logs" + Path.DirectorySeparatorChar + file_name))
             {
                 string[] log_file = System.IO.File.ReadAllLines(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "quotes" + Path.DirectorySeparatorChar + "logs" + Path.DirectorySeparatorChar + file_name);

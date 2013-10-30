@@ -9,12 +9,12 @@ namespace Bot.Modules
 {
     class logging : Module
     {
-        public override void control(bot ircbot, BotConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, BotConfig Conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
-            string module_name = ircbot.conf.module_config[module_id][0];
+            string module_name = ircbot.Conf.Module_Config[module_id][0];
             if ((type.Equals("channel") || type.Equals("query")) && bot_command == true)
             {
-                foreach (List<string> tmp_command in conf.command_list)
+                foreach (List<string> tmp_command in Conf.Command_List)
                 {
                     if (module_name.Equals(tmp_command[0]))
                     {
@@ -72,7 +72,7 @@ namespace Bot.Modules
                                                         bool isNumeric = int.TryParse(args[2], out n);
                                                         if (isNumeric)
                                                         {
-                                                            display_log_nick_num(args[1], Convert.ToInt32(args[2]), channel, nick, args[0], ircbot, conf);
+                                                            display_log_nick_num(args[1], Convert.ToInt32(args[2]), channel, nick, args[0], ircbot, Conf);
                                                         }
                                                         else
                                                         {
@@ -85,33 +85,33 @@ namespace Bot.Modules
                                                         bool isNumeric = int.TryParse(args[1], out n);
                                                         if (isNumeric)
                                                         {
-                                                            display_log_number(Convert.ToInt32(args[1]), channel, nick, args[0], ircbot, conf);
+                                                            display_log_number(Convert.ToInt32(args[1]), channel, nick, args[0], ircbot, Conf);
                                                         }
                                                         else
                                                         {
-                                                            display_log_nick(args[1], channel, nick, args[0], ircbot, conf);
+                                                            display_log_nick(args[1], channel, nick, args[0], ircbot, Conf);
                                                         }
                                                     }
                                                     else
                                                     {
-                                                        display_log(channel, nick, line[4], ircbot, conf);
+                                                        display_log(channel, nick, line[4], ircbot, Conf);
                                                     }
                                                 }
                                                 else
                                                 {
                                                     if (args.GetUpperBound(0) > 0)
                                                     {
-                                                        display_log_nick(args[1], channel, nick, args[0], ircbot, conf);
+                                                        display_log_nick(args[1], channel, nick, args[0], ircbot, Conf);
                                                     }
                                                     else
                                                     {
-                                                        display_log(channel, nick, line[4], ircbot, conf);
+                                                        display_log(channel, nick, line[4], ircbot, Conf);
                                                     }
                                                 }
                                             }
                                             else
                                             {
-                                                display_last_log(channel, nick, ircbot, conf);
+                                                display_last_log(channel, nick, ircbot, Conf);
                                             }
                                         }
                                         else
@@ -128,7 +128,7 @@ namespace Bot.Modules
             if (type.Equals("query") && bot_command == true)
             {
                 bool command_valid = false;
-                foreach (List<string> tmp_command in conf.command_list)
+                foreach (List<string> tmp_command in Conf.Command_List)
                 {
                     string[] triggers = tmp_command[3].Split('|');
                     foreach (string trigger in triggers)
@@ -152,7 +152,7 @@ namespace Bot.Modules
             if (type.Equals("channel") && bot_command == true)
             {
                 bool command_valid = false;
-                foreach (List<string> tmp_command in conf.command_list)
+                foreach (List<string> tmp_command in Conf.Command_List)
                 {
                     string[] triggers = tmp_command[3].Split('|');
                     foreach (string trigger in triggers)
@@ -175,9 +175,9 @@ namespace Bot.Modules
             }
         }
 
-        private void display_last_log(string channel, string requst_nick, bot ircbot, BotConfig conf)
+        private void display_last_log(string channel, string requst_nick, bot ircbot, BotConfig Conf)
         {
-            string file_name = ircbot.conf.server + ".log";
+            string file_name = ircbot.Conf.Server_Name + ".log";
             bool cmd_found = false;
             if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "logging" + Path.DirectorySeparatorChar + file_name))
             {
@@ -213,7 +213,7 @@ namespace Bot.Modules
                     }
                     if (cmd_found == true)
                     {
-                        ircbot.sendData("NOTICE", requst_nick + " :The last command used was " + ircbot.conf.command + command + " by " + nick + " on " + date + " in " + inside + parameters);
+                        ircbot.sendData("NOTICE", requst_nick + " :The last command used was " + ircbot.Conf.Command + command + " by " + nick + " on " + date + " in " + inside + parameters);
                     }
                     else
                     {
@@ -231,9 +231,9 @@ namespace Bot.Modules
             }
         }
 
-        private void display_log(string channel, string requst_nick, string command, bot ircbot, BotConfig conf)
+        private void display_log(string channel, string requst_nick, string command, bot ircbot, BotConfig Conf)
         {
-            string file_name = ircbot.conf.server + ".log";
+            string file_name = ircbot.Conf.Server_Name + ".log";
             bool cmd_found = false;
             if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "logging" + Path.DirectorySeparatorChar + file_name))
             {
@@ -272,7 +272,7 @@ namespace Bot.Modules
                     }
                     if (cmd_found == true)
                     {
-                        ircbot.sendData("NOTICE", requst_nick + " :" + ircbot.conf.command + command + " has been used " + num_uses + " times.");
+                        ircbot.sendData("NOTICE", requst_nick + " :" + ircbot.Conf.Command + command + " has been used " + num_uses + " times.");
                         ircbot.sendData("NOTICE", requst_nick + " :It was last used by " + nick + " on " + date + " in " + inside + parameters);
                     }
                     else
@@ -306,7 +306,7 @@ namespace Bot.Modules
                         if (cmd_found == true)
                         {
                             ircbot.sendData("NOTICE", requst_nick + " :" + nick + " has used " + num_uses + " commands.");
-                            ircbot.sendData("NOTICE", requst_nick + " :The last command they used was " + ircbot.conf.command + new_command + " on " + date + " in " + inside + parameters);
+                            ircbot.sendData("NOTICE", requst_nick + " :The last command they used was " + ircbot.Conf.Command + new_command + " on " + date + " in " + inside + parameters);
                         }
                         else
                         {
@@ -325,9 +325,9 @@ namespace Bot.Modules
             }
         }
 
-        private void display_log_number(int number, string channel, string requst_nick, string command, bot ircbot, BotConfig conf)
+        private void display_log_number(int number, string channel, string requst_nick, string command, bot ircbot, BotConfig Conf)
         {
-            string file_name = ircbot.conf.server + ".log";
+            string file_name = ircbot.Conf.Server_Name + ".log";
             bool cmd_found = false;
             if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "logging" + Path.DirectorySeparatorChar + file_name))
             {
@@ -376,7 +376,7 @@ namespace Bot.Modules
                             date = command_list[number][2];
                             inside = command_list[number][1];
                             nick = command_list[number][0];
-                            ircbot.sendData("NOTICE", requst_nick + " :" + ircbot.conf.command + command + " was used by " + nick + " on " + date + " in " + inside + parameters);
+                            ircbot.sendData("NOTICE", requst_nick + " :" + ircbot.Conf.Command + command + " was used by " + nick + " on " + date + " in " + inside + parameters);
                         }
                         else
                         {
@@ -418,7 +418,7 @@ namespace Bot.Modules
                             date = command_list[number][2];
                             inside = command_list[number][1];
                             nick = command_list[number][0];
-                            ircbot.sendData("NOTICE", requst_nick + " :" + nick + " used " + ircbot.conf.command + command_list[number][3] + " on " + date + " in " + inside + parameters);
+                            ircbot.sendData("NOTICE", requst_nick + " :" + nick + " used " + ircbot.Conf.Command + command_list[number][3] + " on " + date + " in " + inside + parameters);
                         }
                         else
                         {
@@ -428,18 +428,18 @@ namespace Bot.Modules
                 }
                 else
                 {
-                    ircbot.sendData("NOTICE", requst_nick + " :" + ircbot.conf.command + command + " has not been used");
+                    ircbot.sendData("NOTICE", requst_nick + " :" + ircbot.Conf.Command + command + " has not been used");
                 }
             }
             else
             {
-                ircbot.sendData("NOTICE", requst_nick + " :" + ircbot.conf.command + command + " has not been used");
+                ircbot.sendData("NOTICE", requst_nick + " :" + ircbot.Conf.Command + command + " has not been used");
             }
         }
 
-        private void display_log_nick(string nick, string channel, string requst_nick, string command, bot ircbot, BotConfig conf)
+        private void display_log_nick(string nick, string channel, string requst_nick, string command, bot ircbot, BotConfig Conf)
         {
-            string file_name = ircbot.conf.server + ".log";
+            string file_name = ircbot.Conf.Server_Name + ".log";
             bool cmd_found = false;
             if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "logging" + Path.DirectorySeparatorChar + file_name))
             {
@@ -476,12 +476,12 @@ namespace Bot.Modules
                     }
                     if (cmd_found == true)
                     {
-                        ircbot.sendData("NOTICE", requst_nick + " :" + nick + " has used " + ircbot.conf.command + command + " " + num_uses + " times.");
-                        ircbot.sendData("NOTICE", requst_nick + " :They last used " + ircbot.conf.command + command + " on " + date + " in " + inside + parameters);
+                        ircbot.sendData("NOTICE", requst_nick + " :" + nick + " has used " + ircbot.Conf.Command + command + " " + num_uses + " times.");
+                        ircbot.sendData("NOTICE", requst_nick + " :They last used " + ircbot.Conf.Command + command + " on " + date + " in " + inside + parameters);
                     }
                     else
                     {
-                        ircbot.sendData("NOTICE", requst_nick + " :" + nick + " has not used " + ircbot.conf.command + command);
+                        ircbot.sendData("NOTICE", requst_nick + " :" + nick + " has not used " + ircbot.Conf.Command + command);
                     }
                 }
                 else
@@ -495,9 +495,9 @@ namespace Bot.Modules
             }
         }
 
-        private void display_log_nick_num(string nick, int number, string channel, string requst_nick, string command, bot ircbot, BotConfig conf)
+        private void display_log_nick_num(string nick, int number, string channel, string requst_nick, string command, bot ircbot, BotConfig Conf)
         {
-            string file_name = ircbot.conf.server + ".log";
+            string file_name = ircbot.Conf.Server_Name + ".log";
             bool cmd_found = false;
             if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "logging" + Path.DirectorySeparatorChar + file_name))
             {
@@ -545,16 +545,16 @@ namespace Bot.Modules
                             date = command_list[number][2];
                             inside = command_list[number][1];
                             nick = command_list[number][0];
-                            ircbot.sendData("NOTICE", requst_nick + " :" + nick + " used " + ircbot.conf.command + command + " on " + date + " in " + inside + parameters);
+                            ircbot.sendData("NOTICE", requst_nick + " :" + nick + " used " + ircbot.Conf.Command + command + " on " + date + " in " + inside + parameters);
                         }
                         else
                         {
-                            ircbot.sendData("NOTICE", requst_nick + " :" + nick + " has not used " + ircbot.conf.command + command + " that many times");
+                            ircbot.sendData("NOTICE", requst_nick + " :" + nick + " has not used " + ircbot.Conf.Command + command + " that many times");
                         }
                     }
                     else
                     {
-                        ircbot.sendData("NOTICE", requst_nick + " :" + nick + " has not used " + ircbot.conf.command + command);
+                        ircbot.sendData("NOTICE", requst_nick + " :" + nick + " has not used " + ircbot.Conf.Command + command);
                     }
                 }
                 else
@@ -572,7 +572,7 @@ namespace Bot.Modules
         {
             string file_name = "";
             string msg = "";
-            file_name = ircbot.conf.server + ".log";
+            file_name = ircbot.Conf.Server_Name + ".log";
             DateTime current_date = DateTime.Now;
             if (Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "logging" + Path.DirectorySeparatorChar + "") == false)
             {

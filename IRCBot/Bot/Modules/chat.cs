@@ -37,12 +37,12 @@ namespace Bot.Modules
             myBot.isAcceptingUserInput = true;
         }
 
-        public override void control(bot ircbot, BotConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, BotConfig Conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
-            string module_name = ircbot.conf.module_config[module_id][0];
+            string module_name = ircbot.Conf.Module_Config[module_id][0];
             if (type.Equals("channel") && bot_command == true)
             {
-                foreach (List<string> tmp_command in conf.command_list)
+                foreach (List<string> tmp_command in Conf.Command_List)
                 {
                     if (module_name.Equals(tmp_command[0]))
                     {
@@ -119,7 +119,7 @@ namespace Bot.Modules
             }
             if (type.Equals("channel") && bot_command == false)
             {
-                chat_time.Interval = Convert.ToInt32(conf.module_config[module_id][3]) * 1000;
+                chat_time.Interval = Convert.ToInt32(Conf.Module_Config[module_id][3]) * 1000;
                 if (line.GetUpperBound(0) >= 3)
                 {
                     string msg = "";
@@ -135,7 +135,7 @@ namespace Bot.Modules
                     bool me_in = false;
                     foreach (string word in words)
                     {
-                        if (word.Contains(conf.nick))
+                        if (word.Contains(Conf.Nick))
                         {
                             me_in = true;
                             break;
@@ -163,7 +163,7 @@ namespace Bot.Modules
                             chat_time.Stop();
                             Request r = new Request(msg, myUser, myBot);
                             Result res = myBot.Chat(r);
-                            ircbot.sendData("PRIVMSG", channel + " :" + res.Output.Replace("[nick]", nick).Replace("[me]", conf.nick).Replace("[owner]", conf.owner.TrimStart(',').TrimEnd(',').Replace(",", " and ")).Replace("[version]", Assembly.GetExecutingAssembly().GetName().Version.ToString()).Replace("\n", " "));
+                            ircbot.sendData("PRIVMSG", channel + " :" + res.Output.Replace("[nick]", nick).Replace("[me]", Conf.Nick).Replace("[owner]", Conf.Owner.TrimStart(',').TrimEnd(',').Replace(",", " and ")).Replace("[version]", Assembly.GetExecutingAssembly().GetName().Version.ToString()).Replace("\n", " "));
                             chat_time.Start();
                             still_chatting = true;
                         }

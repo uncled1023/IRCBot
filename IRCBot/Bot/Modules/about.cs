@@ -9,12 +9,12 @@ namespace Bot.Modules
 {
     class about : Module
     {
-        public override void control(bot ircbot, BotConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, BotConfig Conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
-            string module_name = ircbot.conf.module_config[module_id][0];
+            string module_name = ircbot.Conf.Module_Config[module_id][0];
             if (type.Equals("channel") || type.Equals("query") && bot_command == true)
             {
-                foreach (List<string> tmp_command in conf.command_list)
+                foreach (List<string> tmp_command in Conf.Command_List)
                 {
                     if (module_name.Equals(tmp_command[0]))
                     {
@@ -61,22 +61,22 @@ namespace Bot.Modules
                                         }
                                         if (nick_access >= command_access)
                                         {
-                                            string[] owners = conf.owner.TrimStart(',').TrimEnd(',').Split(',');
+                                            string[] owners = Conf.Owner.TrimStart(',').TrimEnd(',').Split(',');
                                             string owner_num = " is";
                                             if (owners.GetUpperBound(0) > 0)
                                             {
                                                 owner_num = "s are";
                                             }
                                             string response = "IRCBot";
-                                            if (conf.module_config[module_id][3].Equals("True"))
+                                            if (Conf.Module_Config[module_id][3].Equals("True"))
                                             {
                                                 response += " v" + Assembly.GetExecutingAssembly().GetName().Version.ToString() + ".";
                                             }
-                                            if (conf.module_config[module_id][4].Equals("True"))
+                                            if (Conf.Module_Config[module_id][4].Equals("True"))
                                             {
                                                 response += " Created by Uncled1023.";
                                             }
-                                            if (conf.module_config[module_id][5].Equals("True"))
+                                            if (Conf.Module_Config[module_id][5].Equals("True"))
                                             {
                                                 if (owners.GetUpperBound(0) > 0)
                                                 {
@@ -100,7 +100,7 @@ namespace Bot.Modules
                                                     }
                                                     else
                                                     {
-                                                        response += conf.owner.TrimStart(',').TrimEnd(',').Replace(",", " and ");
+                                                        response += Conf.Owner.TrimStart(',').TrimEnd(',').Replace(",", " and ");
                                                     }
                                                 }
                                             }

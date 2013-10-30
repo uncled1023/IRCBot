@@ -16,13 +16,13 @@ namespace Bot.Modules
 {
     class github : Module
     {
-        public override void control(bot ircbot, BotConfig conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, BotConfig Conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
             char[] charS = new char[] { ' ' };
-            string module_name = ircbot.conf.module_config[module_id][0];
+            string module_name = ircbot.Conf.Module_Config[module_id][0];
             if ((type.Equals("channel") || type.Equals("query")) && bot_command == true)
             {
-                foreach (List<string> tmp_command in conf.command_list)
+                foreach (List<string> tmp_command in Conf.Command_List)
                 {
                     if (module_name.Equals(tmp_command[0]))
                     {
@@ -80,8 +80,8 @@ namespace Bot.Modules
                                                     description = split[1];
                                                 }
                                                 List<string> label = new List<string>() { "bug" };
-                                                string uri = "https://api.github.com/repos/" + ircbot.conf.module_config[module_id][3] + "/" + ircbot.conf.module_config[module_id][5] + "/issues";
-                                                string response = post_issue(ircbot, module_id, uri, title, description, ircbot.conf.module_config[module_id][3], label);
+                                                string uri = "https://api.github.com/repos/" + ircbot.Conf.Module_Config[module_id][3] + "/" + ircbot.Conf.Module_Config[module_id][5] + "/issues";
+                                                string response = post_issue(ircbot, module_id, uri, title, description, ircbot.Conf.Module_Config[module_id][3], label);
                                                 if (response.Equals(""))
                                                 {
                                                     ircbot.sendData("NOTICE", nick + " :Issue Added Successfully");
@@ -119,8 +119,8 @@ namespace Bot.Modules
                                                     description = split[1];
                                                 }
                                                 List<string> label = new List<string>() { "Feature Request" };
-                                                string uri = "https://api.github.com/repos/" + ircbot.conf.module_config[module_id][3] + "/" + ircbot.conf.module_config[module_id][5] + "/issues";
-                                                string response = post_issue(ircbot, module_id, uri, title, description, ircbot.conf.module_config[module_id][3], label);
+                                                string uri = "https://api.github.com/repos/" + ircbot.Conf.Module_Config[module_id][3] + "/" + ircbot.Conf.Module_Config[module_id][5] + "/issues";
+                                                string response = post_issue(ircbot, module_id, uri, title, description, ircbot.Conf.Module_Config[module_id][3], label);
                                                 if (response.Equals(""))
                                                 {
                                                     ircbot.sendData("NOTICE", nick + " :Feature Request Added Successfully");
@@ -155,7 +155,7 @@ namespace Bot.Modules
             string jsonString = issue.ToJSON();
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
             request.Method = "POST";
-            request.Headers.Add("Authorization: Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes(ircbot.conf.module_config[module_id][3] + ":" + ircbot.conf.module_config[module_id][4])));
+            request.Headers.Add("Authorization: Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes(ircbot.Conf.Module_Config[module_id][3] + ":" + ircbot.Conf.Module_Config[module_id][4])));
             request.UserAgent = "IRCBot";
             byte[] postBytes = Encoding.ASCII.GetBytes(jsonString);
             // this is important - make sure you specify type this way
@@ -186,7 +186,7 @@ namespace Bot.Modules
             string jsonString = issue.ToJSON();
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
             request.Method = "POST";
-            request.Headers.Add("Authorization: Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes(ircbot.conf.module_config[module_id][3] + ":" + ircbot.conf.module_config[module_id][4])));
+            request.Headers.Add("Authorization: Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes(ircbot.Conf.Module_Config[module_id][3] + ":" + ircbot.Conf.Module_Config[module_id][4])));
             request.UserAgent = "IRCBot";
             byte[] postBytes = Encoding.ASCII.GetBytes(jsonString);
             // this is important - make sure you specify type this way

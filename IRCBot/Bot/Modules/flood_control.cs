@@ -43,7 +43,7 @@ namespace Bot.Modules
                     }
                     if (ban)
                     {
-                        string target_host = ircbot.get_user_host(nick);
+                        string target_host = ircbot.get_nick_host(nick);
                         string tmp_ban = "*!*@" + target_host;
                         if (target_host.Equals(""))
                         {

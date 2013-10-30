@@ -671,7 +671,7 @@ namespace Bot.Modules
                                                 {
                                                     if (nick_access >= sent_nick_access)
                                                     {
-                                                        string target_host = ircbot.get_user_host(total_nicks[0]);
+                                                        string target_host = ircbot.get_nick_host(total_nicks[0]);
                                                         string ban = "*!*@" + target_host;
                                                         if (target_host.Equals(""))
                                                         {
@@ -718,7 +718,7 @@ namespace Bot.Modules
 
                                                 if (nick_access >= sent_nick_access)
                                                 {
-                                                    string target_host = ircbot.get_user_host(total_nicks[0]);
+                                                    string target_host = ircbot.get_nick_host(total_nicks[0]);
                                                     string ban = "*!*@" + target_host;
                                                     if (target_host.Equals(""))
                                                     {
@@ -797,7 +797,7 @@ namespace Bot.Modules
                                                 {
                                                     if (nick_access >= sent_nick_access)
                                                     {
-                                                        string target_host = ircbot.get_user_host(total_nicks[0]);
+                                                        string target_host = ircbot.get_nick_host(total_nicks[0]);
                                                         string ban = "*!*@" + target_host;
                                                         if (target_host.Equals(""))
                                                         {
@@ -846,7 +846,7 @@ namespace Bot.Modules
                                                     string nicks = new_line[1];
                                                     char[] charSep = new char[] { ',' };
                                                     string[] total_nicks = nicks.Split(charSep, StringSplitOptions.RemoveEmptyEntries);
-                                                    string target_host = ircbot.get_user_host(total_nicks[0]);
+                                                    string target_host = ircbot.get_nick_host(total_nicks[0]);
                                                     int sent_nick_access = ircbot.get_nick_access(total_nicks[0], line[2]);
 
                                                     bool tmp_me = false;
@@ -928,7 +928,7 @@ namespace Bot.Modules
                                                     char[] charSep = new char[] { ',' };
                                                     string[] total_nicks = nicks.Split(charSep, StringSplitOptions.RemoveEmptyEntries);
                                                     int sent_nick_access = ircbot.get_nick_access(total_nicks[0], line[2]);
-                                                    string target_host = ircbot.get_user_host(total_nicks[0]);
+                                                    string target_host = ircbot.get_nick_host(total_nicks[0]);
 
                                                     bool tmp_me = false;
                                                     for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
@@ -1028,7 +1028,7 @@ namespace Bot.Modules
                                                 {
                                                     if (nick_access >= sent_nick_access)
                                                     {
-                                                        string target_host = ircbot.get_user_host(total_nicks[0]);
+                                                        string target_host = ircbot.get_nick_host(total_nicks[0]);
                                                         if (new_line.GetUpperBound(0) > 0)
                                                         {
                                                             add_auto(total_nicks[0], line[2], target_host, "k", new_line[1], ircbot);
@@ -1064,7 +1064,7 @@ namespace Bot.Modules
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 string[] new_line = line[4].Split(charS, 2);
-                                                string target_host = ircbot.get_user_host(new_line[0]);
+                                                string target_host = ircbot.get_nick_host(new_line[0]);
                                                 string nicks = new_line[0].TrimStart(':');
                                                 char[] charSep = new char[] { ',' };
                                                 string[] total_nicks = nicks.Split(charSep, StringSplitOptions.RemoveEmptyEntries);
@@ -1124,7 +1124,7 @@ namespace Bot.Modules
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 string[] new_line = line[4].Split(charS, 2);
-                                                string target_host = ircbot.get_user_host(new_line[0]);
+                                                string target_host = ircbot.get_nick_host(new_line[0]);
                                                 string nicks = new_line[0].TrimStart(':');
                                                 char[] charSep = new char[] { ',' };
                                                 string[] total_nicks = nicks.Split(charSep, StringSplitOptions.RemoveEmptyEntries);
@@ -1183,7 +1183,7 @@ namespace Bot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                string target_host = ircbot.get_user_host(line[4]);
+                                                string target_host = ircbot.get_nick_host(line[4]);
                                                 del_auto(line[4], line[2], target_host, "k", ircbot);
                                             }
                                             else
@@ -1205,7 +1205,7 @@ namespace Bot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                string target_host = ircbot.get_user_host(line[4]);
+                                                string target_host = ircbot.get_nick_host(line[4]);
                                                 del_auto(line[4], line[2], target_host, "b", ircbot);
                                             }
                                             else
@@ -1227,7 +1227,7 @@ namespace Bot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                string target_host = ircbot.get_user_host(line[4]);
+                                                string target_host = ircbot.get_nick_host(line[4]);
                                                 del_auto(line[4], line[2], target_host, "kb", ircbot);
                                             }
                                             else

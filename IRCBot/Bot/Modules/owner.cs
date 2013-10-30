@@ -421,7 +421,7 @@ namespace Bot.Modules
                                         }
                                         if (nick_access >= command_access)
                                         {
-                                            //ircbot.controller.Exit();
+                                            Environment.Exit(0);
                                         }
                                         else
                                         {
@@ -436,6 +436,7 @@ namespace Bot.Modules
                                         if (nick_access >= command_access)
                                         {
                                             System.Diagnostics.Process.Start(Assembly.GetEntryAssembly().Location); // to start new instance of application
+                                            Environment.Exit(0);
                                         }
                                         else
                                         {
@@ -879,6 +880,95 @@ namespace Bot.Modules
                                             else
                                             {
                                                 ircbot.sendData("NOTICE", nick + " :" + nick + ", you need to include more info.");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                        }
+                                        break;
+                                    case "nicklist":
+                                        if (spam_check == true)
+                                        {
+                                            ircbot.add_spam_count(channel);
+                                        }
+                                        if (nick_access >= command_access)
+                                        {
+                                            if (type.Equals("channel"))
+                                            {
+                                                if (line.GetUpperBound(0) > 3)
+                                                {
+                                                    bool nick_found = false;
+                                                    string nick_list = "";
+                                                    Channel_Info chan_info = ircbot.get_chan_info(line[4]);
+                                                    if (chan_info != null)
+                                                    {
+                                                        foreach (Nick_Info nick_info in chan_info.Nicks)
+                                                        {
+                                                            nick_list += nick_info.Nick + ", ";
+                                                            nick_found = true;
+                                                        }
+                                                    }
+                                                    if (nick_found)
+                                                    {
+                                                        ircbot.sendData("NOTICE", nick + " :" + line[4] + ": " + nick_list.Trim().TrimEnd(','));
+                                                    }
+                                                    else
+                                                    {
+                                                        ircbot.sendData("NOTICE", nick + " :No nicks in " + line[4]);
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    bool nick_found = false;
+                                                    string nick_list = "";
+                                                    Channel_Info chan_info = ircbot.get_chan_info(channel);
+                                                    if (chan_info != null)
+                                                    {
+                                                        foreach (Nick_Info nick_info in chan_info.Nicks)
+                                                        {
+                                                            nick_list += nick_info.Nick + ", ";
+                                                            nick_found = true;
+                                                        }
+                                                    }
+                                                    if (nick_found)
+                                                    {
+                                                        ircbot.sendData("NOTICE", nick + " :" + channel + ": " + nick_list.Trim().TrimEnd(','));
+                                                    }
+                                                    else
+                                                    {
+                                                        ircbot.sendData("NOTICE", nick + " :No nicks in " + channel);
+                                                    }
+                                                }
+                                            }
+                                            else
+                                            {
+                                                if (line.GetUpperBound(0) > 3)
+                                                {
+                                                    bool nick_found = false;
+                                                    string nick_list = "";
+                                                    Channel_Info chan_info = ircbot.get_chan_info(line[4]);
+                                                    if (chan_info != null)
+                                                    {
+                                                        foreach (Nick_Info nick_info in chan_info.Nicks)
+                                                        {
+                                                            nick_list += nick_info.Nick + ", ";
+                                                            nick_found = true;
+                                                        }
+                                                    }
+                                                    if (nick_found)
+                                                    {
+                                                        ircbot.sendData("NOTICE", nick + " :" + line[4] + ": " + nick_list.Trim().TrimEnd(','));
+                                                    }
+                                                    else
+                                                    {
+                                                        ircbot.sendData("NOTICE", nick + " :No nicks in " + line[4]);
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    ircbot.sendData("NOTICE", nick + " :" + nick + ", you need to include more info.");
+                                                }
                                             }
                                         }
                                         else

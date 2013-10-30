@@ -210,6 +210,7 @@ copy "$(SolutionDir)IRCBot-Console\bin\x86\Release\IRCBot-Console.exe" "$(Soluti
 copy $(TargetPath) "$(SolutionDir)Release-Mono" /y
 copy "$(SolutionDir)IRCBot-GUI\bin\x86\Release\IRCBot-GUI.exe" "$(SolutionDir)Release-Mono" /y
 copy "$(SolutionDir)IRCBot-Console\bin\x86\Release\IRCBot-Console.exe" "$(SolutionDir)Release-Mono" /y
+copy "$(ProjectDir)lib\Config\*" "$(SolutionDir)Release-Mono\Config" /y
 
 goto :exit
 
@@ -226,7 +227,7 @@ copy "$(ProjectDir)Resources\*" "$(TargetDir)Resources" /y
   </PropertyGroup>
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties BuildVersion_BuildVersioningStyle="None.None.Increment.Increment" BuildVersion_AssemblyInfoFilename="Properties\AssemblyInfo.cs" BuildVersion_UpdateFileVersion="True" BuildVersion_UpdateAssemblyVersion="True" />
+      <UserProperties BuildVersion_UpdateAssemblyVersion="True" BuildVersion_UpdateFileVersion="True" BuildVersion_AssemblyInfoFilename="Properties\AssemblyInfo.cs" BuildVersion_BuildVersioningStyle="None.None.Increment.Increment" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -397,6 +397,10 @@ Usage: `addchanlist {channel}`
 * `delchanlist` Removes the specified channel to the auto-join list.<br>
 Usage: `delchanlist {channel}`
 
+* `nicklist` Lists the nicks in the current channel or specified one.<br>
+Aliases: `nicks`<br>
+Usage: `nicklist [{channel}]`
+
 * `channels` Lists the channels the bot is in on that server.<br>
 Usage: `channels`
 

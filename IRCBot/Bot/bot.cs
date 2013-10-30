@@ -843,17 +843,15 @@ namespace Bot
                 if (ex[1].Equals("nick", StringComparison.InvariantCultureIgnoreCase))
                 {
                     type = "nick";
-                    Nick_Info info = get_nick_info(line_nick, channel);
-                    if (info != null)
+                    foreach (Channel_Info chan_info in Conf.Channel_List)
                     {
-                        info.Nick = ex[2].TrimStart(':');
-                    }
-                    else
-                    {
-                        info = new Nick_Info();
-                        info.Nick = ex[2].TrimStart(':');
-                        info.Access = get_nick_chan_access(ex[2].TrimStart(':'), channel);
-                        add_nick_info(info, channel);
+                        foreach (Nick_Info nick_info in chan_info.Nicks)
+                        {
+                            if (nick_info.Nick.Equals(line_nick))
+                            {
+                                nick_info.Nick = channel;
+                            }
+                        }
                     }
                 }
 

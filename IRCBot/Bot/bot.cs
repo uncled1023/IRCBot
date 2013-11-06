@@ -259,6 +259,10 @@ namespace Bot
                         {
                             bot_state = 6;
                         }
+                        else if (line.Contains("You have not registered"))
+                        {
+                            bot_state = 6;
+                        }
                         else if (line.Contains("This nick is awaiting an e-mail verification code before completing registration."))
                         {
                             checkRegisterationTimer.Stop();
@@ -348,6 +352,10 @@ namespace Bot
                             bot_state = 6;
                         }
                         else if (line.Contains("Your nick") && line.Contains("isn't registered"))
+                        {
+                            bot_state = 6;
+                        }
+                        else if (line.Contains("You have not registered"))
                         {
                             bot_state = 6;
                         }
@@ -2405,6 +2413,34 @@ namespace Bot
             internal set
             {
                 logs_path = value;
+            }
+        }
+
+        private long max_log_size;
+        public long Max_Log_Size
+        {
+            get
+            {
+                return max_log_size;
+            }
+
+            internal set
+            {
+                max_log_size = value;
+            }
+        }
+
+        private int max_log_number;
+        public int Max_Log_Number
+        {
+            get
+            {
+                return max_log_number;
+            }
+
+            internal set
+            {
+                max_log_number = value;
             }
         }
 

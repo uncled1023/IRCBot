@@ -288,7 +288,7 @@ namespace Bot.Modules
                         string[] new_line = lines.Split(sep, 3);
                         if (new_line.GetUpperBound(0) > 0)
                         {
-                            if (new_line[0].Trim().Equals(nick, StringComparison.InvariantCultureIgnoreCase) && new_line[1].Trim().Equals(channel))
+                            if (new_line[0].Trim().Equals(nick, StringComparison.InvariantCultureIgnoreCase) && new_line[1].Trim().Equals(channel, StringComparison.InvariantCultureIgnoreCase))
                             {
                                 string[] tmp_line = new_line[2].Trim().Split(',');
                                 bool access_found = false;
@@ -362,7 +362,7 @@ namespace Bot.Modules
                         string[] new_line = line.Split(sep, 3);
                         if (new_line.GetUpperBound(0) > 1)
                         {
-                            if (new_line[0].Trim().Equals(nick, StringComparison.InvariantCultureIgnoreCase) && new_line[1].Trim().Equals(channel))
+                            if (new_line[0].Trim().Equals(nick, StringComparison.InvariantCultureIgnoreCase) && new_line[1].Trim().Equals(channel, StringComparison.InvariantCultureIgnoreCase))
                             {
                                 try
                                 {
@@ -399,7 +399,7 @@ namespace Bot.Modules
                         string[] new_line = lines.Split(sep, 3);
                         if (new_line.GetUpperBound(0) > 0)
                         {
-                            if (new_line[0].Trim().Equals(nick, StringComparison.InvariantCultureIgnoreCase) && new_line[1].Trim().Equals(channel))
+                            if (new_line[0].Trim().Equals(nick, StringComparison.InvariantCultureIgnoreCase) && new_line[1].Trim().Equals(channel, StringComparison.InvariantCultureIgnoreCase))
                             {
                                 string[] tmp_line = new_line[2].Trim().Split(',');
                                 string new_access = "";

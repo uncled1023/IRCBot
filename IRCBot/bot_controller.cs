@@ -56,8 +56,25 @@ namespace IRCBot
             
             if (File.Exists(servers_config_path))
             {
-                check_config(default_servers, servers_config_path);
-                servers.Load(servers_config_path);
+                XmlDocument tmp_servers = new XmlDocument();
+                tmp_servers.Load(servers_config_path);
+                XmlNodeList xnList = tmp_servers.SelectSingleNode("/server_list").ChildNodes;
+                XmlNode default_node = default_servers.SelectSingleNode("/server_list");
+                //let's add the root element
+                servers.AppendChild(servers.CreateElement("", "server_list", ""));
+                foreach (XmlNode server in xnList)
+                {
+                    temp_xml = new XmlDocument();
+                    temp_xml.LoadXml(server.OuterXml);
+                    XmlDocument tmp_default = new XmlDocument();
+                    tmp_default.LoadXml(default_node.InnerXml);
+                    foreach (XmlNode ChNode in tmp_default.ChildNodes)
+                    {
+                        CompareLower(ChNode);
+                    }
+                    servers.DocumentElement.AppendChild(servers.ImportNode(temp_xml.SelectSingleNode("/server"), true));
+                }
+                servers.Save(servers_config_path);
             }
             else
             {
@@ -99,7 +116,6 @@ namespace IRCBot
 
         public bool start_bot(string server_name)
         {
-            int index = 0;
             bool server_started = false;
             bot bot = get_bot_instance(server_name);
             if (bot != null)
@@ -107,7 +123,7 @@ namespace IRCBot
                 if (bot.connected == false && bot.connecting == false && bot.disconnected == true && bot.Conf.Server_Name.Equals(server_name))
                 {
                     server_started = true;
-                    bot_instances[index].start_bot();
+                    bot.start_bot();
                 }
             }
             return server_started;
@@ -116,7 +132,6 @@ namespace IRCBot
         public bool stop_bot(string server_name)
         {
             bool server_terminated = false;
-            int index = 0;
             foreach (Bot.bot bot in bot_instances)
             {
                 if ((bot.connected == true || bot.connecting == true) && bot.Conf.Server_Name.Equals(server_name))
@@ -125,7 +140,6 @@ namespace IRCBot
                     bot.worker.CancelAsync();
                     break;
                 }
-                index++;
             }
             return server_terminated;
         }
@@ -367,14 +381,9 @@ namespace IRCBot
                 bot_conf.Spam_Timeout = Convert.ToInt32(xn["spam_timeout"].InnerText);
                 bot_conf.Max_Message_Length = Convert.ToInt32(xn["max_message_length"].InnerText);
                 bot_conf.Keep_Logs = xn["keep_logs"].InnerText;
-                if (Directory.Exists(xn["logs_path"].InnerText))
-                {
-                    bot_conf.Logs_Path = xn["logs_path"].InnerText;
-                }
-                else
-                {
-                    bot_conf.Logs_Path = cur_dir + Path.DirectorySeparatorChar + "logs";
-                }
+                bot_conf.Logs_Path = xn["logs_path"].InnerText;
+                bot_conf.Max_Log_Size = Convert.ToInt32(xn["max_log_size"].InnerText);
+                bot_conf.Max_Log_Number = Convert.ToInt32(xn["max_log_number"].InnerText);
                 bot_conf.Default_Level = Math.Min(bot_conf.User_Level, Math.Min(bot_conf.Voice_Level, Math.Min(bot_conf.Hop_Level, Math.Min(bot_conf.Op_Level, Math.Min(bot_conf.Sop_Level, Math.Min(bot_conf.Founder_Level, bot_conf.Owner_Level)))))) - 1;
 
                 try
@@ -628,22 +637,42 @@ namespace IRCBot
         {
             if (bot != null && bot.Conf.Keep_Logs.Equals("True") && !log.Trim().Equals(string.Empty))
             {
-                string file_name = "";
-                file_name = bot.Conf.Server_Name + "-" + channel + ".log";
+                string file_name = "log.log";
                 if (bot.Conf.Logs_Path == "")
                 {
                     bot.Conf.Logs_Path = cur_dir + Path.DirectorySeparatorChar + "logs";
                 }
-                if (Directory.Exists(bot.Conf.Logs_Path))
+                string full_path = bot.Conf.Logs_Path + Path.DirectorySeparatorChar + bot.Conf.Server_Name + Path.DirectorySeparatorChar + channel;
+                if (Directory.Exists(full_path))
                 {
-                    StreamWriter log_file = File.AppendText(bot.Conf.Logs_Path + Path.DirectorySeparatorChar + file_name);
+                    if (File.Exists(full_path + Path.DirectorySeparatorChar + file_name))
+                    {
+                        FileInfo f = new FileInfo(full_path + Path.DirectorySeparatorChar + file_name);
+                        long s1 = f.Length;
+                        if (s1 > bot.Conf.Max_Log_Size)
+                        {
+                            if (File.Exists(full_path + Path.DirectorySeparatorChar + "log_" + bot.Conf.Max_Log_Number.ToString() + ".log"))
+                            {
+                                File.Delete(full_path + Path.DirectorySeparatorChar + "log_" + bot.Conf.Max_Log_Number.ToString() + ".log");
+                            }
+                            for (int x = bot.Conf.Max_Log_Number - 1; x >= 0; x--)
+                            {
+                                if (File.Exists(full_path + Path.DirectorySeparatorChar + "log_" + x.ToString() + ".log"))
+                                {
+                                    File.Move(full_path + Path.DirectorySeparatorChar + "log_" + x.ToString() + ".log", full_path + Path.DirectorySeparatorChar + "log_" + (x + 1).ToString() + ".log");
+                                }
+                            }
+                            File.Move(full_path + Path.DirectorySeparatorChar + file_name, full_path + Path.DirectorySeparatorChar + "log_1.log");
+                        }
+                    }
+                    StreamWriter log_file = File.AppendText(full_path + Path.DirectorySeparatorChar + file_name);
                     log_file.WriteLine("[" + date_stamp + " " + time_stamp + "] " + log);
                     log_file.Close();
                 }
                 else
                 {
-                    Directory.CreateDirectory(cur_dir + Path.DirectorySeparatorChar + "logs");
-                    StreamWriter log_file = File.AppendText(cur_dir + Path.DirectorySeparatorChar + "logs" + Path.DirectorySeparatorChar + file_name);
+                    Directory.CreateDirectory(full_path);
+                    StreamWriter log_file = File.AppendText(full_path + Path.DirectorySeparatorChar + file_name);
                     log_file.WriteLine("[" + date_stamp + " " + time_stamp + "] " + log);
                     log_file.Close();
                 }

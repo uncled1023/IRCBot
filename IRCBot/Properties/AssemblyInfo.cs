@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("IRCBot")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("IRCBot is an all in one IRC Bot solution for Windows.  For more information, please visit https://github.com/uncled1023/IRCBot")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Jimmy Rustlers, Inc.")]
 [assembly: AssemblyProduct("IRCBot")]
-[assembly: AssemblyCopyright("Copyright ©  2013")]
+[assembly: AssemblyCopyright("Copyright ©  2012-2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -31,5 +31,5 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
-// [assembly: AssemblyVersion("1.0.288")]
-[assembly: AssemblyVersion("5.3.0.2194")]
+// [assembly: AssemblyVersion("1.0.466")]
+[assembly: AssemblyVersion("5.3.93.2289")]

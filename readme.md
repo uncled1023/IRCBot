@@ -657,8 +657,8 @@ Please report all bugs you find to me so I can fix them as soon as possible.  Al
 
 ## Contact Info
 
-Email: admin@inb4u.com<br>
-IRC: (irc.inb4u.com)#IRCBot<br>
+Email: admin@teknik.io<br>
+IRC: (irc.teknik.io)#IRCBot<br>
 Nick: Uncled1023
 
 ## Acknowledgements

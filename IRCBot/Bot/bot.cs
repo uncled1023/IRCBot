@@ -775,7 +775,14 @@ namespace Bot
                         }
                         else // From Query
                         {
-                            nick_access = get_nick_access(line_nick, null);
+                            foreach (Channel_Info chan in Conf.Channel_List)
+                            {
+                                int tmp_nick_access = get_nick_access(line_nick, chan.Channel);
+                                if (tmp_nick_access > nick_access)
+                                {
+                                    nick_access = tmp_nick_access;
+                                }
+                            }
                             type = "query";
                         }
                     }
@@ -1500,7 +1507,7 @@ namespace Bot
             {
                 foreach (string part in Conf.Spam_Ignore.Split(','))
                 {
-                    if (part.Equals(channel, StringComparison.InvariantCultureIgnoreCase) || part.Equals(nick, StringComparison.InvariantCultureIgnoreCase))
+                    if (part.Equals(channel, StringComparison.InvariantCultureIgnoreCase) || part.Equals(nick, StringComparison.InvariantCultureIgnoreCase) || part.Equals(Nick))
                     {
                         active = false;
                     }
@@ -1811,11 +1818,8 @@ namespace Bot
                             }
                             if (chan_allowed)
                             {
-                                if (channel != null)
-                                {
-                                    Modules.access acc = new Modules.access();
-                                    access_num.AddRange(acc.get_access_list(tmp_nick, channel, this));
-                                }
+                                Modules.access acc = new Modules.access();
+                                access_num.AddRange(acc.get_access_list(tmp_nick, channel, this));
                             }
                             break;
                         }

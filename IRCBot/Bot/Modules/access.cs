@@ -362,13 +362,16 @@ namespace Bot.Modules
                         string[] new_line = line.Split(sep, 3);
                         if (new_line.GetUpperBound(0) > 1)
                         {
-                            if (new_line[0].Trim().Equals(nick, StringComparison.InvariantCultureIgnoreCase) && new_line[1].Trim().Equals(channel, StringComparison.InvariantCultureIgnoreCase))
+                            if (channel != null)
                             {
-                                try
+                                if (new_line[0].Trim().Equals(nick, StringComparison.InvariantCultureIgnoreCase) && new_line[1].Trim().Equals(channel, StringComparison.InvariantCultureIgnoreCase))
                                 {
-                                    access.Add(Convert.ToInt32(new_line[2]));
+                                    try
+                                    {
+                                        access.Add(Convert.ToInt32(new_line[2]));
+                                    }
+                                    catch { }
                                 }
-                                catch { }
                             }
                         }
                     }

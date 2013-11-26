@@ -73,6 +73,8 @@ namespace IRCBot_GUI
             spam_threshold_box.Text = xn["spam_threshold"].InnerText;
             spam_timeout_box.Text = xn["spam_timeout"].InnerText;
             max_message_length_box.Text = xn["max_message_length"].InnerText;
+            keep_logs_box.Checked = Convert.ToBoolean(xn["keep_logs"].InnerText);
+            log_folder_box.Text = xn["logs_path"].InnerText;
 
             XmlNode xnNode = xmlModules.SelectSingleNode("/modules");
             XmlNodeList xnList = xnNode.ChildNodes;

@@ -986,7 +986,7 @@ namespace IRCBot_GUI
                         }
                         if (!text.Trim().Equals(string.Empty))
                         {
-                            controller.log(text, bot, channel, date_stamp, time_stamp);
+                            controller.log(text, bot, channel_line, date_stamp, time_stamp);
                         }
                     }
                 }

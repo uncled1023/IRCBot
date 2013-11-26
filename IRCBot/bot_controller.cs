@@ -7,6 +7,7 @@ using System.Xml.Linq;
 using System.Xml;
 using System.Reflection;
 using System.Net;
+using System.Text.RegularExpressions;
 using Bot;
 
 namespace IRCBot
@@ -642,7 +643,9 @@ namespace IRCBot
                 {
                     bot.Conf.Logs_Path = cur_dir + Path.DirectorySeparatorChar + "logs";
                 }
-                string full_path = bot.Conf.Logs_Path + Path.DirectorySeparatorChar + bot.Conf.Server_Name + Path.DirectorySeparatorChar + channel;
+                string pattern = "[^a-zA-Z0-9-_.+#]"; //regex pattern
+                string parsed_chan = Regex.Replace(channel, pattern, "_");
+                string full_path = bot.Conf.Logs_Path + Path.DirectorySeparatorChar + bot.Conf.Server_Name + Path.DirectorySeparatorChar + parsed_chan;
                 if (Directory.Exists(full_path))
                 {
                     if (File.Exists(full_path + Path.DirectorySeparatorChar + file_name))

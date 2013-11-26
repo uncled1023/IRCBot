@@ -64,7 +64,7 @@ namespace Bot.Modules
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 string[] parse = line[4].Split(' ');
-                                                if (parse.GetUpperBound(0) > 1)
+                                                if (type.Equals("query") && parse.GetUpperBound(0) > 1)
                                                 {
                                                     if (Convert.ToInt32(parse[2]) <= nick_access)
                                                     {
@@ -113,7 +113,7 @@ namespace Bot.Modules
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 string[] parse = line[4].Split(' ');
-                                                if (parse.GetUpperBound(0) > 1)
+                                                if (type.Equals("query") && parse.GetUpperBound(0) > 1)
                                                 {
                                                     if (Convert.ToInt32(parse[2]) <= nick_access)
                                                     {
@@ -159,7 +159,7 @@ namespace Bot.Modules
                                         }
                                         if (nick_access >= command_access)
                                         {
-                                            if (line.GetUpperBound(0) > 3)
+                                            if (type.Equals("query") && line.GetUpperBound(0) > 3)
                                             {
                                                 list_access_list(nick, line[4], ircbot);
                                             }

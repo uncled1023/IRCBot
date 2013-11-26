@@ -13,9 +13,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IRCBot", "IRCBot\IRCBot.csproj", "{12D8164D-B315-423B-AEBB-5701867C84E4}"
 EndProject
 Global
-	GlobalSection(CodealikeProperties) = postSolution
-		SolutionGuid = 636f711e-fd43-4d81-8f76-1f47bb40735a
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -66,10 +63,13 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		BuildVersion_AssemblyInfoFilename = 
-		BuildVersion_BuildVersioningStyle = None.None.None.None
-		BuildVersion_BuildAction = Both
-		BuildVersion_UpdateFileVersion = False
 		BuildVersion_UpdateAssemblyVersion = False
+		BuildVersion_UpdateFileVersion = False
+		BuildVersion_BuildAction = Both
+		BuildVersion_BuildVersioningStyle = None.None.None.None
+		BuildVersion_AssemblyInfoFilename = 
+	EndGlobalSection
+	GlobalSection(CodealikeProperties) = postSolution
+		SolutionGuid = 636f711e-fd43-4d81-8f76-1f47bb40735a
 	EndGlobalSection
 EndGlobal

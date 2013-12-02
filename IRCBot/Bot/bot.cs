@@ -814,16 +814,19 @@ namespace Bot
                 if (ex[1].Equals("quit", StringComparison.InvariantCultureIgnoreCase))
                 {
                     type = "quit";
-                    if (line_nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase))
+                    if (line_nick.Equals(Nick, StringComparison.InvariantCultureIgnoreCase))
                     {
-                        del_chan_info(channel);
+                        Conf.Channel_List.Clear();
                     }
                     else
                     {
-                        Nick_Info info = get_nick_info(line_nick, channel);
-                        if (info != null)
+                        foreach (Channel_Info chan_info in Conf.Channel_List)
                         {
-                            del_nick_info(info, channel);
+                            Nick_Info info = get_nick_info(line_nick, chan_info.Channel);
+                            if (info != null)
+                            {
+                                del_nick_info(info, chan_info.Channel);
+                            }
                         }
                     }
                 }
@@ -832,7 +835,7 @@ namespace Bot
                 if (ex[1].Equals("part", StringComparison.InvariantCultureIgnoreCase))
                 {
                     type = "part";
-                    if (line_nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase))
+                    if (line_nick.Equals(Nick, StringComparison.InvariantCultureIgnoreCase))
                     {
                         del_chan_info(channel);
                     }
@@ -850,13 +853,13 @@ namespace Bot
                 if (ex[1].Equals("kick", StringComparison.InvariantCultureIgnoreCase))
                 {
                     type = "kick";
-                    if (ex[3].Equals(nick, StringComparison.InvariantCultureIgnoreCase))
+                    if (ex[3].Equals(Nick, StringComparison.InvariantCultureIgnoreCase))
                     {
                         del_chan_info(channel);
                     }
                     else
                     {
-                        Nick_Info info = get_nick_info(line_nick, channel);
+                        Nick_Info info = get_nick_info(ex[3], channel);
                         if (info != null)
                         {
                             del_nick_info(info, channel);
@@ -1853,10 +1856,17 @@ namespace Bot
                     top_access = get_nick_chan_access(tmp_nick, channel);
                     if (top_access != Conf.Default_Level)
                     {
-                        Nick_Info new_nick = new Nick_Info();
-                        new_nick.Access = top_access;
-                        new_nick.Nick = tmp_nick;
-                        add_nick_info(new_nick, channel);
+                        if (nick_info != null)
+                        {
+                            nick_info.Access = top_access;
+                        }
+                        else
+                        {
+                            Nick_Info new_nick = new Nick_Info();
+                            new_nick.Access = top_access;
+                            new_nick.Nick = tmp_nick;
+                            add_nick_info(new_nick, channel);
+                        }
                     }
                 }
             }

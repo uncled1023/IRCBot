@@ -1199,6 +1199,7 @@ namespace Bot.Modules
                                                             if (!nick_info.Nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase) && !nick_info.Nick.Equals(ircbot.Nick, StringComparison.InvariantCultureIgnoreCase))
                                                             {
                                                                 ircbot.sendData("KICK", line[4] + " :" + nick_info.Nick);
+                                                                Thread.Sleep(100);
                                                             }
                                                         }
                                                     }
@@ -1213,6 +1214,7 @@ namespace Bot.Modules
                                                             if (!nick_info.Nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase) && !nick_info.Nick.Equals(ircbot.Nick, StringComparison.InvariantCultureIgnoreCase))
                                                             {
                                                                 ircbot.sendData("KICK", line[4] + " :" + nick_info.Nick);
+                                                                Thread.Sleep(100);
                                                             }
                                                         }
                                                     }
@@ -1230,6 +1232,7 @@ namespace Bot.Modules
                                                             if (!nick_info.Nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase) && !nick_info.Nick.Equals(ircbot.Nick, StringComparison.InvariantCultureIgnoreCase))
                                                             {
                                                                 ircbot.sendData("KICK", line[4] + " :" + nick_info.Nick);
+                                                                Thread.Sleep(100);
                                                             }
                                                         }
                                                     }

@@ -39,7 +39,7 @@ The IRCBot is designed to provide an all-in-one solution for those who wish to r
 
 ## Installation - Windows
 
-1) Download the Release.zip from the latest release and extract the files to a directory of your choice.<br>
+1) Download the Release.zip from the latest release in https://github.com/uncled1023/IRCBot/releases and extract the files to a directory of your choice.<br>
 2) Run IRCBot-GUI.exe or IRCBot-Console.exe
 
 ## Installation - Linux (Alpha)

@@ -972,7 +972,7 @@ namespace Bot.Modules
                                             }
                                             else
                                             {
-                                                if (chan_info.Show || ircbot.get_nick_info(nick, channel) != null)
+                                                if (chan_info.Show || ircbot.get_nick_info(nick, chan_info.Channel) != null)
                                                 {
                                                     chan_list += chan_info.Channel + ", ";
                                                     chan_found = true;

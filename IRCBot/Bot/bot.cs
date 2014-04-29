@@ -817,13 +817,10 @@ namespace Bot
                         {
                             add_chan_info(channel);
                         }
-                        else
-                        {
-                            info = new Nick_Info();
-                            info.Nick = line_nick;
-                            info.Access = get_nick_chan_access(line_nick, channel);
-                            add_nick_info(info, channel);
-                        }
+                        info = new Nick_Info();
+                        info.Nick = line_nick;
+                        info.Access = get_nick_chan_access(line_nick, channel);
+                        add_nick_info(info, channel);
                     }
                 }
 
@@ -1710,66 +1707,6 @@ namespace Bot
             return new_access;
         }
 
-        internal List<Nick_Info> get_chan_nicks(string channel)
-        {
-            List<Nick_Info> nick_list = new List<Nick_Info>();
-            string line = "";
-            lock (queuelock)
-            {
-                sendData("WHO", channel);
-                line = read_queue();
-                DateTime start = DateTime.Now;
-
-                while (DateTime.Now.Subtract(start).Seconds < 15 && !line.Contains("352 " + nick + " " + channel))
-                {
-                    if (line.Contains("Please wait a while and try again."))
-                    {
-                        Thread.Sleep(1000);
-                        sendData("WHO", channel);
-                    }
-                    line = read_queue();
-                }
-                char[] Separator = new char[] { ' ' };
-
-                start = DateTime.Now;
-                while (DateTime.Now.Subtract(start).Seconds < 15 && !line.Contains("315 " + nick + " " + channel + " :End of /WHO list."))
-                {
-                    if (line.Contains("352 " + nick + " " + channel))
-                    {
-                        string[] name_line = line.Split(Separator, StringSplitOptions.RemoveEmptyEntries);
-                        if (name_line.GetUpperBound(0) >= 8)
-                        {
-                            Nick_Info new_nick = new Nick_Info();
-                            new_nick.Nick = name_line[7].TrimStart('~');
-                            bool char_found = false;
-                            char[] arr = name_line[8].ToCharArray();
-                            int new_access = Conf.Default_Level;
-                            foreach (char c in arr)
-                            {
-                                if (c.Equals('~') || c.Equals('&') || c.Equals('@') || c.Equals('%') || c.Equals('+'))
-                                {
-                                    int tmp_access = get_access_num(c.ToString(), false);
-                                    char_found = true;
-                                    if (tmp_access > new_access)
-                                    {
-                                        new_access = tmp_access;
-                                    }
-                                }
-                            }
-                            if (!char_found)
-                            {
-                                new_access = Conf.User_Level;
-                            }
-                            new_nick.Access = new_access;
-                            nick_list.Add(new_nick);
-                        }
-                    }
-                    line = read_queue();
-                }
-            }
-            return nick_list;
-        }
-
         internal int get_nick_access(string tmp_nick, string channel)
         {
             List<int> access_num = new List<int>();
@@ -1777,12 +1714,29 @@ namespace Bot
             access_num.Add(Conf.Default_Level);
             try
             {
-                if (tmp_nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase))
+                Nick_Info nick_info = get_nick_info(tmp_nick, channel);
+                if (nick_info != null)
+                {
+                    access_num.Add(nick_info.Access);
+                }
+                else
+                {
+                    Nick_Info new_nick = new Nick_Info();
+                    new_nick.Nick = tmp_nick;
+                    new_nick.Access = Conf.Default_Level;
+                    new_nick.Identified = false;
+                    add_nick_info(new_nick, channel);
+                    nick_info = new_nick;
+                }
+                if (nick_info.Nick.Equals(nick, StringComparison.InvariantCultureIgnoreCase))
                 {
                     access_num.Add(Conf.Owner_Level);
                 }
-                bool user_identified = get_nick_ident(tmp_nick);
-                if (user_identified == true)
+                if (!nick_info.Identified)
+                {
+                    nick_info.Identified = get_nick_ident(nick_info.Nick);
+                }
+                if (nick_info.Identified == true)
                 {
                     foreach (Modules.Module module in Conf.Modules)
                     {
@@ -1806,12 +1760,7 @@ namespace Bot
                         }
                     }
                 }
-                Nick_Info nick_info = get_nick_info(tmp_nick, channel);
-                if (nick_info != null)
-                {
-                    access_num.Add(nick_info.Access);
-                }
-                if (user_identified == true)
+                if (nick_info.Identified == true)
                 {
                     string[] owners = Conf.Owner.Split(','); // Get list of owners
                     for (int x = 0; x <= owners.GetUpperBound(0); x++)
@@ -1834,17 +1783,7 @@ namespace Bot
                     top_access = get_nick_chan_access(tmp_nick, channel);
                     if (top_access != Conf.Default_Level)
                     {
-                        if (nick_info != null)
-                        {
-                            nick_info.Access = top_access;
-                        }
-                        else
-                        {
-                            Nick_Info new_nick = new Nick_Info();
-                            new_nick.Access = top_access;
-                            new_nick.Nick = tmp_nick;
-                            add_nick_info(new_nick, channel);
-                        }
+                        nick_info.Access = top_access;
                     }
                 }
             }
@@ -1914,11 +1853,11 @@ namespace Bot
             return chan_info;
         }
 
-        internal void add_chan_info(string channel)
+        internal void add_chan_info(string channel, bool show = true)
         {
             Channel_Info chan_info = new Channel_Info();
             chan_info.Channel = channel;
-            chan_info.Nicks = get_chan_nicks(channel);
+            chan_info.Nicks = new List<Nick_Info>();
             chan_info.Show = get_chan_access(channel);
             Conf.Channel_List.Add(chan_info);
         }
@@ -1938,24 +1877,20 @@ namespace Bot
             string line = "";
             lock (queuelock)
             {
-                sendData("LIST", channel.TrimStart(':'));
+                sendData("MODE", channel.TrimStart(':'));
                 line = read_queue();
                 DateTime start = DateTime.Now;
 
-                while (DateTime.Now.Subtract(start).Seconds < 15 && !line.Contains("322 " + nick + " " + channel))
+                while (DateTime.Now.Subtract(start).Seconds < 15 && !line.Contains("324 " + nick + " " + channel))
                 {
-                    if (line.Contains("Please wait a while and try again."))
-                    {
-                        Thread.Sleep(1000);
-                        sendData("LIST", channel.TrimStart(':'));
-                    }
+                    Thread.Sleep(100);
                     line = read_queue();
                 }
                 char[] Separator = new char[] { ' ' };
                 string[] name_line = line.Split(Separator, StringSplitOptions.RemoveEmptyEntries);
-                if (name_line.GetUpperBound(0) >= 5)
+                if (name_line.GetUpperBound(0) >= 4)
                 {
-                    char[] arr = name_line[5].TrimStart(':').TrimStart('[').TrimEnd(']').TrimStart('+').ToCharArray();
+                    char[] arr = name_line[4].TrimStart('+').ToCharArray();
                     foreach (char c in arr)
                     {
                         if (c.Equals('p') || c.Equals('s'))
@@ -2506,6 +2441,20 @@ namespace Bot
             internal set
             {
                 access = value;
+            }
+        }
+
+        private bool identified;
+        public bool Identified
+        {
+            get
+            {
+                return identified;
+            }
+
+            internal set
+            {
+                identified = value;
             }
         }
     }

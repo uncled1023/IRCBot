@@ -11,219 +11,197 @@ namespace Bot.Modules
     {
         List<trivia_info> trivias = new List<trivia_info>();
         public readonly object trivialock = new object();
-        public override void control(bot ircbot, BotConfig Conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, BotConfig Conf, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
-            string module_name = ircbot.Conf.Module_Config[module_id][0];
             if (type.Equals("channel") && bot_command == true)
             {
-                foreach (List<string> tmp_command in Conf.Command_List)
+                foreach (Command tmp_command in this.Commands)
                 {
-                    if (module_name.Equals(tmp_command[0]))
+                    bool blocked = tmp_command.Blacklist.Contains(channel) || tmp_command.Blacklist.Contains(nick);
+                    bool cmd_found = false;
+                    bool spam_check = ircbot.get_spam_check(channel, nick, tmp_command.Spam_Check);
+                    if (spam_check == true)
                     {
-                        string[] triggers = tmp_command[3].Split('|');
-                        int command_access = Convert.ToInt32(tmp_command[5]);
-                        string[] blacklist = tmp_command[6].Split(',');
-                        bool blocked = false;
-                        bool cmd_found = false;
-                        bool spam_check = ircbot.get_spam_check(channel, nick, Convert.ToBoolean(tmp_command[8]));
-                        foreach (string bl_chan in blacklist)
+                        blocked = blocked || ircbot.get_spam_status(channel);
+                    }
+                    cmd_found = tmp_command.Triggers.Contains(command);
+                    if (blocked == true && cmd_found == true)
+                    {
+                        ircbot.sendData("NOTICE", nick + " :I am currently too busy to process that.");
+                    }
+                    if (blocked == false && cmd_found == true)
+                    {
+                        foreach (string trigger in tmp_command.Triggers)
                         {
-                            if (bl_chan.Equals(channel))
+                            switch (trigger)
                             {
-                                blocked = true;
-                                break;
-                            }
-                        }
-                        if (spam_check == true)
-                        {
-                            blocked = ircbot.get_spam_status(channel);
-                        }
-                        foreach (string trigger in triggers)
-                        {
-                            if (trigger.Equals(command))
-                            {
-                                cmd_found = true;
-                                break;
-                            }
-                        }
-                        if (blocked == true && cmd_found == true)
-                        {
-                            ircbot.sendData("NOTICE", nick + " :I am currently too busy to process that.");
-                        }
-                        if (blocked == false && cmd_found == true)
-                        {
-                            foreach (string trigger in triggers)
-                            {
-                                switch (trigger)
-                                {
-                                    case "trivia":
-                                        if (spam_check == true)
+                                case "trivia":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        bool score_found = false;
+                                        lock (trivialock)
                                         {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            bool score_found = false;
-                                            lock (trivialock)
+                                            foreach (trivia_info trivia in trivias)
                                             {
-                                                foreach (trivia_info trivia in trivias)
+                                                if (trivia.channel.Equals(channel, StringComparison.InvariantCultureIgnoreCase) && trivia.running)
                                                 {
-                                                    if (trivia.channel.Equals(channel, StringComparison.InvariantCultureIgnoreCase) && trivia.running)
-                                                    {
-                                                        score_found = true;
-                                                        break;
-                                                    }
+                                                    score_found = true;
+                                                    break;
                                                 }
                                             }
-                                            if (!score_found)
-                                            {
-                                                ircbot.sendData("PRIVMSG", channel + " :Lets play some Trivia!");
-                                                new_question(channel, ircbot);
-                                            }
-                                            else
-                                            {
-                                                ircbot.sendData("PRIVMSG", channel + " :There is already a trivia game started!");
-                                            }
                                         }
-                                        break;
-                                    case "scores":
-                                        if (spam_check == true)
+                                        if (!score_found)
                                         {
-                                            ircbot.add_spam_count(channel);
+                                            ircbot.sendData("PRIVMSG", channel + " :Lets play some Trivia!");
+                                            new_question(channel, ircbot);
                                         }
-                                        if (nick_access >= command_access)
+                                        else
                                         {
-                                            bool score_found = false;
-                                            lock (trivialock)
+                                            ircbot.sendData("PRIVMSG", channel + " :There is already a trivia game started!");
+                                        }
+                                    }
+                                    break;
+                                case "scores":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        bool score_found = false;
+                                        lock (trivialock)
+                                        {
+                                            foreach (trivia_info trivia in trivias)
                                             {
-                                                foreach (trivia_info trivia in trivias)
+                                                if (trivia.channel.Equals(channel, StringComparison.InvariantCultureIgnoreCase))
                                                 {
-                                                    if (trivia.channel.Equals(channel, StringComparison.InvariantCultureIgnoreCase))
+                                                    score_found = true;
+                                                    int index = 1;
+                                                    List<List<string>> sorted = new List<List<string>>();
+                                                    string msg = "";
+                                                    foreach (List<string> score in trivia.scores)
                                                     {
-                                                        score_found = true;
-                                                        int index = 1;
-                                                        List<List<string>> sorted = new List<List<string>>();
-                                                        string msg = "";
-                                                        foreach (List<string> score in trivia.scores)
+                                                        if (index <= 10)
                                                         {
-                                                            if (index <= 10)
-                                                            {
-                                                                msg += "[" + index + "] " + score[0] + ": " + score[1] + " points | ";
-                                                            }
-                                                            else
-                                                            {
-                                                                break;
-                                                            }
-                                                            index++;
-                                                        }
-                                                        if (!msg.Equals(string.Empty))
-                                                        {
-                                                            ircbot.sendData("PRIVMSG", channel + " :" + msg.Trim().TrimEnd('|').Trim());
+                                                            msg += "[" + index + "] " + score[0] + ": " + score[1] + " points | ";
                                                         }
                                                         else
                                                         {
-                                                            ircbot.sendData("PRIVMSG", channel + " :No scores are available.");
+                                                            break;
                                                         }
-                                                        break;
+                                                        index++;
                                                     }
-                                                }
-                                            }
-                                            if (!score_found)
-                                            {
-                                                ircbot.sendData("PRIVMSG", channel + " :No scores are available.");
-                                            }
-                                        }
-                                        break;
-                                    case "score":
-                                        if (spam_check == true)
-                                        {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            bool score_found = false;
-                                            lock (trivialock)
-                                            {
-                                                foreach (trivia_info trivia in trivias)
-                                                {
-                                                    if (trivia.channel.Equals(channel, StringComparison.InvariantCultureIgnoreCase))
+                                                    if (!msg.Equals(string.Empty))
                                                     {
-                                                        score_found = true;
-                                                        int index = 0;
-                                                        bool nick_found = false;
-                                                        foreach (List<string> score in trivia.scores)
-                                                        {
-                                                            if (score[0].Equals(nick, StringComparison.InvariantCultureIgnoreCase))
-                                                            {
-                                                                ircbot.sendData("PRIVMSG", channel + " :You are rank " + (index + 1).ToString() + " out of " + trivia.scores.Count + " with " + score[1] + " points");
-                                                                nick_found = true;
-                                                                break;
-                                                            }
-                                                            index++;
-                                                        }
-                                                        if (!nick_found)
-                                                        {
-                                                            ircbot.sendData("NOTICE", nick + " :You are not currently ranked.  Try answering some questions to earn points!");
-                                                        }
-                                                        break;
+                                                        ircbot.sendData("PRIVMSG", channel + " :" + msg.Trim().TrimEnd('|').Trim());
                                                     }
-                                                }
-                                            }
-                                            if (!score_found)
-                                            {
-                                                ircbot.sendData("PRIVMSG", channel + " :No scores are available.");
-                                            }
-                                        }
-                                        break;
-                                    case "stoptrivia":
-                                        if (spam_check == true)
-                                        {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            bool trivia_found = false;
-                                            lock (trivialock)
-                                            {
-                                                foreach (trivia_info trivia in trivias)
-                                                {
-                                                    if (trivia.channel.Equals(channel, StringComparison.InvariantCultureIgnoreCase))
+                                                    else
                                                     {
-                                                        trivia_found = true;
-                                                        trivia.answer_timer.Stop();
-                                                        trivia.running = false;
-                                                        ircbot.sendData("PRIVMSG", channel + " :Trivia has been stopped!");
-                                                        int index = 1;
-                                                        List<List<string>> sorted = new List<List<string>>();
-                                                        string msg = "";
-                                                        foreach (List<string> score in trivia.scores)
-                                                        {
-                                                            if (index <= 10)
-                                                            {
-                                                                msg += "[" + index + "] " + score[0] + ": " + score[1] + " points | ";
-                                                            }
-                                                            else
-                                                            {
-                                                                break;
-                                                            }
-                                                        }
-                                                        if (!msg.Equals(string.Empty))
-                                                        {
-                                                            ircbot.sendData("PRIVMSG", channel + " :" + msg.Trim().TrimEnd('|').Trim());
-                                                        }
-                                                        break;
+                                                        ircbot.sendData("PRIVMSG", channel + " :No scores are available.");
                                                     }
+                                                    break;
                                                 }
                                             }
-                                            if (!trivia_found)
+                                        }
+                                        if (!score_found)
+                                        {
+                                            ircbot.sendData("PRIVMSG", channel + " :No scores are available.");
+                                        }
+                                    }
+                                    break;
+                                case "score":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        bool score_found = false;
+                                        lock (trivialock)
+                                        {
+                                            foreach (trivia_info trivia in trivias)
                                             {
-                                                ircbot.sendData("PRIVMSG", channel + " :There isn't a trivia game running here.");
+                                                if (trivia.channel.Equals(channel, StringComparison.InvariantCultureIgnoreCase))
+                                                {
+                                                    score_found = true;
+                                                    int index = 0;
+                                                    bool nick_found = false;
+                                                    foreach (List<string> score in trivia.scores)
+                                                    {
+                                                        if (score[0].Equals(nick, StringComparison.InvariantCultureIgnoreCase))
+                                                        {
+                                                            ircbot.sendData("PRIVMSG", channel + " :You are rank " + (index + 1).ToString() + " out of " + trivia.scores.Count + " with " + score[1] + " points");
+                                                            nick_found = true;
+                                                            break;
+                                                        }
+                                                        index++;
+                                                    }
+                                                    if (!nick_found)
+                                                    {
+                                                        ircbot.sendData("NOTICE", nick + " :You are not currently ranked.  Try answering some questions to earn points!");
+                                                    }
+                                                    break;
+                                                }
                                             }
                                         }
-                                        break;
-                                    default:
-                                        break;
-                                }
+                                        if (!score_found)
+                                        {
+                                            ircbot.sendData("PRIVMSG", channel + " :No scores are available.");
+                                        }
+                                    }
+                                    break;
+                                case "stoptrivia":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        bool trivia_found = false;
+                                        lock (trivialock)
+                                        {
+                                            foreach (trivia_info trivia in trivias)
+                                            {
+                                                if (trivia.channel.Equals(channel, StringComparison.InvariantCultureIgnoreCase))
+                                                {
+                                                    trivia_found = true;
+                                                    trivia.answer_timer.Stop();
+                                                    trivia.running = false;
+                                                    ircbot.sendData("PRIVMSG", channel + " :Trivia has been stopped!");
+                                                    int index = 1;
+                                                    List<List<string>> sorted = new List<List<string>>();
+                                                    string msg = "";
+                                                    foreach (List<string> score in trivia.scores)
+                                                    {
+                                                        if (index <= 10)
+                                                        {
+                                                            msg += "[" + index + "] " + score[0] + ": " + score[1] + " points | ";
+                                                        }
+                                                        else
+                                                        {
+                                                            break;
+                                                        }
+                                                    }
+                                                    if (!msg.Equals(string.Empty))
+                                                    {
+                                                        ircbot.sendData("PRIVMSG", channel + " :" + msg.Trim().TrimEnd('|').Trim());
+                                                    }
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        if (!trivia_found)
+                                        {
+                                            ircbot.sendData("PRIVMSG", channel + " :There isn't a trivia game running here.");
+                                        }
+                                    }
+                                    break;
+                                default:
+                                    break;
                             }
                         }
                     }

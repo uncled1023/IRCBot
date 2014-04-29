@@ -9,114 +9,92 @@ namespace Bot.Modules
 {
     class messaging : Module
     {
-        public override void control(bot ircbot, BotConfig Conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, BotConfig Conf, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
-            string module_name = ircbot.Conf.Module_Config[module_id][0];
             if (type.Equals("channel") || type.Equals("query") && bot_command == true)
             {
-                foreach (List<string> tmp_command in Conf.Command_List)
+                foreach (Command tmp_command in this.Commands)
                 {
-                    if (module_name.Equals(tmp_command[0]))
+                    bool blocked = tmp_command.Blacklist.Contains(channel) || tmp_command.Blacklist.Contains(nick);
+                    bool cmd_found = false;
+                    bool spam_check = ircbot.get_spam_check(channel, nick, tmp_command.Spam_Check);
+                    if (spam_check == true)
                     {
-                        string[] triggers = tmp_command[3].Split('|');
-                        int command_access = Convert.ToInt32(tmp_command[5]);
-                        string[] blacklist = tmp_command[6].Split(',');
-                        bool blocked = false;
-                        bool cmd_found = false;
-                        bool spam_check = ircbot.get_spam_check(channel, nick, Convert.ToBoolean(tmp_command[8]));
-                        foreach (string bl_chan in blacklist)
+                        blocked = blocked || ircbot.get_spam_status(channel);
+                    }
+                    cmd_found = tmp_command.Triggers.Contains(command);
+                    if (blocked == true && cmd_found == true)
+                    {
+                        ircbot.sendData("NOTICE", nick + " :I am currently too busy to process that.");
+                    }
+                    if (blocked == false && cmd_found == true)
+                    {
+                        foreach (string trigger in tmp_command.Triggers)
                         {
-                            if (bl_chan.Equals(channel))
+                            switch (trigger)
                             {
-                                blocked = true;
-                                break;
-                            }
-                        }
-                        if (spam_check == true)
-                        {
-                            blocked = ircbot.get_spam_status(channel);
-                        }
-                        foreach (string trigger in triggers)
-                        {
-                            if (trigger.Equals(command))
-                            {
-                                cmd_found = true;
-                                break;
-                            }
-                        }
-                        if (blocked == true && cmd_found == true)
-                        {
-                            ircbot.sendData("NOTICE", nick + " :I am currently too busy to process that.");
-                        }
-                        if (blocked == false && cmd_found == true)
-                        {
-                            foreach (string trigger in triggers)
-                            {
-                                switch (trigger)
-                                {
-                                    case "message":
-                                        if (spam_check == true)
+                                case "message":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
                                         {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
+                                            if (type.Equals("channel"))
                                             {
-                                                if (type.Equals("channel"))
-                                                {
-                                                    add_message(nick, line, line[2], ircbot, module_id);
-                                                }
-                                                else
-                                                {
-                                                    add_message(nick, line, null, ircbot, module_id);
-                                                }
+                                                add_message(nick, line, line[2], ircbot);
                                             }
                                             else
                                             {
-                                                if (type.Equals("channel"))
-                                                {
-                                                    ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                                                }
-                                                else
-                                                {
-                                                    ircbot.sendData("PRIVMSG", nick + " :" + nick + ", you need to include more info.");
-                                                }
+                                                add_message(nick, line, null, ircbot);
                                             }
                                         }
-                                        break;
-                                    case "anonmessage":
-                                        if (spam_check == true)
+                                        else
                                         {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
+                                            if (type.Equals("channel"))
                                             {
-                                                if (type.Equals("channel"))
-                                                {
-                                                    add_anonmessage(nick, line, line[2], ircbot, module_id);
-                                                }
-                                                else
-                                                {
-                                                    add_anonmessage(nick, line, null, ircbot, module_id);
-                                                }
+                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
                                             }
                                             else
                                             {
-                                                if (type.Equals("channel"))
-                                                {
-                                                    ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                                                }
-                                                else
-                                                {
-                                                    ircbot.sendData("PRIVMSG", nick + " :" + nick + ", you need to include more info.");
-                                                }
+                                                ircbot.sendData("PRIVMSG", nick + " :" + nick + ", you need to include more info.");
                                             }
                                         }
-                                        break;
-                                }
+                                    }
+                                    break;
+                                case "anonmessage":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
+                                        {
+                                            if (type.Equals("channel"))
+                                            {
+                                                add_anonmessage(nick, line, line[2], ircbot);
+                                            }
+                                            else
+                                            {
+                                                add_anonmessage(nick, line, null, ircbot);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (type.Equals("channel"))
+                                            {
+                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                                            }
+                                            else
+                                            {
+                                                ircbot.sendData("PRIVMSG", nick + " :" + nick + ", you need to include more info.");
+                                            }
+                                        }
+                                    }
+                                    break;
                             }
                         }
                     }
@@ -128,7 +106,7 @@ namespace Bot.Modules
             }
         }
 
-        private void add_message(string nick, string[] line, string channel, bot ircbot, int module_id)
+        private void add_message(string nick, string[] line, string channel, bot ircbot)
         {
             string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "messaging" + Path.DirectorySeparatorChar + ircbot.Conf.Server_Name + "_messages.txt";
             char[] charS = new char[] { ' ' };
@@ -158,7 +136,7 @@ namespace Bot.Modules
                         }
                         new_file.Add(file_line);
                     }
-                    if (Convert.ToInt32(ircbot.Conf.Module_Config[module_id][3]) > num_msg)
+                    if (Convert.ToInt32(this.Options["max_messages"]) > num_msg)
                     {
                         new_file.Add(add_line);
                         added_nick = true;
@@ -181,7 +159,7 @@ namespace Bot.Modules
             }
         }
 
-        private void add_anonmessage(string nick, string[] line, string channel, bot ircbot, int module_id)
+        private void add_anonmessage(string nick, string[] line, string channel, bot ircbot)
         {
             string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "messaging" + Path.DirectorySeparatorChar + ircbot.Conf.Server_Name + "_messages.txt";
             char[] charS = new char[] { ' ' };
@@ -211,7 +189,7 @@ namespace Bot.Modules
                         }
                         new_file.Add(file_line);
                     }
-                    if (Convert.ToInt32(ircbot.Conf.Module_Config[module_id][3]) > num_msg)
+                    if (Convert.ToInt32(this.Options["max_messages"]) > num_msg)
                     {
                         new_file.Add(add_line);
                         added_nick = true;

@@ -16,9 +16,8 @@ namespace Bot.Modules
 {
     class url : Module
     {
-        public override void control(bot ircbot, BotConfig Conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, BotConfig Conf, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
-            string module_name = ircbot.Conf.Module_Config[module_id][0];
             if (type.Equals("channel") && bot_command == false)
             {
                 string text = "";
@@ -60,7 +59,7 @@ namespace Bot.Modules
                                     Regex title_ex = new Regex(title_regex, RegexOptions.IgnoreCase);
                                     MatchCollection title_matches = title_ex.Matches(source);
                                     string title = title_matches[0].Value.Trim();
-                                    if (url.OriginalString.Contains("youtube.com/watch?") && ircbot.Conf.Module_Config[module_id][4].Equals("True"))
+                                    if (url.OriginalString.Contains("youtube.com/watch?") && this.Options["parse_youtube"])
                                     {
                                         string YouTubeVideoID = ExtractYouTubeVideoIDFromUrl(url.OriginalString);
                                         Uri videoEntryUrl = new Uri(string.Format("https://gdata.youtube.com/feeds/api/videos/{0}", YouTubeVideoID));
@@ -89,7 +88,7 @@ namespace Bot.Modules
                                         }
                                         ircbot.sendData("PRIVMSG", channel + " :[Youtube] Title: " + HttpUtility.HtmlDecode(yt_title) + " | Length: " + total_duration.TrimEnd(' ') + " | Views: " + string.Format("{0:#,###0}", views) + " | Rated: " + Math.Round(rateavg, 2).ToString() + "/5.0 | Uploaded By: " + uploader + " on " + date.ToString("yyyy-MM-dd"));
                                     }
-                                    else if (url.OriginalString.Contains("youtu.be") && ircbot.Conf.Module_Config[module_id][4].Equals("True"))
+                                    else if (url.OriginalString.Contains("youtu.be") && this.Options["parse_youtube"])
                                     {
                                         string[] url_parsed = url.OriginalString.Split('/');
                                         string YouTubeVideoID = url_parsed[url_parsed.GetUpperBound(0)];
@@ -119,16 +118,16 @@ namespace Bot.Modules
                                         }
                                         ircbot.sendData("PRIVMSG", channel + " :[Youtube] Title: " + HttpUtility.HtmlDecode(yt_title) + " | Length: " + total_duration.TrimEnd(' ') + " | Views: " + string.Format("{0:#,###0}", views) + " | Rated: " + Math.Round(rateavg, 2).ToString() + "/5.0 | Uploaded By: " + uploader + " on " + date.ToString("yyyy-MM-dd"));
                                     }
-                                    else if ((url.OriginalString.Contains("boards.4chan.org") && url.Segments.GetUpperBound(0) > 2) && ircbot.Conf.Module_Config[module_id][5].Equals("True"))
+                                    else if ((url.OriginalString.Contains("boards.4chan.org") && url.Segments.GetUpperBound(0) > 2) && this.Options["parse_4chan"])
                                     {
                                         string board = url.Segments[1].TrimEnd('/');
-                                        string uri = "https://api.4chan.org/" + board + "/res/" + url.Segments[3] + ".json";
+                                        string uri = "https://a.4cdn.org/" + board + "/thread/" + url.Segments[3].TrimEnd('/') + ".json";
                                         WebClient chan = new WebClient();
                                         chan.Encoding = Encoding.UTF8;
                                         var json_data = string.Empty;
                                         json_data = chan.DownloadString(uri);
-                                        XmlDocument xmlDoc = JsonConvert.DeserializeXmlNode(json_data, board + "-" + url.Segments[3]);
-                                        XmlNodeList post_list = xmlDoc.SelectNodes(board + "-" + url.Segments[3] + "/posts");
+                                        XmlDocument xmlDoc = JsonConvert.DeserializeXmlNode(json_data, board + "-" + url.Segments[3].TrimEnd('/'));
+                                        XmlNodeList post_list = xmlDoc.SelectNodes(board + "-" + url.Segments[3].TrimEnd('/') + "/posts");
                                         string thread = "";
                                         if (!url.Fragment.Equals(string.Empty))
                                         {
@@ -136,7 +135,7 @@ namespace Bot.Modules
                                         }
                                         else
                                         {
-                                            thread = url.Segments[3];
+                                            thread = url.Segments[3].TrimEnd('/');
                                         }
                                         foreach (XmlNode post in post_list)
                                         {
@@ -293,37 +292,37 @@ namespace Bot.Modules
                                             }
                                         }
                                     }
-                                    else if (ircbot.Conf.Module_Config[module_id][3].Equals("True"))
+                                    else if (this.Options["parse_url"].Equals("True"))
                                     {
                                         ircbot.sendData("PRIVMSG", channel + " :[URL] " + HttpUtility.HtmlDecode(title) + " (" + url.Host + ")");
                                     }
                                     break;
                                 case "image":
-                                    if (ircbot.Conf.Module_Config[module_id][6].Equals("True"))
+                                    if (this.Options["parse_image"])
                                     {
                                         ircbot.sendData("PRIVMSG", channel + " :[" + resp.ContentType + "] Size: " + ToFileSize(resp.ContentLength));
                                     }
                                     break;
                                 case "video":
-                                    if (ircbot.Conf.Module_Config[module_id][7].Equals("True"))
+                                    if (this.Options["parse_video"])
                                     {
                                         ircbot.sendData("PRIVMSG", channel + " :[Video] Type: " + content_type[1] + " | Size: " + ToFileSize(resp.ContentLength));
                                     }
                                     break;
                                 case "application":
-                                    if (ircbot.Conf.Module_Config[module_id][8].Equals("True"))
+                                    if (this.Options["parse_app"])
                                     {
                                         ircbot.sendData("PRIVMSG", channel + " :[Application] Type: " + content_type[1] + " | Size: " + ToFileSize(resp.ContentLength));
                                     }
                                     break;
                                 case "audio":
-                                    if (ircbot.Conf.Module_Config[module_id][9].Equals("True"))
+                                    if (this.Options["parse_audio"])
                                     {
                                         ircbot.sendData("PRIVMSG", channel + " :[Audio] Type: " + content_type[1] + " | Size: " + ToFileSize(resp.ContentLength));
                                     }
                                     break;
                                 default:
-                                    if (ircbot.Conf.Module_Config[module_id][10].Equals("True"))
+                                    if (this.Options["parse_content"])
                                     {
                                         ircbot.sendData("PRIVMSG", channel + " :[URL] " + HttpUtility.HtmlDecode(resp.ContentType) + " (" + url.Host + ")");
                                     }

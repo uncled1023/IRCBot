@@ -26,135 +26,40 @@ namespace Bot.Modules
         private bot main;
         public List<hbomb_info> hbombs = new List<hbomb_info>();
 
-        public override void control(bot ircbot, BotConfig Conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, BotConfig Conf, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
-            string module_name = ircbot.Conf.Module_Config[module_id][0];
             if (type.Equals("channel") && bot_command == true)
             {
-                foreach (List<string> tmp_command in Conf.Command_List)
+                foreach (Command tmp_command in this.Commands)
                 {
-                    if (module_name.Equals(tmp_command[0]))
+                    bool blocked = tmp_command.Blacklist.Contains(channel) || tmp_command.Blacklist.Contains(nick);
+                    bool cmd_found = false;
+                    bool spam_check = ircbot.get_spam_check(channel, nick, tmp_command.Spam_Check);
+                    if (spam_check == true)
                     {
-                        string[] triggers = tmp_command[3].Split('|');
-                        int command_access = Convert.ToInt32(tmp_command[5]);
-                        string[] blacklist = tmp_command[6].Split(',');
-                        bool blocked = false;
-                        bool cmd_found = false;
-                        bool spam_check = ircbot.get_spam_check(channel, nick, Convert.ToBoolean(tmp_command[8]));
-                        foreach (string bl_chan in blacklist)
+                        blocked = blocked || ircbot.get_spam_status(channel);
+                    }
+                    cmd_found = tmp_command.Triggers.Contains(command);
+                    if (blocked == true && cmd_found == true)
+                    {
+                        ircbot.sendData("NOTICE", nick + " :I am currently too busy to process that.");
+                    }
+                    if (blocked == false && cmd_found == true)
+                    {
+                        foreach (string trigger in tmp_command.Triggers)
                         {
-                            if (bl_chan.Equals(channel))
+                            switch (trigger)
                             {
-                                blocked = true;
-                                break;
-                            }
-                        }
-                        if (spam_check == true)
-                        {
-                            blocked = ircbot.get_spam_status(channel);
-                        }
-                        foreach (string trigger in triggers)
-                        {
-                            if (trigger.Equals(command))
-                            {
-                                cmd_found = true;
-                                break;
-                            }
-                        }
-                        if (blocked == true && cmd_found == true)
-                        {
-                            ircbot.sendData("NOTICE", nick + " :I am currently too busy to process that.");
-                        }
-                        if (blocked == false && cmd_found == true)
-                        {
-                            foreach (string trigger in triggers)
-                            {
-                                switch (trigger)
-                                {
-                                    case "hbomb":
-                                        if (spam_check == true)
+                                case "hbomb":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        Modules.idle idle = (Modules.idle)ircbot.get_module("idle");
+                                        if (idle.check_idle(nick) == false)
                                         {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            Modules.idle idle = (Modules.idle)ircbot.get_module("idle");
-                                            if (idle.check_idle(nick) == false)
-                                            {
-                                                bool hbomb_active = false;
-                                                hbomb_info tmp_info = new hbomb_info();
-                                                foreach (hbomb_info bomb in hbombs)
-                                                {
-                                                    if (bomb.bomb_channel.Equals(channel))
-                                                    {
-                                                        tmp_info = bomb;
-                                                        hbomb_active = true;
-                                                        break;
-                                                    }
-                                                }
-                                                if (hbomb_active == false)
-                                                {
-                                                    tmp_info.bomb_locked = false;
-                                                    tmp_info.bomb_trigger = new System.Timers.Timer();
-                                                    tmp_info.wire_colors = ircbot.Conf.Module_Config[module_id][3].Split(',');
-                                                    tmp_info.bomb_channel = channel;
-
-                                                    Random random_color = new Random();
-                                                    int color_index = random_color.Next(0, tmp_info.wire_colors.GetUpperBound(0) + 1);
-                                                    tmp_info.wire_color = tmp_info.wire_colors[color_index];
-
-                                                    Random random = new Random();
-                                                    int index = random.Next(10, 60);
-
-                                                    tmp_info.bomb_trigger.Elapsed += (System, EventArgs) => activate_bomb(channel);
-                                                    tmp_info.bomb_trigger.Interval = (index * 1000);
-                                                    tmp_info.bomb_trigger.Enabled = true;
-                                                    tmp_info.bomb_trigger.AutoReset = false;
-
-                                                    main = ircbot;
-
-                                                    tmp_info.previous_bomb_holder = nick;
-                                                    tmp_info.bomb_holder = nick;
-
-                                                    ircbot.sendData("PRIVMSG", channel + " :" + nick + " has started the timer!  If the bomb gets passed to you, type " + ircbot.Conf.Command + "pass <nick> to pass it to someone else, or type " + ircbot.Conf.Command + "defuse <color> to try to defuse it.");
-                                                    string colors = "";
-                                                    foreach (string wire in tmp_info.wire_colors)
-                                                    {
-                                                        colors += wire + ",";
-                                                    }
-                                                    ircbot.sendData("NOTICE", nick + " :You need to hurry and pass the bomb before it blows up!  Or you can try to defuse it yourself.  The colors are: " + colors.TrimEnd(','));
-                                                    hbombs.Add(tmp_info);
-                                                }
-                                                else
-                                                {
-                                                    if (tmp_info.bomb_channel.Equals(channel))
-                                                    {
-                                                        ircbot.sendData("PRIVMSG", channel + " :There is already a bomb counting down.");
-                                                    }
-                                                    else
-                                                    {
-                                                        ircbot.sendData("PRIVMSG", line[2] + " :There is already a bomb counting down in " + tmp_info.bomb_channel + ".");
-                                                    }
-                                                }
-                                            }
-                                            else
-                                            {
-                                                ircbot.sendData("PRIVMSG", channel + " :You can not start a HBomb when you are idle.");
-                                            }
-                                        }
-                                        else
-                                        {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                                        }
-                                        break;
-                                    case "pass":
-                                        if (spam_check == true)
-                                        {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            int index = 0;
                                             bool hbomb_active = false;
                                             hbomb_info tmp_info = new hbomb_info();
                                             foreach (hbomb_info bomb in hbombs)
@@ -165,362 +70,435 @@ namespace Bot.Modules
                                                     hbomb_active = true;
                                                     break;
                                                 }
-                                                index++;
                                             }
-                                            if (hbomb_active == true)
-                                            {
-                                                if (!tmp_info.bomb_locked)
-                                                {
-                                                    Modules.idle idle = (Modules.idle)ircbot.get_module("idle");
-                                                    if (idle.check_idle(nick) == false)
-                                                    {
-                                                        if (tmp_info.bomb_holder.Equals(nick, StringComparison.InvariantCultureIgnoreCase))
-                                                        {
-                                                            if (line.GetUpperBound(0) > 3)
-                                                            {
-                                                                if (line[4].Trim().Equals(ircbot.Nick, StringComparison.InvariantCultureIgnoreCase))
-                                                                {
-                                                                    ircbot.sendData("PRIVMSG", channel + " :" + nick + ", you can't pass it to me!");
-                                                                }
-                                                                else
-                                                                {
-                                                                    int user_access = ircbot.get_nick_access(line[4].Trim(), channel);
-                                                                    if (user_access > 0 && idle.check_idle(line[4].Trim()) == false)
-                                                                    {
-                                                                        pass_hbomb(line[4].Trim(), channel, nick, ircbot, Conf, ref tmp_info, index);
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        ircbot.sendData("PRIVMSG", channel + " :" + nick + ", you can't pass to them!");
-                                                                    }
-                                                                }
-                                                            }
-                                                            else
-                                                            {
-                                                                ircbot.sendData("PRIVMSG", channel + " :" + nick + ", you need to pass the bomb to someone.");
-                                                            }
-                                                        }
-                                                        else
-                                                        {
-                                                            ircbot.sendData("PRIVMSG", channel + " :You don't have the bomb!");
-                                                        }
-                                                    }
-                                                    else
-                                                    {
-                                                        ircbot.sendData("PRIVMSG", channel + " :You can not pass the HBomb when you are idle.");
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    ircbot.sendData("PRIVMSG", channel + " :You can not pass a locked bomb.");
-                                                }
-                                            }
-                                            else
-                                            {
-                                                ircbot.sendData("PRIVMSG", channel + " :There isn't a bomb to pass!");
-                                            }
-                                        }
-                                        else
-                                        {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                                        }
-                                        break;
-                                    case "set_bomb":
-                                        if (spam_check == true)
-                                        {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            int index = 0;
-                                            bool hbomb_active = false;
-                                            hbomb_info tmp_info = new hbomb_info();
-                                            foreach (hbomb_info bomb in hbombs)
-                                            {
-                                                if (bomb.bomb_channel.Equals(channel))
-                                                {
-                                                    tmp_info = bomb;
-                                                    hbomb_active = true;
-                                                    break;
-                                                }
-                                                index++;
-                                            }
-                                            if (hbomb_active == true)
-                                            {
-                                                if (line.GetUpperBound(0) > 3)
-                                                {
-                                                    if (line[4].Trim().Equals(ircbot.Nick, StringComparison.InvariantCultureIgnoreCase))
-                                                    {
-                                                        ircbot.sendData("PRIVMSG", channel + " :" + nick + ", you can't pass it to me!");
-                                                    }
-                                                    else
-                                                    {
-                                                        int user_access = ircbot.get_nick_access(line[4].Trim(), channel);
-                                                        if (user_access > 0)
-                                                        {
-                                                            pass_hbomb(line[4].Trim(), channel, nick, ircbot, Conf, ref tmp_info, index);
-                                                        }
-                                                        else
-                                                        {
-                                                            ircbot.sendData("PRIVMSG", channel + " :" + nick + ", that user isn't online!");
-                                                        }
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    ircbot.sendData("PRIVMSG", channel + " :" + nick + ", you need to pass the bomb to someone.");
-                                                }
-
-                                            }
-                                            else
-                                            {
-                                                ircbot.sendData("PRIVMSG", channel + " :There isn't a bomb to pass!");
-                                            }
-                                        }
-                                        else
-                                        {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                                        }
-                                        break;
-                                    case "lock_bomb":
-                                        if (spam_check == true)
-                                        {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            int index = 0;
-                                            bool hbomb_active = false;
-                                            hbomb_info tmp_info = new hbomb_info();
-                                            foreach (hbomb_info bomb in hbombs)
-                                            {
-                                                if (bomb.bomb_channel.Equals(channel))
-                                                {
-                                                    tmp_info = bomb;
-                                                    hbomb_active = true;
-                                                    break;
-                                                }
-                                                index++;
-                                            }
-                                            if (hbomb_active == true)
-                                            {
-                                                if (line.GetUpperBound(0) > 3)
-                                                {
-                                                    if (line[4].Trim().Equals(ircbot.Nick, StringComparison.InvariantCultureIgnoreCase))
-                                                    {
-                                                        ircbot.sendData("PRIVMSG", channel + " :" + nick + ", you can't pass it to me!");
-                                                    }
-                                                    else
-                                                    {
-                                                        int user_access = ircbot.get_nick_access(line[4].Trim(), channel);
-                                                        if (user_access > 0)
-                                                        {
-                                                            pass_hbomb(line[4].Trim(), channel, nick, ircbot, Conf, ref tmp_info, index);
-                                                            tmp_info.bomb_locked = true;
-                                                        }
-                                                        else
-                                                        {
-                                                            ircbot.sendData("PRIVMSG", channel + " :" + nick + ", that user isn't online!");
-                                                        }
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    tmp_info.bomb_locked = true;
-                                                }
-                                                hbombs[index] = tmp_info;
-                                            }
-                                            else
-                                            {
-                                                ircbot.sendData("PRIVMSG", channel + " :There isn't a bomb to lock!");
-                                            }
-                                        }
-                                        else
-                                        {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                                        }
-                                        break;
-                                    case "unlock_bomb":
-                                        if (spam_check == true)
-                                        {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            int index = 0;
-                                            bool hbomb_active = false;
-                                            hbomb_info tmp_info = new hbomb_info();
-                                            foreach (hbomb_info bomb in hbombs)
-                                            {
-                                                if (bomb.bomb_channel.Equals(channel))
-                                                {
-                                                    tmp_info = bomb;
-                                                    hbomb_active = true;
-                                                    break;
-                                                }
-                                                index++;
-                                            }
-                                            if (hbomb_active == true)
+                                            if (hbomb_active == false)
                                             {
                                                 tmp_info.bomb_locked = false;
-                                                hbombs[index] = tmp_info;
-                                            }
-                                            else
-                                            {
-                                                ircbot.sendData("PRIVMSG", channel + " :There isn't a bomb to unlock!");
-                                            }
-                                        }
-                                        else
-                                        {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                                        }
-                                        break;
-                                    case "detonate":
-                                        if (spam_check == true)
-                                        {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            bool hbomb_active = false;
-                                            foreach (hbomb_info bomb in hbombs)
-                                            {
-                                                if (bomb.bomb_channel.Equals(channel))
-                                                {
-                                                    hbomb_active = true;
-                                                    break;
-                                                }
-                                            }
-                                            if (hbomb_active == true)
-                                            {
+                                                tmp_info.bomb_trigger = new System.Timers.Timer();
+                                                tmp_info.wire_colors = this.Options["wire_colors"].Split(',');
+                                                tmp_info.bomb_channel = channel;
+
+                                                Random random_color = new Random();
+                                                int color_index = random_color.Next(0, tmp_info.wire_colors.GetUpperBound(0) + 1);
+                                                tmp_info.wire_color = tmp_info.wire_colors[color_index];
+
+                                                Random random = new Random();
+                                                int index = random.Next(10, 60);
+
+                                                tmp_info.bomb_trigger.Elapsed += (System, EventArgs) => activate_bomb(channel);
+                                                tmp_info.bomb_trigger.Interval = (index * 1000);
+                                                tmp_info.bomb_trigger.Enabled = true;
+                                                tmp_info.bomb_trigger.AutoReset = false;
+
                                                 main = ircbot;
-                                                activate_bomb(channel);
+
+                                                tmp_info.previous_bomb_holder = nick;
+                                                tmp_info.bomb_holder = nick;
+
+                                                ircbot.sendData("PRIVMSG", channel + " :" + nick + " has started the timer!  If the bomb gets passed to you, type " + ircbot.Conf.Command + "pass <nick> to pass it to someone else, or type " + ircbot.Conf.Command + "defuse <color> to try to defuse it.");
+                                                string colors = "";
+                                                foreach (string wire in tmp_info.wire_colors)
+                                                {
+                                                    colors += wire + ",";
+                                                }
+                                                ircbot.sendData("NOTICE", nick + " :You need to hurry and pass the bomb before it blows up!  Or you can try to defuse it yourself.  The colors are: " + colors.TrimEnd(','));
+                                                hbombs.Add(tmp_info);
                                             }
                                             else
                                             {
-                                                ircbot.sendData("PRIVMSG", channel + " :There isn't a bomb to blow up!");
+                                                if (tmp_info.bomb_channel.Equals(channel))
+                                                {
+                                                    ircbot.sendData("PRIVMSG", channel + " :There is already a bomb counting down.");
+                                                }
+                                                else
+                                                {
+                                                    ircbot.sendData("PRIVMSG", line[2] + " :There is already a bomb counting down in " + tmp_info.bomb_channel + ".");
+                                                }
                                             }
                                         }
                                         else
                                         {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                            ircbot.sendData("PRIVMSG", channel + " :You can not start a HBomb when you are idle.");
                                         }
-                                        break;
-                                    case "stop_bomb":
-                                        if (spam_check == true)
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "pass":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        int index = 0;
+                                        bool hbomb_active = false;
+                                        hbomb_info tmp_info = new hbomb_info();
+                                        foreach (hbomb_info bomb in hbombs)
                                         {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            int index = 0;
-                                            bool hbomb_active = false;
-                                            hbomb_info tmp_info = new hbomb_info();
-                                            foreach (hbomb_info bomb in hbombs)
+                                            if (bomb.bomb_channel.Equals(channel))
                                             {
-                                                if (bomb.bomb_channel.Equals(channel))
+                                                tmp_info = bomb;
+                                                hbomb_active = true;
+                                                break;
+                                            }
+                                            index++;
+                                        }
+                                        if (hbomb_active == true)
+                                        {
+                                            if (!tmp_info.bomb_locked)
+                                            {
+                                                Modules.idle idle = (Modules.idle)ircbot.get_module("idle");
+                                                if (idle.check_idle(nick) == false)
                                                 {
-                                                    tmp_info = bomb;
-                                                    hbomb_active = true;
-                                                    break;
-                                                }
-                                                index++;
-                                            }
-                                            if (hbomb_active == true)
-                                            {
-                                                hbombs.RemoveAt(index);
-                                                ircbot.sendData("PRIVMSG", channel + " :Bomb has been defused and thrown away.");
-                                            }
-                                            else
-                                            {
-                                                ircbot.sendData("PRIVMSG", channel + " :There isn't a bomb to stop!");
-                                            }
-                                        }
-                                        else
-                                        {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                                        }
-                                        break;
-                                    case "defuse":
-                                        if (spam_check == true)
-                                        {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            int index = 0;
-                                            bool hbomb_active = false;
-                                            hbomb_info tmp_info = new hbomb_info();
-                                            foreach (hbomb_info bomb in hbombs)
-                                            {
-                                                if (bomb.bomb_channel.Equals(channel))
-                                                {
-                                                    tmp_info = bomb;
-                                                    hbomb_active = true;
-                                                    break;
-                                                }
-                                                index++;
-                                            }
-                                            if (hbomb_active == true)
-                                            {
-                                                if (!tmp_info.bomb_locked)
-                                                {
-                                                    Modules.idle idle = (Modules.idle)ircbot.get_module("idle");
-                                                    if (idle.check_idle(nick) == false)
+                                                    if (tmp_info.bomb_holder.Equals(nick, StringComparison.InvariantCultureIgnoreCase))
                                                     {
-                                                        if (tmp_info.bomb_holder.Equals(nick, StringComparison.InvariantCultureIgnoreCase))
+                                                        if (line.GetUpperBound(0) > 3)
                                                         {
-                                                            if (line.GetUpperBound(0) > 3)
+                                                            if (line[4].Trim().Equals(ircbot.Nick, StringComparison.InvariantCultureIgnoreCase))
                                                             {
-                                                                if (line[4].Trim().Equals(tmp_info.wire_color, StringComparison.InvariantCultureIgnoreCase))
-                                                                {
-                                                                    ircbot.sendData("PRIVMSG", channel + " :You have successfully defused the bomb!");
-                                                                    if (tmp_info.previous_bomb_holder.Equals(tmp_info.bomb_holder))
-                                                                    {
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        ircbot.sendData("KICK", tmp_info.bomb_channel + " " + tmp_info.previous_bomb_holder + " :BOOM!!!");
-                                                                    }
-                                                                    hbombs.RemoveAt(index);
-                                                                }
-                                                                else
-                                                                {
-                                                                    main = ircbot;
-                                                                    activate_bomb(channel);
-                                                                }
+                                                                ircbot.sendData("PRIVMSG", channel + " :" + nick + ", you can't pass it to me!");
                                                             }
                                                             else
                                                             {
-                                                                ircbot.sendData("PRIVMSG", channel + " :" + nick + ", you need to cut a wire.");
+                                                                int user_access = ircbot.get_nick_access(line[4].Trim(), channel);
+                                                                if (user_access > 0 && idle.check_idle(line[4].Trim()) == false)
+                                                                {
+                                                                    pass_hbomb(line[4].Trim(), channel, nick, ircbot, Conf, ref tmp_info, index);
+                                                                }
+                                                                else
+                                                                {
+                                                                    ircbot.sendData("PRIVMSG", channel + " :" + nick + ", you can't pass to them!");
+                                                                }
                                                             }
                                                         }
                                                         else
                                                         {
-                                                            ircbot.sendData("PRIVMSG", channel + " :You don't have the bomb!");
+                                                            ircbot.sendData("PRIVMSG", channel + " :" + nick + ", you need to pass the bomb to someone.");
                                                         }
                                                     }
                                                     else
                                                     {
-                                                        ircbot.sendData("PRIVMSG", channel + " :You can not defuse the HBomb when you are idle.");
+                                                        ircbot.sendData("PRIVMSG", channel + " :You don't have the bomb!");
                                                     }
                                                 }
                                                 else
                                                 {
-                                                    ircbot.sendData("PRIVMSG", channel + " :You can not defuse the HBomb when it is locked.");
+                                                    ircbot.sendData("PRIVMSG", channel + " :You can not pass the HBomb when you are idle.");
                                                 }
                                             }
                                             else
                                             {
-                                                ircbot.sendData("PRIVMSG", channel + " :There isn't a bomb to defuse!");
+                                                ircbot.sendData("PRIVMSG", channel + " :You can not pass a locked bomb.");
                                             }
                                         }
                                         else
                                         {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                            ircbot.sendData("PRIVMSG", channel + " :There isn't a bomb to pass!");
                                         }
-                                        break;
-                                }
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "set_bomb":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        int index = 0;
+                                        bool hbomb_active = false;
+                                        hbomb_info tmp_info = new hbomb_info();
+                                        foreach (hbomb_info bomb in hbombs)
+                                        {
+                                            if (bomb.bomb_channel.Equals(channel))
+                                            {
+                                                tmp_info = bomb;
+                                                hbomb_active = true;
+                                                break;
+                                            }
+                                            index++;
+                                        }
+                                        if (hbomb_active == true)
+                                        {
+                                            if (line.GetUpperBound(0) > 3)
+                                            {
+                                                if (line[4].Trim().Equals(ircbot.Nick, StringComparison.InvariantCultureIgnoreCase))
+                                                {
+                                                    ircbot.sendData("PRIVMSG", channel + " :" + nick + ", you can't pass it to me!");
+                                                }
+                                                else
+                                                {
+                                                    int user_access = ircbot.get_nick_access(line[4].Trim(), channel);
+                                                    if (user_access > 0)
+                                                    {
+                                                        pass_hbomb(line[4].Trim(), channel, nick, ircbot, Conf, ref tmp_info, index);
+                                                    }
+                                                    else
+                                                    {
+                                                        ircbot.sendData("PRIVMSG", channel + " :" + nick + ", that user isn't online!");
+                                                    }
+                                                }
+                                            }
+                                            else
+                                            {
+                                                ircbot.sendData("PRIVMSG", channel + " :" + nick + ", you need to pass the bomb to someone.");
+                                            }
+
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("PRIVMSG", channel + " :There isn't a bomb to pass!");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "lock_bomb":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        int index = 0;
+                                        bool hbomb_active = false;
+                                        hbomb_info tmp_info = new hbomb_info();
+                                        foreach (hbomb_info bomb in hbombs)
+                                        {
+                                            if (bomb.bomb_channel.Equals(channel))
+                                            {
+                                                tmp_info = bomb;
+                                                hbomb_active = true;
+                                                break;
+                                            }
+                                            index++;
+                                        }
+                                        if (hbomb_active == true)
+                                        {
+                                            if (line.GetUpperBound(0) > 3)
+                                            {
+                                                if (line[4].Trim().Equals(ircbot.Nick, StringComparison.InvariantCultureIgnoreCase))
+                                                {
+                                                    ircbot.sendData("PRIVMSG", channel + " :" + nick + ", you can't pass it to me!");
+                                                }
+                                                else
+                                                {
+                                                    int user_access = ircbot.get_nick_access(line[4].Trim(), channel);
+                                                    if (user_access > 0)
+                                                    {
+                                                        pass_hbomb(line[4].Trim(), channel, nick, ircbot, Conf, ref tmp_info, index);
+                                                        tmp_info.bomb_locked = true;
+                                                    }
+                                                    else
+                                                    {
+                                                        ircbot.sendData("PRIVMSG", channel + " :" + nick + ", that user isn't online!");
+                                                    }
+                                                }
+                                            }
+                                            else
+                                            {
+                                                tmp_info.bomb_locked = true;
+                                            }
+                                            hbombs[index] = tmp_info;
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("PRIVMSG", channel + " :There isn't a bomb to lock!");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "unlock_bomb":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        int index = 0;
+                                        bool hbomb_active = false;
+                                        hbomb_info tmp_info = new hbomb_info();
+                                        foreach (hbomb_info bomb in hbombs)
+                                        {
+                                            if (bomb.bomb_channel.Equals(channel))
+                                            {
+                                                tmp_info = bomb;
+                                                hbomb_active = true;
+                                                break;
+                                            }
+                                            index++;
+                                        }
+                                        if (hbomb_active == true)
+                                        {
+                                            tmp_info.bomb_locked = false;
+                                            hbombs[index] = tmp_info;
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("PRIVMSG", channel + " :There isn't a bomb to unlock!");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "detonate":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        bool hbomb_active = false;
+                                        foreach (hbomb_info bomb in hbombs)
+                                        {
+                                            if (bomb.bomb_channel.Equals(channel))
+                                            {
+                                                hbomb_active = true;
+                                                break;
+                                            }
+                                        }
+                                        if (hbomb_active == true)
+                                        {
+                                            main = ircbot;
+                                            activate_bomb(channel);
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("PRIVMSG", channel + " :There isn't a bomb to blow up!");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "stop_bomb":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        int index = 0;
+                                        bool hbomb_active = false;
+                                        hbomb_info tmp_info = new hbomb_info();
+                                        foreach (hbomb_info bomb in hbombs)
+                                        {
+                                            if (bomb.bomb_channel.Equals(channel))
+                                            {
+                                                tmp_info = bomb;
+                                                hbomb_active = true;
+                                                break;
+                                            }
+                                            index++;
+                                        }
+                                        if (hbomb_active == true)
+                                        {
+                                            hbombs.RemoveAt(index);
+                                            ircbot.sendData("PRIVMSG", channel + " :Bomb has been defused and thrown away.");
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("PRIVMSG", channel + " :There isn't a bomb to stop!");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "defuse":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        int index = 0;
+                                        bool hbomb_active = false;
+                                        hbomb_info tmp_info = new hbomb_info();
+                                        foreach (hbomb_info bomb in hbombs)
+                                        {
+                                            if (bomb.bomb_channel.Equals(channel))
+                                            {
+                                                tmp_info = bomb;
+                                                hbomb_active = true;
+                                                break;
+                                            }
+                                            index++;
+                                        }
+                                        if (hbomb_active == true)
+                                        {
+                                            if (!tmp_info.bomb_locked)
+                                            {
+                                                Modules.idle idle = (Modules.idle)ircbot.get_module("idle");
+                                                if (idle.check_idle(nick) == false)
+                                                {
+                                                    if (tmp_info.bomb_holder.Equals(nick, StringComparison.InvariantCultureIgnoreCase))
+                                                    {
+                                                        if (line.GetUpperBound(0) > 3)
+                                                        {
+                                                            if (line[4].Trim().Equals(tmp_info.wire_color, StringComparison.InvariantCultureIgnoreCase))
+                                                            {
+                                                                ircbot.sendData("PRIVMSG", channel + " :You have successfully defused the bomb!");
+                                                                if (tmp_info.previous_bomb_holder.Equals(tmp_info.bomb_holder))
+                                                                {
+                                                                }
+                                                                else
+                                                                {
+                                                                    ircbot.sendData("KICK", tmp_info.bomb_channel + " " + tmp_info.previous_bomb_holder + " :BOOM!!!");
+                                                                }
+                                                                hbombs.RemoveAt(index);
+                                                            }
+                                                            else
+                                                            {
+                                                                main = ircbot;
+                                                                activate_bomb(channel);
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            ircbot.sendData("PRIVMSG", channel + " :" + nick + ", you need to cut a wire.");
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        ircbot.sendData("PRIVMSG", channel + " :You don't have the bomb!");
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    ircbot.sendData("PRIVMSG", channel + " :You can not defuse the HBomb when you are idle.");
+                                                }
+                                            }
+                                            else
+                                            {
+                                                ircbot.sendData("PRIVMSG", channel + " :You can not defuse the HBomb when it is locked.");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("PRIVMSG", channel + " :There isn't a bomb to defuse!");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
                             }
                         }
                     }

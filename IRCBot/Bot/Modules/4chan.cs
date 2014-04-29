@@ -30,289 +30,263 @@ namespace Bot.Modules
     {
         private List<Board> Board_stats = new List<Board>();
 
-        public override void control(bot ircbot, BotConfig Conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, BotConfig Conf, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
-            string module_name = ircbot.Conf.Module_Config[module_id][0];
             if (type.Equals("channel") && bot_command == true)
             {
-                foreach (List<string> tmp_command in Conf.Command_List)
+                foreach (Command tmp_command in this.Commands)
                 {
-                    if (module_name.Equals(tmp_command[0]))
+                    bool blocked = tmp_command.Blacklist.Contains(channel) || tmp_command.Blacklist.Contains(nick);
+                    bool cmd_found = false;
+                    bool spam_check = ircbot.get_spam_check(channel, nick, tmp_command.Spam_Check);
+                    if (spam_check == true)
                     {
-                        string[] triggers = tmp_command[3].Split('|');
-                        int command_access = Convert.ToInt32(tmp_command[5]);
-                        string[] blacklist = tmp_command[6].Split(',');
-                        bool blocked = false;
-                        bool cmd_found = false;
-                        bool spam_check = ircbot.get_spam_check(channel, nick, Convert.ToBoolean(tmp_command[8]));
-                        foreach (string bl_chan in blacklist)
+                        blocked = blocked || ircbot.get_spam_status(channel);
+                    }
+                    cmd_found = tmp_command.Triggers.Contains(command);
+                    if (blocked == true && cmd_found == true)
+                    {
+                        ircbot.sendData("NOTICE", nick + " :I am currently too busy to process that.");
+                    }
+                    if (blocked == false && cmd_found == true)
+                    {
+                        foreach (string trigger in tmp_command.Triggers)
                         {
-                            if (bl_chan.Equals(channel))
+                            switch (trigger)
                             {
-                                blocked = true;
-                                break;
-                            }
-                        }
-                        if (spam_check == true)
-                        {
-                            blocked = ircbot.get_spam_status(channel);
-                        }
-                        foreach (string trigger in triggers)
-                        {
-                            if (trigger.Equals(command))
-                            {
-                                cmd_found = true;
-                                break;
-                            }
-                        }
-                        if (blocked == true && cmd_found == true)
-                        {
-                            ircbot.sendData("NOTICE", nick + " :I am currently too busy to process that.");
-                        }
-                        if (blocked == false && cmd_found == true)
-                        {
-                            foreach (string trigger in triggers)
-                            {
-                                switch (trigger)
-                                {
-                                    case "4chan":
-                                        if (spam_check == true)
+                                case "4chan":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
                                         {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
+                                            string[] args = line[4].Split(' ');
+                                            if (args.GetUpperBound(0) > 1)
                                             {
-                                                string[] args = line[4].Split(' ');
-                                                if (args.GetUpperBound(0) > 1)
+                                                try
                                                 {
-                                                    try
+                                                    bool thread_id = false;
+                                                    bool reply_id = false;
+                                                    if (args[1].StartsWith("#"))
                                                     {
-                                                        bool thread_id = false;
-                                                        bool reply_id = false;
-                                                        if (args[1].StartsWith("#"))
-                                                        {
-                                                            thread_id = true;
-                                                            args[1] = args[1].TrimStart('#');
-                                                        }
-                                                        if (args[2].StartsWith("#"))
-                                                        {
-                                                            reply_id = true;
-                                                            args[2] = args[2].TrimStart('#');
-                                                        }
-                                                        bool thread_found = get_reply(channel, ircbot, args[0], args[1], args[2], thread_id, reply_id);
-                                                        if (!thread_found)
-                                                        {
-                                                            ircbot.sendData("PRIVMSG", channel + " :Could not find the thread specified");
-                                                        }
+                                                        thread_id = true;
+                                                        args[1] = args[1].TrimStart('#');
                                                     }
-                                                    catch
+                                                    if (args[2].StartsWith("#"))
                                                     {
-                                                        ircbot.sendData("PRIVMSG", channel + " :Could not find the thread specified");
+                                                        reply_id = true;
+                                                        args[2] = args[2].TrimStart('#');
                                                     }
-                                                }
-                                                else if (args.GetUpperBound(0) > 0)
-                                                {
-                                                    try
-                                                    {
-                                                        bool thread_id = false;
-                                                        if (args[1].StartsWith("#"))
-                                                        {
-                                                            thread_id = true;
-                                                            args[1] = args[1].TrimStart('#');
-                                                        }
-                                                        bool thread_found = get_thread(channel, ircbot, args[0], args[1], thread_id);
-                                                        if (!thread_found)
-                                                        {
-                                                            ircbot.sendData("PRIVMSG", channel + " :Could not find the thread specified");
-                                                        }
-                                                    }
-                                                    catch
-                                                    {
-                                                        ircbot.sendData("PRIVMSG", channel + " :Could not find the thread specified");
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    bool thread_found = get_thread(channel, ircbot, args[0], "0", false);
+                                                    bool thread_found = get_reply(channel, ircbot, args[0], args[1], args[2], thread_id, reply_id);
                                                     if (!thread_found)
                                                     {
-                                                        ircbot.sendData("PRIVMSG", channel + " :Could not find the board specified");
+                                                        ircbot.sendData("PRIVMSG", channel + " :Could not find the thread specified");
                                                     }
+                                                }
+                                                catch
+                                                {
+                                                    ircbot.sendData("PRIVMSG", channel + " :Could not find the thread specified");
+                                                }
+                                            }
+                                            else if (args.GetUpperBound(0) > 0)
+                                            {
+                                                try
+                                                {
+                                                    bool thread_id = false;
+                                                    if (args[1].StartsWith("#"))
+                                                    {
+                                                        thread_id = true;
+                                                        args[1] = args[1].TrimStart('#');
+                                                    }
+                                                    bool thread_found = get_thread(channel, ircbot, args[0], args[1], thread_id);
+                                                    if (!thread_found)
+                                                    {
+                                                        ircbot.sendData("PRIVMSG", channel + " :Could not find the thread specified");
+                                                    }
+                                                }
+                                                catch
+                                                {
+                                                    ircbot.sendData("PRIVMSG", channel + " :Could not find the thread specified");
                                                 }
                                             }
                                             else
                                             {
-                                                string uri = "https://api.4chan.org/boards.json";
-                                                WebClient chan = new WebClient();
-                                                chan.Encoding = Encoding.UTF8;
-                                                var json_data = string.Empty;
-                                                json_data = chan.DownloadString(uri);
-                                                XmlDocument xmlDoc = JsonConvert.DeserializeXmlNode(json_data, "_4chan");
-                                                XmlNodeList board_list = xmlDoc.SelectNodes("_4chan/boards");
-                                                string msg = "";
-                                                foreach (XmlNode tmp_board in board_list)
+                                                bool thread_found = get_thread(channel, ircbot, args[0], "0", false);
+                                                if (!thread_found)
                                                 {
-                                                    msg += " /" + tmp_board["board"].InnerText + "/,";
-                                                }
-                                                if (!msg.Equals(string.Empty))
-                                                {
-                                                    ircbot.sendData("PRIVMSG", channel + " :Boards Available:" + msg.TrimEnd(','));
-                                                }
-                                                else
-                                                {
-                                                    ircbot.sendData("PRIVMSG", channel + " :No Boards Available");
+                                                    ircbot.sendData("PRIVMSG", channel + " :Could not find the board specified");
                                                 }
                                             }
                                         }
                                         else
                                         {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                                        }
-                                        break;
-                                    case "next_thread":
-                                        if (spam_check == true)
-                                        {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            bool chan_found = false;
-                                            string board = "";
-                                            string thread = "";
-                                            bool thread_id = false;
-                                            for (int x = 0; x < Board_stats.Count(); x++)
+                                            string uri = "https://a.4cdn.org/boards.json";
+                                            WebClient chan = new WebClient();
+                                            chan.Encoding = Encoding.UTF8;
+                                            var json_data = string.Empty;
+                                            json_data = chan.DownloadString(uri);
+                                            XmlDocument xmlDoc = JsonConvert.DeserializeXmlNode(json_data, "_4chan");
+                                            XmlNodeList board_list = xmlDoc.SelectNodes("_4chan/boards");
+                                            string msg = "";
+                                            foreach (XmlNode tmp_board in board_list)
                                             {
-                                                if (Board_stats[x].channel.Equals(channel))
-                                                {
-                                                    chan_found = true;
-                                                    board = Board_stats[x].cur_board;
-                                                    thread = (Board_stats[x].cur_OP_num + 1).ToString();
-                                                }
+                                                msg += " /" + tmp_board["board"].InnerText + "/,";
                                             }
-                                            if (!chan_found)
+                                            if (!msg.Equals(string.Empty))
                                             {
-                                                string uri = "https://api.4chan.org/boards.json";
-                                                WebClient chan = new WebClient();
-                                                chan.Encoding = Encoding.UTF8;
-                                                var json_data = string.Empty;
-                                                json_data = chan.DownloadString(uri);
-                                                XmlDocument xmlDoc = JsonConvert.DeserializeXmlNode(json_data, "_4chan");
-                                                XmlNodeList board_list = xmlDoc.SelectNodes("_4chan/boards");
-                                                Random rand = new Random();
-                                                int stop = rand.Next(board_list.Count);
-                                                int index = 0;
-                                                foreach(XmlNode tmp_board in board_list)
+                                                ircbot.sendData("PRIVMSG", channel + " :Boards Available:" + msg.TrimEnd(','));
+                                            }
+                                            else
+                                            {
+                                                ircbot.sendData("PRIVMSG", channel + " :No Boards Available");
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "next_thread":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        bool chan_found = false;
+                                        string board = "";
+                                        string thread = "";
+                                        bool thread_id = false;
+                                        for (int x = 0; x < Board_stats.Count(); x++)
+                                        {
+                                            if (Board_stats[x].channel.Equals(channel))
+                                            {
+                                                chan_found = true;
+                                                board = Board_stats[x].cur_board;
+                                                thread = (Board_stats[x].cur_OP_num + 1).ToString();
+                                            }
+                                        }
+                                        if (!chan_found)
+                                        {
+                                            string uri = "https://a.4cdn.org/boards.json";
+                                            WebClient chan = new WebClient();
+                                            chan.Encoding = Encoding.UTF8;
+                                            var json_data = string.Empty;
+                                            json_data = chan.DownloadString(uri);
+                                            XmlDocument xmlDoc = JsonConvert.DeserializeXmlNode(json_data, "_4chan");
+                                            XmlNodeList board_list = xmlDoc.SelectNodes("_4chan/boards");
+                                            Random rand = new Random();
+                                            int stop = rand.Next(board_list.Count);
+                                            int index = 0;
+                                            foreach (XmlNode tmp_board in board_list)
+                                            {
+                                                if (stop == index)
                                                 {
-                                                    if(stop == index)
+                                                    board = tmp_board["board"].InnerText;
+                                                    break;
+                                                }
+                                                index++;
+                                            }
+                                            thread = "0";
+                                        }
+                                        bool thread_found = get_thread(channel, ircbot, board, thread, thread_id);
+                                        if (!thread_found)
+                                        {
+                                            ircbot.sendData("PRIVMSG", channel + " :Could not find the thread specified");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "next_reply":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        bool chan_found = false;
+                                        string board = "";
+                                        string thread = "";
+                                        string reply = "";
+                                        bool thread_id = false;
+                                        bool reply_id = false;
+                                        for (int x = 0; x < Board_stats.Count(); x++)
+                                        {
+                                            if (Board_stats[x].channel.Equals(channel))
+                                            {
+                                                chan_found = true;
+                                                board = Board_stats[x].cur_board;
+                                                thread = Board_stats[x].cur_thread;
+                                                thread_id = true;
+                                                reply = (Board_stats[x].cur_reply_num + 1).ToString();
+                                            }
+                                        }
+                                        if (!chan_found)
+                                        {
+                                            string uri = "https://a.4cdn.org/boards.json";
+                                            WebClient chan = new WebClient();
+                                            chan.Encoding = Encoding.UTF8;
+                                            var json_data = string.Empty;
+                                            json_data = chan.DownloadString(uri);
+                                            XmlDocument xmlDoc = JsonConvert.DeserializeXmlNode(json_data, "_4chan");
+                                            XmlNodeList board_list = xmlDoc.SelectNodes("_4chan/boards");
+                                            Random rand = new Random();
+                                            int stop = rand.Next(board_list.Count);
+                                            int index = 0;
+                                            foreach (XmlNode tmp_board in board_list)
+                                            {
+                                                if (stop == index)
+                                                {
+                                                    board = tmp_board["board"].InnerText;
+                                                    break;
+                                                }
+                                                index++;
+                                            }
+                                            thread = "0";
+                                            reply = "0";
+                                        }
+                                        bool thread_found = get_reply(channel, ircbot, board, thread, reply, thread_id, reply_id);
+                                        if (!thread_found)
+                                        {
+                                            ircbot.sendData("PRIVMSG", channel + " :Could not find the thread specified");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "4chansearch":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
+                                        {
+                                            char[] sep = new char[] { ' ' };
+                                            string[] args = line[4].Split(sep, 2);
+                                            if (args.GetUpperBound(0) > 0)
+                                            {
+                                                try
+                                                {
+                                                    bool thread_found = search_board(channel, ircbot, args[0], args[1]);
+                                                    if (!thread_found)
                                                     {
-                                                        board = tmp_board["board"].InnerText;
-                                                        break;
-                                                    }
-                                                    index++;
-                                                }
-                                                thread = "0";
-                                            }
-                                            bool thread_found = get_thread(channel, ircbot, board, thread, thread_id);
-                                            if (!thread_found)
-                                            {
-                                                ircbot.sendData("PRIVMSG", channel + " :Could not find the thread specified");
-                                            }
-                                        }
-                                        else
-                                        {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                                        }
-                                        break;
-                                    case "next_reply":
-                                        if (spam_check == true)
-                                        {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            bool chan_found = false;
-                                            string board = "";
-                                            string thread = "";
-                                            string reply = "";
-                                            bool thread_id = false;
-                                            bool reply_id = false;
-                                            for (int x = 0; x < Board_stats.Count(); x++)
-                                            {
-                                                if (Board_stats[x].channel.Equals(channel))
-                                                {
-                                                    chan_found = true;
-                                                    board = Board_stats[x].cur_board;
-                                                    thread = Board_stats[x].cur_thread;
-                                                    thread_id = true;
-                                                    reply = (Board_stats[x].cur_reply_num + 1).ToString();
-                                                }
-                                            }
-                                            if (!chan_found)
-                                            {
-                                                string uri = "https://api.4chan.org/boards.json";
-                                                WebClient chan = new WebClient();
-                                                chan.Encoding = Encoding.UTF8;
-                                                var json_data = string.Empty;
-                                                json_data = chan.DownloadString(uri);
-                                                XmlDocument xmlDoc = JsonConvert.DeserializeXmlNode(json_data, "_4chan");
-                                                XmlNodeList board_list = xmlDoc.SelectNodes("_4chan/boards");
-                                                Random rand = new Random();
-                                                int stop = rand.Next(board_list.Count);
-                                                int index = 0;
-                                                foreach (XmlNode tmp_board in board_list)
-                                                {
-                                                    if (stop == index)
-                                                    {
-                                                        board = tmp_board["board"].InnerText;
-                                                        break;
-                                                    }
-                                                    index++;
-                                                }
-                                                thread = "0";
-                                                reply = "0";
-                                            }
-                                            bool thread_found = get_reply(channel, ircbot, board, thread, reply, thread_id, reply_id);
-                                            if (!thread_found)
-                                            {
-                                                ircbot.sendData("PRIVMSG", channel + " :Could not find the thread specified");
-                                            }
-                                        }
-                                        else
-                                        {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                                        }
-                                        break;
-                                    case "4chansearch":
-                                        if (spam_check == true)
-                                        {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
-                                            {
-                                                char[] sep = new char[] { ' ' };
-                                                string[] args = line[4].Split(sep, 2);
-                                                if (args.GetUpperBound(0) > 0)
-                                                {
-                                                    try
-                                                    {
-                                                        bool thread_found = search_board(channel, ircbot, args[0], args[1]);
-                                                        if (!thread_found)
-                                                        {
-                                                            ircbot.sendData("PRIVMSG", channel + " :Could not find a similar post.");
-                                                        }
-                                                    }
-                                                    catch
-                                                    {
-                                                        ircbot.sendData("PRIVMSG", channel + " :Could not find the board specified.");
+                                                        ircbot.sendData("PRIVMSG", channel + " :Could not find a similar post.");
                                                     }
                                                 }
-                                                else
+                                                catch
                                                 {
-                                                    ircbot.sendData("PRIVMSG", channel + " :You need to include more info.");
+                                                    ircbot.sendData("PRIVMSG", channel + " :Could not find the board specified.");
                                                 }
                                             }
                                             else
@@ -322,10 +296,14 @@ namespace Bot.Modules
                                         }
                                         else
                                         {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                            ircbot.sendData("PRIVMSG", channel + " :You need to include more info.");
                                         }
-                                        break;
-                                }
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
                             }
                         }
                     }
@@ -335,7 +313,7 @@ namespace Bot.Modules
 
         private bool search_board(string channel, bot ircbot, string board, string query)
         {
-            string uri_board = "https://api.4chan.org/boards.json";
+            string uri_board = "https://a.4cdn.org/boards.json";
             WebClient chan_board = new WebClient();
             chan_board.Encoding = Encoding.UTF8;
             var json_data_board = string.Empty;
@@ -355,9 +333,9 @@ namespace Bot.Modules
                 }
             }
             bool thread_found = false;
-            for (int page_num = 0; page_num < pages; page_num++)
+            for (int page_num = 1; page_num <= pages; page_num++)
             {
-                string uri = "https://api.4chan.org/" + board + "/" + page_num + ".json";
+                string uri = "https://a.4cdn.org/" + board + "/" + page_num + ".json";
                 WebClient chan = new WebClient();
                 chan.Encoding = Encoding.UTF8;
                 var json_data = string.Empty;
@@ -416,7 +394,7 @@ namespace Bot.Modules
         private bool get_thread(string channel, bot ircbot, string board, string thread, bool thread_id)
         {
             bool thread_found = false;
-            string uri_board = "https://api.4chan.org/boards.json";
+            string uri_board = "https://a.4cdn.org/boards.json";
             WebClient chan_board = new WebClient();
             chan_board.Encoding = Encoding.UTF8;
             var json_data_board = string.Empty;
@@ -432,9 +410,9 @@ namespace Bot.Modules
                     break;
                 }
             }
-            for (int page_num = 0; page_num < pages; page_num++)
+            for (int page_num = 1; page_num <= pages; page_num++)
             {
-                string uri = "https://api.4chan.org/" + board + "/" + page_num + ".json";
+                string uri = "https://a.4cdn.org/" + board + "/" + page_num + ".json";
                 WebClient chan = new WebClient();
                 chan.Encoding = Encoding.UTF8;
                 var json_data = string.Empty;
@@ -629,7 +607,7 @@ namespace Bot.Modules
                         {
                             ircbot.sendData("PRIVMSG", channel + " :" + Regex.Replace(post_message.Replace("<wbr>","").Trim().TrimEnd('|').Trim(), re, "$1"));
                         }
-                        ircbot.sendData("PRIVMSG", channel + " :http://boards.4chan.org/" + board + "/res/" + tmp_post_num);
+                        ircbot.sendData("PRIVMSG", channel + " :http://boards.4chan.org/" + board + "/thread/" + tmp_post_num);
                         break;
                     }
                     if (!tmp_replies.Equals(string.Empty))
@@ -648,7 +626,7 @@ namespace Bot.Modules
         private bool get_reply(string channel, bot ircbot, string board, string thread, string reply, bool thread_id, bool reply_id)
         {
             bool thread_found = false;
-            string uri_board = "https://api.4chan.org/boards.json";
+            string uri_board = "https://a.4cdn.org/boards.json";
             WebClient chan_board = new WebClient();
             chan_board.Encoding = Encoding.UTF8;
             var json_data_board = string.Empty;
@@ -664,9 +642,9 @@ namespace Bot.Modules
                     break;
                 }
             }
-            for (int page_num = 0; page_num < pages; page_num++)
+            for (int page_num = 1; page_num <= pages; page_num++)
             {
-                string uri = "https://api.4chan.org/" + board + "/" + page_num + ".json";
+                string uri = "https://a.4cdn.org/" + board + "/" + page_num + ".json";
                 WebClient chan = new WebClient();
                 chan.Encoding = Encoding.UTF8;
                 var json_data = string.Empty;
@@ -679,7 +657,7 @@ namespace Bot.Modules
                     string tmp_post_num = post["no"].InnerText;
                     if ((thread_id && tmp_post_num.Equals(thread)) || (!thread_id && index == Convert.ToInt32(thread)))
                     {
-                        uri = "https://api.4chan.org/" + board + "/res/" + tmp_post_num + ".json";
+                        uri = "https://a.4cdn.org/" + board + "/res/" + tmp_post_num + ".json";
                         chan = new WebClient();
                         chan.Encoding = Encoding.UTF8;
                         json_data = string.Empty;
@@ -868,7 +846,7 @@ namespace Bot.Modules
                                 {
                                     ircbot.sendData("PRIVMSG", channel + " :" + Regex.Replace(post_message.Trim().TrimEnd('|').Trim(), re, "$1"));
                                 }
-                                ircbot.sendData("PRIVMSG", channel + " :http://boards.4chan.org/" + board + "/res/" + tmp_post_num + "#p" + tmp_reply_num);
+                                ircbot.sendData("PRIVMSG", channel + " :http://boards.4chan.org/" + board + "/thread/" + tmp_post_num + "#p" + tmp_reply_num);
                                 break;
                             }
                             index_reply++;

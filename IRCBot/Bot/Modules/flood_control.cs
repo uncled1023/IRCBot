@@ -9,17 +9,16 @@ namespace Bot.Modules
     class flood_control : Module
     {
         private List<spam_check> spam_logs = new List<spam_check>();
-        public override void control(bot ircbot, BotConfig Conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, BotConfig Conf, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
-            string module_name = ircbot.Conf.Module_Config[module_id][0];
-            int max_lines = Convert.ToInt32(ircbot.Conf.Module_Config[module_id][3]);
-            int check_timeout = Convert.ToInt32(ircbot.Conf.Module_Config[module_id][4]);
-            bool warn = Convert.ToBoolean(ircbot.Conf.Module_Config[module_id][5]);
-            string warn_msg = ircbot.Conf.Module_Config[module_id][6];
-            bool kick = Convert.ToBoolean(ircbot.Conf.Module_Config[module_id][7]);
-            string kick_msg = ircbot.Conf.Module_Config[module_id][8];
-            bool ban = Convert.ToBoolean(ircbot.Conf.Module_Config[module_id][9]);
-            string ban_msg = ircbot.Conf.Module_Config[module_id][10];
+            int max_lines = Convert.ToInt32(this.Options["max_lines"]);
+            int check_timeout = Convert.ToInt32(this.Options["spam_timeout"]);
+            bool warn = this.Options["warn"];
+            string warn_msg = this.Options["warn_msg"];
+            bool kick = this.Options["kick"];
+            string kick_msg = this.Options["kick_msg"];
+            bool ban = this.Options["ban"];
+            string ban_msg = this.Options["ban_msg"];
             if (type.Equals("channel"))
             {
                 bool nick_found = false;

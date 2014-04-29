@@ -18,124 +18,91 @@ namespace Bot.Modules
             alarms = new List<System.Timers.Timer>();
         }
 
-        public override void control(bot ircbot, BotConfig Conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, BotConfig Conf, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
             access access = new access();
 
             char[] charS = new char[] { ' ' };
-            string module_name = ircbot.Conf.Module_Config[module_id][0];
             if ((type.Equals("channel") || type.Equals("query")) && bot_command == true)
             {
-                foreach (List<string> tmp_command in Conf.Command_List)
+                foreach (Command tmp_command in this.Commands)
                 {
-                    if (module_name.Equals(tmp_command[0]))
+                    bool blocked = tmp_command.Blacklist.Contains(channel) || tmp_command.Blacklist.Contains(nick);
+                    bool cmd_found = false;
+                    bool spam_check = ircbot.get_spam_check(channel, nick, tmp_command.Spam_Check);
+                    if (spam_check == true)
                     {
-                        string[] triggers = tmp_command[3].Split('|');
-                        int command_access = Convert.ToInt32(tmp_command[5]);
-                        string[] blacklist = tmp_command[6].Split(',');
-                        bool blocked = false;
-                        bool cmd_found = false;
-                        bool spam_check = ircbot.get_spam_check(channel, nick, Convert.ToBoolean(tmp_command[8]));
-                        foreach (string bl_chan in blacklist)
+                        blocked = blocked || ircbot.get_spam_status(channel);
+                    }
+                    cmd_found = tmp_command.Triggers.Contains(command);
+                    if (blocked == true && cmd_found == true)
+                    {
+                        ircbot.sendData("NOTICE", nick + " :I am currently too busy to process that.");
+                    }
+                    if (blocked == false && cmd_found == true)
+                    {
+                        foreach (string trigger in tmp_command.Triggers)
                         {
-                            if (bl_chan.Equals(channel))
+                            switch (trigger)
                             {
-                                blocked = true;
-                                break;
-                            }
-                        }
-                        if (spam_check == true)
-                        {
-                            blocked = ircbot.get_spam_status(channel);
-                        }
-                        foreach (string trigger in triggers)
-                        {
-                            if (trigger.Equals(command))
-                            {
-                                cmd_found = true;
-                                break;
-                            }
-                        }
-                        if (blocked == true && cmd_found == true)
-                        {
-                            ircbot.sendData("NOTICE", nick + " :I am currently too busy to process that.");
-                        }
-                        if (blocked == false && cmd_found == true)
-                        {
-                            foreach (string trigger in triggers)
-                            {
-                                switch (trigger)
-                                {
-                                    case "alarm":
-                                        if (spam_check == true)
+                                case "alarm":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
                                         {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
+                                            string[] new_line = line[4].Split(charS, 2, StringSplitOptions.RemoveEmptyEntries);
+                                            if (new_line.GetUpperBound(0) > 0)
                                             {
-                                                string[] new_line = line[4].Split(charS, 2, StringSplitOptions.RemoveEmptyEntries);
-                                                if (new_line.GetUpperBound(0) > 0)
+                                                bool int_allowed = true;
+                                                int time = 0;
+                                                try
                                                 {
-                                                    bool int_allowed = true;
-                                                    int time = 0;
-                                                    try
-                                                    {
-                                                        time = Convert.ToInt32(new_line[0]);
-                                                        if ((time * 1000) <= 0)
-                                                        {
-                                                            int_allowed = false;
-                                                        }
-                                                    }
-                                                    catch
+                                                    time = Convert.ToInt32(new_line[0]);
+                                                    if ((time * 1000) <= 0)
                                                     {
                                                         int_allowed = false;
                                                     }
-                                                    if (int_allowed == true)
+                                                }
+                                                catch
+                                                {
+                                                    int_allowed = false;
+                                                }
+                                                if (int_allowed == true)
+                                                {
+                                                    char[] charSplit = new char[] { ' ' };
+                                                    string[] ex = new_line[1].Split(charSplit);
+                                                    if (ex[0].TrimStart(Convert.ToChar(ircbot.Conf.Command)).Equals("alarm"))
                                                     {
-                                                        char[] charSplit = new char[] { ' ' };
-                                                        string[] ex = new_line[1].Split(charSplit);
-                                                        if (ex[0].TrimStart(Convert.ToChar(ircbot.Conf.Command)).Equals("alarm"))
+                                                        if (type.Equals("channel"))
                                                         {
-                                                            if (type.Equals("channel"))
-                                                            {
-                                                                ircbot.sendData("PRIVMSG", line[2] + " :Recursion is bad.");
-                                                            }
-                                                            else
-                                                            {
-                                                                ircbot.sendData("PRIVMSG", nick + " :Recursion is bad.");
-                                                            }
+                                                            ircbot.sendData("PRIVMSG", line[2] + " :Recursion is bad.");
                                                         }
                                                         else
                                                         {
-                                                            tmp_conf = Conf;
-                                                            Timer alarm_trigger = new Timer();
-                                                            alarm_trigger.Interval = (time * 1000);
-                                                            alarm_trigger.Enabled = true;
-                                                            alarm_trigger.AutoReset = false;
-                                                            alarm_trigger.Elapsed += (sender, e) => ring_alarm(sender, e, ircbot, nick, line[0], nick_access, channel, type, new_line[1]);
-                                                            alarms.Add(alarm_trigger);
-
-                                                            if (type.Equals("channel"))
-                                                            {
-                                                                ircbot.sendData("PRIVMSG", line[2] + " :Alarm added for " + new_line[0] + " seconds from now.");
-                                                            }
-                                                            else
-                                                            {
-                                                                ircbot.sendData("PRIVMSG", nick + " :Alarm added for " + new_line[0] + " seconds from now.");
-                                                            }
+                                                            ircbot.sendData("PRIVMSG", nick + " :Recursion is bad.");
                                                         }
                                                     }
                                                     else
                                                     {
+                                                        tmp_conf = Conf;
+                                                        Timer alarm_trigger = new Timer();
+                                                        alarm_trigger.Interval = (time * 1000);
+                                                        alarm_trigger.Enabled = true;
+                                                        alarm_trigger.AutoReset = false;
+                                                        alarm_trigger.Elapsed += (sender, e) => ring_alarm(sender, e, ircbot, nick, line[0], nick_access, channel, type, new_line[1]);
+                                                        alarms.Add(alarm_trigger);
+
                                                         if (type.Equals("channel"))
                                                         {
-                                                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", please pick a valid time.");
+                                                            ircbot.sendData("PRIVMSG", line[2] + " :Alarm added for " + new_line[0] + " seconds from now.");
                                                         }
                                                         else
                                                         {
-                                                            ircbot.sendData("PRIVMSG", nick + " :" + nick + ", please pick a valid time.");
+                                                            ircbot.sendData("PRIVMSG", nick + " :Alarm added for " + new_line[0] + " seconds from now.");
                                                         }
                                                     }
                                                 }
@@ -143,11 +110,11 @@ namespace Bot.Modules
                                                 {
                                                     if (type.Equals("channel"))
                                                     {
-                                                        ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                                                        ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", please pick a valid time.");
                                                     }
                                                     else
                                                     {
-                                                        ircbot.sendData("PRIVMSG", nick + " :" + nick + ", you need to include more info.");
+                                                        ircbot.sendData("PRIVMSG", nick + " :" + nick + ", please pick a valid time.");
                                                     }
                                                 }
                                             }
@@ -165,10 +132,21 @@ namespace Bot.Modules
                                         }
                                         else
                                         {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                            if (type.Equals("channel"))
+                                            {
+                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                                            }
+                                            else
+                                            {
+                                                ircbot.sendData("PRIVMSG", nick + " :" + nick + ", you need to include more info.");
+                                            }
                                         }
-                                        break;
-                                }
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
                             }
                         }
                     }

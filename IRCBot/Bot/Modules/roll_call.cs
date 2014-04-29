@@ -8,79 +8,57 @@ namespace Bot.Modules
 {
     class roll_call : Module
     {
-        public override void control(bot ircbot, BotConfig Conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, BotConfig Conf, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
-            string module_name = ircbot.Conf.Module_Config[module_id][0];
             if (type.Equals("channel") && bot_command == true)
             {
-                foreach (List<string> tmp_command in Conf.Command_List)
+                foreach (Command tmp_command in this.Commands)
                 {
-                    if (module_name.Equals(tmp_command[0]))
+                    bool blocked = tmp_command.Blacklist.Contains(channel) || tmp_command.Blacklist.Contains(nick);
+                    bool cmd_found = false;
+                    bool spam_check = ircbot.get_spam_check(channel, nick, tmp_command.Spam_Check);
+                    if (spam_check == true)
                     {
-                        string[] triggers = tmp_command[3].Split('|');
-                        int command_access = Convert.ToInt32(tmp_command[5]);
-                        string[] blacklist = tmp_command[6].Split(',');
-                        bool blocked = false;
-                        bool cmd_found = false;
-                        bool spam_check = ircbot.get_spam_check(channel, nick, Convert.ToBoolean(tmp_command[8]));
-                        foreach (string bl_chan in blacklist)
+                        blocked = blocked || ircbot.get_spam_status(channel);
+                    }
+                    cmd_found = tmp_command.Triggers.Contains(command);
+                    if (blocked == true && cmd_found == true)
+                    {
+                        ircbot.sendData("NOTICE", nick + " :I am currently too busy to process that.");
+                    }
+                    if (blocked == false && cmd_found == true)
+                    {
+                        foreach (string trigger in tmp_command.Triggers)
                         {
-                            if (bl_chan.Equals(channel))
+                            switch (trigger)
                             {
-                                blocked = true;
-                                break;
-                            }
-                        }
-                        if (spam_check == true)
-                        {
-                            blocked = ircbot.get_spam_status(channel);
-                        }
-                        foreach (string trigger in triggers)
-                        {
-                            if (trigger.Equals(command))
-                            {
-                                cmd_found = true;
-                                break;
-                            }
-                        }
-                        if (blocked == true && cmd_found == true)
-                        {
-                            ircbot.sendData("NOTICE", nick + " :I am currently too busy to process that.");
-                        }
-                        if (blocked == false && cmd_found == true)
-                        {
-                            foreach (string trigger in triggers)
-                            {
-                                switch (trigger)
-                                {
-                                    case "rollcall":
-                                        if (spam_check == true)
+                                case "rollcall":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
                                         {
-                                            ircbot.add_spam_count(channel);
+                                            if (line[4].StartsWith("#"))
+                                            {
+                                                channel = line[4];
+                                            }
+                                            else
+                                            {
+                                                ircbot.sendData("PRIVMSG", nick + " :Please specify a valid channel");
+                                            }
                                         }
-                                        if (nick_access >= command_access)
+                                        string nicks = "";
+                                        Channel_Info chan_info = ircbot.get_chan_info(channel);
+                                        foreach (Nick_Info info in chan_info.Nicks)
                                         {
-                                            if (line.GetUpperBound(0) > 3)
-                                            {
-                                                if (line[4].StartsWith("#"))
-                                                {
-                                                    channel = line[4];
-                                                }
-                                                else
-                                                {
-                                                    ircbot.sendData("PRIVMSG", nick + " :Please specify a valid channel");
-                                                }
-                                            }
-                                            string nicks = "";
-                                            Channel_Info chan_info = ircbot.get_chan_info(channel);
-                                            foreach (Nick_Info info in chan_info.Nicks)
-                                            {
-                                                nicks += info.Nick + ", ";
-                                            }
-                                            ircbot.sendData("PRIVMSG", channel + " :" + Conf.Module_Config[module_id][3] + ": " + nicks.Trim().TrimEnd(','));
+                                            nicks += info.Nick + ", ";
                                         }
-                                        break;
-                                }
+                                        ircbot.sendData("PRIVMSG", channel + " :" + this.Options["roll_call_message"] + ": " + nicks.Trim().TrimEnd(','));
+                                    }
+                                    break;
                             }
                         }
                     }

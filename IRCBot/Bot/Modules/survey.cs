@@ -22,265 +22,200 @@ namespace Bot.Modules
 
         List<survey_info> active_surveys = new List<survey_info>();
 
-        public override void control(bot ircbot, BotConfig Conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, BotConfig Conf, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
-            string module_name = ircbot.Conf.Module_Config[module_id][0];
-            if ((type.Equals("channel") || type.Equals("query")) && bot_command == true)
+            if (type.Equals("channel") && bot_command == true)
             {
-                foreach (List<string> tmp_command in Conf.Command_List)
+                foreach (Command tmp_command in this.Commands)
                 {
-                    if (module_name.Equals(tmp_command[0]))
+                    bool blocked = tmp_command.Blacklist.Contains(channel) || tmp_command.Blacklist.Contains(nick);
+                    bool cmd_found = false;
+                    bool spam_check = ircbot.get_spam_check(channel, nick, tmp_command.Spam_Check);
+                    if (spam_check == true)
                     {
-                        string[] triggers = tmp_command[3].Split('|');
-                        int command_access = Convert.ToInt32(tmp_command[5]);
-                        string[] blacklist = tmp_command[6].Split(',');
-                        bool blocked = false;
-                        bool cmd_found = false;
-                        bool spam_check = ircbot.get_spam_check(channel, nick, Convert.ToBoolean(tmp_command[8]));
-                        foreach (string bl_chan in blacklist)
+                        blocked = blocked || ircbot.get_spam_status(channel);
+                    }
+                    cmd_found = tmp_command.Triggers.Contains(command);
+                    if (blocked == true && cmd_found == true)
+                    {
+                        ircbot.sendData("NOTICE", nick + " :I am currently too busy to process that.");
+                    }
+                    if (blocked == false && cmd_found == true)
+                    {
+                        foreach (string trigger in tmp_command.Triggers)
                         {
-                            if (bl_chan.Equals(channel))
+                            switch (trigger)
                             {
-                                blocked = true;
-                                break;
-                            }
-                        }
-                        if (spam_check == true)
-                        {
-                            blocked = ircbot.get_spam_status(channel);
-                        }
-                        foreach (string trigger in triggers)
-                        {
-                            if (trigger.Equals(command))
-                            {
-                                cmd_found = true;
-                                break;
-                            }
-                        }
-                        if (blocked == true && cmd_found == true)
-                        {
-                            ircbot.sendData("NOTICE", nick + " :I am currently too busy to process that.");
-                        }
-                        if (blocked == false && cmd_found == true)
-                        {
-                            foreach (string trigger in triggers)
-                            {
-                                switch (trigger)
-                                {
-                                    case "survey":
-                                        if (spam_check == true)
+                                case "survey":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
                                         {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
+                                            int num_survey = 1;
+                                            try
                                             {
-                                                int num_survey = 1;
-                                                try
-                                                {
-                                                    num_survey = Convert.ToInt32(line[4].Trim());
-                                                    start_survey(nick, nick_access, num_survey - 1, ircbot, Conf);
-                                                }
-                                                catch
-                                                {
-                                                    ircbot.sendData("NOTICE", nick + " :You need to choose a valid survey.  To view all surveys, please type " + ircbot.Conf.Command + "surveys");
-                                                }
+                                                num_survey = Convert.ToInt32(line[4].Trim());
+                                                start_survey(nick, nick_access, num_survey - 1, ircbot, Conf);
                                             }
-                                            else
+                                            catch
                                             {
                                                 ircbot.sendData("NOTICE", nick + " :You need to choose a valid survey.  To view all surveys, please type " + ircbot.Conf.Command + "surveys");
                                             }
                                         }
                                         else
                                         {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                            ircbot.sendData("NOTICE", nick + " :You need to choose a valid survey.  To view all surveys, please type " + ircbot.Conf.Command + "surveys");
                                         }
-                                        break;
-                                    case "nextquestion":
-                                        if (spam_check == true)
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "nextquestion":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        continue_survey(nick, nick_access, ircbot, Conf);
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "finishsurvey":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        int index = 0;
+                                        foreach (survey_info survey in active_surveys)
                                         {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            continue_survey(nick, nick_access, ircbot, Conf);
-                                        }
-                                        else
-                                        {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                                        }
-                                        break;
-                                    case "finishsurvey":
-                                        if (spam_check == true)
-                                        {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            int index = 0;
-                                            foreach (survey_info survey in active_surveys)
+                                            if (nick.Equals(survey.nick, StringComparison.InvariantCultureIgnoreCase) && survey.user_submission == false)
                                             {
-                                                if (nick.Equals(survey.nick, StringComparison.InvariantCultureIgnoreCase) && survey.user_submission == false)
+                                                if (Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + ""))
                                                 {
-                                                    if (Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + ""))
+                                                    FileInfo fi = new FileInfo(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + "");
+                                                    DirectoryInfo di = fi.Directory;
+                                                    FileSystemInfo[] fsi = di.GetFiles();
+                                                    if (fsi.GetUpperBound(0) >= 0 && fsi.GetUpperBound(0) >= survey.survey_number)
                                                     {
-                                                        FileInfo fi = new FileInfo(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + "");
-                                                        DirectoryInfo di = fi.Directory;
-                                                        FileSystemInfo[] fsi = di.GetFiles();
-                                                        if (fsi.GetUpperBound(0) >= 0 && fsi.GetUpperBound(0) >= survey.survey_number)
+                                                        string[] questions = File.ReadAllLines(fsi[survey.survey_number].FullName);
+                                                        if (questions.GetUpperBound(0) > 2)
                                                         {
-                                                            string[] questions = File.ReadAllLines(fsi[survey.survey_number].FullName);
-                                                            if (questions.GetUpperBound(0) > 2)
-                                                            {
-                                                                ircbot.sendData("PRIVMSG", nick + " :Thank you for submitting the survey.  It is survey #" + (survey.survey_number + 1).ToString());
-                                                                active_surveys.RemoveAt(index);
-                                                            }
-                                                            else
-                                                            {
-                                                                ircbot.sendData("PRIVMSG", nick + " :You need to submit at least one question for your survey.");
-                                                            }
+                                                            ircbot.sendData("PRIVMSG", nick + " :Thank you for submitting the survey.  It is survey #" + (survey.survey_number + 1).ToString());
+                                                            active_surveys.RemoveAt(index);
                                                         }
                                                         else
                                                         {
-                                                            ircbot.sendData("PRIVMSG", nick + " :The survey no longer exists.  Please retry adding your survey.");
+                                                            ircbot.sendData("PRIVMSG", nick + " :You need to submit at least one question for your survey.");
                                                         }
                                                     }
                                                     else
                                                     {
                                                         ircbot.sendData("PRIVMSG", nick + " :The survey no longer exists.  Please retry adding your survey.");
                                                     }
-                                                    break;
                                                 }
-                                                index++;
+                                                else
+                                                {
+                                                    ircbot.sendData("PRIVMSG", nick + " :The survey no longer exists.  Please retry adding your survey.");
+                                                }
+                                                break;
                                             }
+                                            index++;
                                         }
-                                        else
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "cancelsurvey":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        int index = 0;
+                                        foreach (survey_info survey in active_surveys)
                                         {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                                        }
-                                        break;
-                                    case "cancelsurvey":
-                                        if (spam_check == true)
-                                        {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            int index = 0;
-                                            foreach (survey_info survey in active_surveys)
+                                            if (nick.Equals(survey.nick, StringComparison.InvariantCultureIgnoreCase) && survey.user_submission == false)
                                             {
-                                                if (nick.Equals(survey.nick, StringComparison.InvariantCultureIgnoreCase) && survey.user_submission == false)
+                                                if (Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + ""))
                                                 {
-                                                    if (Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + ""))
+                                                    FileInfo fi = new FileInfo(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + "");
+                                                    DirectoryInfo di = fi.Directory;
+                                                    FileSystemInfo[] fsi = di.GetFiles();
+                                                    if (fsi.GetUpperBound(0) >= 0 && fsi.GetUpperBound(0) >= survey.survey_number)
                                                     {
-                                                        FileInfo fi = new FileInfo(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + "");
-                                                        DirectoryInfo di = fi.Directory;
-                                                        FileSystemInfo[] fsi = di.GetFiles();
-                                                        if (fsi.GetUpperBound(0) >= 0 && fsi.GetUpperBound(0) >= survey.survey_number)
+                                                        File.Delete(fsi[survey.survey_number].FullName);
+                                                        string[] owners = File.ReadAllLines(fsi[survey.survey_number].FullName)[2].Split(',');
+                                                        foreach (string owner in owners)
                                                         {
-                                                            File.Delete(fsi[survey.survey_number].FullName);
-                                                            string[] owners = File.ReadAllLines(fsi[survey.survey_number].FullName)[2].Split(',');
-                                                            foreach (string owner in owners)
-                                                            {
-                                                                ircbot.sendData("NOTICE", owner + " :" + nick + " has canceled your survey, " + File.ReadAllLines(fsi[survey.survey_number].FullName)[1]);
-                                                            }
-                                                            active_surveys.RemoveAt(index);
+                                                            ircbot.sendData("NOTICE", owner + " :" + nick + " has canceled your survey, " + File.ReadAllLines(fsi[survey.survey_number].FullName)[1]);
                                                         }
-                                                        else
-                                                        {
-                                                            ircbot.sendData("NOTICE", nick + " :The survey does not exist.");
-                                                        }
-                                                    }
-                                                    else
-                                                    {
-                                                        ircbot.sendData("NOTICE", nick + " :The survey does not exist.");
-                                                    }
-                                                    break;
-                                                }
-                                                else if(nick.Equals(survey.nick, StringComparison.InvariantCultureIgnoreCase) && survey.user_submission == true)
-                                                {
-                                                    if (Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "answers" + Path.DirectorySeparatorChar + survey.name + Path.DirectorySeparatorChar + nick))
-                                                    {
-                                                        Directory.Delete(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "answers" + Path.DirectorySeparatorChar + survey.name + Path.DirectorySeparatorChar + nick, true);
                                                         active_surveys.RemoveAt(index);
                                                     }
                                                     else
                                                     {
                                                         ircbot.sendData("NOTICE", nick + " :The survey does not exist.");
                                                     }
-                                                    break;
-                                                }
-                                                index++;
-                                            }
-                                        }
-                                        else
-                                        {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                                        }
-                                        break;
-                                    case "surveys":
-                                        if (spam_check == true)
-                                        {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
-                                            {
-                                                int num_survey = 1;
-                                                char[] sep = new char[] { ' ' };
-                                                string[] new_line = line[4].Split(sep, StringSplitOptions.RemoveEmptyEntries);
-                                                if (new_line.GetUpperBound(0) > 0)
-                                                {
-                                                    try
-                                                    {
-                                                        num_survey = Convert.ToInt32(new_line[0].Trim());
-                                                        view_survey(num_survey - 1, nick_access, nick, new_line[1], ircbot, Conf);
-                                                    }
-                                                    catch
-                                                    {
-                                                        ircbot.sendData("NOTICE", nick + " :You need to choose a valid survey.  To view all surveys, please type " + ircbot.Conf.Command + "surveys");
-                                                    }
                                                 }
                                                 else
                                                 {
-                                                    try
-                                                    {
-                                                        num_survey = Convert.ToInt32(new_line[0].Trim());
-                                                        view_survey(num_survey - 1, nick_access, nick, null, ircbot, Conf);
-                                                    }
-                                                    catch
-                                                    {
-                                                        ircbot.sendData("NOTICE", nick + " :You need to choose a valid survey.  To view all surveys, please type " + ircbot.Conf.Command + "surveys");
-                                                    }
+                                                    ircbot.sendData("NOTICE", nick + " :The survey does not exist.");
                                                 }
+                                                break;
                                             }
-                                            else
+                                            else if (nick.Equals(survey.nick, StringComparison.InvariantCultureIgnoreCase) && survey.user_submission == true)
                                             {
-                                                view_survey(-1, nick_access, nick, null, ircbot, Conf);
+                                                if (Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "answers" + Path.DirectorySeparatorChar + survey.name + Path.DirectorySeparatorChar + nick))
+                                                {
+                                                    Directory.Delete(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "answers" + Path.DirectorySeparatorChar + survey.name + Path.DirectorySeparatorChar + nick, true);
+                                                    active_surveys.RemoveAt(index);
+                                                }
+                                                else
+                                                {
+                                                    ircbot.sendData("NOTICE", nick + " :The survey does not exist.");
+                                                }
+                                                break;
                                             }
+                                            index++;
                                         }
-                                        else
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "surveys":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
                                         {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                                        }
-                                        break;
-                                    case "addsurveyowner":
-                                        if (spam_check == true)
-                                        {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
+                                            int num_survey = 1;
+                                            char[] sep = new char[] { ' ' };
+                                            string[] new_line = line[4].Split(sep, StringSplitOptions.RemoveEmptyEntries);
+                                            if (new_line.GetUpperBound(0) > 0)
                                             {
-                                                int num_survey = 1;
-                                                string[] new_line = line[4].Split(' ');
                                                 try
                                                 {
-                                                    num_survey = Convert.ToInt32(new_line[0]);
-                                                    add_survey_owner(num_survey - 1, nick, new_line[1], ircbot, Conf);
+                                                    num_survey = Convert.ToInt32(new_line[0].Trim());
+                                                    view_survey(num_survey - 1, nick_access, nick, new_line[1], ircbot, Conf);
                                                 }
                                                 catch
                                                 {
@@ -289,77 +224,116 @@ namespace Bot.Modules
                                             }
                                             else
                                             {
-                                                ircbot.sendData("NOTICE", nick + " :You need to choose a valid survey.  To view all surveys, please type " + ircbot.Conf.Command + "surveys");
-                                            }
-                                        }
-                                        else
-                                        {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                                        }
-                                        break;
-                                    case "delsurveyowner":
-                                        if (spam_check == true)
-                                        {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
-                                            {
-                                                int num_survey = 1;
-                                                string[] new_line = line[4].Split(' ');
                                                 try
                                                 {
-                                                    num_survey = Convert.ToInt32(new_line[0]);
-                                                    del_survey_owner(num_survey - 1, nick, new_line[1], ircbot, Conf);
+                                                    num_survey = Convert.ToInt32(new_line[0].Trim());
+                                                    view_survey(num_survey - 1, nick_access, nick, null, ircbot, Conf);
                                                 }
                                                 catch
                                                 {
                                                     ircbot.sendData("NOTICE", nick + " :You need to choose a valid survey.  To view all surveys, please type " + ircbot.Conf.Command + "surveys");
                                                 }
                                             }
-                                            else
+                                        }
+                                        else
+                                        {
+                                            view_survey(-1, nick_access, nick, null, ircbot, Conf);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "addsurveyowner":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
+                                        {
+                                            int num_survey = 1;
+                                            string[] new_line = line[4].Split(' ');
+                                            try
+                                            {
+                                                num_survey = Convert.ToInt32(new_line[0]);
+                                                add_survey_owner(num_survey - 1, nick, new_line[1], ircbot, Conf);
+                                            }
+                                            catch
                                             {
                                                 ircbot.sendData("NOTICE", nick + " :You need to choose a valid survey.  To view all surveys, please type " + ircbot.Conf.Command + "surveys");
                                             }
                                         }
                                         else
                                         {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                            ircbot.sendData("NOTICE", nick + " :You need to choose a valid survey.  To view all surveys, please type " + ircbot.Conf.Command + "surveys");
                                         }
-                                        break;
-                                    case "addsurvey":
-                                        if (spam_check == true)
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "delsurveyowner":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
                                         {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
+                                            int num_survey = 1;
+                                            string[] new_line = line[4].Split(' ');
+                                            try
                                             {
-                                                char[] charSep = new char[] { ' ' };
-                                                string[] new_line = line[4].Split(charSep, 2);
-                                                if (new_line.GetUpperBound(0) > 0)
+                                                num_survey = Convert.ToInt32(new_line[0]);
+                                                del_survey_owner(num_survey - 1, nick, new_line[1], ircbot, Conf);
+                                            }
+                                            catch
+                                            {
+                                                ircbot.sendData("NOTICE", nick + " :You need to choose a valid survey.  To view all surveys, please type " + ircbot.Conf.Command + "surveys");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("NOTICE", nick + " :You need to choose a valid survey.  To view all surveys, please type " + ircbot.Conf.Command + "surveys");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "addsurvey":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
+                                        {
+                                            char[] charSep = new char[] { ' ' };
+                                            string[] new_line = line[4].Split(charSep, 2);
+                                            if (new_line.GetUpperBound(0) > 0)
+                                            {
+                                                int survey_access = Conf.User_Level - 1;
+                                                bool access_valid = true;
+                                                try
                                                 {
-                                                    int survey_access = Conf.User_Level - 1;
-                                                    bool access_valid = true;
-                                                    try
-                                                    {
-                                                        survey_access = Convert.ToInt32(new_line[0]);
-                                                    }
-                                                    catch
-                                                    {
-                                                        access_valid = false;
-                                                        ircbot.sendData("NOTICE", nick + " :Please choose a valid access level.");
-                                                    }
-                                                    if (access_valid == true)
-                                                    {
-                                                        add_survey(nick, survey_access, new_line[1], ircbot, Conf);
-                                                    }
-                                                    else
-                                                    {
-                                                        ircbot.sendData("NOTICE", nick + " :Please include the survey access level and title for the survey.  Ex: " + ircbot.Conf.Command + "addsurvey 1 Title of Survey");
-                                                    }
+                                                    survey_access = Convert.ToInt32(new_line[0]);
+                                                }
+                                                catch
+                                                {
+                                                    access_valid = false;
+                                                    ircbot.sendData("NOTICE", nick + " :Please choose a valid access level.");
+                                                }
+                                                if (access_valid == true)
+                                                {
+                                                    add_survey(nick, survey_access, new_line[1], ircbot, Conf);
                                                 }
                                                 else
                                                 {
@@ -373,40 +347,44 @@ namespace Bot.Modules
                                         }
                                         else
                                         {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                            ircbot.sendData("NOTICE", nick + " :Please include the survey access level and title for the survey.  Ex: " + ircbot.Conf.Command + "addsurvey 1 Title of Survey");
                                         }
-                                        break;
-                                    case "delsurvey":
-                                        if (spam_check == true)
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "delsurvey":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
                                         {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
+                                            int num_survey = 1;
+                                            try
                                             {
-                                                int num_survey = 1;
-                                                try
-                                                {
-                                                    num_survey = Convert.ToInt32(line[4].Trim());
-                                                    del_survey(nick, num_survey - 1, ircbot, Conf);
-                                                }
-                                                catch
-                                                {
-                                                    ircbot.sendData("NOTICE", nick + " :You need to choose a valid survey.  To view all surveys, please type " + ircbot.Conf.Command + "surveys");
-                                                }
+                                                num_survey = Convert.ToInt32(line[4].Trim());
+                                                del_survey(nick, num_survey - 1, ircbot, Conf);
                                             }
-                                            else
+                                            catch
                                             {
                                                 ircbot.sendData("NOTICE", nick + " :You need to choose a valid survey.  To view all surveys, please type " + ircbot.Conf.Command + "surveys");
                                             }
                                         }
                                         else
                                         {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                            ircbot.sendData("NOTICE", nick + " :You need to choose a valid survey.  To view all surveys, please type " + ircbot.Conf.Command + "surveys");
                                         }
-                                        break;
-                                }
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
                             }
                         }
                     }

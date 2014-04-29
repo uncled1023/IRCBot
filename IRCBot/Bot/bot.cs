@@ -76,7 +76,6 @@ namespace Bot
         internal BackgroundWorker irc_worker;
         internal BackgroundWorker save_stream_worker;
         internal BackgroundWorker check_connect_worker;
-        internal List<Modules.Module> module_list;
         internal List<string> modules_loaded;
         internal List<string> modules_error;
         internal DateTime start_time;
@@ -423,7 +422,6 @@ namespace Bot
             start_time = DateTime.Now;
             cur_dir = controller.cur_dir;
             nick = Conf.Nick;
-            module_list = new List<Modules.Module>();
             modules_loaded = new List<string>();
             modules_error = new List<string>();
             data_queue = new List<string>();
@@ -578,25 +576,23 @@ namespace Bot
        
         internal void load_modules()
         {
-            module_list.Clear();
+            Conf.Modules.Clear();
             modules_loaded.Clear();
             modules_error.Clear();
-            foreach (List<string> module in Conf.Module_Config)
+            foreach (string module_class_name in controller.get_module_list(Conf.Server_Name))
             {
                 bool module_loaded = false;
-                string module_name = module[1];
-                string class_name = module[0];
 
-                module_loaded = load_module(class_name);
+                module_loaded = load_module(module_class_name);
 
                 //check to see if the class is instantiated or not
                 if (module_loaded)
                 {
-                    modules_loaded.Add(module_name);
+                    modules_loaded.Add(get_module(module_class_name).Name);
                 }
                 else
                 {
-                    modules_error.Add(module_name);
+                    modules_error.Add(get_module(module_class_name).Name);
                 }
             }
             if (modules_loaded.Count > 0)
@@ -637,29 +633,39 @@ namespace Bot
 
         internal bool load_module(string class_name)
         {
-            bool module_found = false;
             bool module_loaded = false;
-            foreach (Modules.Module module in module_list)
+            foreach (Modules.Module module in Conf.Modules)
             {
-                if (module.ToString().Equals("Bot.Modules." + class_name))
+                if (module.Loaded && module.Class_Name.Equals(class_name))
                 {
-                    module_found = true;
+                    module_loaded = true;
                     break;
                 }
             }
-            if (module_found == false)
+            if (!module_loaded)
             {
-                //create the class base on string
-                //note : include the namespace and class name (namespace=IRCBot.Modules, class name=<class_name>)
-                Assembly a = Assembly.Load("IRCBot");
-                Type t = a.GetType("Bot.Modules." + class_name);
-
-                //check to see if the class is instantiated or not
-                if (t != null)
+                Modules.Module module = controller.get_module_conf(Conf.Server_Name, class_name);
+                if (module.Enabled)
                 {
-                    Modules.Module new_module = (Modules.Module)Activator.CreateInstance(t);
-                    module_list.Add(new_module);
-                    module_loaded = true;
+                    //create the class base on string
+                    //note : include the namespace and class name (namespace=Bot.Modules, class name=<class_name>)
+                    Assembly a = Assembly.Load("IRCBot");
+                    Type t = a.GetType("Bot.Modules." + class_name);
+
+                    //check to see if the class is instantiated or not
+                    if (t != null)
+                    {
+                        Modules.Module new_module = (Modules.Module)Activator.CreateInstance(t);
+                        new_module.Loaded = true;
+                        new_module.Blacklist = module.Blacklist;
+                        new_module.Class_Name = module.Class_Name;
+                        new_module.Commands = module.Commands;
+                        new_module.Enabled = module.Enabled;
+                        new_module.Name = module.Name;
+                        new_module.Options = module.Options;
+                        Conf.Modules.Add(new_module);
+                        module_loaded = true;
+                    }
                 }
             }
             return module_loaded;
@@ -669,11 +675,11 @@ namespace Bot
         {
             bool module_found = false;
             int index = 0;
-            foreach (Modules.Module module in module_list)
+            foreach (Modules.Module module in Conf.Modules)
             {
                 if (module.ToString().Equals("Bot.Modules." + class_name))
                 {
-                    module_list.RemoveAt(index);
+                    Conf.Modules.RemoveAt(index);
                     module_found = true;
                     break;
                 }
@@ -684,9 +690,9 @@ namespace Bot
 
         internal Modules.Module get_module(string class_name)
         {
-            foreach (Modules.Module module in module_list)
+            foreach (Modules.Module module in Conf.Modules)
             {
-                if (module.ToString().Equals("Bot.Modules." + class_name))
+                if (module.Class_Name.Equals(class_name))
                 {
                     return module;
                 }
@@ -1020,61 +1026,25 @@ namespace Bot
             if (run_modules)
             {
                 //Run Enabled Modules
-                List<Modules.Module> tmp_module_list = new List<Modules.Module>();
-                tmp_module_list.AddRange(module_list);
-                foreach (Modules.Module module in tmp_module_list)
+                foreach (Modules.Module module in Conf.Modules)
                 {
-                    int index = 0;
-                    bool module_found = false;
-                    string module_blacklist = "";
-                    foreach (List<string> conf_module in Conf.Module_Config)
+                    char[] sepSpace = new char[] { ' ' };
+                    bool module_allowed = !module.Blacklist.Contains(line_nick) && !module.Blacklist.Contains(channel);
+                    if (module_allowed == true)
                     {
-                        if (module.ToString().Equals("Bot.Modules." + conf_module[0]))
-                        {
-                            module_blacklist = conf_module[2];
-                            module_found = true;
-                            break;
-                        }
-                        index++;
-                    }
-                    if (module_found == true)
-                    {
-                        char[] sepComma = new char[] { ',' };
-                        char[] sepSpace = new char[] { ' ' };
-                        string[] blacklist = module_blacklist.Split(sepComma, StringSplitOptions.RemoveEmptyEntries);
-                        bool module_allowed = true;
-                        foreach (string blacklist_node in blacklist)
-                        {
-                            string[] nodes = blacklist_node.Split(sepSpace, StringSplitOptions.RemoveEmptyEntries);
-                            foreach (string node in nodes)
-                            {
-                                if (node.Equals(line_nick, StringComparison.InvariantCultureIgnoreCase) || node.TrimStart('#').Equals(channel.TrimStart('#'), StringComparison.InvariantCultureIgnoreCase))
-                                {
-                                    module_allowed = false;
-                                    break;
-                                }
-                            }
-                            if (module_allowed == false)
-                            {
-                                break;
-                            }
-                        }
-                        if (module_allowed == true)
-                        {
-                            BackgroundWorker work = new BackgroundWorker();
-                            work.DoWork += (sender, e) => backgroundWorker_RunModule(sender, e, this, module, index, ex, command, nick_access, line_nick, channel, bot_command, type);
-                            work.RunWorkerAsync(2000);
-                        }
+                        BackgroundWorker work = new BackgroundWorker();
+                        work.DoWork += (sender, e) => backgroundWorker_RunModule(sender, e, this, module, ex, command, nick_access, line_nick, channel, bot_command, type);
+                        work.RunWorkerAsync(2000);
                     }
                 }
             }
         }
 
-        private void backgroundWorker_RunModule(object sender, DoWorkEventArgs e, bot parent, Modules.Module module, int index, string[] ex, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        private void backgroundWorker_RunModule(object sender, DoWorkEventArgs e, bot parent, Modules.Module module, string[] ex, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
             BackgroundWorker bw = sender as BackgroundWorker;
 
-            module.control(parent, Conf, index, ex, command, nick_access, nick, channel, bot_command, type);
+            module.control(parent, Conf, ex, command, nick_access, nick, channel, bot_command, type);
         }
 
         internal void sendData(string cmd, string param)
@@ -1806,12 +1776,12 @@ namespace Bot
                 bool user_identified = get_nick_ident(tmp_nick);
                 if (user_identified == true)
                 {
-                    for (int x = 0; x < Conf.Module_Config.Count(); x++)
+                    foreach (Modules.Module module in Conf.Modules)
                     {
-                        if (Conf.Module_Config[x][0].Equals("access"))
+                        if (module.Class_Name.Equals("access"))
                         {
                             bool chan_allowed = true;
-                            foreach (string blacklist in Conf.Module_Config[x][2].Split(','))
+                            foreach (string blacklist in module.Blacklist)
                             {
                                 if (blacklist.Equals(channel, StringComparison.InvariantCultureIgnoreCase))
                                 {
@@ -2458,31 +2428,17 @@ namespace Bot
             }
         }
 
-        private List<List<string>> module_config;
-        public List<List<string>> Module_Config
+        private List<Modules.Module> modules;
+        public List<Modules.Module> Modules
         {
             get
             {
-                return module_config;
+                return modules;
             }
 
             internal set
             {
-                module_config = value;
-            }
-        }
-
-        private List<List<string>> command_list;
-        public List<List<string>> Command_List
-        {
-            get
-            {
-                return command_list;
-            }
-
-            internal set
-            {
-                command_list = value;
+                modules = value;
             }
         }
 

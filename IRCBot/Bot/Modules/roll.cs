@@ -8,189 +8,167 @@ namespace Bot.Modules
 {
     class roll : Module
     {
-        public override void control(bot ircbot, BotConfig Conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, BotConfig Conf, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
-            string module_name = ircbot.Conf.Module_Config[module_id][0];
             if (type.Equals("channel") && bot_command == true)
             {
-                foreach (List<string> tmp_command in Conf.Command_List)
+                foreach (Command tmp_command in this.Commands)
                 {
-                    if (module_name.Equals(tmp_command[0]))
+                    bool blocked = tmp_command.Blacklist.Contains(channel) || tmp_command.Blacklist.Contains(nick);
+                    bool cmd_found = false;
+                    bool spam_check = ircbot.get_spam_check(channel, nick, tmp_command.Spam_Check);
+                    if (spam_check == true)
                     {
-                        string[] triggers = tmp_command[3].Split('|');
-                        int command_access = Convert.ToInt32(tmp_command[5]);
-                        string[] blacklist = tmp_command[6].Split(',');
-                        bool blocked = false;
-                        bool cmd_found = false;
-                        bool spam_check = ircbot.get_spam_check(channel, nick, Convert.ToBoolean(tmp_command[8]));
-                        foreach (string bl_chan in blacklist)
+                        blocked = blocked || ircbot.get_spam_status(channel);
+                    }
+                    cmd_found = tmp_command.Triggers.Contains(command);
+                    if (blocked == true && cmd_found == true)
+                    {
+                        ircbot.sendData("NOTICE", nick + " :I am currently too busy to process that.");
+                    }
+                    if (blocked == false && cmd_found == true)
+                    {
+                        foreach (string trigger in tmp_command.Triggers)
                         {
-                            if (bl_chan.Equals(channel))
+                            switch (trigger)
                             {
-                                blocked = true;
-                                break;
-                            }
-                        }
-                        if (spam_check == true)
-                        {
-                            blocked = ircbot.get_spam_status(channel);
-                        }
-                        foreach (string trigger in triggers)
-                        {
-                            if (trigger.Equals(command))
-                            {
-                                cmd_found = true;
-                                break;
-                            }
-                        }
-                        if (blocked == true && cmd_found == true)
-                        {
-                            ircbot.sendData("NOTICE", nick + " :I am currently too busy to process that.");
-                        }
-                        if (blocked == false && cmd_found == true)
-                        {
-                            foreach (string trigger in triggers)
-                            {
-                                switch (trigger)
-                                {
-                                    case "roll":
-                                        if (spam_check == true)
+                                case "roll":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
                                         {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
+                                            string[] new_line = line[4].Trim().Split(' ');
+                                            if (new_line.GetUpperBound(0) > 0)
                                             {
-                                                string[] new_line = line[4].Trim().Split(' ');
-                                                if (new_line.GetUpperBound(0) > 0)
+                                                int num_dice = 0;
+                                                int num_sides = 0;
+                                                List<List<int>> roll_results = new List<List<int>>();
+                                                try
                                                 {
-                                                    int num_dice = 0;
-                                                    int num_sides = 0;
-                                                    List<List<int>> roll_results = new List<List<int>>();
-                                                    try
+                                                    num_dice = Convert.ToInt32(new_line[0].Trim());
+                                                }
+                                                catch (Exception ex)
+                                                {
+                                                    if (ex != null)
                                                     {
-                                                        num_dice = Convert.ToInt32(new_line[0].Trim());
+                                                        num_dice = 1;
                                                     }
-                                                    catch (Exception ex)
+                                                }
+                                                try
+                                                {
+                                                    num_sides = Convert.ToInt32(new_line[1].Trim());
+                                                }
+                                                catch (Exception ex)
+                                                {
+                                                    if (ex != null)
                                                     {
-                                                        if (ex != null)
-                                                        {
-                                                            num_dice = 1;
-                                                        }
+                                                        num_sides = 6;
                                                     }
-                                                    try
-                                                    {
-                                                        num_sides = Convert.ToInt32(new_line[1].Trim());
-                                                    }
-                                                    catch (Exception ex)
-                                                    {
-                                                        if (ex != null)
-                                                        {
-                                                            num_sides = 6;
-                                                        }
-                                                    }
-                                                    if (num_dice > Convert.ToInt32(Conf.Module_Config[module_id][3]))
-                                                    {
-                                                        num_dice = Convert.ToInt32(Conf.Module_Config[module_id][3]);
-                                                    }
-                                                    if (num_sides > Convert.ToInt32(Conf.Module_Config[module_id][4]))
-                                                    {
-                                                        num_sides = Convert.ToInt32(Conf.Module_Config[module_id][4]);
-                                                    }
-                                                    for (int x = 0; x < num_dice; x++)
-                                                    {
-                                                        System.Threading.Thread.Sleep(100);
-                                                        Random random = new Random();
-                                                        int ran_num = random.Next(1, num_sides + 1);
-                                                        bool num_found = false;
-                                                        foreach (List<int> num in roll_results)
-                                                        {
-                                                            if (num[0] == ran_num)
-                                                            {
-                                                                num[1]++;
-                                                                num_found = true;
-                                                                break;
-                                                            }
-                                                        }
-                                                        if (num_found == false)
-                                                        {
-                                                            List<int> tmp = new List<int>();
-                                                            tmp.Add(ran_num);
-                                                            tmp.Add(1);
-                                                            roll_results.Add(tmp);
-                                                        }
-                                                    }
-                                                    string msg = "";
+                                                }
+                                                if (num_dice > Convert.ToInt32(this.Options["max_dice"]))
+                                                {
+                                                    num_dice = Convert.ToInt32(this.Options["max_dice"]);
+                                                }
+                                                if (num_sides > Convert.ToInt32(this.Options["max_sides"]))
+                                                {
+                                                    num_sides = Convert.ToInt32(this.Options["max_sides"]);
+                                                }
+                                                for (int x = 0; x < num_dice; x++)
+                                                {
+                                                    System.Threading.Thread.Sleep(100);
+                                                    Random random = new Random();
+                                                    int ran_num = random.Next(1, num_sides + 1);
+                                                    bool num_found = false;
                                                     foreach (List<int> num in roll_results)
                                                     {
-                                                        msg += num[1] + " [" + num[0] + "'s] | ";
+                                                        if (num[0] == ran_num)
+                                                        {
+                                                            num[1]++;
+                                                            num_found = true;
+                                                            break;
+                                                        }
                                                     }
-                                                    ircbot.sendData("PRIVMSG", channel + " :Rolling " + num_dice + " " + num_sides + "-sided dice: " + msg.Trim().TrimEnd('|').Trim());
+                                                    if (num_found == false)
+                                                    {
+                                                        List<int> tmp = new List<int>();
+                                                        tmp.Add(ran_num);
+                                                        tmp.Add(1);
+                                                        roll_results.Add(tmp);
+                                                    }
                                                 }
-                                                else
+                                                string msg = "";
+                                                foreach (List<int> num in roll_results)
                                                 {
-                                                    int num_dice = 0;
-                                                    List<List<int>> roll_results = new List<List<int>>();
-                                                    try
-                                                    {
-                                                        num_dice = Convert.ToInt32(new_line[0]);
-                                                    }
-                                                    catch (Exception ex)
-                                                    {
-                                                        if (ex != null)
-                                                        {
-                                                            num_dice = 1;
-                                                        }
-                                                    }
-                                                    if (num_dice > Convert.ToInt32(Conf.Module_Config[module_id][3]))
-                                                    {
-                                                        num_dice = Convert.ToInt32(Conf.Module_Config[module_id][3]);
-                                                    }
-                                                    for (int x = 0; x < num_dice; x++)
-                                                    {
-                                                        System.Threading.Thread.Sleep(100);
-                                                        Random random = new Random();
-                                                        int ran_num = random.Next(1, 7);
-                                                        bool num_found = false;
-                                                        foreach (List<int> num in roll_results)
-                                                        {
-                                                            if (num[0] == ran_num)
-                                                            {
-                                                                num[1]++;
-                                                                num_found = true;
-                                                                break;
-                                                            }
-                                                        }
-                                                        if (num_found == false)
-                                                        {
-                                                            List<int> tmp = new List<int>();
-                                                            tmp.Add(ran_num);
-                                                            tmp.Add(1);
-                                                            roll_results.Add(tmp);
-                                                        }
-                                                    }
-                                                    string msg = "";
-                                                    foreach (List<int> num in roll_results)
-                                                    {
-                                                        msg += num[1] + " [" + num[0] + "'s] | ";
-                                                    }
-                                                    ircbot.sendData("PRIVMSG", channel + " :Rolling " + num_dice + " 6-sided dice: " + msg.Trim().TrimEnd('|').Trim());
+                                                    msg += num[1] + " [" + num[0] + "'s] | ";
                                                 }
+                                                ircbot.sendData("PRIVMSG", channel + " :Rolling " + num_dice + " " + num_sides + "-sided dice: " + msg.Trim().TrimEnd('|').Trim());
                                             }
                                             else
                                             {
-                                                Random random = new Random();
-                                                int ran_num = random.Next(1, 7);
-                                                ircbot.sendData("PRIVMSG", channel + " :Rolling 1 6-sided dice: " + ran_num.ToString());
+                                                int num_dice = 0;
+                                                List<List<int>> roll_results = new List<List<int>>();
+                                                try
+                                                {
+                                                    num_dice = Convert.ToInt32(new_line[0]);
+                                                }
+                                                catch (Exception ex)
+                                                {
+                                                    if (ex != null)
+                                                    {
+                                                        num_dice = 1;
+                                                    }
+                                                }
+                                                if (num_dice > Convert.ToInt32(this.Options["max_dice"]))
+                                                {
+                                                    num_dice = Convert.ToInt32(this.Options["max_dice"]);
+                                                }
+                                                for (int x = 0; x < num_dice; x++)
+                                                {
+                                                    System.Threading.Thread.Sleep(100);
+                                                    Random random = new Random();
+                                                    int ran_num = random.Next(1, 7);
+                                                    bool num_found = false;
+                                                    foreach (List<int> num in roll_results)
+                                                    {
+                                                        if (num[0] == ran_num)
+                                                        {
+                                                            num[1]++;
+                                                            num_found = true;
+                                                            break;
+                                                        }
+                                                    }
+                                                    if (num_found == false)
+                                                    {
+                                                        List<int> tmp = new List<int>();
+                                                        tmp.Add(ran_num);
+                                                        tmp.Add(1);
+                                                        roll_results.Add(tmp);
+                                                    }
+                                                }
+                                                string msg = "";
+                                                foreach (List<int> num in roll_results)
+                                                {
+                                                    msg += num[1] + " [" + num[0] + "'s] | ";
+                                                }
+                                                ircbot.sendData("PRIVMSG", channel + " :Rolling " + num_dice + " 6-sided dice: " + msg.Trim().TrimEnd('|').Trim());
                                             }
                                         }
                                         else
                                         {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                            Random random = new Random();
+                                            int ran_num = random.Next(1, 7);
+                                            ircbot.sendData("PRIVMSG", channel + " :Rolling 1 6-sided dice: " + ran_num.ToString());
                                         }
-                                        break;
-                                }
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
                             }
                         }
                     }

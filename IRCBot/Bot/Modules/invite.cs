@@ -7,7 +7,7 @@ namespace Bot.Modules
 {
     class invite : Module
     {
-        public override void control(bot ircbot, BotConfig Conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, BotConfig Conf, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
             if (type.Equals("line") && line.GetUpperBound(0) >= 3 && line[1].Equals("invite", StringComparison.InvariantCultureIgnoreCase) && command.Equals(string.Empty))
             {

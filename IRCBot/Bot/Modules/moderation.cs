@@ -20,702 +20,634 @@ namespace Bot.Modules
             ban_info = new List<List<string>>();
         }
 
-        public override void control(bot ircbot, BotConfig Conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, BotConfig Conf, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
             access access = new access();
 
             char[] charS = new char[] { ' ' };
-            string module_name = ircbot.Conf.Module_Config[module_id][0];
-            string disallowed_modes = ircbot.Conf.Module_Config[module_id][3];
+            string disallowed_modes = this.Options["disallowed_modes"];
             if (type.Equals("channel") && bot_command == true)
             {
-                foreach (List<string> tmp_command in Conf.Command_List)
+                foreach (Command tmp_command in this.Commands)
                 {
-                    if (module_name.Equals(tmp_command[0]))
+                    bool blocked = tmp_command.Blacklist.Contains(channel) || tmp_command.Blacklist.Contains(nick);
+                    bool cmd_found = false;
+                    bool spam_check = ircbot.get_spam_check(channel, nick, tmp_command.Spam_Check);
+                    if (spam_check == true)
                     {
-                        string[] triggers = tmp_command[3].Split('|');
-                        int command_access = Convert.ToInt32(tmp_command[5]);
-                        string[] blacklist = tmp_command[6].Split(',');
-                        bool blocked = false;
-                        bool cmd_found = false;
-                        bool spam_check = ircbot.get_spam_check(channel, nick, Convert.ToBoolean(tmp_command[8]));
-                        foreach (string bl_chan in blacklist)
+                        blocked = blocked || ircbot.get_spam_status(channel);
+                    }
+                    cmd_found = tmp_command.Triggers.Contains(command);
+                    if (blocked == true && cmd_found == true)
+                    {
+                        ircbot.sendData("NOTICE", nick + " :I am currently too busy to process that.");
+                    }
+                    if (blocked == false && cmd_found == true)
+                    {
+                        foreach (string trigger in tmp_command.Triggers)
                         {
-                            if (bl_chan.Equals(channel))
+                            switch (trigger)
                             {
-                                blocked = true;
-                                break;
-                            }
-                        }
-                        if (spam_check == true)
-                        {
-                            blocked = ircbot.get_spam_status(channel);
-                        }
-                        foreach (string trigger in triggers)
-                        {
-                            if (trigger.Equals(command))
-                            {
-                                cmd_found = true;
-                                break;
-                            }
-                        }
-                        if (blocked == true && cmd_found == true)
-                        {
-                            ircbot.sendData("NOTICE", nick + " :I am currently too busy to process that.");
-                        }
-                        if (blocked == false && cmd_found == true)
-                        {
-                            foreach (string trigger in triggers)
-                            {
-                                switch (trigger)
-                                {
-                                    case "founder":
-                                        if (spam_check == true)
+                                case "founder":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
                                         {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
-                                            {
-                                                ircbot.sendData("MODE", line[2] + " +q " + line[4]);
-                                                access.set_access_list(line[4], line[2], Conf.Founder_Level.ToString(), ircbot);
-                                            }
-                                            else
-                                            {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                                            }
+                                            ircbot.sendData("MODE", line[2] + " +q " + line[4]);
+                                            access.set_access_list(line[4], line[2], Conf.Founder_Level.ToString(), ircbot);
                                         }
                                         else
                                         {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
                                         }
-                                        break;
-                                    case "defounder":
-                                        if (spam_check == true)
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "defounder":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
                                         {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
-                                            {
-                                                ircbot.sendData("MODE", line[2] + " -q " + line[4]);
-                                                access.del_access_list(line[4], line[2], Conf.Founder_Level.ToString(), ircbot);
-                                            }
-                                            else
-                                            {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                                            }
-                                        }
-                                        else
-                                        {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                                        }
-                                        break;
-                                    case "sop":
-                                        if (spam_check == true)
-                                        {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
-                                            {
-                                                ircbot.sendData("MODE", line[2] + " +a " + line[4]);
-                                                access.set_access_list(line[4], line[2], Conf.Sop_Level.ToString(), ircbot);
-                                            }
-                                            else
-                                            {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                                            }
+                                            ircbot.sendData("MODE", line[2] + " -q " + line[4]);
+                                            access.del_access_list(line[4], line[2], Conf.Founder_Level.ToString(), ircbot);
                                         }
                                         else
                                         {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
                                         }
-                                        break;
-                                    case "asop":
-                                        if (spam_check == true)
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "sop":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
                                         {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
-                                            {
-                                                ircbot.sendData("MODE", line[2] + " +a " + line[4]);
-                                                ircbot.sendData("PRIVMSG", "chanserv :SOP " + line[2] + " add " + line[4]);
-                                                access.set_access_list(line[4], line[2], Conf.Sop_Level.ToString(), ircbot);
-                                            }
-                                            else
-                                            {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                                            }
-                                        }
-                                        else
-                                        {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                                        }
-                                        break;
-                                    case "deasop":
-                                        if (spam_check == true)
-                                        {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
-                                            {
-                                                ircbot.sendData("MODE", line[2] + " -a " + line[4]);
-                                                ircbot.sendData("PRIVMSG", "chanserv :SOP " + line[2] + " del " + line[4]);
-                                                access.del_access_list(line[4], line[2], Conf.Sop_Level.ToString(), ircbot);
-                                            }
-                                            else
-                                            {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                                            }
+                                            ircbot.sendData("MODE", line[2] + " +a " + line[4]);
+                                            access.set_access_list(line[4], line[2], Conf.Sop_Level.ToString(), ircbot);
                                         }
                                         else
                                         {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
                                         }
-                                        break;
-                                    case "desop":
-                                        if (spam_check == true)
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "asop":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
                                         {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
-                                            {
-                                                ircbot.sendData("MODE", line[2] + " -a " + line[4]);
-                                                access.del_access_list(line[4], line[2], Conf.Sop_Level.ToString(), ircbot);
-                                            }
-                                            else
-                                            {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                                            }
-                                        }
-                                        else
-                                        {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                                        }
-                                        break;
-                                    case "op":
-                                        if (spam_check == true)
-                                        {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
-                                            {
-                                                ircbot.sendData("MODE", line[2] + " +o " + line[4]);
-                                                access.set_access_list(line[4], line[2], Conf.Op_Level.ToString(), ircbot);
-                                            }
-                                            else
-                                            {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                                            }
+                                            ircbot.sendData("MODE", line[2] + " +a " + line[4]);
+                                            ircbot.sendData("PRIVMSG", "chanserv :SOP " + line[2] + " add " + line[4]);
+                                            access.set_access_list(line[4], line[2], Conf.Sop_Level.ToString(), ircbot);
                                         }
                                         else
                                         {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
                                         }
-                                        break;
-                                    case "aop":
-                                        if (spam_check == true)
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "deasop":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
                                         {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
-                                            {
-                                                ircbot.sendData("MODE", line[2] + " +o " + line[4]);
-                                                if (!ircbot.get_nick_auto("SOP", line[2], line[4]))
-                                                {
-                                                    ircbot.sendData("PRIVMSG", "chanserv :AOP " + line[2] + " add " + line[4]);
-                                                }
-                                                access.set_access_list(line[4], line[2], Conf.Op_Level.ToString(), ircbot);
-                                            }
-                                            else
-                                            {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                                            }
+                                            ircbot.sendData("MODE", line[2] + " -a " + line[4]);
+                                            ircbot.sendData("PRIVMSG", "chanserv :SOP " + line[2] + " del " + line[4]);
+                                            access.del_access_list(line[4], line[2], Conf.Sop_Level.ToString(), ircbot);
                                         }
                                         else
                                         {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
                                         }
-                                        break;
-                                    case "deaop":
-                                        if (spam_check == true)
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "desop":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
                                         {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
-                                            {
-                                                ircbot.sendData("MODE", line[2] + " -o " + line[4]);
-                                                ircbot.sendData("PRIVMSG", "chanserv :AOP " + line[2] + " del " + line[4]);
-                                                access.del_access_list(line[4], line[2], Conf.Op_Level.ToString(), ircbot);
-                                            }
-                                            else
-                                            {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                                            }
-                                        }
-                                        else
-                                        {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                                        }
-                                        break;
-                                    case "deop":
-                                        if (spam_check == true)
-                                        {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
-                                            {
-                                                ircbot.sendData("MODE", line[2] + " -o " + line[4]);
-                                                access.del_access_list(line[4], line[2], Conf.Op_Level.ToString(), ircbot);
-                                            }
-                                            else
-                                            {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                                            }
+                                            ircbot.sendData("MODE", line[2] + " -a " + line[4]);
+                                            access.del_access_list(line[4], line[2], Conf.Sop_Level.ToString(), ircbot);
                                         }
                                         else
                                         {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
                                         }
-                                        break;
-                                    case "ahop":
-                                        if (spam_check == true)
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "op":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
                                         {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
-                                            {
-                                                ircbot.sendData("MODE", line[2] + " +h " + line[4]);
-                                                if (!ircbot.get_nick_auto("AOP", line[2], line[4]) && !ircbot.get_nick_auto("SOP", line[2], line[4]))
-                                                {
-                                                    ircbot.sendData("PRIVMSG", "chanserv :HOP " + line[2] + " add " + line[4]);
-                                                }
-                                                access.set_access_list(line[4], line[2], Conf.Hop_Level.ToString(), ircbot);
-                                            }
-                                            else
-                                            {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                                            }
+                                            ircbot.sendData("MODE", line[2] + " +o " + line[4]);
+                                            access.set_access_list(line[4], line[2], Conf.Op_Level.ToString(), ircbot);
                                         }
                                         else
                                         {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
                                         }
-                                        break;
-                                    case "deahop":
-                                        if (spam_check == true)
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "aop":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
                                         {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
+                                            ircbot.sendData("MODE", line[2] + " +o " + line[4]);
+                                            if (!ircbot.get_nick_auto("SOP", line[2], line[4]))
                                             {
-                                                ircbot.sendData("MODE", line[2] + " -h " + line[4]);
-                                                ircbot.sendData("PRIVMSG", "chanserv :HOP " + line[2] + " del " + line[4]);
-                                                access.del_access_list(line[4], line[2], Conf.Hop_Level.ToString(), ircbot);
+                                                ircbot.sendData("PRIVMSG", "chanserv :AOP " + line[2] + " add " + line[4]);
                                             }
-                                            else
-                                            {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                                            }
+                                            access.set_access_list(line[4], line[2], Conf.Op_Level.ToString(), ircbot);
                                         }
                                         else
                                         {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
                                         }
-                                        break;
-                                    case "hop":
-                                        if (spam_check == true)
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "deaop":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
                                         {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
-                                            {
-                                                ircbot.sendData("MODE", line[2] + " +h " + line[4]);
-                                                access.set_access_list(line[4], line[2], Conf.Hop_Level.ToString(), ircbot);
-                                            }
-                                            else
-                                            {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                                            }
-                                        }
-                                        else
-                                        {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                                        }
-                                        break;
-                                    case "dehop":
-                                        if (spam_check == true)
-                                        {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
-                                            {
-                                                ircbot.sendData("MODE", line[2] + " -h " + line[4]);
-                                                access.del_access_list(line[4], line[2], Conf.Hop_Level.ToString(), ircbot);
-                                            }
-                                            else
-                                            {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                                            }
+                                            ircbot.sendData("MODE", line[2] + " -o " + line[4]);
+                                            ircbot.sendData("PRIVMSG", "chanserv :AOP " + line[2] + " del " + line[4]);
+                                            access.del_access_list(line[4], line[2], Conf.Op_Level.ToString(), ircbot);
                                         }
                                         else
                                         {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
                                         }
-                                        break;
-                                    case "avoice":
-                                        if (spam_check == true)
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "deop":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
                                         {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
-                                            {
-                                                ircbot.sendData("MODE", line[2] + " +v " + line[4]);
-                                                if (!ircbot.get_nick_auto("AOP", line[2], line[4]) && !ircbot.get_nick_auto("SOP", line[2], line[4]) && !ircbot.get_nick_auto("VOP", line[2], line[4]))
-                                                {
-                                                    ircbot.sendData("PRIVMSG", "chanserv :VOP " + line[2] + " add " + line[4]);
-                                                }
-                                                access.set_access_list(line[4], line[2], Conf.Voice_Level.ToString(), ircbot);
-                                            }
-                                            else
-                                            {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                                            }
+                                            ircbot.sendData("MODE", line[2] + " -o " + line[4]);
+                                            access.del_access_list(line[4], line[2], Conf.Op_Level.ToString(), ircbot);
                                         }
                                         else
                                         {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
                                         }
-                                        break;
-                                    case "deavoice":
-                                        if (spam_check == true)
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "ahop":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
                                         {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
+                                            ircbot.sendData("MODE", line[2] + " +h " + line[4]);
+                                            if (!ircbot.get_nick_auto("AOP", line[2], line[4]) && !ircbot.get_nick_auto("SOP", line[2], line[4]))
                                             {
-                                                ircbot.sendData("MODE", line[2] + " -v " + line[4]);
-                                                ircbot.sendData("PRIVMSG", "chanserv :VOP " + line[2] + " del " + line[4]);
-                                                access.del_access_list(line[4], line[2], Conf.Voice_Level.ToString(), ircbot);
+                                                ircbot.sendData("PRIVMSG", "chanserv :HOP " + line[2] + " add " + line[4]);
                                             }
-                                            else
-                                            {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                                            }
+                                            access.set_access_list(line[4], line[2], Conf.Hop_Level.ToString(), ircbot);
                                         }
                                         else
                                         {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
                                         }
-                                        break;
-                                    case "voice":
-                                        if (spam_check == true)
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "deahop":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
                                         {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
-                                            {
-                                                ircbot.sendData("MODE", line[2] + " +v " + line[4]);
-                                                access.set_access_list(line[4], line[2], Conf.Voice_Level.ToString(), ircbot);
-                                            }
-                                            else
-                                            {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                                            }
-                                        }
-                                        else
-                                        {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                                        }
-                                        break;
-                                    case "devoice":
-                                        if (spam_check == true)
-                                        {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
-                                            {
-                                                ircbot.sendData("MODE", line[2] + " -v " + line[4]);
-                                                access.del_access_list(line[4], line[2], Conf.Voice_Level.ToString(), ircbot);
-                                            }
-                                            else
-                                            {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                                            }
+                                            ircbot.sendData("MODE", line[2] + " -h " + line[4]);
+                                            ircbot.sendData("PRIVMSG", "chanserv :HOP " + line[2] + " del " + line[4]);
+                                            access.del_access_list(line[4], line[2], Conf.Hop_Level.ToString(), ircbot);
                                         }
                                         else
                                         {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
                                         }
-                                        break;
-                                    case "mode":
-                                        if (spam_check == true)
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "hop":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
                                         {
-                                            ircbot.add_spam_count(channel);
+                                            ircbot.sendData("MODE", line[2] + " +h " + line[4]);
+                                            access.set_access_list(line[4], line[2], Conf.Hop_Level.ToString(), ircbot);
                                         }
-                                        if (nick_access >= command_access)
+                                        else
                                         {
-                                            if (line.GetUpperBound(0) > 3)
+                                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "dehop":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
+                                        {
+                                            ircbot.sendData("MODE", line[2] + " -h " + line[4]);
+                                            access.del_access_list(line[4], line[2], Conf.Hop_Level.ToString(), ircbot);
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "avoice":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
+                                        {
+                                            ircbot.sendData("MODE", line[2] + " +v " + line[4]);
+                                            if (!ircbot.get_nick_auto("AOP", line[2], line[4]) && !ircbot.get_nick_auto("SOP", line[2], line[4]) && !ircbot.get_nick_auto("VOP", line[2], line[4]))
                                             {
-                                                string[] new_line = line[4].Split(charS, 2);
-                                                char[] arr = new_line[0].ToCharArray();
+                                                ircbot.sendData("PRIVMSG", "chanserv :VOP " + line[2] + " add " + line[4]);
+                                            }
+                                            access.set_access_list(line[4], line[2], Conf.Voice_Level.ToString(), ircbot);
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "deavoice":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
+                                        {
+                                            ircbot.sendData("MODE", line[2] + " -v " + line[4]);
+                                            ircbot.sendData("PRIVMSG", "chanserv :VOP " + line[2] + " del " + line[4]);
+                                            access.del_access_list(line[4], line[2], Conf.Voice_Level.ToString(), ircbot);
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "voice":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
+                                        {
+                                            ircbot.sendData("MODE", line[2] + " +v " + line[4]);
+                                            access.set_access_list(line[4], line[2], Conf.Voice_Level.ToString(), ircbot);
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "devoice":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
+                                        {
+                                            ircbot.sendData("MODE", line[2] + " -v " + line[4]);
+                                            access.del_access_list(line[4], line[2], Conf.Voice_Level.ToString(), ircbot);
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "mode":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
+                                        {
+                                            string[] new_line = line[4].Split(charS, 2);
+                                            char[] arr = new_line[0].ToCharArray();
 
-                                                bool mode_allowed = true;
-                                                bool positive = true;
-                                                int mode_index = 0;
-                                                foreach (char c in arr)
+                                            bool mode_allowed = true;
+                                            bool positive = true;
+                                            int mode_index = 0;
+                                            foreach (char c in arr)
+                                            {
+                                                if (!c.Equals('+') && !c.Equals('-'))
                                                 {
-                                                    if (!c.Equals('+') && !c.Equals('-'))
+                                                    char[] modes_disallowed = disallowed_modes.ToCharArray();
+                                                    foreach (char m in modes_disallowed)
                                                     {
-                                                        char[] modes_disallowed = disallowed_modes.ToCharArray();
-                                                        foreach (char m in modes_disallowed)
+                                                        if (m.Equals(c))
                                                         {
-                                                            if (m.Equals(c))
+                                                            mode_allowed = false;
+                                                            break;
+                                                        }
+                                                    }
+                                                    if (mode_allowed == true)
+                                                    {
+                                                        if (c.Equals('q') || c.Equals('a') || c.Equals('o') || c.Equals('h') || c.Equals('v'))
+                                                        {
+                                                            int mode_access = ircbot.get_access_num(c.ToString(), true);
+                                                            if (nick_access < mode_access)
                                                             {
                                                                 mode_allowed = false;
                                                                 break;
                                                             }
                                                         }
-                                                        if (mode_allowed == true)
-                                                        {
-                                                            if (c.Equals('q') || c.Equals('a') || c.Equals('o') || c.Equals('h') || c.Equals('v'))
-                                                            {
-                                                                int mode_access = ircbot.get_access_num(c.ToString(), true);
-                                                                if (nick_access < mode_access)
-                                                                {
-                                                                    mode_allowed = false;
-                                                                    break;
-                                                                }
-                                                            }
-                                                        }
-                                                        if (mode_allowed)
-                                                        {
-                                                            string leading_cmd = "";
-                                                            if (positive)
-                                                            {
-                                                                leading_cmd = "+";
-                                                            }
-                                                            else
-                                                            {
-                                                                leading_cmd = "-";
-                                                            }
-                                                            bool nick_needed = false;
-                                                            if (new_line.GetUpperBound(0) > 0)
-                                                            {
-                                                                string[] nicks = new_line[1].Split(charS);
-                                                                if (nicks.GetUpperBound(0) >= mode_index)
-                                                                {
-                                                                    nick_needed = true;
-                                                                }
-                                                            }
-                                                            if (nick_needed)
-                                                            {
-                                                                string[] nicks = new_line[1].Split(charS);
-                                                                ircbot.sendData("MODE", line[2] + " " + leading_cmd + c.ToString() + " :" + nicks[mode_index]);
-                                                            }
-                                                            else
-                                                            {
-                                                                ircbot.sendData("MODE", line[2] + " " + leading_cmd + c.ToString());
-                                                            }
-                                                        }
-                                                        mode_index++;
                                                     }
-                                                    else if (c.Equals('+'))
+                                                    if (mode_allowed)
                                                     {
-                                                        positive = true;
-                                                    }
-                                                    else if (c.Equals('-'))
-                                                    {
-                                                        positive = false;
-                                                    }
-                                                }
-                                                if (!mode_allowed)
-                                                {
-                                                    ircbot.sendData("PRIVMSG", line[2] + " :You do not have permission to use that command.");
-                                                }
-                                            }
-                                            else
-                                            {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                                            }
-                                        }
-                                        else
-                                        {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                                        }
-                                        break;
-                                    case "topic":
-                                        if (spam_check == true)
-                                        {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
-                                            {
-                                                string[] new_line = line[4].Split(charS, 2);
-                                                if (new_line.GetUpperBound(0) > 0)
-                                                {
-                                                    ircbot.sendData("TOPIC", line[2] + " :" + new_line[0] + " " + new_line[1]);
-                                                }
-                                                else
-                                                {
-                                                    ircbot.sendData("TOPIC", line[2] + " :" + new_line[0]);
-                                                }
-                                            }
-                                            else
-                                            {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                                            }
-                                        }
-                                        else
-                                        {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                                        }
-                                        break;
-                                    case "invite":
-                                        if (spam_check == true)
-                                        {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
-                                            {
-                                                string[] new_line = line[4].Split(charS, 2);
-                                                if (new_line.GetUpperBound(0) > 0)
-                                                {
-                                                    ircbot.sendData("INVITE", new_line[0] + " " + new_line[1]);
-                                                }
-                                                else
-                                                {
-                                                    ircbot.sendData("INVITE", new_line[0] + " " + line[2]);
-                                                }
-                                            }
-                                            else
-                                            {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                                            }
-                                        }
-                                        else
-                                        {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                                        }
-                                        break;
-                                    case "b":
-                                        if (spam_check == true)
-                                        {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
-                                            {
-                                                string[] new_line = line[4].Split(charS, 2);
-                                                string nicks = new_line[0].TrimStart(':');
-                                                char[] charSep = new char[] { ',' };
-                                                string[] total_nicks = new_line[0].Split(charSep, StringSplitOptions.RemoveEmptyEntries);
-                                                int sent_nick_access = ircbot.get_nick_access(total_nicks[0], line[2]);
-
-                                                bool tmp_me = false;
-                                                for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
-                                                {
-                                                    if (total_nicks[y].Equals(Conf.Name, StringComparison.OrdinalIgnoreCase))
-                                                    {
-                                                        tmp_me = true;
-                                                    }
-                                                }
-                                                if (sent_nick_access == Conf.Owner_Level)
-                                                {
-                                                    ircbot.sendData("PRIVMSG", line[2] + " :You can't ban my owner!");
-                                                }
-                                                else if (tmp_me == true)
-                                                {
-                                                    ircbot.sendData("PRIVMSG", line[2] + " :You can't ban me!");
-                                                }
-                                                else
-                                                {
-                                                    if (nick_access >= sent_nick_access)
-                                                    {
-                                                        string target_host = ircbot.get_nick_host(total_nicks[0]);
-                                                        string ban = "*!*@" + target_host;
-                                                        if (target_host.Equals(""))
+                                                        string leading_cmd = "";
+                                                        if (positive)
                                                         {
-                                                            ban = new_line[0] + "!*@*";
-                                                        }
-                                                        if (new_line.GetUpperBound(0) > 0)
-                                                        {
-                                                            ircbot.sendData("MODE", line[2] + " +b " + ban + " :" + new_line[1]);
+                                                            leading_cmd = "+";
                                                         }
                                                         else
                                                         {
-                                                            ircbot.sendData("MODE", line[2] + " +b " + ban + " :No Reason");
+                                                            leading_cmd = "-";
+                                                        }
+                                                        bool nick_needed = false;
+                                                        if (new_line.GetUpperBound(0) > 0)
+                                                        {
+                                                            string[] nicks = new_line[1].Split(charS);
+                                                            if (nicks.GetUpperBound(0) >= mode_index)
+                                                            {
+                                                                nick_needed = true;
+                                                            }
+                                                        }
+                                                        if (nick_needed)
+                                                        {
+                                                            string[] nicks = new_line[1].Split(charS);
+                                                            ircbot.sendData("MODE", line[2] + " " + leading_cmd + c.ToString() + " :" + nicks[mode_index]);
+                                                        }
+                                                        else
+                                                        {
+                                                            ircbot.sendData("MODE", line[2] + " " + leading_cmd + c.ToString());
                                                         }
                                                     }
-                                                    else
-                                                    {
-                                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                                                    }
+                                                    mode_index++;
+                                                }
+                                                else if (c.Equals('+'))
+                                                {
+                                                    positive = true;
+                                                }
+                                                else if (c.Equals('-'))
+                                                {
+                                                    positive = false;
                                                 }
                                             }
-                                            else
+                                            if (!mode_allowed)
                                             {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                                                ircbot.sendData("PRIVMSG", line[2] + " :You do not have permission to use that command.");
                                             }
                                         }
                                         else
                                         {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
                                         }
-                                        break;
-                                    case "ub":
-                                        if (spam_check == true)
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "topic":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
                                         {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
+                                            string[] new_line = line[4].Split(charS, 2);
+                                            if (new_line.GetUpperBound(0) > 0)
                                             {
-                                                string[] new_line = line[4].Split(charS, 2);
-                                                char[] charSep = new char[] { ',' };
-                                                string[] total_nicks = new_line[0].Split(charSep, StringSplitOptions.RemoveEmptyEntries);
-                                                int sent_nick_access = ircbot.get_nick_access(total_nicks[0].TrimStart(':'), line[2]);
+                                                ircbot.sendData("TOPIC", line[2] + " :" + new_line[0] + " " + new_line[1]);
+                                            }
+                                            else
+                                            {
+                                                ircbot.sendData("TOPIC", line[2] + " :" + new_line[0]);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "invite":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
+                                        {
+                                            string[] new_line = line[4].Split(charS, 2);
+                                            if (new_line.GetUpperBound(0) > 0)
+                                            {
+                                                ircbot.sendData("INVITE", new_line[0] + " " + new_line[1]);
+                                            }
+                                            else
+                                            {
+                                                ircbot.sendData("INVITE", new_line[0] + " " + line[2]);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "b":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
+                                        {
+                                            string[] new_line = line[4].Split(charS, 2);
+                                            string nicks = new_line[0].TrimStart(':');
+                                            char[] charSep = new char[] { ',' };
+                                            string[] total_nicks = new_line[0].Split(charSep, StringSplitOptions.RemoveEmptyEntries);
+                                            int sent_nick_access = ircbot.get_nick_access(total_nicks[0], line[2]);
 
+                                            bool tmp_me = false;
+                                            for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
+                                            {
+                                                if (total_nicks[y].Equals(Conf.Name, StringComparison.OrdinalIgnoreCase))
+                                                {
+                                                    tmp_me = true;
+                                                }
+                                            }
+                                            if (sent_nick_access == Conf.Owner_Level)
+                                            {
+                                                ircbot.sendData("PRIVMSG", line[2] + " :You can't ban my owner!");
+                                            }
+                                            else if (tmp_me == true)
+                                            {
+                                                ircbot.sendData("PRIVMSG", line[2] + " :You can't ban me!");
+                                            }
+                                            else
+                                            {
                                                 if (nick_access >= sent_nick_access)
                                                 {
                                                     string target_host = ircbot.get_nick_host(total_nicks[0]);
@@ -726,11 +658,11 @@ namespace Bot.Modules
                                                     }
                                                     if (new_line.GetUpperBound(0) > 0)
                                                     {
-                                                        ircbot.sendData("MODE", line[2] + " -b " + ban + " :" + new_line[1]);
+                                                        ircbot.sendData("MODE", line[2] + " +b " + ban + " :" + new_line[1]);
                                                     }
                                                     else
                                                     {
-                                                        ircbot.sendData("MODE", line[2] + " -b " + ban + " :No Reason");
+                                                        ircbot.sendData("MODE", line[2] + " +b " + ban + " :No Reason");
                                                     }
                                                 }
                                                 else
@@ -738,43 +670,162 @@ namespace Bot.Modules
                                                     ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
                                                 }
                                             }
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "ub":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
+                                        {
+                                            string[] new_line = line[4].Split(charS, 2);
+                                            char[] charSep = new char[] { ',' };
+                                            string[] total_nicks = new_line[0].Split(charSep, StringSplitOptions.RemoveEmptyEntries);
+                                            int sent_nick_access = ircbot.get_nick_access(total_nicks[0].TrimStart(':'), line[2]);
+
+                                            if (nick_access >= sent_nick_access)
+                                            {
+                                                string target_host = ircbot.get_nick_host(total_nicks[0]);
+                                                string ban = "*!*@" + target_host;
+                                                if (target_host.Equals(""))
+                                                {
+                                                    ban = new_line[0] + "!*@*";
+                                                }
+                                                if (new_line.GetUpperBound(0) > 0)
+                                                {
+                                                    ircbot.sendData("MODE", line[2] + " -b " + ban + " :" + new_line[1]);
+                                                }
+                                                else
+                                                {
+                                                    ircbot.sendData("MODE", line[2] + " -b " + ban + " :No Reason");
+                                                }
+                                            }
                                             else
                                             {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                                                ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
                                             }
                                         }
                                         else
                                         {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
                                         }
-                                        break;
-                                    case "clearban":
-                                        if (spam_check == true)
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "clearban":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        ircbot.sendData("PRIVMSG", "chanserv :clear " + channel + " bans");
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "kb":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
                                         {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            ircbot.sendData("PRIVMSG", "chanserv :clear " + channel + " bans");
+                                            string[] new_line = line[4].Split(charS, 2);
+                                            string nicks = new_line[0].TrimStart(':');
+                                            char[] charSep = new char[] { ',' };
+                                            string[] total_nicks = nicks.Split(charSep, StringSplitOptions.RemoveEmptyEntries);
+                                            int sent_nick_access = ircbot.get_nick_access(total_nicks[0], line[2]);
+
+                                            bool tmp_me = false;
+                                            for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
+                                            {
+                                                if (total_nicks[y].Equals(Conf.Name, StringComparison.InvariantCultureIgnoreCase))
+                                                {
+                                                    tmp_me = true;
+                                                }
+                                            }
+                                            if (sent_nick_access == Conf.Owner_Level)
+                                            {
+                                                ircbot.sendData("PRIVMSG", line[2] + " :You can't kick-ban my owner!");
+                                            }
+                                            else if (tmp_me == true)
+                                            {
+                                                ircbot.sendData("PRIVMSG", line[2] + " :You can't kick-ban me!");
+                                            }
+                                            else
+                                            {
+                                                if (nick_access >= sent_nick_access)
+                                                {
+                                                    string target_host = ircbot.get_nick_host(total_nicks[0]);
+                                                    string ban = "*!*@" + target_host;
+                                                    if (target_host.Equals(""))
+                                                    {
+                                                        ban = new_line[0] + "!*@*";
+                                                    }
+                                                    if (new_line.GetUpperBound(0) > 0)
+                                                    {
+                                                        ircbot.sendData("MODE", line[2] + " +b " + ban + " :" + new_line[1]);
+                                                        ircbot.sendData("KICK", line[2] + " " + total_nicks[0] + " :" + new_line[1]);
+                                                    }
+                                                    else
+                                                    {
+                                                        ircbot.sendData("MODE", line[2] + " +b " + ban + " :No Reason");
+                                                        ircbot.sendData("KICK", line[2] + " " + total_nicks[0] + " :No Reason");
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                                }
+                                            }
                                         }
                                         else
                                         {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
                                         }
-                                        break;
-                                    case "kb":
-                                        if (spam_check == true)
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "tb":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
                                         {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
+                                            string[] new_line = line[4].Split(charS, 3, StringSplitOptions.RemoveEmptyEntries);
+                                            if (new_line.GetUpperBound(0) > 0)
                                             {
-                                                string[] new_line = line[4].Split(charS, 2);
-                                                string nicks = new_line[0].TrimStart(':');
+                                                int time = Convert.ToInt32(new_line[0].TrimStart(':'));
+                                                string nicks = new_line[1];
                                                 char[] charSep = new char[] { ',' };
                                                 string[] total_nicks = nicks.Split(charSep, StringSplitOptions.RemoveEmptyEntries);
+                                                string target_host = ircbot.get_nick_host(total_nicks[0]);
                                                 int sent_nick_access = ircbot.get_nick_access(total_nicks[0], line[2]);
 
                                                 bool tmp_me = false;
@@ -787,298 +838,6 @@ namespace Bot.Modules
                                                 }
                                                 if (sent_nick_access == Conf.Owner_Level)
                                                 {
-                                                    ircbot.sendData("PRIVMSG", line[2] + " :You can't kick-ban my owner!");
-                                                }
-                                                else if (tmp_me == true)
-                                                {
-                                                    ircbot.sendData("PRIVMSG", line[2] + " :You can't kick-ban me!");
-                                                }
-                                                else
-                                                {
-                                                    if (nick_access >= sent_nick_access)
-                                                    {
-                                                        string target_host = ircbot.get_nick_host(total_nicks[0]);
-                                                        string ban = "*!*@" + target_host;
-                                                        if (target_host.Equals(""))
-                                                        {
-                                                            ban = new_line[0] + "!*@*";
-                                                        }
-                                                        if (new_line.GetUpperBound(0) > 0)
-                                                        {
-                                                            ircbot.sendData("MODE", line[2] + " +b " + ban + " :" + new_line[1]);
-                                                            ircbot.sendData("KICK", line[2] + " " + total_nicks[0] + " :" + new_line[1]);
-                                                        }
-                                                        else
-                                                        {
-                                                            ircbot.sendData("MODE", line[2] + " +b " + ban + " :No Reason");
-                                                            ircbot.sendData("KICK", line[2] + " " + total_nicks[0] + " :No Reason");
-                                                        }
-                                                    }
-                                                    else
-                                                    {
-                                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                                                    }
-                                                }
-                                            }
-                                            else
-                                            {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                                            }
-                                        }
-                                        else
-                                        {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                                        }
-                                        break;
-                                    case "tb":
-                                        if (spam_check == true)
-                                        {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
-                                            {
-                                                string[] new_line = line[4].Split(charS, 3, StringSplitOptions.RemoveEmptyEntries);
-                                                if (new_line.GetUpperBound(0) > 0)
-                                                {
-                                                    int time = Convert.ToInt32(new_line[0].TrimStart(':'));
-                                                    string nicks = new_line[1];
-                                                    char[] charSep = new char[] { ',' };
-                                                    string[] total_nicks = nicks.Split(charSep, StringSplitOptions.RemoveEmptyEntries);
-                                                    string target_host = ircbot.get_nick_host(total_nicks[0]);
-                                                    int sent_nick_access = ircbot.get_nick_access(total_nicks[0], line[2]);
-
-                                                    bool tmp_me = false;
-                                                    for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
-                                                    {
-                                                        if (total_nicks[y].Equals(Conf.Name, StringComparison.InvariantCultureIgnoreCase))
-                                                        {
-                                                            tmp_me = true;
-                                                        }
-                                                    }
-                                                    if (sent_nick_access == Conf.Owner_Level)
-                                                    {
-                                                        ircbot.sendData("PRIVMSG", line[2] + " :You can't ban my owner!");
-                                                    }
-                                                    else if (tmp_me == true)
-                                                    {
-                                                        ircbot.sendData("PRIVMSG", line[2] + " :You can't ban me!");
-                                                    }
-                                                    else
-                                                    {
-                                                        if (nick_access >= sent_nick_access)
-                                                        {
-                                                            string ban = "*!*@" + target_host;
-                                                            if (target_host.Equals(""))
-                                                            {
-                                                                ban = total_nicks[0] + "!*@*";
-                                                            }
-                                                            if (new_line.GetUpperBound(0) > 1)
-                                                            {
-                                                                ircbot.sendData("MODE", line[2] + " +b " + ban + " :" + new_line[2]);
-                                                            }
-                                                            else
-                                                            {
-                                                                ircbot.sendData("MODE", line[2] + " +b " + ban + " :No Reason");
-                                                            }
-                                                            Timer unban_trigger = new Timer();
-                                                            unban_trigger.Interval = (Convert.ToInt32(new_line[0]) * 1000);
-                                                            unban_trigger.Enabled = true;
-                                                            unban_trigger.AutoReset = false;
-                                                            unban_trigger.Elapsed += (sender, e) => unban_nick(sender, e, total_nicks[0], target_host, line[2]);
-                                                            unban_triggers.Add(unban_trigger);
-                                                            main = ircbot;
-                                                        }
-                                                        else
-                                                        {
-                                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                                                        }
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                                                }
-                                            }
-                                            else
-                                            {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                                            }
-                                        }
-                                        else
-                                        {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                                        }
-                                        break;
-                                    case "tkb":
-                                        if (spam_check == true)
-                                        {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
-                                            {
-                                                string[] new_line = line[4].Split(charS, 3, StringSplitOptions.RemoveEmptyEntries);
-                                                if (new_line.GetUpperBound(0) > 0)
-                                                {
-                                                    int time = Convert.ToInt32(new_line[0].TrimStart(':'));
-                                                    string nicks = new_line[1];
-                                                    char[] charSep = new char[] { ',' };
-                                                    string[] total_nicks = nicks.Split(charSep, StringSplitOptions.RemoveEmptyEntries);
-                                                    int sent_nick_access = ircbot.get_nick_access(total_nicks[0], line[2]);
-                                                    string target_host = ircbot.get_nick_host(total_nicks[0]);
-
-                                                    bool tmp_me = false;
-                                                    for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
-                                                    {
-                                                        if (total_nicks[y].Trim().Equals(Conf.Name, StringComparison.InvariantCultureIgnoreCase))
-                                                        {
-                                                            tmp_me = true;
-                                                        }
-                                                    }
-                                                    if (sent_nick_access == Conf.Owner_Level)
-                                                    {
-                                                        ircbot.sendData("PRIVMSG", line[2] + " :You can't kick-ban my owner!");
-                                                    }
-                                                    else if (tmp_me == true)
-                                                    {
-                                                        ircbot.sendData("PRIVMSG", line[2] + " :You can't kick-ban me!");
-                                                    }
-                                                    else
-                                                    {
-                                                        if (nick_access >= sent_nick_access)
-                                                        {
-                                                            string ban = "*!*@" + target_host;
-                                                            if (target_host.Equals(""))
-                                                            {
-                                                                ban = new_line[1] + "!*@*";
-                                                            }
-                                                            if (new_line.GetUpperBound(0) > 1)
-                                                            {
-                                                                ircbot.sendData("MODE", line[2] + " +b " + ban + " :" + new_line[2]);
-                                                                ircbot.sendData("KICK", line[2] + " " + total_nicks[0] + " :" + new_line[2]);
-                                                            }
-                                                            else
-                                                            {
-                                                                ircbot.sendData("MODE", line[2] + " +b " + ban + " :No Reason");
-                                                                ircbot.sendData("KICK", line[2] + " " + total_nicks[0] + " :No Reason");
-                                                            }
-                                                            System.Timers.Timer unban_trigger = new System.Timers.Timer();
-                                                            unban_trigger.Interval = (Convert.ToInt32(new_line[0]) * 1000);
-                                                            unban_trigger.Enabled = true;
-                                                            unban_trigger.AutoReset = false;
-                                                            unban_trigger.Elapsed += (sender, e) => unban_nick(sender, e, total_nicks[0], target_host, line[2]);
-                                                            unban_triggers.Add(unban_trigger);
-                                                            main = ircbot;
-                                                        }
-                                                        else
-                                                        {
-                                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                                                        }
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                                                }
-                                            }
-                                            else
-                                            {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                                            }
-                                        }
-                                        else
-                                        {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                                        }
-                                        break;
-                                    case "ak":
-                                        if (spam_check == true)
-                                        {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
-                                            {
-                                                string[] new_line = line[4].Split(charS, 2);
-                                                string nicks = new_line[0].TrimStart(':');
-                                                char[] charSep = new char[] { ',' };
-                                                string[] total_nicks = nicks.Split(charSep, StringSplitOptions.RemoveEmptyEntries);
-                                                int sent_nick_access = ircbot.get_nick_access(total_nicks[0], line[2]);
-                                                bool tmp_me = false;
-                                                for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
-                                                {
-                                                    if (total_nicks[y].Trim().Equals(Conf.Name, StringComparison.InvariantCultureIgnoreCase))
-                                                    {
-                                                        tmp_me = true;
-                                                    }
-                                                }
-                                                if (sent_nick_access == Conf.Owner_Level)
-                                                {
-                                                    ircbot.sendData("PRIVMSG", line[2] + " :You can't kick my owner!");
-                                                }
-                                                else if (tmp_me == true)
-                                                {
-                                                    ircbot.sendData("PRIVMSG", line[2] + " :You can't kick me!");
-                                                }
-                                                else
-                                                {
-                                                    if (nick_access >= sent_nick_access)
-                                                    {
-                                                        string target_host = ircbot.get_nick_host(total_nicks[0]);
-                                                        if (new_line.GetUpperBound(0) > 0)
-                                                        {
-                                                            add_auto(total_nicks[0], line[2], target_host, "k", new_line[1], ircbot);
-                                                        }
-                                                        else
-                                                        {
-                                                            add_auto(total_nicks[0], line[2], target_host, "k", "No Reason", ircbot);
-                                                        }
-                                                    }
-                                                    else
-                                                    {
-                                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                                                    }
-                                                }
-                                            }
-                                            else
-                                            {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                                            }
-                                        }
-                                        else
-                                        {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                                        }
-                                        break;
-                                    case "ab":
-                                        if (spam_check == true)
-                                        {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
-                                            {
-                                                string[] new_line = line[4].Split(charS, 2);
-                                                string target_host = ircbot.get_nick_host(new_line[0]);
-                                                string nicks = new_line[0].TrimStart(':');
-                                                char[] charSep = new char[] { ',' };
-                                                string[] total_nicks = nicks.Split(charSep, StringSplitOptions.RemoveEmptyEntries);
-                                                int sent_nick_access = ircbot.get_nick_access(total_nicks[0], line[2]);
-                                                bool tmp_me = false;
-                                                for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
-                                                {
-                                                    if (total_nicks[y].Trim().Equals(Conf.Name, StringComparison.InvariantCultureIgnoreCase))
-                                                    {
-                                                        tmp_me = true;
-                                                    }
-                                                }
-                                                if (sent_nick_access == Conf.Owner_Level)
-                                                {
                                                     ircbot.sendData("PRIVMSG", line[2] + " :You can't ban my owner!");
                                                 }
                                                 else if (tmp_me == true)
@@ -1089,14 +848,26 @@ namespace Bot.Modules
                                                 {
                                                     if (nick_access >= sent_nick_access)
                                                     {
-                                                        if (new_line.GetUpperBound(0) > 0)
+                                                        string ban = "*!*@" + target_host;
+                                                        if (target_host.Equals(""))
                                                         {
-                                                            add_auto(total_nicks[0], line[2], target_host, "b", new_line[1], ircbot);
+                                                            ban = total_nicks[0] + "!*@*";
+                                                        }
+                                                        if (new_line.GetUpperBound(0) > 1)
+                                                        {
+                                                            ircbot.sendData("MODE", line[2] + " +b " + ban + " :" + new_line[2]);
                                                         }
                                                         else
                                                         {
-                                                            add_auto(total_nicks[0], line[2], target_host, "b", "No Reason", ircbot);
+                                                            ircbot.sendData("MODE", line[2] + " +b " + ban + " :No Reason");
                                                         }
+                                                        Timer unban_trigger = new Timer();
+                                                        unban_trigger.Interval = (Convert.ToInt32(new_line[0]) * 1000);
+                                                        unban_trigger.Enabled = true;
+                                                        unban_trigger.AutoReset = false;
+                                                        unban_trigger.Elapsed += (sender, e) => unban_nick(sender, e, total_nicks[0], target_host, line[2]);
+                                                        unban_triggers.Add(unban_trigger);
+                                                        main = ircbot;
                                                     }
                                                     else
                                                     {
@@ -1111,24 +882,33 @@ namespace Bot.Modules
                                         }
                                         else
                                         {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
                                         }
-                                        break;
-                                    case "akb":
-                                        if (spam_check == true)
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "tkb":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
                                         {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
+                                            string[] new_line = line[4].Split(charS, 3, StringSplitOptions.RemoveEmptyEntries);
+                                            if (new_line.GetUpperBound(0) > 0)
                                             {
-                                                string[] new_line = line[4].Split(charS, 2);
-                                                string target_host = ircbot.get_nick_host(new_line[0]);
-                                                string nicks = new_line[0].TrimStart(':');
+                                                int time = Convert.ToInt32(new_line[0].TrimStart(':'));
+                                                string nicks = new_line[1];
                                                 char[] charSep = new char[] { ',' };
                                                 string[] total_nicks = nicks.Split(charSep, StringSplitOptions.RemoveEmptyEntries);
                                                 int sent_nick_access = ircbot.get_nick_access(total_nicks[0], line[2]);
+                                                string target_host = ircbot.get_nick_host(total_nicks[0]);
+
                                                 bool tmp_me = false;
                                                 for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
                                                 {
@@ -1149,14 +929,28 @@ namespace Bot.Modules
                                                 {
                                                     if (nick_access >= sent_nick_access)
                                                     {
-                                                        if (new_line.GetUpperBound(0) > 0)
+                                                        string ban = "*!*@" + target_host;
+                                                        if (target_host.Equals(""))
                                                         {
-                                                            add_auto(total_nicks[0], line[2], target_host, "kb", new_line[1], ircbot);
+                                                            ban = new_line[1] + "!*@*";
+                                                        }
+                                                        if (new_line.GetUpperBound(0) > 1)
+                                                        {
+                                                            ircbot.sendData("MODE", line[2] + " +b " + ban + " :" + new_line[2]);
+                                                            ircbot.sendData("KICK", line[2] + " " + total_nicks[0] + " :" + new_line[2]);
                                                         }
                                                         else
                                                         {
-                                                            add_auto(total_nicks[0], line[2], target_host, "kb", "No Reason", ircbot);
+                                                            ircbot.sendData("MODE", line[2] + " +b " + ban + " :No Reason");
+                                                            ircbot.sendData("KICK", line[2] + " " + total_nicks[0] + " :No Reason");
                                                         }
+                                                        System.Timers.Timer unban_trigger = new System.Timers.Timer();
+                                                        unban_trigger.Interval = (Convert.ToInt32(new_line[0]) * 1000);
+                                                        unban_trigger.Enabled = true;
+                                                        unban_trigger.AutoReset = false;
+                                                        unban_trigger.Elapsed += (sender, e) => unban_nick(sender, e, total_nicks[0], target_host, line[2]);
+                                                        unban_triggers.Add(unban_trigger);
+                                                        main = ircbot;
                                                     }
                                                     else
                                                     {
@@ -1171,152 +965,336 @@ namespace Bot.Modules
                                         }
                                         else
                                         {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
                                         }
-                                        break;
-                                    case "deak":
-                                        if (spam_check == true)
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "ak":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
                                         {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
+                                            string[] new_line = line[4].Split(charS, 2);
+                                            string nicks = new_line[0].TrimStart(':');
+                                            char[] charSep = new char[] { ',' };
+                                            string[] total_nicks = nicks.Split(charSep, StringSplitOptions.RemoveEmptyEntries);
+                                            int sent_nick_access = ircbot.get_nick_access(total_nicks[0], line[2]);
+                                            bool tmp_me = false;
+                                            for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
                                             {
-                                                string target_host = ircbot.get_nick_host(line[4]);
-                                                del_auto(line[4], line[2], target_host, "k", ircbot);
-                                            }
-                                            else
-                                            {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                                            }
-                                        }
-                                        else
-                                        {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                                        }
-                                        break;
-                                    case "deab":
-                                        if (spam_check == true)
-                                        {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
-                                            {
-                                                string target_host = ircbot.get_nick_host(line[4]);
-                                                del_auto(line[4], line[2], target_host, "b", ircbot);
-                                            }
-                                            else
-                                            {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                                            }
-                                        }
-                                        else
-                                        {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                                        }
-                                        break;
-                                    case "deakb":
-                                        if (spam_check == true)
-                                        {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
-                                            {
-                                                string target_host = ircbot.get_nick_host(line[4]);
-                                                del_auto(line[4], line[2], target_host, "kb", ircbot);
-                                            }
-                                            else
-                                            {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
-                                            }
-                                        }
-                                        else
-                                        {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                                        }
-                                        break;
-                                    case "k":
-                                        if (spam_check == true)
-                                        {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
-                                            {
-                                                string[] new_line = line[4].Split(charS, 2);
-                                                string nicks = new_line[0].TrimStart(':');
-                                                char[] charSep = new char[] { ',' };
-                                                string[] total_nicks = nicks.Split(charSep, StringSplitOptions.RemoveEmptyEntries);
-                                                int sent_nick_access = ircbot.get_nick_access(total_nicks[0], line[2]);
-                                                bool tmp_me = false;
-                                                for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
+                                                if (total_nicks[y].Trim().Equals(Conf.Name, StringComparison.InvariantCultureIgnoreCase))
                                                 {
-                                                    if (total_nicks[y].Trim().Equals(Conf.Name, StringComparison.InvariantCultureIgnoreCase))
+                                                    tmp_me = true;
+                                                }
+                                            }
+                                            if (sent_nick_access == Conf.Owner_Level)
+                                            {
+                                                ircbot.sendData("PRIVMSG", line[2] + " :You can't kick my owner!");
+                                            }
+                                            else if (tmp_me == true)
+                                            {
+                                                ircbot.sendData("PRIVMSG", line[2] + " :You can't kick me!");
+                                            }
+                                            else
+                                            {
+                                                if (nick_access >= sent_nick_access)
+                                                {
+                                                    string target_host = ircbot.get_nick_host(total_nicks[0]);
+                                                    if (new_line.GetUpperBound(0) > 0)
                                                     {
-                                                        tmp_me = true;
+                                                        add_auto(total_nicks[0], line[2], target_host, "k", new_line[1], ircbot);
                                                     }
-                                                }
-                                                if (sent_nick_access == Conf.Owner_Level)
-                                                {
-                                                    ircbot.sendData("PRIVMSG", line[2] + " :You can't kick my owner!");
-                                                }
-                                                else if (tmp_me == true)
-                                                {
-                                                    ircbot.sendData("PRIVMSG", line[2] + " :You can't kick me!");
+                                                    else
+                                                    {
+                                                        add_auto(total_nicks[0], line[2], target_host, "k", "No Reason", ircbot);
+                                                    }
                                                 }
                                                 else
                                                 {
-                                                    if (nick_access >= sent_nick_access)
-                                                    {
-                                                        if (new_line.GetUpperBound(0) > 0)
-                                                        {
-                                                            ircbot.sendData("KICK", line[2] + " " + total_nicks[0] + " :" + new_line[1]);
-                                                        }
-                                                        else
-                                                        {
-                                                            ircbot.sendData("KICK", line[2] + " " + total_nicks[0] + " :No Reason");
-                                                        }
-                                                    }
-                                                    else
-                                                    {
-                                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
-                                                    }
+                                                    ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
                                                 }
-                                            }
-                                            else
-                                            {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
                                             }
                                         }
                                         else
                                         {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
                                         }
-                                        break;
-                                    case "kme":
-                                        if (spam_check == true)
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "ab":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
                                         {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
+                                            string[] new_line = line[4].Split(charS, 2);
+                                            string target_host = ircbot.get_nick_host(new_line[0]);
+                                            string nicks = new_line[0].TrimStart(':');
+                                            char[] charSep = new char[] { ',' };
+                                            string[] total_nicks = nicks.Split(charSep, StringSplitOptions.RemoveEmptyEntries);
+                                            int sent_nick_access = ircbot.get_nick_access(total_nicks[0], line[2]);
+                                            bool tmp_me = false;
+                                            for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
                                             {
-                                                ircbot.sendData("KICK", line[2] + " " + nick + " :" + line[4]);
+                                                if (total_nicks[y].Trim().Equals(Conf.Name, StringComparison.InvariantCultureIgnoreCase))
+                                                {
+                                                    tmp_me = true;
+                                                }
+                                            }
+                                            if (sent_nick_access == Conf.Owner_Level)
+                                            {
+                                                ircbot.sendData("PRIVMSG", line[2] + " :You can't ban my owner!");
+                                            }
+                                            else if (tmp_me == true)
+                                            {
+                                                ircbot.sendData("PRIVMSG", line[2] + " :You can't ban me!");
                                             }
                                             else
                                             {
-                                                ircbot.sendData("KICK", line[2] + " " + nick + " :No Reason");
+                                                if (nick_access >= sent_nick_access)
+                                                {
+                                                    if (new_line.GetUpperBound(0) > 0)
+                                                    {
+                                                        add_auto(total_nicks[0], line[2], target_host, "b", new_line[1], ircbot);
+                                                    }
+                                                    else
+                                                    {
+                                                        add_auto(total_nicks[0], line[2], target_host, "b", "No Reason", ircbot);
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                                }
                                             }
                                         }
-                                        break;
-                                }
+                                        else
+                                        {
+                                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "akb":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
+                                        {
+                                            string[] new_line = line[4].Split(charS, 2);
+                                            string target_host = ircbot.get_nick_host(new_line[0]);
+                                            string nicks = new_line[0].TrimStart(':');
+                                            char[] charSep = new char[] { ',' };
+                                            string[] total_nicks = nicks.Split(charSep, StringSplitOptions.RemoveEmptyEntries);
+                                            int sent_nick_access = ircbot.get_nick_access(total_nicks[0], line[2]);
+                                            bool tmp_me = false;
+                                            for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
+                                            {
+                                                if (total_nicks[y].Trim().Equals(Conf.Name, StringComparison.InvariantCultureIgnoreCase))
+                                                {
+                                                    tmp_me = true;
+                                                }
+                                            }
+                                            if (sent_nick_access == Conf.Owner_Level)
+                                            {
+                                                ircbot.sendData("PRIVMSG", line[2] + " :You can't kick-ban my owner!");
+                                            }
+                                            else if (tmp_me == true)
+                                            {
+                                                ircbot.sendData("PRIVMSG", line[2] + " :You can't kick-ban me!");
+                                            }
+                                            else
+                                            {
+                                                if (nick_access >= sent_nick_access)
+                                                {
+                                                    if (new_line.GetUpperBound(0) > 0)
+                                                    {
+                                                        add_auto(total_nicks[0], line[2], target_host, "kb", new_line[1], ircbot);
+                                                    }
+                                                    else
+                                                    {
+                                                        add_auto(total_nicks[0], line[2], target_host, "kb", "No Reason", ircbot);
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "deak":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
+                                        {
+                                            string target_host = ircbot.get_nick_host(line[4]);
+                                            del_auto(line[4], line[2], target_host, "k", ircbot);
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "deab":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
+                                        {
+                                            string target_host = ircbot.get_nick_host(line[4]);
+                                            del_auto(line[4], line[2], target_host, "b", ircbot);
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "deakb":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
+                                        {
+                                            string target_host = ircbot.get_nick_host(line[4]);
+                                            del_auto(line[4], line[2], target_host, "kb", ircbot);
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "k":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
+                                        {
+                                            string[] new_line = line[4].Split(charS, 2);
+                                            string nicks = new_line[0].TrimStart(':');
+                                            char[] charSep = new char[] { ',' };
+                                            string[] total_nicks = nicks.Split(charSep, StringSplitOptions.RemoveEmptyEntries);
+                                            int sent_nick_access = ircbot.get_nick_access(total_nicks[0], line[2]);
+                                            bool tmp_me = false;
+                                            for (int y = 0; y <= total_nicks.GetUpperBound(0); y++)
+                                            {
+                                                if (total_nicks[y].Trim().Equals(Conf.Name, StringComparison.InvariantCultureIgnoreCase))
+                                                {
+                                                    tmp_me = true;
+                                                }
+                                            }
+                                            if (sent_nick_access == Conf.Owner_Level)
+                                            {
+                                                ircbot.sendData("PRIVMSG", line[2] + " :You can't kick my owner!");
+                                            }
+                                            else if (tmp_me == true)
+                                            {
+                                                ircbot.sendData("PRIVMSG", line[2] + " :You can't kick me!");
+                                            }
+                                            else
+                                            {
+                                                if (nick_access >= sent_nick_access)
+                                                {
+                                                    if (new_line.GetUpperBound(0) > 0)
+                                                    {
+                                                        ircbot.sendData("KICK", line[2] + " " + total_nicks[0] + " :" + new_line[1]);
+                                                    }
+                                                    else
+                                                    {
+                                                        ircbot.sendData("KICK", line[2] + " " + total_nicks[0] + " :No Reason");
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
+                                case "kme":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
+                                        {
+                                            ircbot.sendData("KICK", line[2] + " " + nick + " :" + line[4]);
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("KICK", line[2] + " " + nick + " :No Reason");
+                                        }
+                                    }
+                                    break;
                             }
                         }
                     }

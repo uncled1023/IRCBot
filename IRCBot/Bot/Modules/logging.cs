@@ -9,117 +9,95 @@ namespace Bot.Modules
 {
     class logging : Module
     {
-        public override void control(bot ircbot, BotConfig Conf, int module_id, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        public override void control(bot ircbot, BotConfig Conf, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
-            string module_name = ircbot.Conf.Module_Config[module_id][0];
             if ((type.Equals("channel") || type.Equals("query")) && bot_command == true)
             {
-                foreach (List<string> tmp_command in Conf.Command_List)
+                foreach (Command tmp_command in this.Commands)
                 {
-                    if (module_name.Equals(tmp_command[0]))
+                    bool blocked = tmp_command.Blacklist.Contains(channel) || tmp_command.Blacklist.Contains(nick);
+                    bool cmd_found = false;
+                    bool spam_check = ircbot.get_spam_check(channel, nick, tmp_command.Spam_Check);
+                    if (spam_check == true)
                     {
-                        string[] triggers = tmp_command[3].Split('|');
-                        int command_access = Convert.ToInt32(tmp_command[5]);
-                        string[] blacklist = tmp_command[6].Split(',');
-                        bool blocked = false;
-                        bool cmd_found = false;
-                        bool spam_check = ircbot.get_spam_check(channel, nick, Convert.ToBoolean(tmp_command[8]));
-                        foreach (string bl_chan in blacklist)
+                        blocked = blocked || ircbot.get_spam_status(channel);
+                    }
+                    cmd_found = tmp_command.Triggers.Contains(command);
+                    if (blocked == true && cmd_found == true)
+                    {
+                        ircbot.sendData("NOTICE", nick + " :I am currently too busy to process that.");
+                    }
+                    if (blocked == false && cmd_found == true)
+                    {
+                        foreach (string trigger in tmp_command.Triggers)
                         {
-                            if (bl_chan.Equals(channel))
+                            switch (trigger)
                             {
-                                blocked = true;
-                                break;
-                            }
-                        }
-                        if (spam_check == true)
-                        {
-                            blocked = ircbot.get_spam_status(channel);
-                        }
-                        foreach (string trigger in triggers)
-                        {
-                            if (trigger.Equals(command))
-                            {
-                                cmd_found = true;
-                                break;
-                            }
-                        }
-                        if (blocked == true && cmd_found == true)
-                        {
-                            ircbot.sendData("NOTICE", nick + " :I am currently too busy to process that.");
-                        }
-                        if (blocked == false && cmd_found == true)
-                        {
-                            foreach (string trigger in triggers)
-                            {
-                                switch (trigger)
-                                {
-                                    case "last":
-                                        if (spam_check == true)
+                                case "last":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
                                         {
-                                            ircbot.add_spam_count(channel);
-                                        }
-                                        if (nick_access >= command_access)
-                                        {
-                                            if (line.GetUpperBound(0) > 3)
+                                            string[] args = line[4].Split(' ');
+                                            if (type.Equals("channel"))
                                             {
-                                                string[] args = line[4].Split(' ');
-                                                if (type.Equals("channel"))
+                                                if (args.GetUpperBound(0) > 1)
                                                 {
-                                                    if (args.GetUpperBound(0) > 1)
+                                                    int n;
+                                                    bool isNumeric = int.TryParse(args[2], out n);
+                                                    if (isNumeric)
                                                     {
-                                                        int n;
-                                                        bool isNumeric = int.TryParse(args[2], out n);
-                                                        if (isNumeric)
-                                                        {
-                                                            display_log_nick_num(args[1], Convert.ToInt32(args[2]), channel, nick, args[0], ircbot, Conf);
-                                                        }
-                                                        else
-                                                        {
-                                                            ircbot.sendData("NOTICE", nick + " :" + nick + ", you need to specify a valid number.");
-                                                        }
-                                                    }
-                                                    else if (args.GetUpperBound(0) > 0)
-                                                    {
-                                                        int n;
-                                                        bool isNumeric = int.TryParse(args[1], out n);
-                                                        if (isNumeric)
-                                                        {
-                                                            display_log_number(Convert.ToInt32(args[1]), channel, nick, args[0], ircbot, Conf);
-                                                        }
-                                                        else
-                                                        {
-                                                            display_log_nick(args[1], channel, nick, args[0], ircbot, Conf);
-                                                        }
+                                                        display_log_nick_num(args[1], Convert.ToInt32(args[2]), channel, nick, args[0], ircbot, Conf);
                                                     }
                                                     else
                                                     {
-                                                        display_log(channel, nick, line[4], ircbot, Conf);
+                                                        ircbot.sendData("NOTICE", nick + " :" + nick + ", you need to specify a valid number.");
+                                                    }
+                                                }
+                                                else if (args.GetUpperBound(0) > 0)
+                                                {
+                                                    int n;
+                                                    bool isNumeric = int.TryParse(args[1], out n);
+                                                    if (isNumeric)
+                                                    {
+                                                        display_log_number(Convert.ToInt32(args[1]), channel, nick, args[0], ircbot, Conf);
+                                                    }
+                                                    else
+                                                    {
+                                                        display_log_nick(args[1], channel, nick, args[0], ircbot, Conf);
                                                     }
                                                 }
                                                 else
                                                 {
-                                                    if (args.GetUpperBound(0) > 0)
-                                                    {
-                                                        display_log_nick(args[1], channel, nick, args[0], ircbot, Conf);
-                                                    }
-                                                    else
-                                                    {
-                                                        display_log(channel, nick, line[4], ircbot, Conf);
-                                                    }
+                                                    display_log(channel, nick, line[4], ircbot, Conf);
                                                 }
                                             }
                                             else
                                             {
-                                                display_last_log(channel, nick, ircbot, Conf);
+                                                if (args.GetUpperBound(0) > 0)
+                                                {
+                                                    display_log_nick(args[1], channel, nick, args[0], ircbot, Conf);
+                                                }
+                                                else
+                                                {
+                                                    display_log(channel, nick, line[4], ircbot, Conf);
+                                                }
                                             }
                                         }
                                         else
                                         {
-                                            ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                            display_last_log(channel, nick, ircbot, Conf);
                                         }
-                                        break;
-                                }
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
                             }
                         }
                     }
@@ -128,49 +106,31 @@ namespace Bot.Modules
             if (type.Equals("query") && bot_command == true)
             {
                 bool command_valid = false;
-                foreach (List<string> tmp_command in Conf.Command_List)
+                foreach (Module tmp_module in Conf.Modules)
                 {
-                    string[] triggers = tmp_command[3].Split('|');
-                    foreach (string trigger in triggers)
+                    foreach (Command tmp_command in tmp_module.Commands)
                     {
-                        if (command.Equals(trigger))
+                        command_valid = tmp_command.Triggers.Contains(command);
+                        if (command_valid == true)
                         {
-                            command_valid = true;
-                            break;
+                            add_log(nick, "a private message", line, ircbot);
                         }
                     }
-                    if (command_valid == true)
-                    {
-                        break;
-                    }
-                }
-                if (command_valid == true)
-                {
-                    add_log(nick, "a private message", line, ircbot);
                 }
             }
             if (type.Equals("channel") && bot_command == true)
             {
                 bool command_valid = false;
-                foreach (List<string> tmp_command in Conf.Command_List)
+                foreach (Module tmp_module in Conf.Modules)
                 {
-                    string[] triggers = tmp_command[3].Split('|');
-                    foreach (string trigger in triggers)
+                    foreach (Command tmp_command in tmp_module.Commands)
                     {
-                        if (command.Equals(trigger))
+                        command_valid = tmp_command.Triggers.Contains(command);
+                        if (command_valid == true)
                         {
-                            command_valid = true;
-                            break;
+                            add_log(nick, channel, line, ircbot);
                         }
                     }
-                    if (command_valid == true)
-                    {
-                        break;
-                    }
-                }
-                if (command_valid == true)
-                {
-                    add_log(nick, channel, line, ircbot);
                 }
             }
         }

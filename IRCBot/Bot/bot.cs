@@ -77,6 +77,7 @@ namespace Bot
         internal BackgroundWorker save_stream_worker;
         internal BackgroundWorker check_connect_worker;
         internal List<string> modules_loaded;
+        internal List<string> modules_disabled;
         internal List<string> modules_error;
         internal DateTime start_time;
 
@@ -423,6 +424,7 @@ namespace Bot
             cur_dir = controller.cur_dir;
             nick = Conf.Nick;
             modules_loaded = new List<string>();
+            modules_disabled = new List<string>();
             modules_error = new List<string>();
             data_queue = new List<string>();
             stream_queue = new List<string>();
@@ -578,21 +580,19 @@ namespace Bot
         {
             Conf.Modules.Clear();
             modules_loaded.Clear();
+            modules_disabled.Clear();
             modules_error.Clear();
-            foreach (string module_class_name in controller.get_module_list(Conf.Server_Name))
+            List<string> module_list = controller.get_module_list(Conf.Server_Name);
+            foreach (string module_class_name in module_list)
             {
                 bool module_loaded = false;
 
                 module_loaded = load_module(module_class_name);
 
                 //check to see if the class is instantiated or not
-                if (module_loaded)
+                if (!module_loaded)
                 {
-                    modules_loaded.Add(get_module(module_class_name).Name);
-                }
-                else
-                {
-                    modules_error.Add(get_module(module_class_name).Name);
+                    modules_error.Add(module_class_name);
                 }
             }
             if (modules_loaded.Count > 0)
@@ -603,6 +603,23 @@ namespace Bot
                     msg += ", " + module_name;
                 }
                 string output = Environment.NewLine + Conf.Server_Name + ":Loaded Modules: " + msg.TrimStart(',').Trim();
+                lock (controller.listLock)
+                {
+                    if (controller.queue_text.Count >= 1000)
+                    {
+                        controller.queue_text.RemoveAt(0);
+                    }
+                    controller.queue_text.Add(output);
+                }
+            }
+            if (modules_disabled.Count > 0)
+            {
+                string msg = "";
+                foreach (string module_name in modules_disabled)
+                {
+                    msg += ", " + module_name;
+                }
+                string output = Environment.NewLine + Conf.Server_Name + ":Disabled Modules: " + msg.TrimStart(',').Trim();
                 lock (controller.listLock)
                 {
                     if (controller.queue_text.Count >= 1000)
@@ -664,8 +681,15 @@ namespace Bot
                         new_module.Name = module.Name;
                         new_module.Options = module.Options;
                         Conf.Modules.Add(new_module);
+
+                        modules_loaded.Add(module.Name);
                         module_loaded = true;
                     }
+                }
+                else
+                {
+                    modules_disabled.Add(module.Name);
+                    module_loaded = true;
                 }
             }
             return module_loaded;

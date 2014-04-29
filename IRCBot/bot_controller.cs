@@ -82,6 +82,12 @@ namespace IRCBot
                 default_servers.Save(servers_config_path);
                 servers.Load(servers_config_path);
             }
+
+            foreach (string server in list_servers())
+            {
+                string module_path = get_module_config_path(server);
+                check_config(default_module, module_path);
+            }
         }
 
         public string[] list_servers()
@@ -406,13 +412,12 @@ namespace IRCBot
             module_conf.Options = new Dictionary<string, dynamic>();
 
             XmlDocument xmlDocModules = new XmlDocument();
-            check_config(default_module, get_module_config_path(server_name));
             xmlDocModules = get_module_xml(server_name);
             XmlNode xnNode = xmlDocModules.SelectSingleNode("/modules");
             XmlNodeList xnList = xnNode.ChildNodes;
             foreach (XmlNode xn_module in xnList)
             {
-                if (xn_module["enabled"].InnerText.Equals("True") && xn_module["class_name"].InnerText.Equals(module_class_name))
+                if (xn_module["class_name"].InnerText.Equals(module_class_name))
                 {
                     module_conf.Name = xn_module["name"].InnerText;
                     module_conf.Class_Name = xn_module["class_name"].InnerText;
@@ -471,7 +476,6 @@ namespace IRCBot
             List<string> module_list = new List<string>();
 
             XmlDocument xmlDocModules = new XmlDocument();
-            check_config(default_module, get_module_config_path(server_name));
             xmlDocModules = get_module_xml(server_name);
             XmlNode xnNode = xmlDocModules.SelectSingleNode("/modules");
             XmlNodeList xnList = xnNode.ChildNodes;

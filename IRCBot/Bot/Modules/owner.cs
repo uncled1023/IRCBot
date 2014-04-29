@@ -646,7 +646,7 @@ namespace Bot.Modules
                                         string msg = "";
                                         foreach (Module module in ircbot.Conf.Modules)
                                         {
-                                            msg += ", " + module.ToString().Remove(0, 15);
+                                            msg += ", " + module.ToString().Remove(0, 12);
                                         }
                                         if (msg != "")
                                         {

@@ -42,7 +42,7 @@ namespace Bot.Modules
             }
         }
 
-        public void Util()
+        public static void Util()
         {
 
         }

@@ -54,7 +54,7 @@ namespace Bot.Modules
             }
         }
 
-        private void display_help(string[] line, string nick, string channel, int access, bot ircbot, BotConfig Conf)
+        private static void display_help(string[] line, string nick, string channel, int access, bot ircbot, BotConfig Conf)
         {
             string search_term = "";
             string cmds = "";
@@ -90,7 +90,7 @@ namespace Bot.Modules
                                                     alt += ircbot.Conf.Command + trigger + ", ";
                                                 }
                                             }
-                                            if (!alt.Equals(string.Empty))
+                                            if (!String.IsNullOrEmpty(alt))
                                             {
                                                 alt = " | Alternate Commands: " + alt.Trim().TrimEnd(',');
                                             }
@@ -129,7 +129,7 @@ namespace Bot.Modules
                                                     alt += ircbot.Conf.Command + trigger + ", ";
                                                 }
                                             }
-                                            if (!alt.Equals(string.Empty))
+                                            if (!String.IsNullOrEmpty(alt))
                                             {
                                                 alt = " | Alternate Commands: " + alt.Trim().TrimEnd(',');
                                             }
@@ -186,7 +186,7 @@ namespace Bot.Modules
                             }
                         }
                     }
-                    if (cmds != "")
+                    if (!String.IsNullOrEmpty(cmds))
                     {
                         ircbot.sendData("NOTICE", nick + " :Commands for " + module_name + ":" + cmds.TrimEnd(','));
                         cmds = "";
@@ -207,7 +207,7 @@ namespace Bot.Modules
                     mods += " [" + index + "]" + tmp_module.Class_Name + ",";
                     index++;
                 }
-                if (mods != "")
+                if (!String.IsNullOrEmpty(mods))
                 {
                     ircbot.sendData("NOTICE", nick + " :" + mods.TrimEnd(','));
                     mods = "";

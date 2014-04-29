@@ -66,7 +66,7 @@ namespace Bot.Modules
             }
         }
 
-        public DateTime get_seen_time(string nick, string channel, bot ircbot)
+        public static DateTime get_seen_time(string nick, string channel, bot ircbot)
         {
             string tab_name = channel.TrimStart('#');
             string pattern = "[^a-zA-Z0-9]"; //regex pattern
@@ -97,7 +97,7 @@ namespace Bot.Modules
             return past_date;
         }
 
-        private void display_seen(string nick, string channel, bot ircbot)
+        private static void display_seen(string nick, string channel, bot ircbot)
         {
             string tab_name = channel.TrimStart('#');
             string pattern = "[^a-zA-Z0-9]"; //regex pattern
@@ -167,7 +167,7 @@ namespace Bot.Modules
             }            
         }
 
-        public void add_seen(string nick, string channel, string[] line, bot ircbot)
+        public static void add_seen(string nick, string channel, string[] line, bot ircbot)
         {
             string tab_name = channel.TrimStart('#');
             string pattern = "[^a-zA-Z0-9]"; //regex pattern

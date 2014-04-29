@@ -44,7 +44,7 @@ namespace Bot.Modules
                     {
                         string target_host = ircbot.get_nick_host(nick);
                         string tmp_ban = "*!*@" + target_host;
-                        if (target_host.Equals(""))
+                        if (String.IsNullOrEmpty(target_host))
                         {
                             tmp_ban = nick + "!*@*";
                         }

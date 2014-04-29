@@ -82,7 +82,7 @@ namespace Bot.Modules
             }
         }
 
-        public void check_intro(string nick, string channel, bot ircbot)
+        public static void check_intro(string nick, string channel, bot ircbot)
         {
             string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "intro" + Path.DirectorySeparatorChar + ircbot.Conf.Server_Name + "_list.txt";
             if (File.Exists(list_file))
@@ -108,7 +108,7 @@ namespace Bot.Modules
             }
         }
 
-        private void add_intro(string nick, string channel, string[] line, bot ircbot, int char_limit)
+        private static void add_intro(string nick, string channel, string[] line, bot ircbot, int char_limit)
         {
             string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "intro" + Path.DirectorySeparatorChar + ircbot.Conf.Server_Name + "_list.txt";
             string add_line = nick + ":" + channel + ":";
@@ -160,7 +160,7 @@ namespace Bot.Modules
             }
         }
 
-        private void delete_intro(string nick, string channel, bot ircbot)
+        private static void delete_intro(string nick, string channel, bot ircbot)
         {
             string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "intro" + Path.DirectorySeparatorChar + ircbot.Conf.Server_Name + "_list.txt";
             if (File.Exists(list_file))

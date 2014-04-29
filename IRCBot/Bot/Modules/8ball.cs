@@ -73,7 +73,7 @@ namespace Bot.Modules
                     Random random = new Random();
                     int index = random.Next(0, number_of_lines);
                     line = answer_file[index];
-                    if (!line.Equals(string.Empty))
+                    if (!String.IsNullOrEmpty(line))
                     {
                         ircbot.sendData("PRIVMSG", channel + " :" + line);
                     }

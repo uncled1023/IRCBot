@@ -212,7 +212,7 @@ namespace Bot.Modules
             }
         }
 
-        public void find_message(string nick, bot ircbot)
+        public static void find_message(string nick, bot ircbot)
         {
             string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "messaging" + Path.DirectorySeparatorChar + ircbot.Conf.Server_Name + "_messages.txt";
             if (File.Exists(list_file))

@@ -207,7 +207,7 @@ namespace IRCBot_GUI
 
         private void start_client()
         {
-            updateOutput.Interval = 30;
+            updateOutput.Interval = 50;
             updateOutput.Start();
 
             // Load Bot Configuration
@@ -352,12 +352,14 @@ namespace IRCBot_GUI
                 if (controller.bot_connected(tab_name[1]) == true)
                 {
                     connectToolStripMenuItem.Text = "Disconnect";
+                    connectToolStripMenuItem.Enabled = true;
                     input_box.Enabled = true;
                     send_button.Enabled = true;
                 }
                 else
                 {
                     connectToolStripMenuItem.Text = "Connect";
+                    connectToolStripMenuItem.Enabled = true;
                     input_box.Enabled = false;
                     send_button.Enabled = false;
                 }
@@ -995,12 +997,15 @@ namespace IRCBot_GUI
 
         private void ThreadProcSafeOutput()
         {
-            string text = string.Join("", controller.get_queue());
-            string[] stringSeparators = new string[] { "\r\n" };
-            string[] lines = text.Split(stringSeparators, StringSplitOptions.RemoveEmptyEntries);
-            for (int x = 0; x <= lines.GetUpperBound(0); x++)
+            if (controller != null)
             {
-                UpdateOutput_final(lines[x]);
+                string text = string.Join("", controller.get_queue());
+                string[] stringSeparators = new string[] { "\r\n" };
+                string[] lines = text.Split(stringSeparators, StringSplitOptions.RemoveEmptyEntries);
+                for (int x = 0; x <= lines.GetUpperBound(0); x++)
+                {
+                    UpdateOutput_final(lines[x]);
+                }
             }
         }
 
@@ -1013,6 +1018,7 @@ namespace IRCBot_GUI
             }
             else
             {
+                string old_tab_name = tabControl1.SelectedTab.Name;
                 // disable tab change events (screws up updating)
                 this.tabControl1.SelectedIndexChanged -= new System.EventHandler(this.tabControl1_MouseClick);
                 this.tabControl1.MouseClick -= new System.Windows.Forms.MouseEventHandler(this.tabControl1_MouseClick);
@@ -1088,7 +1094,7 @@ namespace IRCBot_GUI
                 foreach (string[] page in tab_names)
                 {
                     tabControl1.Controls.Add(tmp_tabcontrol.Controls.Find(page[0], true)[0]);
-                    if (page[0].Equals(tabpage.Name))
+                    if (page[0].Equals(old_tab_name))
                     {
                         tab_index = index;
                     }
@@ -1308,7 +1314,7 @@ namespace IRCBot_GUI
 
         private void Interface_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (controller.bot_instances != null)
+            if (controller != null && controller.bot_instances != null)
             {
                 foreach (Bot.bot bot_instance in controller.bot_instances)
                 {

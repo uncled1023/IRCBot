@@ -18,7 +18,6 @@ namespace Bot.Modules
     {
         public override void control(bot ircbot, BotConfig Conf, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
-            char[] charS = new char[] { ' ' };
             if ((type.Equals("channel") || type.Equals("query")) && bot_command == true)
             {
                 foreach (Command tmp_command in this.Commands)
@@ -61,7 +60,7 @@ namespace Bot.Modules
                                             List<string> label = new List<string>() { "bug" };
                                             string uri = "https://api.github.com/repos/" + this.Options["username"] + "/" + this.Options["repository"] + "/issues";
                                             string response = post_issue(ircbot, uri, title, description, this.Options["username"], label);
-                                            if (response.Equals(""))
+                                            if (String.IsNullOrEmpty(response))
                                             {
                                                 ircbot.sendData("NOTICE", nick + " :Issue Added Successfully");
                                             }
@@ -100,7 +99,7 @@ namespace Bot.Modules
                                             List<string> label = new List<string>() { "Feature Request" };
                                             string uri = "https://api.github.com/repos/" + this.Options["username"] + "/" + this.Options["repository"] + "/issues";
                                             string response = post_issue(ircbot, uri, title, description, this.Options["username"], label);
-                                            if (response.Equals(""))
+                                            if (String.IsNullOrEmpty(response))
                                             {
                                                 ircbot.sendData("NOTICE", nick + " :Feature Request Added Successfully");
                                             }

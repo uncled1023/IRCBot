@@ -81,7 +81,6 @@ namespace Bot.Modules
                                                 {
                                                     score_found = true;
                                                     int index = 1;
-                                                    List<List<string>> sorted = new List<List<string>>();
                                                     string msg = "";
                                                     foreach (List<string> score in trivia.scores)
                                                     {
@@ -95,7 +94,7 @@ namespace Bot.Modules
                                                         }
                                                         index++;
                                                     }
-                                                    if (!msg.Equals(string.Empty))
+                                                    if (!String.IsNullOrEmpty(msg))
                                                     {
                                                         ircbot.sendData("PRIVMSG", channel + " :" + msg.Trim().TrimEnd('|').Trim());
                                                     }
@@ -186,7 +185,7 @@ namespace Bot.Modules
                                                             break;
                                                         }
                                                     }
-                                                    if (!msg.Equals(string.Empty))
+                                                    if (!String.IsNullOrEmpty(msg))
                                                     {
                                                         ircbot.sendData("PRIVMSG", channel + " :" + msg.Trim().TrimEnd('|').Trim());
                                                     }
@@ -228,7 +227,7 @@ namespace Bot.Modules
                             string[] answers = trivia.answer.Split('*');
                             foreach (string answer in answers)
                             {
-                                if (response.Equals(trivia.answer, StringComparison.InvariantCultureIgnoreCase))
+                                if (response.Equals(answer, StringComparison.InvariantCultureIgnoreCase))
                                 {
                                     int points = 0;
                                     int index = 0;
@@ -237,7 +236,6 @@ namespace Bot.Modules
                                     {
                                         if (score[0].Equals(nick, StringComparison.InvariantCultureIgnoreCase))
                                         {
-                                            List<string> tmp_list = new List<string>();
                                             int old_points = Convert.ToInt32(score[1]);
                                             points = old_points + 1;
                                             score[1] = points.ToString();

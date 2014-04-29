@@ -135,7 +135,7 @@ namespace Bot.Modules
             }
         }
 
-        private void display_last_log(string channel, string requst_nick, bot ircbot, BotConfig Conf)
+        private static void display_last_log(string channel, string requst_nick, bot ircbot, BotConfig Conf)
         {
             string file_name = ircbot.Conf.Server_Name + ".log";
             bool cmd_found = false;
@@ -156,7 +156,7 @@ namespace Bot.Modules
                         string[] new_line = line.Split(sep, 5);
                         if (new_line.GetUpperBound(0) > 0)
                         {
-                            if (new_line[4] != "")
+                            if (!String.IsNullOrEmpty(new_line[4]))
                             {
                                 parameters = " with the following argument: " + new_line[4];
                             }
@@ -191,7 +191,7 @@ namespace Bot.Modules
             }
         }
 
-        private void display_log(string channel, string requst_nick, string command, bot ircbot, BotConfig Conf)
+        private static void display_log(string channel, string requst_nick, string command, bot ircbot, BotConfig Conf)
         {
             string file_name = ircbot.Conf.Server_Name + ".log";
             bool cmd_found = false;
@@ -214,7 +214,7 @@ namespace Bot.Modules
                         {
                             if (new_line[3].Equals(command))
                             {
-                                if (new_line[4] != "")
+                                if (String.IsNullOrEmpty(new_line[4]))
                                 {
                                     parameters = " with the following argument: " + new_line[4];
                                 }
@@ -246,7 +246,7 @@ namespace Bot.Modules
                             {
                                 if (new_line[0].Equals(command))
                                 {
-                                    if (new_line[4] != "")
+                                    if (!String.IsNullOrEmpty(new_line[4]))
                                     {
                                         parameters = " with the following argument: " + new_line[4];
                                     }
@@ -285,7 +285,7 @@ namespace Bot.Modules
             }
         }
 
-        private void display_log_number(int number, string channel, string requst_nick, string command, bot ircbot, BotConfig Conf)
+        private static void display_log_number(int number, string channel, string requst_nick, string command, bot ircbot, BotConfig Conf)
         {
             string file_name = ircbot.Conf.Server_Name + ".log";
             bool cmd_found = false;
@@ -325,7 +325,7 @@ namespace Bot.Modules
                     {
                         if (number < num_uses && number >= 0)
                         {
-                            if (command_list[number][4] != "")
+                            if (!String.IsNullOrEmpty(command_list[number][4]))
                             {
                                 parameters = " with the following argument: " + command_list[number][4];
                             }
@@ -367,7 +367,7 @@ namespace Bot.Modules
                         }
                         if (number < num_uses && number >= 0)
                         {
-                            if (command_list[number][4] != "")
+                            if (!String.IsNullOrEmpty(command_list[number][4]))
                             {
                                 parameters = " with the following argument: " + command_list[number][4];
                             }
@@ -397,7 +397,7 @@ namespace Bot.Modules
             }
         }
 
-        private void display_log_nick(string nick, string channel, string requst_nick, string command, bot ircbot, BotConfig Conf)
+        private static void display_log_nick(string nick, string channel, string requst_nick, string command, bot ircbot, BotConfig Conf)
         {
             string file_name = ircbot.Conf.Server_Name + ".log";
             bool cmd_found = false;
@@ -419,7 +419,7 @@ namespace Bot.Modules
                         {
                             if (new_line[0].Equals(nick, StringComparison.InvariantCultureIgnoreCase) && new_line[3].Equals(command))
                             {
-                                if (new_line[4] != "")
+                                if (!String.IsNullOrEmpty(new_line[4]))
                                 {
                                     parameters = " with the following argument: " + new_line[4];
                                 }
@@ -455,7 +455,7 @@ namespace Bot.Modules
             }
         }
 
-        private void display_log_nick_num(string nick, int number, string channel, string requst_nick, string command, bot ircbot, BotConfig Conf)
+        private static void display_log_nick_num(string nick, int number, string channel, string requst_nick, string command, bot ircbot, BotConfig Conf)
         {
             string file_name = ircbot.Conf.Server_Name + ".log";
             bool cmd_found = false;
@@ -494,7 +494,7 @@ namespace Bot.Modules
                     {
                         if (number < num_uses && number >= 0)
                         {
-                            if (command_list[number][4] != "")
+                            if (!String.IsNullOrEmpty(command_list[number][4]))
                             {
                                 parameters = " with the following argument: " + command_list[number][4];
                             }
@@ -528,7 +528,7 @@ namespace Bot.Modules
             }
         }
 
-        public void add_log(string nick, string channel, string[] line, bot ircbot)
+        public static void add_log(string nick, string channel, string[] line, bot ircbot)
         {
             string file_name = "";
             string msg = "";

@@ -74,7 +74,7 @@ namespace Bot.Modules
             }
         }
 
-        public void add_quote(string nick, string channel, string[] line, bot ircbot, BotConfig Conf)
+        public static void add_quote(string nick, string channel, string[] line, bot ircbot, BotConfig Conf)
         {
             string tab_name = channel.TrimStart('#');
             string pattern = "[^a-zA-Z0-9]"; //regex pattern
@@ -96,7 +96,7 @@ namespace Bot.Modules
             log_file.Close();
         }
 
-        private void get_quote(string channel, bot ircbot, BotConfig Conf)
+        private static void get_quote(string channel, bot ircbot, BotConfig Conf)
         {
             string tab_name = channel.TrimStart('#');
             string pattern = "[^a-zA-Z0-9]"; //regex pattern
@@ -112,7 +112,7 @@ namespace Bot.Modules
                     Random random = new Random();
                     int index = random.Next(0, number_of_lines);
                     line = log_file[index];
-                    if (!line.Equals(string.Empty))
+                    if (!String.IsNullOrEmpty(line))
                     {
                         char[] charSep = new char[] { '*' };
                         string[] lines = line.Split(charSep, 2);
@@ -134,7 +134,7 @@ namespace Bot.Modules
             }
         }
 
-        private void get_specific_quote(string channel, string nick, bot ircbot, BotConfig Conf)
+        private static void get_specific_quote(string channel, string nick, bot ircbot, BotConfig Conf)
         {
             string tab_name = channel.TrimStart('#');
             string pattern = "[^a-zA-Z0-9]"; //regex pattern
@@ -168,8 +168,12 @@ namespace Bot.Modules
                         Random random = new Random();
                         number_of_lines = quote_list.Count();
                         int index = random.Next(0, number_of_lines);
-                        line = quote_list[index - 1];
-                        if (!line.Equals(string.Empty))
+                        if (quote_list.Count > 1)
+                        {
+                            index--;
+                        }
+                        line = quote_list[index];
+                        if (!String.IsNullOrEmpty(line))
                         {
                             char[] charSep = new char[] { '*' };
                             string[] lines = line.Split(charSep, 2);

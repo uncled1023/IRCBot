@@ -355,7 +355,6 @@ namespace IRCBot
             XmlNode xn = get_server_xml(server_name);
             if (xn != null)
             {
-                string module_path = Path.GetDirectoryName(servers_config_path) + Path.DirectorySeparatorChar + xn["module_path"].InnerText;
                 bot_conf.Modules = new List<Bot.Modules.Module>();
                 bot_conf.Spam_Check = new List<spam_info>();
                 bot_conf.Channel_List = new List<Channel_Info>();
@@ -597,7 +596,7 @@ namespace IRCBot
             }
         }
 
-        private string CreatePath(XmlNode Node)
+        private static string CreatePath(XmlNode Node)
         {
 
             string Path = "/" + Node.Name;
@@ -637,10 +636,10 @@ namespace IRCBot
 
         public void log(string log, bot bot, string channel, string date_stamp, string time_stamp)
         {
-            if (bot != null && bot.Conf.Keep_Logs.Equals("True") && !log.Trim().Equals(string.Empty))
+            if (bot != null && bot.Conf.Keep_Logs.Equals("True") && !String.IsNullOrEmpty(log.Trim()))
             {
                 string file_name = "log.log";
-                if (bot.Conf.Logs_Path == "")
+                if (String.IsNullOrEmpty(bot.Conf.Logs_Path))
                 {
                     bot.Conf.Logs_Path = cur_dir + Path.DirectorySeparatorChar + "logs";
                 }

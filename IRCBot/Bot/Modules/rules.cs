@@ -97,7 +97,7 @@ namespace Bot.Modules
             }
         }
 
-        private void add_rule(string rule, string nick, string channel, bot ircbot)
+        private static void add_rule(string rule, string nick, string channel, bot ircbot)
         {
             string pattern = "[^a-zA-Z0-9]"; //regex pattern
             string tab_name = Regex.Replace(channel, pattern, "_");
@@ -120,7 +120,7 @@ namespace Bot.Modules
             ircbot.sendData("PRIVMSG", channel + " :Rule added successfully");
         }
 
-        private void del_rule(string rule_num, string nick, string channel, bot ircbot)
+        private static void del_rule(string rule_num, string nick, string channel, bot ircbot)
         {
             string pattern = "[^a-zA-Z0-9]"; //regex pattern
             string tab_name = Regex.Replace(channel, pattern, "_");
@@ -134,7 +134,6 @@ namespace Bot.Modules
                     bool rule_found = false;
                     foreach (string line in rules_file)
                     {
-                        string[] split = line.Split('*');
                         if ((index + 1) == Convert.ToInt32(rule_num))
                         {
                             rules_file.RemoveAt(index);
@@ -163,7 +162,7 @@ namespace Bot.Modules
             }
         }
 
-        private void get_rules(string nick, string channel, bot ircbot)
+        private static void get_rules(string nick, string channel, bot ircbot)
         {
             string pattern = "[^a-zA-Z0-9]"; //regex pattern
             string tab_name = Regex.Replace(channel, pattern, "_");

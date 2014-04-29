@@ -427,7 +427,7 @@ namespace Bot.Modules
             }
         }
 
-        private void view_survey(int survey_num, int nick_access, string nick, string requested_nick, bot ircbot, BotConfig Conf)
+        private static void view_survey(int survey_num, int nick_access, string nick, string requested_nick, bot ircbot, BotConfig Conf)
         {
             bool survey_found = false;
             if (survey_num != -1)
@@ -563,7 +563,7 @@ namespace Bot.Modules
             }
         }
 
-        private void add_survey_owner(int survey_num, string nick, string add_owner, bot ircbot, BotConfig Conf)
+        private static void add_survey_owner(int survey_num, string nick, string add_owner, bot ircbot, BotConfig Conf)
         {
             bool survey_found = false;
             if (Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + ""))
@@ -611,7 +611,7 @@ namespace Bot.Modules
             }
         }
 
-        private void del_survey_owner(int survey_num, string nick, string del_owner, bot ircbot, BotConfig Conf)
+        private static void del_survey_owner(int survey_num, string nick, string del_owner, bot ircbot, BotConfig Conf)
         {
             bool survey_found = false;
             if (Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "survey" + Path.DirectorySeparatorChar + "surveys" + Path.DirectorySeparatorChar + ""))
@@ -642,7 +642,7 @@ namespace Bot.Modules
                                 bool owner_loop = false;
                                 foreach (string old_owner in del_owner.Split(','))
                                 {
-                                    if (del_owner.Equals(owner, StringComparison.InvariantCultureIgnoreCase))
+                                    if (old_owner.Equals(owner, StringComparison.InvariantCultureIgnoreCase))
                                     {
                                         owner_loop = true;
                                         owner_found = true;

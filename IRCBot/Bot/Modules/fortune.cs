@@ -53,7 +53,7 @@ namespace Bot.Modules
             }
         }
 
-        private void get_quote(string channel, bot ircbot)
+        private static void get_quote(string channel, bot ircbot)
         {
             if (File.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "fortune" + Path.DirectorySeparatorChar + "list.txt"))
             {
@@ -65,7 +65,7 @@ namespace Bot.Modules
                     Random random = new Random();
                     int index = random.Next(0, number_of_lines);
                     line = answer_file[index];
-                    if (!line.Equals(string.Empty))
+                    if (!String.IsNullOrEmpty(line))
                     {
                         ircbot.sendData("PRIVMSG", channel + " :" + line);
                     }

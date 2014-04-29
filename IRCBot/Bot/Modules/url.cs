@@ -129,7 +129,7 @@ namespace Bot.Modules
                                         XmlDocument xmlDoc = JsonConvert.DeserializeXmlNode(json_data, board + "-" + url.Segments[3].TrimEnd('/'));
                                         XmlNodeList post_list = xmlDoc.SelectNodes(board + "-" + url.Segments[3].TrimEnd('/') + "/posts");
                                         string thread = "";
-                                        if (!url.Fragment.Equals(string.Empty))
+                                        if (!String.IsNullOrEmpty(url.Fragment))
                                         {
                                             thread = url.Fragment.TrimStart('#').TrimStart('p');
                                         }
@@ -161,7 +161,7 @@ namespace Bot.Modules
                                                 {
                                                     total_duration += t.Seconds.ToString() + "s ";
                                                 }
-                                                string post_name = "", post_comment = "", tripcode = "", ID = "", email = "", subject = "", replies = "", images = "", image_ext = "", image_name = "", image_width = "", image_height = "";
+                                                string post_name = "", post_comment = "", tripcode = "", ID = "", subject = "", replies = "", images = "", image_ext = "", image_name = "", image_width = "", image_height = "";
                                                 try
                                                 {
                                                     post_name = post["name"].InnerText;
@@ -180,11 +180,6 @@ namespace Bot.Modules
                                                 try
                                                 {
                                                     ID = post["id"].InnerText;
-                                                }
-                                                catch { }
-                                                try
-                                                {
-                                                    email = post["email"].InnerText;
                                                 }
                                                 catch { }
                                                 try
@@ -223,7 +218,7 @@ namespace Bot.Modules
                                                 }
                                                 catch { }
 
-                                                if (!ID.Trim().Equals(string.Empty))
+                                                if (!String.IsNullOrEmpty(ID.Trim()))
                                                 {
                                                     ID = "[" + ID + "]";
                                                 }
@@ -231,7 +226,7 @@ namespace Bot.Modules
                                                 string quote = "<span class=\"(.*?)\">(.*?)</span>";
                                                 subject = Regex.Replace(subject, quote, "$2");
                                                 string post_message = "";
-                                                if (!subject.Equals(string.Empty))
+                                                if (!String.IsNullOrEmpty(subject))
                                                 {
                                                     post_message += "Subject: " + subject + " | ";
                                                 }
@@ -246,7 +241,7 @@ namespace Bot.Modules
                                                     }
                                                     post_message += "...";
                                                 }
-                                                else if (!post_comment.Equals(string.Empty))
+                                                else if (!String.IsNullOrEmpty(post_comment))
                                                 {
                                                     post_message += " Comment: " + post_comment;
                                                 }
@@ -255,36 +250,36 @@ namespace Bot.Modules
                                                 post_message = "";
                                                 foreach (string tmp in tmp_post)
                                                 {
-                                                    if (!tmp.Trim().Equals(string.Empty))
+                                                    if (!String.IsNullOrEmpty(tmp.Trim()))
                                                     {
                                                         post_message += HttpUtility.HtmlDecode(tmp) + " | ";
                                                     }
                                                 }
 
                                                 string image_url = "";
-                                                if (!image_name.Equals(string.Empty))
+                                                if (!String.IsNullOrEmpty(image_name))
                                                 {
                                                     image_url = "http://images.4chan.org/" + board + "/src/" + image_name + image_ext;
                                                 }
 
-                                                if (!image_url.Equals(string.Empty))
+                                                if (!String.IsNullOrEmpty(image_url))
                                                 {
                                                     image_url = " | Posted Image: " + image_url + " (" + image_width + "x" + image_height + ")";
                                                 }
 
-                                                if (!replies.Equals(string.Empty))
+                                                if (!String.IsNullOrEmpty(replies))
                                                 {
                                                     replies = " | Replies: " + replies;
                                                 }
 
-                                                if (!images.Equals(string.Empty))
+                                                if (!String.IsNullOrEmpty(images))
                                                 {
                                                     images = " | Images: " + images;
                                                 }
 
                                                 ircbot.sendData("PRIVMSG", channel + " :[4chan] /" + board + "/ | Posted by: " + post_name + tripcode + ID + " " + total_duration.Trim() + " ago" + replies + images + image_url);
                                                 string re = @"<a [^>]+>(.*?)<\/a>(.*?)";
-                                                if (!post_message.Equals(string.Empty))
+                                                if (!String.IsNullOrEmpty(post_message))
                                                 {
                                                     ircbot.sendData("PRIVMSG", channel + " :" + Regex.Replace(post_message.Replace("<wbr>", "").Trim().TrimEnd('|').Trim(), re, "$1"));
                                                 }
@@ -292,7 +287,7 @@ namespace Bot.Modules
                                             }
                                         }
                                     }
-                                    else if (this.Options["parse_url"].Equals("True"))
+                                    else if (this.Options["parse_url"])
                                     {
                                         ircbot.sendData("PRIVMSG", channel + " :[URL] " + HttpUtility.HtmlDecode(title) + " (" + url.Host + ")");
                                     }
@@ -338,7 +333,7 @@ namespace Bot.Modules
             }
         }
 
-        public string ToFileSize(long source)
+        public static string ToFileSize(long source)
         {
             const int byteConversion = 1024;
             double bytes = Convert.ToDouble(source);
@@ -363,7 +358,7 @@ namespace Bot.Modules
 
         private readonly string developerKey = "AI39si6RqynrlYF5GRmMp01moUQiRUxdB3HPzHdD99sSH9wfMVvf6gosz00Mt--loK-zavQ2oXjpDnL9IAgCSp7sX-yuFA2usA";
 
-        private string ExtractYouTubeVideoIDFromUrl(string youTubeUrl)
+        private static string ExtractYouTubeVideoIDFromUrl(string youTubeUrl)
         {
             return Regex.Match(youTubeUrl, @"https?://www\.youtube\.com.*v=(?'VideoID'[^&]*)")
                 .Groups["VideoID"]

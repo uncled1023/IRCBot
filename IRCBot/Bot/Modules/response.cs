@@ -85,7 +85,6 @@ namespace Bot.Modules
                                             try
                                             {
                                                 bool response_found = false;
-                                                int del_num = Convert.ToInt32(line[4]);
                                                 string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "Response" + Path.DirectorySeparatorChar + "dictionary.txt";
                                                 if (Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "Response" + Path.DirectorySeparatorChar + "") == false)
                                                 {

@@ -68,7 +68,7 @@ namespace Bot.Modules
             }
         }
 
-        private bool CheckConnection(String Url)
+        private static bool CheckConnection(String Url)
         {
             if (!Url.Contains("://"))
             {

@@ -16,7 +16,6 @@ namespace Bot.Modules
 {
     class owner : Module
     {
-        System.Timers.Timer invalid_pass_timeout = new System.Timers.Timer();
         public override void control(bot ircbot, BotConfig Conf, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
             char[] charS = new char[] { ' ' };
@@ -648,7 +647,7 @@ namespace Bot.Modules
                                         {
                                             msg += ", " + module.ToString().Remove(0, 12);
                                         }
-                                        if (msg != "")
+                                        if (!String.IsNullOrEmpty(msg))
                                         {
                                             ircbot.sendData("NOTICE", nick + " :" + msg.TrimStart(',').Trim());
                                         }
@@ -1234,7 +1233,7 @@ namespace Bot.Modules
             }
         }
 
-        private void add_blacklist(string channel, string nick, bot ircbot, BotConfig Conf)
+        private static void add_blacklist(string channel, string nick, bot ircbot, BotConfig Conf)
         {
             XmlNode node = ircbot.controller.get_server_xml(Conf.Server_Name);
             string new_blacklist = node["chan_blacklist"].InnerText + "," + channel;
@@ -1253,7 +1252,7 @@ namespace Bot.Modules
             }
         }
 
-        private void unblacklist(string channel, string nick, bot ircbot, BotConfig Conf)
+        private static void unblacklist(string channel, string nick, bot ircbot, BotConfig Conf)
         {
             XmlNode node = ircbot.controller.get_server_xml(Conf.Server_Name);
             string new_blacklist = "";
@@ -1285,7 +1284,7 @@ namespace Bot.Modules
             }
         }
 
-        private void ignorecmd(string cmd, string ignore_nick, string nick, bot ircbot, BotConfig Conf)
+        private static void ignorecmd(string cmd, string ignore_nick, string nick, bot ircbot, BotConfig Conf)
         {
             XmlDocument xmlDoc = ircbot.controller.get_module_xml(Conf.Server_Name);            
             bool cmd_found_file = false;
@@ -1336,7 +1335,7 @@ namespace Bot.Modules
             }
         }
 
-        private void unignorecmd(string cmd, string ignore_nick, string nick, bot ircbot, BotConfig Conf)
+        private static void unignorecmd(string cmd, string ignore_nick, string nick, bot ircbot, BotConfig Conf)
         {
             XmlDocument xmlDoc = ircbot.controller.get_module_xml(Conf.Server_Name);   
             bool cmd_found_file = false;
@@ -1393,7 +1392,7 @@ namespace Bot.Modules
             }
         }
 
-        private void ignoremodule(string module, string ignore_nick, string nick, bot ircbot, BotConfig Conf)
+        private static void ignoremodule(string module, string ignore_nick, string nick, bot ircbot, BotConfig Conf)
         {
             XmlDocument xmlDoc = ircbot.controller.get_module_xml(Conf.Server_Name);
             bool module_found_file = false;
@@ -1432,7 +1431,7 @@ namespace Bot.Modules
             }
         }
 
-        private void unignoremodule(string module, string ignore_nick, string nick, bot ircbot, BotConfig Conf)
+        private static void unignoremodule(string module, string ignore_nick, string nick, bot ircbot, BotConfig Conf)
         {
             XmlDocument xmlDoc = ircbot.controller.get_module_xml(Conf.Server_Name);   
             bool module_found_file = false;
@@ -1477,7 +1476,7 @@ namespace Bot.Modules
             }
         }
 
-        private void ignore(string ignore_nick, string nick, bot ircbot, BotConfig Conf)
+        private static void ignore(string ignore_nick, string nick, bot ircbot, BotConfig Conf)
         {
             bool added = false;
             XmlNode xn = ircbot.controller.get_server_xml(Conf.Server_Name);
@@ -1496,7 +1495,7 @@ namespace Bot.Modules
             }
         }
 
-        private void unignore(string ignore_nick, string nick, bot ircbot, BotConfig Conf)
+        private static void unignore(string ignore_nick, string nick, bot ircbot, BotConfig Conf)
         {
             bool removed = false;
             XmlNode xn = ircbot.controller.get_server_xml(Conf.Server_Name);
@@ -1528,7 +1527,7 @@ namespace Bot.Modules
             }
         }
 
-        private void add_channel_list(string channel, bot ircbot, BotConfig Conf)
+        private static void add_channel_list(string channel, bot ircbot, BotConfig Conf)
         {
             XmlNode xn = ircbot.controller.get_server_xml(Conf.Server_Name);
             string new_channel = xn["chan_list"].InnerText + "," + channel;
@@ -1537,7 +1536,7 @@ namespace Bot.Modules
             ircbot.controller.save_server_xml(Conf.Server_Name, xn);
         }
 
-        private void del_channel_list(string channel, bot ircbot, BotConfig Conf)
+        private static void del_channel_list(string channel, bot ircbot, BotConfig Conf)
         {
             XmlNode xn = ircbot.controller.get_server_xml(Conf.Server_Name);
             string new_channel = "";
@@ -1555,7 +1554,7 @@ namespace Bot.Modules
             ircbot.controller.save_server_xml(Conf.Server_Name, xn);
         }
 
-        private void add_owner(string nick, bot ircbot, BotConfig Conf)
+        private static void add_owner(string nick, bot ircbot, BotConfig Conf)
         {
             XmlNode xn = ircbot.controller.get_server_xml(Conf.Server_Name);
             string new_owner = xn["owner"].InnerText + "," + nick;
@@ -1564,7 +1563,7 @@ namespace Bot.Modules
             ircbot.controller.save_server_xml(Conf.Server_Name, xn);
         }
 
-        private void del_owner(string nick, bot ircbot, BotConfig Conf)
+        private static void del_owner(string nick, bot ircbot, BotConfig Conf)
         {
             string new_owner = "";
             XmlNode xn = ircbot.controller.get_server_xml(Conf.Server_Name);

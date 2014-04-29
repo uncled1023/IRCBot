@@ -546,7 +546,7 @@ namespace Bot.Modules
                 main.sendData("PRIVMSG", tmp_info.bomb_channel + " :" + msg);
                 msg = "1,1.......4,1`-=7,1#$8,1%&7,1%$#4,1=-'1,1........";
                 main.sendData("PRIVMSG", tmp_info.bomb_channel + " :" + msg);
-                if (tmp_info.bomb_holder != "")
+                if (!String.IsNullOrEmpty(tmp_info.bomb_holder))
                 {
                     main.sendData("KICK", tmp_info.bomb_channel + " " + tmp_info.bomb_holder + " :BOOM!!!");
                 }
@@ -563,7 +563,6 @@ namespace Bot.Modules
             string tab_name = channel.TrimStart('#');
             string pattern = "[^a-zA-Z0-9]"; //regex pattern
             tab_name = Regex.Replace(tab_name, pattern, "_");
-            string file_name = ircbot.Conf.Server_Name + "_#" + tab_name + ".log";
             bool nick_idle = false;
 
             Modules.seen seen = (Modules.seen)ircbot.get_module("seen");

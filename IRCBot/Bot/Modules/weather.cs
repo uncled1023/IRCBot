@@ -35,7 +35,7 @@ namespace Bot.Modules
                             switch (trigger)
                             {
                                 case "weather":
-                                    if (this.Options["allow_weather"].Equals("True"))
+                                    if (this.Options["allow_weather"])
                                     {
                                         if (spam_check == true)
                                         {
@@ -60,7 +60,7 @@ namespace Bot.Modules
                                     }
                                     break;
                                 case "forecast":
-                                    if (this.Options["allow_forecast"].Equals("True"))
+                                    if (this.Options["allow_forecast"])
                                     {
                                         if (spam_check == true)
                                         {
@@ -91,7 +91,7 @@ namespace Bot.Modules
             }
         }
 
-        private void get_forecast(string term, string channel, bot ircbot, int days)
+        private static void get_forecast(string term, string channel, bot ircbot, int days)
         {
             if (days > 5)
             {
@@ -136,7 +136,7 @@ namespace Bot.Modules
             string highc = "";
             string lowc = "";
             string conditions = "";
-            if (location != ", " && location != "")
+            if (location != ", " && !String.IsNullOrEmpty(location))
             {
                 if (nodes.Count > 0)
                 {
@@ -171,7 +171,7 @@ namespace Bot.Modules
             }
         }
 
-        private void get_weather(string term, string channel, bot ircbot)
+        private static void get_weather(string term, string channel, bot ircbot)
         {
             XmlDocument doc = new XmlDocument();
 
@@ -185,7 +185,6 @@ namespace Bot.Modules
             string temp = "";
             string weather = "";
             string humidity = "";
-            string wind = "";
             string wind_dir = "";
             string wind_mph = "";
             if (nodes.Count > 0)
@@ -200,7 +199,6 @@ namespace Bot.Modules
                     temp = node["temperature_string"].InnerText;
                     weather = node["weather"].InnerText;
                     humidity = node["relative_humidity"].InnerText;
-                    wind = node["wind_string"].InnerText;
                     wind_dir = node["wind_dir"].InnerText;
                     wind_mph = node["wind_mph"].InnerText;
                 }

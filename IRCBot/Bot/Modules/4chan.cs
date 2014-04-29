@@ -135,7 +135,7 @@ namespace Bot.Modules
                                             {
                                                 msg += " /" + tmp_board["board"].InnerText + "/,";
                                             }
-                                            if (!msg.Equals(string.Empty))
+                                            if (!String.IsNullOrEmpty(msg))
                                             {
                                                 ircbot.sendData("PRIVMSG", channel + " :Boards Available:" + msg.TrimEnd(','));
                                             }
@@ -429,7 +429,7 @@ namespace Bot.Modules
                         tmp_replies = post["replies"].InnerText;
                     }
                     catch { }
-                    if (((thread_id && tmp_post_num.Equals(thread)) || (!thread_id && index == Convert.ToInt32(thread))) && !tmp_replies.Equals(string.Empty))
+                    if (((thread_id && tmp_post_num.Equals(thread)) || (!thread_id && index == Convert.ToInt32(thread))) && !String.IsNullOrEmpty(tmp_replies))
                     {
                         bool chan_found = false;
                         for (int x = 0; x < Board_stats.Count(); x++)
@@ -480,7 +480,7 @@ namespace Bot.Modules
                         {
                             total_duration += t.Seconds.ToString() + "s ";
                         }
-                        string post_name = "", post_comment = "", tripcode = "", ID = "", email = "", subject = "", replies = "", images = "", image_ext = "", image_name = "", image_width = "", image_height = "";
+                        string post_name = "", post_comment = "", tripcode = "", ID = "", subject = "", replies = "", images = "", image_ext = "", image_name = "", image_width = "", image_height = "";
                         try
                         {
                             post_name = post["name"].InnerText;
@@ -499,11 +499,6 @@ namespace Bot.Modules
                         try
                         {
                             ID = post["id"].InnerText;
-                        }
-                        catch { }
-                        try
-                        {
-                            email = post["email"].InnerText;
                         }
                         catch { }
                         try
@@ -542,7 +537,7 @@ namespace Bot.Modules
                         }
                         catch { }
 
-                        if (!ID.Trim().Equals(string.Empty))
+                        if (!String.IsNullOrEmpty(ID.Trim()))
                         {
                             ID = "[" + ID + "]";
                         }
@@ -550,7 +545,7 @@ namespace Bot.Modules
                         string quote = "<span class=\"(.*?)\">(.*?)</span>";
                         subject = Regex.Replace(subject, quote, "$2");
                         string post_message = "";
-                        if (!subject.Equals(string.Empty))
+                        if (!String.IsNullOrEmpty(subject))
                         {
                             post_message += "Subject: " + subject + " | ";
                         }
@@ -565,7 +560,7 @@ namespace Bot.Modules
                             }
                             post_message += "...";
                         }
-                        else if (!post_comment.Equals(string.Empty))
+                        else if (!String.IsNullOrEmpty(post_comment))
                         {
                             post_message += " Comment: " + post_comment;
                         }
@@ -574,43 +569,43 @@ namespace Bot.Modules
                         post_message = "";
                         foreach (string tmp in tmp_post)
                         {
-                            if (!tmp.Trim().Equals(string.Empty))
+                            if (!String.IsNullOrEmpty(tmp.Trim()))
                             {
                                 post_message += HttpUtility.HtmlDecode(tmp) + " | ";
                             }
                         }
 
                         string image_url = "";
-                        if (!image_name.Equals(string.Empty))
+                        if (!String.IsNullOrEmpty(image_name))
                         {
                             image_url = "http://images.4chan.org/" + board + "/src/" + image_name + image_ext;
                         }
 
-                        if (!image_url.Equals(string.Empty))
+                        if (!String.IsNullOrEmpty(image_url))
                         {
                             image_url = " | Posted Image: " + image_url + " (" + image_width + "x" + image_height + ")";
                         }
 
-                        if (!replies.Equals(string.Empty))
+                        if (!String.IsNullOrEmpty(replies))
                         {
                             replies = " | Replies: " + replies;
                         }
 
-                        if (!images.Equals(string.Empty))
+                        if (!String.IsNullOrEmpty(images))
                         {
                             images = " | Images: " + images;
                         }
 
                         ircbot.sendData("PRIVMSG", channel + " :[4chan] /" + board + "/ | Posted by: " + post_name + tripcode + ID + " " + total_duration.Trim() + " ago" + replies + images + image_url);
                         string re = @"<a [^>]+>(.*?)<\/a>(.*?)";
-                        if (!post_message.Equals(string.Empty))
+                        if (!String.IsNullOrEmpty(post_message))
                         {
                             ircbot.sendData("PRIVMSG", channel + " :" + Regex.Replace(post_message.Replace("<wbr>","").Trim().TrimEnd('|').Trim(), re, "$1"));
                         }
                         ircbot.sendData("PRIVMSG", channel + " :http://boards.4chan.org/" + board + "/thread/" + tmp_post_num);
                         break;
                     }
-                    if (!tmp_replies.Equals(string.Empty))
+                    if (!String.IsNullOrEmpty(tmp_replies))
                     {
                         index++;
                     }
@@ -719,7 +714,7 @@ namespace Bot.Modules
                                 {
                                     total_duration += t.Seconds.ToString() + "s ";
                                 }
-                                string post_name = "", post_comment = "", tripcode = "", ID = "", email = "", subject = "", replies = "", images = "", image_ext = "", image_name = "", image_width = "", image_height = "";
+                                string post_name = "", post_comment = "", tripcode = "", ID = "", subject = "", replies = "", images = "", image_ext = "", image_name = "", image_width = "", image_height = "";
                                 try
                                 {
                                     post_name = post_reply["name"].InnerText;
@@ -738,11 +733,6 @@ namespace Bot.Modules
                                 try
                                 {
                                     ID = post_reply["id"].InnerText;
-                                }
-                                catch { }
-                                try
-                                {
-                                    email = post_reply["email"].InnerText;
                                 }
                                 catch { }
                                 try
@@ -781,7 +771,7 @@ namespace Bot.Modules
                                 }
                                 catch { }
 
-                                if (!ID.Trim().Equals(string.Empty))
+                                if (!String.IsNullOrEmpty(ID.Trim()))
                                 {
                                     ID = "[" + ID + "]";
                                 }
@@ -789,7 +779,7 @@ namespace Bot.Modules
                                 string quote = "<span class=\"(.*?)\">(.*?)</span>";
                                 subject = Regex.Replace(subject, quote, "$2");
                                 string post_message = "";
-                                if (!subject.Equals(string.Empty))
+                                if (!String.IsNullOrEmpty(subject))
                                 {
                                     post_message += "Subject: " + subject + " | ";
                                 }
@@ -804,7 +794,7 @@ namespace Bot.Modules
                                     }
                                     post_message += "...";
                                 }
-                                else if (!post_comment.Equals(string.Empty))
+                                else if (!String.IsNullOrEmpty(post_comment))
                                 {
                                     post_message += " Comment: " + post_comment;
                                 }
@@ -813,36 +803,36 @@ namespace Bot.Modules
                                 post_message = "";
                                 foreach (string tmp in tmp_post)
                                 {
-                                    if (!tmp.Trim().Equals(string.Empty))
+                                    if (!String.IsNullOrEmpty(tmp.Trim()))
                                     {
                                         post_message += HttpUtility.HtmlDecode(tmp) + " | ";
                                     }
                                 }
 
                                 string image_url = "";
-                                if (!image_name.Equals(string.Empty))
+                                if (!String.IsNullOrEmpty(image_name))
                                 {
                                     image_url = "http://images.4chan.org/" + board + "/src/" + image_name + image_ext;
                                 }
 
-                                if (!image_url.Equals(string.Empty))
+                                if (!String.IsNullOrEmpty(image_url))
                                 {
                                     image_url = " | Posted Image: " + image_url + " (" + image_width + "x" + image_height + ")";
                                 }
 
-                                if (!replies.Equals(string.Empty))
+                                if (!String.IsNullOrEmpty(replies))
                                 {
                                     replies = " | Replies: " + replies;
                                 }
 
-                                if (!images.Equals(string.Empty))
+                                if (!String.IsNullOrEmpty(images))
                                 {
                                     images = " | Images: " + images;
                                 }
 
                                 ircbot.sendData("PRIVMSG", channel + " :[4chan] /" + board + "/ | Posted by: " + post_name + tripcode + ID + " " + total_duration.Trim() + " ago" + replies + images + image_url);
                                 string re = @"<a [^>]+>(.*?)<\/a>(.*?)";
-                                if (!post_message.Equals(string.Empty))
+                                if (!String.IsNullOrEmpty(post_message))
                                 {
                                     ircbot.sendData("PRIVMSG", channel + " :" + Regex.Replace(post_message.Trim().TrimEnd('|').Trim(), re, "$1"));
                                 }

@@ -221,7 +221,7 @@ namespace Bot.Modules
                             }
                         }
                     }
-                    if (access_msg != "")
+                    if (!String.IsNullOrEmpty(access_msg))
                     {
                         ircbot.sendData("NOTICE", nick + " :" + access_msg.Trim().TrimStart('|').Trim());
                         ircbot.sendData("NOTICE", nick + " :End of Access List");
@@ -245,7 +245,6 @@ namespace Bot.Modules
         public void set_access_list(string nick, string channel, string access, bot ircbot)
         {
             string file_name = ircbot.Conf.Server_Name + "_list.txt";
-            DateTime current_date = DateTime.Now;
 
             if (Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "access" + Path.DirectorySeparatorChar + "") == false)
             {
@@ -279,7 +278,7 @@ namespace Bot.Modules
                                 }
                                 if (access_found == false)
                                 {
-                                    if (new_line[2].Trim().Equals(""))
+                                    if (String.IsNullOrEmpty(new_line[2].Trim()))
                                     {
                                         new_file.Add(new_line[0].Trim() + "*" + new_line[1].Trim() + "*" + access);
                                     }
@@ -361,7 +360,6 @@ namespace Bot.Modules
         public void del_access_list(string nick, string channel, string access, bot ircbot)
         {
             string file_name = ircbot.Conf.Server_Name + "_list.txt";
-            DateTime current_date = DateTime.Now;
 
             if (Directory.Exists(ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "access" + Path.DirectorySeparatorChar + "") == false)
             {
@@ -394,7 +392,7 @@ namespace Bot.Modules
                                         new_access += "," + line;
                                     }
                                 }
-                                if (new_access.TrimStart(',').TrimEnd(',') != "")
+                                if (String.IsNullOrEmpty(new_access.TrimStart(',').TrimEnd(',')))
                                 {
                                     new_file.Add(new_line[0].Trim() + "*" + new_line[1].Trim() + "*" + new_access.TrimStart(',').TrimEnd(','));
                                 }

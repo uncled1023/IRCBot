@@ -70,7 +70,6 @@ namespace Bot
         internal bool connecting;
         internal bool disconnected;
         internal bool shouldRun;
-        internal bool first_run;
         internal string cur_dir;
         internal BackgroundWorker worker;
         internal BackgroundWorker irc_worker;
@@ -107,7 +106,6 @@ namespace Bot
 
         private void delay_start(object delay_sender, DoWorkEventArgs delay_e, int delay)
         {
-            BackgroundWorker bw = delay_sender as BackgroundWorker;
             Thread.Sleep(delay);
             start_bot();
         }
@@ -202,9 +200,8 @@ namespace Bot
 
         internal void IRCWork()
         {
-            save_stream_worker.RunWorkerAsync();
             check_connect_worker.RunWorkerAsync();
-            
+
             shouldRun = true;
             string data = "";
             
@@ -221,15 +218,15 @@ namespace Bot
             string[] ex = new string[2];
             while (shouldRun)
             {
-                Thread.Sleep(30);
+                Thread.Sleep(10);
+                line = read_queue();
                 switch (bot_state)
                 {
-                    case 0: // set nick state
+                    case 0: // Identify with the server
                         sendData("NICK", nick);
                         bot_state = next_state;
                         break;
                     case 1: // wait until end of MOTD
-                        line = read_queue();
                         if (line.Contains("Nickname is already in use."))
                         {
                             pre_state = bot_state;
@@ -271,14 +268,6 @@ namespace Bot
                         else
                         {
                         }
-                        ex = line.Split(charSeparator, 2, StringSplitOptions.RemoveEmptyEntries);
-                        if (ex.GetUpperBound(0) > 0)
-                        {
-                            if (ex[0] == "PING")
-                            {
-                                sendData("PONG", ex[1]);
-                            }
-                        }
                         break;
                     case 2: // nick taken state
                         if (nicks.GetUpperBound(0) < cur_alt_nick)
@@ -304,7 +293,7 @@ namespace Bot
                         break;
                     case 3: // ghost state
                         ghost_sent = true;
-                        if (!Conf.Pass.Equals(string.Empty))
+                        if (!String.IsNullOrEmpty(Conf.Pass))
                         {
                             sendData("PRIVMSG", "NickServ :ghost " + main_nick + " " + Conf.Pass);
                         }
@@ -324,7 +313,6 @@ namespace Bot
                         }
                         break;
                     case 5: // wait 
-                        line = read_queue();
                         if (line.Contains("Nickname is already in use."))
                         {
                             pre_state = bot_state;
@@ -371,14 +359,6 @@ namespace Bot
                         else
                         {
                         }
-                        ex = line.Split(charSeparator, 2, StringSplitOptions.RemoveEmptyEntries);
-                        if (ex.GetUpperBound(0) > 1)
-                        {
-                            if (ex[0] == "PING")
-                            {
-                                sendData("PONG", ex[1]);
-                            }
-                        }
                         break;
                     case 6:
                         BackgroundWorker work = new BackgroundWorker();
@@ -391,11 +371,19 @@ namespace Bot
                         disconnected = false;
                         restart_attempts = 0;
                         data = read_stream_queue();
-                        if (data != "")
+                        if (!String.IsNullOrEmpty(data))
                         {
                             parse_stream(data.Trim());
                         }
                         break;
+                }
+                ex = line.Split(charSeparator, 2, StringSplitOptions.RemoveEmptyEntries);
+                if (ex.GetUpperBound(0) > 0)
+                {
+                    if (ex[0] == "PING")
+                    {
+                        sendData("PONG", ex[1]);
+                    }
                 }
                 if (worker.CancellationPending || irc_worker.CancellationPending)
                 {
@@ -418,7 +406,6 @@ namespace Bot
             connected = false;
             connecting = false;
             shouldRun = true;
-            first_run = true;
             restart = false;
             start_time = DateTime.Now;
             cur_dir = controller.cur_dir;
@@ -475,18 +462,20 @@ namespace Bot
                 sw = new StreamWriter(ns, Encoding.UTF8);
                 sw.AutoFlush = true;
 
-                if (Conf.Pass != "")
+                // Register with Server
+                sendData("NICK", nick);
+                Thread.Sleep(30);
+                sendData("USER", nick + " * * :" + Conf.Name);
+
+                // Start the stream readers
+                save_stream_worker.RunWorkerAsync();
+
+                // Wait for a response from the server
+                while (stream_queue.Count == 0)
                 {
-                    sendData("PASS", Conf.Pass);
+                    Thread.Sleep(50);
                 }
-                if (Conf.Email != "")
-                {
-                    sendData("USER", nick + " " + Conf.Email + " " + Conf.Email + " :" + Conf.Name);
-                }
-                else
-                {
-                    sendData("USER", nick + " default_host default_server :" + Conf.Name);
-                }
+
                 disconnected = false;
                 bot_connected = true;
             }
@@ -764,7 +753,6 @@ namespace Bot
             int nick_access = Conf.User_Level;
             string line_nick = "";
             string channel = "";
-            string nick_host = "";
             bool bot_command = false;
             string command = "";
             restart = false;
@@ -781,7 +769,6 @@ namespace Bot
             if (name.GetUpperBound(0) > 0)
             {
                 line_nick = name[0].TrimStart(':');
-                nick_host = user_info[1];
                 channel = ex[2].TrimStart(':');
 
                 type = "line";
@@ -1052,7 +1039,6 @@ namespace Bot
                 //Run Enabled Modules
                 foreach (Modules.Module module in Conf.Modules)
                 {
-                    char[] sepSpace = new char[] { ' ' };
                     bool module_allowed = !module.Blacklist.Contains(line_nick) && !module.Blacklist.Contains(channel);
                     if (module_allowed == true)
                     {
@@ -1066,8 +1052,6 @@ namespace Bot
 
         private void backgroundWorker_RunModule(object sender, DoWorkEventArgs e, bot parent, Modules.Module module, string[] ex, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
-            BackgroundWorker bw = sender as BackgroundWorker;
-
             module.control(parent, Conf, ex, command, nick_access, nick, channel, bot_command, type);
         }
 
@@ -1087,7 +1071,7 @@ namespace Bot
                 }
                 if (param == null)
                 {
-                    sw.WriteLine(cmd);
+                    sw.WriteLine(cmd + Environment.NewLine);
                     string output = Environment.NewLine + Conf.Server_Name + ":" + ":" + nick + " " + cmd;
 
                     if (display_output)
@@ -1111,7 +1095,7 @@ namespace Bot
                     {
                         string first = cmd + " " + message[0];
                         string second = message[1];
-                        string[] stringSeparators = new string[] { "\n" };
+                        string[] stringSeparators = new string[] { Environment.NewLine };
                         string[] lines = second.Split(stringSeparators, StringSplitOptions.RemoveEmptyEntries);
                         for (int x = 0; x <= lines.GetUpperBound(0); x++)
                         {
@@ -1128,7 +1112,7 @@ namespace Bot
                                     else
                                     {
                                         msg = msg.Remove(0, 1);
-                                        sw.WriteLine(first + ":" + msg);
+                                        sw.WriteLine(first + ":" + msg + Environment.NewLine);
                                         string output = Environment.NewLine + Conf.Server_Name + ":" + ":" + nick + " " + first + ":" + msg;
                                         if (display_output)
                                         {
@@ -1144,10 +1128,10 @@ namespace Bot
                                         msg = " " + word;
                                     }
                                 }
-                                if (msg.Trim() != "")
+                                if (!String.IsNullOrEmpty(msg.Trim()))
                                 {
                                     msg = msg.Remove(0, 1);
-                                    sw.WriteLine(first + ":" + msg);
+                                    sw.WriteLine(first + ":" + msg + Environment.NewLine);
                                     string output = Environment.NewLine + Conf.Server_Name + ":" + ":" + nick + " " + first + ":" + msg;
                                     if (display_output)
                                     {
@@ -1164,7 +1148,7 @@ namespace Bot
                             }
                             else
                             {
-                                sw.WriteLine(first + ":" + lines[x]);
+                                sw.WriteLine(first + ":" + lines[x] + Environment.NewLine);
                                 string output = Environment.NewLine + Conf.Server_Name + ":" + ":" + nick + " " + first + ":" + lines[x];
 
                                 if (display_output)
@@ -1183,11 +1167,11 @@ namespace Bot
                     }
                     else
                     {
-                        string[] stringSeparators = new string[] { "\n" };
+                        string[] stringSeparators = new string[] { Environment.NewLine };
                         string[] lines = param.Split(stringSeparators, StringSplitOptions.RemoveEmptyEntries);
                         for (int x = 0; x <= lines.GetUpperBound(0); x++)
                         {
-                            sw.WriteLine(cmd + " " + lines[x]);
+                            sw.WriteLine(cmd + " " + lines[x] + Environment.NewLine);
                             string output = Environment.NewLine + Conf.Server_Name + ":" + ":" + nick + " " + cmd + " " + lines[x];
 
                             if (display_output)
@@ -1218,7 +1202,7 @@ namespace Bot
                     {
                         string line = sr.ReadLine();
 
-                        if (line.Equals(string.Empty))
+                        if (String.IsNullOrEmpty(line))
                         {
                             blank_count++;
                         }
@@ -1298,7 +1282,7 @@ namespace Bot
         private void joinChannels()
         {
             // Joins all the channels in the channel list
-            if (Conf.Chans != "")
+            if (!String.IsNullOrEmpty(Conf.Chans))
             {
                 string[] channels = Conf.Chans.Split(',');
                 foreach (string channel in channels)
@@ -1327,7 +1311,7 @@ namespace Bot
             if (connected == true)
             {
                 checkRegisterationTimer.Enabled = false;
-                if (nick != "" && Conf.Pass != "" && Conf.Email != "")
+                if (!String.IsNullOrEmpty(nick) && !String.IsNullOrEmpty(Conf.Pass) && !String.IsNullOrEmpty(Conf.Email))
                 {
                     register_nick(Conf.Pass, Conf.Email);
                 }
@@ -1531,7 +1515,7 @@ namespace Bot
                 line = read_queue();
                 DateTime start = DateTime.Now;
 
-                while (DateTime.Now.Subtract(start).Seconds < 15 && line == "")
+                while (DateTime.Now.Subtract(start).Seconds < 15 && String.IsNullOrEmpty(line))
                 {
                     if (line.Contains("Please wait a while and try again."))
                     {

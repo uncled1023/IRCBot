@@ -11,13 +11,11 @@ namespace Bot.Modules
     class moderation : Module
     {
         private List<System.Timers.Timer> unban_triggers;
-        private List<List<string>> ban_info;
         private bot main;
 
         public moderation()
         {
             unban_triggers = new List<System.Timers.Timer>();
-            ban_info = new List<List<string>>();
         }
 
         public override void control(bot ircbot, BotConfig Conf, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
@@ -652,7 +650,7 @@ namespace Bot.Modules
                                                 {
                                                     string target_host = ircbot.get_nick_host(total_nicks[0]);
                                                     string ban = "*!*@" + target_host;
-                                                    if (target_host.Equals(""))
+                                                    if (String.IsNullOrEmpty(target_host))
                                                     {
                                                         ban = new_line[0] + "!*@*";
                                                     }
@@ -699,7 +697,7 @@ namespace Bot.Modules
                                             {
                                                 string target_host = ircbot.get_nick_host(total_nicks[0]);
                                                 string ban = "*!*@" + target_host;
-                                                if (target_host.Equals(""))
+                                                if (String.IsNullOrEmpty(target_host))
                                                 {
                                                     ban = new_line[0] + "!*@*";
                                                 }
@@ -778,7 +776,7 @@ namespace Bot.Modules
                                                 {
                                                     string target_host = ircbot.get_nick_host(total_nicks[0]);
                                                     string ban = "*!*@" + target_host;
-                                                    if (target_host.Equals(""))
+                                                    if (String.IsNullOrEmpty(target_host))
                                                     {
                                                         ban = new_line[0] + "!*@*";
                                                     }
@@ -821,7 +819,6 @@ namespace Bot.Modules
                                             string[] new_line = line[4].Split(charS, 3, StringSplitOptions.RemoveEmptyEntries);
                                             if (new_line.GetUpperBound(0) > 0)
                                             {
-                                                int time = Convert.ToInt32(new_line[0].TrimStart(':'));
                                                 string nicks = new_line[1];
                                                 char[] charSep = new char[] { ',' };
                                                 string[] total_nicks = nicks.Split(charSep, StringSplitOptions.RemoveEmptyEntries);
@@ -849,7 +846,7 @@ namespace Bot.Modules
                                                     if (nick_access >= sent_nick_access)
                                                     {
                                                         string ban = "*!*@" + target_host;
-                                                        if (target_host.Equals(""))
+                                                        if (String.IsNullOrEmpty(target_host))
                                                         {
                                                             ban = total_nicks[0] + "!*@*";
                                                         }
@@ -930,7 +927,7 @@ namespace Bot.Modules
                                                     if (nick_access >= sent_nick_access)
                                                     {
                                                         string ban = "*!*@" + target_host;
-                                                        if (target_host.Equals(""))
+                                                        if (String.IsNullOrEmpty(target_host))
                                                         {
                                                             ban = new_line[1] + "!*@*";
                                                         }
@@ -1308,7 +1305,7 @@ namespace Bot.Modules
             }
         }
 
-        public void check_auto(string nick, string channel, string hostname, bot ircbot)
+        public static void check_auto(string nick, string channel, string hostname, bot ircbot)
         {
             string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "auto_kb" + Path.DirectorySeparatorChar + ircbot.Conf.Server_Name + "_list.txt";
             if (File.Exists(list_file))
@@ -1325,11 +1322,11 @@ namespace Bot.Modules
                         if ((nick.Equals(auto_nick[0], StringComparison.InvariantCultureIgnoreCase) == true || hostname.Equals(auto_nick[1])) && channel.Equals(auto_nick[2]))
                         {
                             string ban = "*!*@" + hostname;
-                            if (hostname.Equals(""))
+                            if (String.IsNullOrEmpty(hostname))
                             {
                                 ban = nick + "!*@*";
                             }
-                            if (auto_nick[4] == "")
+                            if (String.IsNullOrEmpty(auto_nick[4]))
                             {
                                 auto_nick[4] = "Auto " + auto_nick[3];
                             }
@@ -1365,14 +1362,14 @@ namespace Bot.Modules
             System.Timers.Timer unban_trigger = (System.Timers.Timer)sender;
             unban_trigger.Enabled = false;
             string ban = "*!*@" + host;
-            if (host.Equals(""))
+            if (String.IsNullOrEmpty(host))
             {
                 ban = nick + "!*@*";
             }
             main.sendData("MODE", channel + " -b " + ban);
         }
 
-        private void add_auto(string nick, string channel, string hostname, string type, string reason, bot ircbot)
+        private static void add_auto(string nick, string channel, string hostname, string type, string reason, bot ircbot)
         {
             string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "auto_kb" + Path.DirectorySeparatorChar + ircbot.Conf.Server_Name + "_list.txt";
             string add_line = nick + "*" + hostname + "*" + channel + "*" + type + "*" + reason + "*" + DateTime.Now.ToString("MMMM d, yyyy h:mm:ss tt");
@@ -1401,7 +1398,7 @@ namespace Bot.Modules
                 }
                 System.IO.File.WriteAllLines(@list_file, new_file);
                 string ban = "*!*@" + hostname;
-                if (hostname.Equals(""))
+                if (String.IsNullOrEmpty(hostname))
                 {
                     ban = nick + "!*@*";
                 }
@@ -1429,7 +1426,7 @@ namespace Bot.Modules
             ircbot.sendData("PRIVMSG", channel + " :" + nick + " has been added to the a" + type + " list.");
         }
 
-        private void del_auto(string nick, string channel, string hostname, string type, bot ircbot)
+        private static void del_auto(string nick, string channel, string hostname, string type, bot ircbot)
         {
             string list_file = ircbot.cur_dir + Path.DirectorySeparatorChar + "modules" + Path.DirectorySeparatorChar + "auto_kb" + Path.DirectorySeparatorChar + ircbot.Conf.Server_Name + "_list.txt";
             bool found_nick = false;
@@ -1458,7 +1455,7 @@ namespace Bot.Modules
                 {
                     System.IO.File.WriteAllLines(@list_file, new_file);
                     string ban = "*!*@" + hostname;
-                    if (hostname.Equals(""))
+                    if (String.IsNullOrEmpty(hostname))
                     {
                         ban = nick + "!*@*";
                     }

@@ -783,7 +783,7 @@ namespace Bot.Modules
                                             if (chan_allowed == true)
                                             {
                                                 Channel_Info chan_info = ircbot.get_chan_info(line[4]);
-                                                if (chan_info != null)
+                                                if (chan_info == null)
                                                 {
                                                     if (nick_access != Conf.Owner_Level)
                                                     {
@@ -825,7 +825,7 @@ namespace Bot.Modules
                                         if (line.GetUpperBound(0) > 3)
                                         {
                                             Channel_Info chan_info = ircbot.get_chan_info(line[4]);
-                                            if (chan_info != null)
+                                            if (chan_info == null)
                                             {
                                                 ircbot.sendData("JOIN", line[4]);
                                             }

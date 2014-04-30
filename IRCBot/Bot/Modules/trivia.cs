@@ -184,11 +184,13 @@ namespace Bot.Modules
                                                         {
                                                             break;
                                                         }
+                                                        index++;
                                                     }
                                                     if (!String.IsNullOrEmpty(msg))
                                                     {
                                                         ircbot.sendData("PRIVMSG", channel + " :" + msg.Trim().TrimEnd('|').Trim());
                                                     }
+                                                    trivia.scores = new List<List<string>>();
                                                     break;
                                                 }
                                             }

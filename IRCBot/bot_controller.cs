@@ -325,7 +325,15 @@ namespace IRCBot
                 bot_instance.Conf = get_bot_conf(bot_instance.Conf.Server_Name);
                 foreach (Bot.Modules.Module module in module_list)
                 {
-                    bot_instance.Conf.Modules.Add(get_module_conf(bot_instance.Conf.Server_Name, module.Class_Name));
+                    Bot.Modules.Module new_module = get_module_conf(bot_instance.Conf.Server_Name, module.Class_Name);
+                    module.Loaded = true;
+                    module.Blacklist = new_module.Blacklist;
+                    module.Class_Name = new_module.Class_Name;
+                    module.Commands = new_module.Commands;
+                    module.Enabled = new_module.Enabled;
+                    module.Name = new_module.Name;
+                    module.Options = new_module.Options;
+                    bot_instance.Conf.Modules.Add(module);
                 }
             }
         }
@@ -336,7 +344,20 @@ namespace IRCBot
             {
                 if (bot_instance.Conf.Server_Name.Equals(server_name))
                 {
+                    List<Bot.Modules.Module> module_list = bot_instance.Conf.Modules;
                     bot_instance.Conf = get_bot_conf(bot_instance.Conf.Server_Name);
+                    foreach (Bot.Modules.Module module in module_list)
+                    {
+                        Bot.Modules.Module new_module = get_module_conf(bot_instance.Conf.Server_Name, module.Class_Name);
+                        module.Loaded = true;
+                        module.Blacklist = new_module.Blacklist;
+                        module.Class_Name = new_module.Class_Name;
+                        module.Commands = new_module.Commands;
+                        module.Enabled = new_module.Enabled;
+                        module.Name = new_module.Name;
+                        module.Options = new_module.Options;
+                        bot_instance.Conf.Modules.Add(module);
+                    }
                     break;
                 }
             }
@@ -348,7 +369,20 @@ namespace IRCBot
             {
                 if (bot_instance.Conf.Server_Name.Equals(old_server_name))
                 {
+                    List<Bot.Modules.Module> module_list = bot_instance.Conf.Modules;
                     bot_instance.Conf = get_bot_conf(new_server_name);
+                    foreach (Bot.Modules.Module module in module_list)
+                    {
+                        Bot.Modules.Module new_module = get_module_conf(bot_instance.Conf.Server_Name, module.Class_Name);
+                        module.Loaded = true;
+                        module.Blacklist = new_module.Blacklist;
+                        module.Class_Name = new_module.Class_Name;
+                        module.Commands = new_module.Commands;
+                        module.Enabled = new_module.Enabled;
+                        module.Name = new_module.Name;
+                        module.Options = new_module.Options;
+                        bot_instance.Conf.Modules.Add(module);
+                    }
                     break;
                 }
             }

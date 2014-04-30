@@ -216,6 +216,7 @@ namespace Bot
             string line = "";
             char[] charSeparator = new char[] { ' ' };
             string[] ex = new string[2];
+
             while (shouldRun)
             {
                 Thread.Sleep(10);
@@ -385,6 +386,39 @@ namespace Bot
                         sendData("PONG", ex[1]);
                     }
                 }
+                /*
+
+                if (!sent_ping && DateTime.Now.Subtract(start).TotalSeconds > 30)
+                {
+                    seconds_start = Convert.ToInt64((start.ToUniversalTime() - epoch).TotalSeconds);
+                    start = DateTime.Now;
+                    sendData("PING", seconds_start.ToString());
+                    sent_ping = true;
+                }
+
+                if (sent_ping)
+                {
+                    if (DateTime.Now.Subtract(start).TotalSeconds > 15)
+                    {
+                        shouldRun = false;
+                    }
+                    else
+                    {
+                        if (ex.GetUpperBound(0) > 0)
+                        {
+                            string[] newex = ex[1].Split(charSeparator, StringSplitOptions.RemoveEmptyEntries);
+                            if (newex.GetUpperBound(0) > 1)
+                            {
+                                if (newex[0] == "PONG" && newex[2].Equals(":" + seconds_start.ToString()))
+                                {
+                                    start = DateTime.Now;
+                                    sent_ping = false;
+                                }
+                            }
+                        }
+                    }   
+                }
+                */
                 if (worker.CancellationPending || irc_worker.CancellationPending)
                 {
                     shouldRun = false;
@@ -469,12 +503,6 @@ namespace Bot
 
                 // Start the stream readers
                 save_stream_worker.RunWorkerAsync();
-
-                // Wait for a response from the server
-                while (stream_queue.Count == 0)
-                {
-                    Thread.Sleep(50);
-                }
 
                 disconnected = false;
                 bot_connected = true;
@@ -1069,10 +1097,6 @@ namespace Bot
                 {
                     cmd = "PRIVMSG";
                 }
-                if (cmd.Equals("join") || cmd.Equals("part") || cmd.Equals("quit") || cmd.Equals("kick") || cmd.Equals("nick") || cmd.Equals("notice"))
-                {
-                    display_output = false;
-                }
                 if (param == null)
                 {
                     sw.WriteLine(cmd + Environment.NewLine);
@@ -1519,7 +1543,7 @@ namespace Bot
                 line = read_queue();
                 DateTime start = DateTime.Now;
 
-                while (DateTime.Now.Subtract(start).Seconds < 15 && String.IsNullOrEmpty(line))
+                while (DateTime.Now.Subtract(start).TotalSeconds < 15 && String.IsNullOrEmpty(line))
                 {
                     if (line.Contains("Please wait a while and try again."))
                     {
@@ -1594,7 +1618,7 @@ namespace Bot
                 bool cont = true;
                 DateTime start = DateTime.Now;
 
-                while (DateTime.Now.Subtract(start).Seconds < 15 && cont)
+                while (DateTime.Now.Subtract(start).TotalSeconds < 15 && cont)
                 {
                     if (line.Contains("No matching entries on " + channel + " " + type + " list.") || line.Contains(channel + " " + type + " list is empty."))
                     {
@@ -1638,7 +1662,7 @@ namespace Bot
                 line = read_queue();
                 DateTime start = DateTime.Now;
 
-                while (DateTime.Now.Subtract(start).Seconds < 15 && !line.Contains(":STATUS") && !line.Contains("No such nick/channel"))
+                while (DateTime.Now.Subtract(start).TotalSeconds < 15 && !line.Contains(":STATUS") && !line.Contains("No such nick/channel"))
                 {
                     if (line.Contains("Please wait a while and try again."))
                     {
@@ -1665,7 +1689,7 @@ namespace Bot
                 line = read_queue();
                 DateTime start = DateTime.Now;
 
-                while (DateTime.Now.Subtract(start).Seconds < 15 && !line.Contains("352 " + nick + " " + channel))
+                while (DateTime.Now.Subtract(start).TotalSeconds < 15 && !line.Contains("352 " + nick + " " + channel))
                 {
                     if (line.Contains("Please wait a while and try again."))
                     {
@@ -1677,7 +1701,7 @@ namespace Bot
                 char[] Separator = new char[] { ' ' };
                 start = DateTime.Now;
 
-                while (DateTime.Now.Subtract(start).Seconds < 15 && !line.Contains("315 " + nick + " " + channel + " :End of /WHO list."))
+                while (DateTime.Now.Subtract(start).TotalSeconds < 15 && !line.Contains("315 " + nick + " " + channel + " :End of /WHO list."))
                 {
                     if (line.Contains("352 " + nick + " " + channel))
                     {

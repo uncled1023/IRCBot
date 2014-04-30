@@ -36,7 +36,7 @@ namespace Bot.Modules
                                 }
                             }
                             ircbot.sendData("JOIN", request_chan);
-                            ircbot.sendData("PRIVMSG", request_chan + " :" + nick + " has request me to join this channel.  For more informaiton on what I can do, just type: " + ircbot.Conf.Command + "help");
+                            ircbot.sendData("PRIVMSG", request_chan + " :" + nick + " has requested me to join this channel.  For more informaiton on what I can do, just type: " + ircbot.Conf.Command + "help");
                         }
                         else
                         {

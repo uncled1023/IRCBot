@@ -14,7 +14,7 @@ namespace Bot.Modules
     {
         public override void control(bot ircbot, BotConfig Conf, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
-            if (type.Equals("channel") && bot_command == true)
+            if ((type.Equals("channel") || type.Equals("query")) && bot_command == true)
             {
                 foreach (Command tmp_command in this.Commands)
                 {
@@ -47,7 +47,7 @@ namespace Bot.Modules
                                         {
                                             if (line[4].StartsWith("DCC SEND"))
                                             {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :Invalid Search Term");
+                                                ircbot.sendData("PRIVMSG", channel + " :Invalid Search Term");
                                             }
                                             else
                                             {
@@ -58,29 +58,29 @@ namespace Bot.Modules
                                                     {
                                                         foreach (SearchResult searchType in results)
                                                         {
-                                                            ircbot.sendData("PRIVMSG", line[2] + " :" + searchType.title.Replace("<b>", "").Replace("</b>", "").Replace("&quot;", "\"").Replace("&#39", "'").Replace("&amp;", "&") + ": " + searchType.content.Replace("<b>", "").Replace("</b>", "").Replace("&quot;", "\"").Replace("&#39", "'").Replace("&amp;", "&"));
+                                                            ircbot.sendData("PRIVMSG", channel + " :" + searchType.title.Replace("<b>", "").Replace("</b>", "").Replace("&quot;", "\"").Replace("&#39", "'").Replace("&amp;", "&") + ": " + searchType.content.Replace("<b>", "").Replace("</b>", "").Replace("&quot;", "\"").Replace("&#39", "'").Replace("&amp;", "&"));
 
                                                             if (this.Options["show_url"])
                                                             {
-                                                                ircbot.sendData("PRIVMSG", line[2] + " :" + HttpUtility.UrlDecode(searchType.url));
+                                                                ircbot.sendData("PRIVMSG", channel + " :" + HttpUtility.UrlDecode(searchType.url));
                                                             }
                                                             break;
                                                         }
                                                     }
                                                     else
                                                     {
-                                                        ircbot.sendData("PRIVMSG", line[2] + " :No Results Found");
+                                                        ircbot.sendData("PRIVMSG", channel + " :No Results Found");
                                                     }
                                                 }
                                                 catch
                                                 {
-                                                    ircbot.sendData("PRIVMSG", line[2] + " :Sorry, Google isn't responding to me right now.  Try again later.");
+                                                    ircbot.sendData("PRIVMSG", channel + " :Sorry, Google isn't responding to me right now.  Try again later.");
                                                 }
                                             }
                                         }
                                         else
                                         {
-                                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                                            ircbot.sendData("PRIVMSG", channel + " :" + nick + ", you need to include more info.");
                                         }
                                     }
                                     else

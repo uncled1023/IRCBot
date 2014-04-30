@@ -321,7 +321,12 @@ namespace IRCBot
         {
             foreach (bot bot_instance in bot_instances)
             {
+                List<Bot.Modules.Module> module_list = bot_instance.Conf.Modules;
                 bot_instance.Conf = get_bot_conf(bot_instance.Conf.Server_Name);
+                foreach (Bot.Modules.Module module in module_list)
+                {
+                    bot_instance.Conf.Modules.Add(get_module_conf(bot_instance.Conf.Server_Name, module.Class_Name));
+                }
             }
         }
 
@@ -358,12 +363,17 @@ namespace IRCBot
                 bot_conf.Modules = new List<Bot.Modules.Module>();
                 bot_conf.Spam_Check = new List<spam_info>();
                 bot_conf.Channel_List = new List<Channel_Info>();
+                bot_conf.Owners = new List<string>();
                 bot_conf.Name = xn["name"].InnerText;
                 bot_conf.Nick = xn["nick"].InnerText;
                 bot_conf.Secondary_Nicks = xn["sec_nicks"].InnerText;
                 bot_conf.Pass = xn["password"].InnerText;
                 bot_conf.Email = xn["email"].InnerText;
-                bot_conf.Owner = xn["owner"].InnerText;
+                string[] owners = xn["owner"].InnerText.Split(',');
+                foreach (string owner in owners)
+                { 
+                    bot_conf.Owners.Add(owner);
+                }
                 bot_conf.Port = Convert.ToInt32(xn["port"].InnerText);
                 bot_conf.Server_Name = xn["server_name"].InnerText;
                 bot_conf.Server_Address = xn["server_address"].InnerText;

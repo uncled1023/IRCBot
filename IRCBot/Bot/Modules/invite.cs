@@ -9,7 +9,7 @@ namespace Bot.Modules
     {
         public override void control(bot ircbot, BotConfig Conf, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
-            if (type.Equals("line") && line.GetUpperBound(0) >= 3 && line[1].Equals("invite", StringComparison.InvariantCultureIgnoreCase) && String.IsNullOrEmpty(command))
+            if (type.Equals("invite") && line.GetUpperBound(0) >= 3 && String.IsNullOrEmpty(command))
             {
                 if (channel.Equals(ircbot.Nick))
                 {
@@ -29,8 +29,7 @@ namespace Bot.Modules
                         {
                             if (nick_access != Conf.Owner_Level)
                             {
-                                string[] owners = Conf.Owner.Split(',');
-                                foreach (string owner_nick in owners)
+                                foreach (string owner_nick in Conf.Owners)
                                 {
                                     ircbot.sendData("NOTICE", owner_nick + " :" + nick + " has invited me to join " + request_chan);
                                     ircbot.sendData("NOTICE", owner_nick + " :If you would like to permanently add this channel, please type " + ircbot.Conf.Command + "addchanlist " + request_chan);

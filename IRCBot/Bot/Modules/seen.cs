@@ -60,7 +60,7 @@ namespace Bot.Modules
                     }
                 }
             }
-            if (type.Equals("line") || type.Equals("channel") || type.Equals("join") || type.Equals("mode") || type.Equals("part") || type.Equals("quit") || type.Equals("nick"))
+            if (type.Equals("line") || type.Equals("channel") || type.Equals("invite") || type.Equals("join") || type.Equals("mode") || type.Equals("part") || type.Equals("quit") || type.Equals("nick"))
             {
                 add_seen(nick.Trim(), channel, line, ircbot);
             }
@@ -196,6 +196,10 @@ namespace Bot.Modules
                     msg = "getting kicked from " + channel;
                 }
                 else if (line[1].Equals("mode", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    msg = "setting mode " + " in " + channel;
+                }
+                else if (line[1].Equals("invite", StringComparison.InvariantCultureIgnoreCase))
                 {
                     msg = "setting mode " + " in " + channel;
                 }

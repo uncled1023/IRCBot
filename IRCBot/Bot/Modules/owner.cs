@@ -19,7 +19,7 @@ namespace Bot.Modules
         public override void control(bot ircbot, BotConfig Conf, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
             char[] charS = new char[] { ' ' };
-            if (type.Equals("channel") && bot_command == true)
+            if ((type.Equals("channel") || type.Equals("query")) && bot_command == true)
             {
                 foreach (Command tmp_command in this.Commands)
                 {
@@ -787,8 +787,7 @@ namespace Bot.Modules
                                                 {
                                                     if (nick_access != Conf.Owner_Level)
                                                     {
-                                                        string[] owners = Conf.Owner.Split(',');
-                                                        foreach (string owner_nick in owners)
+                                                        foreach (string owner_nick in Conf.Owners)
                                                         {
                                                             ircbot.sendData("NOTICE", owner_nick + " :" + nick + " has invited me to join " + line[4]);
                                                             ircbot.sendData("NOTICE", owner_nick + " :If you would like to permanently add this channel, please type " + ircbot.Conf.Command + "addchanlist " + line[4]);
@@ -1056,25 +1055,24 @@ namespace Bot.Modules
                                             var fields = myObjectType.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
                                             switch (line[4])
                                             {
-                                                case "module_config":
+                                                case "modules":
                                                     foreach (System.Reflection.FieldInfo info in fields)
                                                     {
-                                                        if (info.Name.Replace("k__BackingField", "").Equals("<module_config>"))
+                                                        if (info.Name.Equals("modules"))
                                                         {
-                                                            List<List<string>> tmp_list = (List<List<string>>)info.GetValue(Conf);
-                                                            int index = 0;
-                                                            foreach (List<string> list in tmp_list)
+                                                            List<Bot.Modules.Module> tmp_list = (List<Bot.Modules.Module>)info.GetValue(Conf);
+                                                            foreach (Bot.Modules.Module list in tmp_list)
                                                             {
                                                                 string msg = "";
-                                                                msg += "Class: " + list[0] + " | ";
-                                                                msg += "Name: " + list[1] + " | ";
-                                                                msg += "Blacklist: " + list[2] + " | ";
-                                                                for (int x = 3; x < list.Count(); x++)
+                                                                msg += "Class: " + list.Class_Name + " | ";
+                                                                msg += "Name: " + list.Name + " | ";
+                                                                string blacklist = "";
+                                                                foreach (string black in list.Blacklist)
                                                                 {
-                                                                    msg += list[x] + ", ";
+                                                                    blacklist += black + ", ";
                                                                 }
+                                                                msg += "Blacklist: " + blacklist.Trim().TrimEnd(',') + " | ";
                                                                 ircbot.sendData("NOTICE", nick + " :" + msg.Trim().TrimEnd('|').TrimEnd(',').Trim());
-                                                                index++;
                                                             }
                                                         }
                                                     }
@@ -1092,7 +1090,7 @@ namespace Bot.Modules
                                             {
                                                 if (info.GetValue(Conf) == null)
                                                 {
-                                                    ircbot.sendData("NOTICE", nick + " :" + info.Name.Replace("k__BackingField", "") + ": NULL");
+                                                    ircbot.sendData("NOTICE", nick + " :" + info.Name + ": NULL");
                                                 }
                                                 else if (info.GetValue(Conf).ToString().Equals("System.Net.IPAddress[]"))
                                                 {
@@ -1104,15 +1102,43 @@ namespace Bot.Modules
                                                         index++;
                                                     }
                                                 }
-                                                else if (info.Name.Replace("k__BackingField", "").Equals("<command_list>"))
+                                                else if (info.GetValue(Conf).ToString().Equals("System.Collections.Generic.List`1[System.String]"))
                                                 {
-                                                    List<List<string>> tmp_list = (List<List<string>>)info.GetValue(Conf);
-                                                    ircbot.sendData("NOTICE", nick + " :" + info.Name.Replace("k__BackingField", "") + ": " + tmp_list.Count().ToString());
+                                                    List<string> tmp_list = (List<string>)info.GetValue(Conf);
+                                                    string response = "";
+                                                    if (tmp_list.Count > 1)
+                                                    {
+                                                        int index = 1;
+                                                        foreach (string item in tmp_list)
+                                                        {
+                                                            response += item;
+                                                            if (index < tmp_list.Count)
+                                                            {
+                                                                response += ", ";
+                                                            }
+                                                            index++;
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        response += tmp_list[0];
+                                                    }
+                                                    ircbot.sendData("NOTICE", nick + " :" + info.Name + ": " + response);
                                                 }
-                                                else if (info.Name.Replace("k__BackingField", "").Equals("<module_config>"))
+                                                else if (info.Name.Equals("modules"))
                                                 {
-                                                    List<List<string>> tmp_list = (List<List<string>>)info.GetValue(Conf);
-                                                    ircbot.sendData("NOTICE", nick + " :" + info.Name.Replace("k__BackingField", "") + ": " + tmp_list.Count().ToString());
+                                                    List<Bot.Modules.Module> tmp_list = (List<Bot.Modules.Module>)info.GetValue(Conf);
+                                                    ircbot.sendData("NOTICE", nick + " :" + info.Name + ": " + tmp_list.Count().ToString());
+                                                }
+                                                else if (info.Name.Equals("spam_check"))
+                                                {
+                                                    List<Bot.spam_info> tmp_list = (List<Bot.spam_info>)info.GetValue(Conf);
+                                                    ircbot.sendData("NOTICE", nick + " :" + info.Name + ": " + tmp_list.Count().ToString());
+                                                }
+                                                else if (info.Name.Equals("channel_list"))
+                                                {
+                                                    List<Bot.Channel_Info> tmp_list = (List<Bot.Channel_Info>)info.GetValue(Conf);
+                                                    ircbot.sendData("NOTICE", nick + " :" + info.Name + ": " + tmp_list.Count().ToString());
                                                 }
                                                 else
                                                 {
@@ -1556,28 +1582,54 @@ namespace Bot.Modules
 
         private static void add_owner(string nick, bot ircbot, BotConfig Conf)
         {
-            XmlNode xn = ircbot.controller.get_server_xml(Conf.Server_Name);
-            string new_owner = xn["owner"].InnerText + "," + nick;
-            xn["owner"].InnerText = new_owner;
-            Conf.Owner += "," + nick;
-            ircbot.controller.save_server_xml(Conf.Server_Name, xn);
+            if (!Conf.Owners.Contains(nick))
+            {
+                XmlNode xn = ircbot.controller.get_server_xml(Conf.Server_Name);
+                string new_owner = xn["owner"].InnerText + "," + nick;
+                xn["owner"].InnerText = new_owner;
+                Conf.Owners.Add(nick);
+
+                foreach (Channel_Info chan in Conf.Channel_List)
+                {
+                    Nick_Info tmp_nick = ircbot.get_nick_info(nick, chan.Channel);
+                    tmp_nick.Identified = true;
+                }
+                ircbot.controller.save_server_xml(Conf.Server_Name, xn);
+            }
+            else
+            {
+                foreach (Channel_Info chan in Conf.Channel_List)
+                {
+                    Nick_Info tmp_nick = ircbot.get_nick_info(nick, chan.Channel);
+                    tmp_nick.Identified = true;
+                }
+            }
         }
 
         private static void del_owner(string nick, bot ircbot, BotConfig Conf)
         {
-            string new_owner = "";
-            XmlNode xn = ircbot.controller.get_server_xml(Conf.Server_Name);
-            string[] new_owner_tmp = xn["owner"].InnerText.Split(',');
-            for (int x = 0; x <= new_owner_tmp.GetUpperBound(0); x++)
+            if (Conf.Owners.Contains(nick))
             {
-                if (!new_owner_tmp[x].Equals(nick, StringComparison.InvariantCultureIgnoreCase))
+                string new_owner = "";
+                XmlNode xn = ircbot.controller.get_server_xml(Conf.Server_Name);
+                string[] new_owner_tmp = xn["owner"].InnerText.Split(',');
+                for (int x = 0; x <= new_owner_tmp.GetUpperBound(0); x++)
                 {
-                    new_owner += new_owner_tmp[x] + ",";
+                    if (!new_owner_tmp[x].Equals(nick, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        new_owner += new_owner_tmp[x] + ",";
+                    }
                 }
+                xn["owner"].InnerText = new_owner.TrimEnd(',');
+                Conf.Owners.Remove(nick);
+
+                foreach (Channel_Info chan in Conf.Channel_List)
+                {
+                    Nick_Info tmp_nick = ircbot.get_nick_info(nick, chan.Channel);
+                    tmp_nick.Identified = false;
+                }
+                ircbot.controller.save_server_xml(Conf.Server_Name, xn);
             }
-            xn["owner"].InnerText = new_owner.TrimEnd(',');
-            Conf.Owner = new_owner.TrimEnd(',');
-            ircbot.controller.save_server_xml(Conf.Server_Name, xn);
         }
     }
 }

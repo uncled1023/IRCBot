@@ -11,7 +11,7 @@ namespace Bot.Modules
     {
         public override void control(bot ircbot, BotConfig Conf, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
-            if (type.Equals("channel") && bot_command == true)
+            if ((type.Equals("channel") || type.Equals("query")) && bot_command == true)
             {
                 foreach (Command tmp_command in this.Commands)
                 {
@@ -42,11 +42,11 @@ namespace Bot.Modules
                                     {
                                         if (line.GetUpperBound(0) > 3)
                                         {
-                                            get_answer(line[2], ircbot);
+                                            get_answer(channel, ircbot);
                                         }
                                         else
                                         {
-                                            ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                                            ircbot.sendData("PRIVMSG", channel + " :" + nick + ", you need to include more info.");
                                         }
                                     }
                                     else

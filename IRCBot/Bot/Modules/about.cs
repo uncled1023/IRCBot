@@ -11,7 +11,7 @@ namespace Bot.Modules
     {
         public override void control(bot ircbot, BotConfig Conf, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
-            if (type.Equals("channel") || type.Equals("query") && bot_command == true)
+            if ((type.Equals("channel") || type.Equals("query")) && bot_command == true)
             {
                 foreach (Command tmp_command in this.Commands)
                 {
@@ -40,9 +40,8 @@ namespace Bot.Modules
                                     }
                                     if (nick_access >= tmp_command.Access)
                                     {
-                                        string[] owners = Conf.Owner.TrimStart(',').TrimEnd(',').Split(',');
                                         string owner_num = " is";
-                                        if (owners.GetUpperBound(0) > 0)
+                                        if (Conf.Owners.Count > 1)
                                         {
                                             owner_num = "s are";
                                         }
@@ -57,20 +56,20 @@ namespace Bot.Modules
                                         }
                                         if (this.Options["display_owner"])
                                         {
-                                            if (owners.GetUpperBound(0) > 0)
+                                            if (Conf.Owners.Count >= 1)
                                             {
                                                 response += " My owner" + owner_num + " ";
-                                                if (owners.GetUpperBound(0) > 1)
+                                                if (Conf.Owners.Count > 1)
                                                 {
-                                                    int index = 0;
-                                                    foreach (string owner in owners)
+                                                    int index = 1;
+                                                    foreach (string owner in Conf.Owners)
                                                     {
                                                         response += owner;
-                                                        if (index == owners.GetUpperBound(0) - 1)
+                                                        if (index == Conf.Owners.Count - 1)
                                                         {
                                                             response += ", and ";
                                                         }
-                                                        else if (index < owners.GetUpperBound(0))
+                                                        else if (index < Conf.Owners.Count)
                                                         {
                                                             response += ", ";
                                                         }
@@ -79,7 +78,7 @@ namespace Bot.Modules
                                                 }
                                                 else
                                                 {
-                                                    response += Conf.Owner.TrimStart(',').TrimEnd(',').Replace(",", " and ");
+                                                    response += Conf.Owners[0];
                                                 }
                                             }
                                         }

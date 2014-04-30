@@ -11,7 +11,7 @@ namespace Bot.Modules
     {
         public override void control(bot ircbot, BotConfig Conf, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
-            if (type.Equals("channel") && bot_command == true)
+            if ((type.Equals("channel") || type.Equals("query")) && bot_command == true)
             {
                 foreach (Command tmp_command in this.Commands)
                 {
@@ -40,7 +40,7 @@ namespace Bot.Modules
                                     }
                                     if (nick_access >= tmp_command.Access)
                                     {
-                                        display_help(line, nick, line[2], nick_access, ircbot, Conf);
+                                        display_help(line, nick, channel, nick_access, ircbot, Conf);
                                     }
                                     else
                                     {

@@ -38,7 +38,7 @@ namespace Bot.Modules
                                     }
                                     if (nick_access >= tmp_command.Access)
                                     {
-                                        get_airtime(line[2], ircbot);
+                                        get_airtime(channel, ircbot);
                                     }
                                     else
                                     {

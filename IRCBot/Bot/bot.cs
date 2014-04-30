@@ -800,9 +800,16 @@ namespace Bot
                                     nick_access = tmp_nick_access;
                                 }
                             }
+                            channel = line_nick;
                             type = "query";
                         }
                     }
+                }
+
+                // On Invite events
+                if (ex[1].Equals("invite", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    type = "invite";
                 }
 
                 // On JOIN events
@@ -1762,10 +1769,9 @@ namespace Bot
                 }
                 if (nick_info.Identified == true)
                 {
-                    string[] owners = Conf.Owner.Split(','); // Get list of owners
-                    for (int x = 0; x <= owners.GetUpperBound(0); x++)
+                    foreach (string owner in Conf.Owners)
                     {
-                        if (tmp_nick.Equals(owners[x], StringComparison.InvariantCultureIgnoreCase))
+                        if (tmp_nick.Equals(owner, StringComparison.InvariantCultureIgnoreCase))
                         {
                             access_num.Add(Conf.Owner_Level);
                         }
@@ -2077,17 +2083,17 @@ namespace Bot
             }
         }
 
-        private string owner;
-        public string Owner
+        private List<string> owners;
+        public List<string> Owners
         {
             get
             {
-                return owner;
+                return owners;
             }
 
             internal set
             {
-                owner = value;
+                owners = value;
             }
         }
 

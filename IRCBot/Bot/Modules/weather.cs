@@ -12,7 +12,7 @@ namespace Bot.Modules
     {
         public override void control(bot ircbot, BotConfig Conf, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
-            if (type.Equals("channel") && bot_command == true)
+            if ((type.Equals("channel") || type.Equals("query")) && bot_command == true)
             {
                 foreach (Command tmp_command in this.Commands)
                 {
@@ -46,11 +46,11 @@ namespace Bot.Modules
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 // Add introduction
-                                                get_weather(line[4], line[2], ircbot);
+                                                get_weather(line[4], channel, ircbot);
                                             }
                                             else
                                             {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                                                ircbot.sendData("PRIVMSG", channel + " :" + nick + ", you need to include more info.");
                                             }
                                         }
                                         else
@@ -71,11 +71,11 @@ namespace Bot.Modules
                                             if (line.GetUpperBound(0) > 3)
                                             {
                                                 // Add introduction
-                                                get_forecast(line[4], line[2], ircbot, Convert.ToInt32(this.Options["forecast_days"]));
+                                                get_forecast(line[4], channel, ircbot, Convert.ToInt32(this.Options["forecast_days"]));
                                             }
                                             else
                                             {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                                                ircbot.sendData("PRIVMSG", channel + " :" + nick + ", you need to include more info.");
                                             }
                                         }
                                         else

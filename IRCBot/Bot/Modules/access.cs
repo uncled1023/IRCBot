@@ -59,7 +59,7 @@ namespace Bot.Modules
                                             {
                                                 if (Convert.ToInt32(parse[1]) <= nick_access)
                                                 {
-                                                    set_access_list(parse[0].Trim(), line[2], parse[1], ircbot);
+                                                    set_access_list(parse[0].Trim(), channel, parse[1], ircbot);
                                                     ircbot.sendData("NOTICE", nick + " :" + parse[0].Trim() + " has been added to access level " + parse[1]);
                                                 }
                                                 else
@@ -108,7 +108,7 @@ namespace Bot.Modules
                                             {
                                                 if (Convert.ToInt32(parse[1]) <= nick_access)
                                                 {
-                                                    del_access_list(parse[0].Trim(), line[2], parse[1], ircbot);
+                                                    del_access_list(parse[0].Trim(), channel, parse[1], ircbot);
                                                     ircbot.sendData("NOTICE", nick + " :" + parse[0].Trim() + " has been removed from access level " + parse[1]);
                                                 }
                                                 else
@@ -144,7 +144,7 @@ namespace Bot.Modules
                                         }
                                         else if (type.Equals("channel"))
                                         {
-                                            list_access_list(nick, line[2], ircbot);
+                                            list_access_list(nick, channel, ircbot);
                                         }
                                         else
                                         {
@@ -178,7 +178,16 @@ namespace Bot.Modules
                                             }
                                             else
                                             {
-                                                ircbot.sendData("NOTICE", nick + " :" + nick + ", you need to include more info.");
+                                                int viewed_access = Conf.Default_Level;
+                                                foreach (Channel_Info chan in Conf.Channel_List)
+                                                {
+                                                    int tmp_nick_access = ircbot.get_nick_access(line[4].Trim(), chan.Channel);
+                                                    if (tmp_nick_access > viewed_access)
+                                                    {
+                                                        viewed_access = tmp_nick_access;
+                                                    }
+                                                }
+                                                ircbot.sendData("NOTICE", nick + " :" + line[4].Trim() + " has access level " + viewed_access.ToString());
                                             }
                                         }
                                         else

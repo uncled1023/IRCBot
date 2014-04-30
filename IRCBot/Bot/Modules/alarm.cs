@@ -77,7 +77,7 @@ namespace Bot.Modules
                                                     {
                                                         if (type.Equals("channel"))
                                                         {
-                                                            ircbot.sendData("PRIVMSG", line[2] + " :Recursion is bad.");
+                                                            ircbot.sendData("PRIVMSG", channel + " :Recursion is bad.");
                                                         }
                                                         else
                                                         {
@@ -96,7 +96,7 @@ namespace Bot.Modules
 
                                                         if (type.Equals("channel"))
                                                         {
-                                                            ircbot.sendData("PRIVMSG", line[2] + " :Alarm added for " + new_line[0] + " seconds from now.");
+                                                            ircbot.sendData("PRIVMSG", channel + " :Alarm added for " + new_line[0] + " seconds from now.");
                                                         }
                                                         else
                                                         {
@@ -108,7 +108,7 @@ namespace Bot.Modules
                                                 {
                                                     if (type.Equals("channel"))
                                                     {
-                                                        ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", please pick a valid time.");
+                                                        ircbot.sendData("PRIVMSG", channel + " :" + nick + ", please pick a valid time.");
                                                     }
                                                     else
                                                     {
@@ -120,7 +120,7 @@ namespace Bot.Modules
                                             {
                                                 if (type.Equals("channel"))
                                                 {
-                                                    ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                                                    ircbot.sendData("PRIVMSG", channel + " :" + nick + ", you need to include more info.");
                                                 }
                                                 else
                                                 {
@@ -132,7 +132,7 @@ namespace Bot.Modules
                                         {
                                             if (type.Equals("channel"))
                                             {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                                                ircbot.sendData("PRIVMSG", channel + " :" + nick + ", you need to include more info.");
                                             }
                                             else
                                             {
@@ -159,16 +159,6 @@ namespace Bot.Modules
             alarm_trigger.Enabled = false;
             if (msg.StartsWith(ircbot.Conf.Command))
             {
-                string chan = "";
-                if (type.Equals("channel"))
-                {
-                    chan = channel;
-                }
-                else
-                {
-                    chan = Conf.Nick;
-                }
-
                 char[] charSplit = new char[] { ' ' };
                 string[] ex = msg.TrimStart(Convert.ToChar(Conf.Command)).Split(charSplit, 2);
                 string[] args;
@@ -180,7 +170,7 @@ namespace Bot.Modules
                 {
                     args = null;
                 }
-                ircbot.controller.run_command(Conf.Server_Name, nick, chan, ex[0], args);
+                ircbot.controller.run_command(Conf.Server_Name, nick, channel, ex[0], args);
             }
             else
             {

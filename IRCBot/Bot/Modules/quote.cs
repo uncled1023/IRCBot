@@ -45,16 +45,16 @@ namespace Bot.Modules
                                         {
                                             if (line.GetUpperBound(0) > 3)
                                             {
-                                                get_specific_quote(line[2], line[4], ircbot, Conf);
+                                                get_specific_quote(channel, line[4], ircbot, Conf);
                                             }
                                             else
                                             {
-                                                get_quote(line[2], ircbot, Conf);
+                                                get_quote(channel, ircbot, Conf);
                                             }
                                         }
                                         else
                                         {
-                                            get_quote(line[2], ircbot, Conf);
+                                            get_quote(channel, ircbot, Conf);
                                         }
                                     }
                                     else

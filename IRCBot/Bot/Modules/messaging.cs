@@ -44,7 +44,7 @@ namespace Bot.Modules
                                         {
                                             if (type.Equals("channel"))
                                             {
-                                                add_message(nick, line, line[2], ircbot);
+                                                add_message(nick, line, channel, ircbot);
                                             }
                                             else
                                             {
@@ -55,7 +55,7 @@ namespace Bot.Modules
                                         {
                                             if (type.Equals("channel"))
                                             {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                                                ircbot.sendData("PRIVMSG", channel + " :" + nick + ", you need to include more info.");
                                             }
                                             else
                                             {
@@ -75,7 +75,7 @@ namespace Bot.Modules
                                         {
                                             if (type.Equals("channel"))
                                             {
-                                                add_anonmessage(nick, line, line[2], ircbot);
+                                                add_anonmessage(nick, line, channel, ircbot);
                                             }
                                             else
                                             {
@@ -86,7 +86,7 @@ namespace Bot.Modules
                                         {
                                             if (type.Equals("channel"))
                                             {
-                                                ircbot.sendData("PRIVMSG", line[2] + " :" + nick + ", you need to include more info.");
+                                                ircbot.sendData("PRIVMSG", channel + " :" + nick + ", you need to include more info.");
                                             }
                                             else
                                             {

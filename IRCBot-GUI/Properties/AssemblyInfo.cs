@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("IRCBot-GUI")]
 [assembly: AssemblyDescription("IRCBot is an all in one IRC Bot solution for Windows.  For more information, please visit https://github.com/uncled1023/IRCBot")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Jimmy Rustlers, Inc.")]
+[assembly: AssemblyCompany("Teknik")]
 [assembly: AssemblyProduct("IRCBot-GUI")]
 [assembly: AssemblyCopyright("Copyright ©  2012-2013")]
 [assembly: AssemblyTrademark("")]
@@ -31,5 +31,5 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
-// [assembly: AssemblyVersion("1.0.726")]
-[assembly: AssemblyVersion("5.3.223.2419")]
+// [assembly: AssemblyVersion("1.0.766")]
+[assembly: AssemblyVersion("5.3.243.2439")]

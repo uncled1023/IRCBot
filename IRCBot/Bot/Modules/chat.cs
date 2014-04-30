@@ -39,7 +39,7 @@ namespace Bot.Modules
 
         public override void control(bot ircbot, BotConfig Conf, string[] line, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
-            if (type.Equals("channel") && bot_command == true)
+            if ((type.Equals("channel") || type.Equals("query")) && bot_command == true)
             {
                 foreach (Command tmp_command in this.Commands)
                 {
@@ -76,13 +76,13 @@ namespace Bot.Modules
                                                 chatting_nick.Clear();
                                                 chat_time.Enabled = false;
                                                 chat_time.Stop();
-                                                ircbot.sendData("PRIVMSG", channel + " :Ok, I will stop.");
+                                                ircbot.sendData("PRIVMSG", line[2] + " :Ok, I will stop.");
                                                 break;
                                             }
                                         }
                                         if (still_chatting == true)
                                         {
-                                            ircbot.sendData("PRIVMSG", channel + " :You are not currently talking to me.");
+                                            ircbot.sendData("PRIVMSG", line[2] + " :You are not currently talking to me.");
                                         }
                                     }
                                     else
@@ -95,7 +95,7 @@ namespace Bot.Modules
                     }
                 }
             }
-            if (type.Equals("channel") && bot_command == false)
+            if ((type.Equals("channel") || type.Equals("query")) && bot_command == false)
             {
                 chat_time.Interval = Convert.ToInt32(this.Options["chat_timeout"]) * 1000;
                 if (line.GetUpperBound(0) >= 3)
@@ -141,7 +141,13 @@ namespace Bot.Modules
                             chat_time.Stop();
                             Request r = new Request(msg, myUser, myBot);
                             Result res = myBot.Chat(r);
-                            ircbot.sendData("PRIVMSG", channel + " :" + res.Output.Replace("[nick]", nick).Replace("[me]", Conf.Nick).Replace("[owner]", Conf.Owner.TrimStart(',').TrimEnd(',').Replace(",", " and ")).Replace("[version]", Assembly.GetExecutingAssembly().GetName().Version.ToString()).Replace("\n", " "));
+                            string owners = "";
+                            foreach (string own in Conf.Owners)
+                            {
+                                owners += Conf.Owners + ",";
+                            }
+                            owners = owners.TrimEnd(',').Replace(",", " and ");
+                            ircbot.sendData("PRIVMSG", line[2] + " :" + res.Output.Replace("[nick]", nick).Replace("[me]", Conf.Nick).Replace("[owner]", owners).Replace("[version]", Assembly.GetExecutingAssembly().GetName().Version.ToString()).Replace("\n", " "));
                             chat_time.Start();
                             still_chatting = true;
                         }

@@ -1402,6 +1402,17 @@
         <show_help>True</show_help>
         <spam_check>True</spam_check>
       </google>
+      <youtube>
+        <name>Youtube Search</name>
+        <description>Returns the first result from Youtube.</description>
+        <triggers>youtube|yt</triggers>
+        <syntax>{query}</syntax>
+        <access_level>1</access_level>
+        <blacklist>
+        </blacklist>
+        <show_help>True</show_help>
+        <spam_check>True</spam_check>
+      </youtube>
     </commands>
     <options>
       <show_url>

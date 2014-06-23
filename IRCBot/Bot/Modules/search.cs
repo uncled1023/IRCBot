@@ -7,6 +7,10 @@ using System.Web;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Net;
+using Google.YouTube;
+using Google.GData.YouTube;
+using Google.GData.Client;
+using Google.GData.Extensions;
 
 namespace Bot.Modules
 {
@@ -62,7 +66,7 @@ namespace Bot.Modules
 
                                                             if (this.Options["show_url"])
                                                             {
-                                                                ircbot.sendData("PRIVMSG", channel + " :" + HttpUtility.UrlDecode(searchType.url));
+                                                                ircbot.sendData("PRIVMSG", channel + " :" + System.Web.HttpUtility.UrlDecode(searchType.url));
                                                             }
                                                             break;
                                                         }
@@ -88,11 +92,83 @@ namespace Bot.Modules
                                         ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
                                     }
                                     break;
+                                case "youtube":
+                                    if (spam_check == true)
+                                    {
+                                        ircbot.add_spam_count(channel);
+                                    }
+                                    if (nick_access >= tmp_command.Access)
+                                    {
+                                        if (line.GetUpperBound(0) > 3)
+                                        {
+                                            Feed<Video> results = YoutubeSearch(line[4]);
+                                            if (results.TotalResults > 0)
+                                            {
+                                                foreach (Video video in results.Entries)
+                                                {
+                                                    int duration = int.Parse(video.Contents.First().Duration);
+                                                    string yt_title = video.Title;
+                                                    int views = video.ViewCount;
+                                                    double rateavg = video.RatingAverage;
+                                                    string uploader = video.Uploader;
+                                                    DateTime date = video.Updated;
+                                                    string total_duration = "";
+                                                    TimeSpan t = TimeSpan.FromSeconds(duration);
+                                                    if (t.Hours > 0)
+                                                    {
+                                                        total_duration += t.Hours.ToString() + "h ";
+                                                    }
+                                                    if (t.Minutes > 0)
+                                                    {
+                                                        total_duration += t.Minutes.ToString() + "m ";
+                                                    }
+                                                    if (t.Seconds > 0)
+                                                    {
+                                                        total_duration += t.Seconds.ToString() + "s ";
+                                                    }
+                                                    ircbot.sendData("PRIVMSG", channel + " :[Youtube] Title: " + System.Web.HttpUtility.HtmlDecode(yt_title) + " | Length: " + total_duration.TrimEnd(' ') + " | Views: " + string.Format("{0:#,###0}", views) + " | Rated: " + Math.Round(rateavg, 2).ToString() + "/5.0 | Uploaded By: " + uploader + " on " + date.ToString("yyyy-MM-dd"));
+                                                        
+                                                    if (this.Options["show_url"])
+                                                    {
+                                                        ircbot.sendData("PRIVMSG", channel + " :" + video.WatchPage.ToString());
+                                                    }
+                                                    break;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                ircbot.sendData("PRIVMSG", channel + " :No Results Found");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            ircbot.sendData("PRIVMSG", channel + " :" + nick + ", you need to include more info.");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        ircbot.sendData("NOTICE", nick + " :You do not have permission to use that command.");
+                                    }
+                                    break;
                             }
                         }
                     }
                 }
             }
+        }
+
+        public static Feed<Video> YoutubeSearch(string search_expression)
+        {
+            string developerKey = "AI39si6RqynrlYF5GRmMp01moUQiRUxdB3HPzHdD99sSH9wfMVvf6gosz00Mt--loK-zavQ2oXjpDnL9IAgCSp7sX-yuFA2usA";
+            YouTubeQuery query = new YouTubeQuery(YouTubeQuery.DefaultVideoUri);
+            query.OrderBy = "relevance";
+            query.Query = search_expression;
+            query.SafeSearch = YouTubeQuery.SafeSearchValues.None;
+
+            YouTubeRequestSettings settings = new YouTubeRequestSettings("YouTube Video Duration Sample App", developerKey);
+            YouTubeRequest yt_request = new YouTubeRequest(settings);
+            Feed<Video> results = yt_request.Get<Video>(query);
+            return results;
         }
 
         public static List<SearchResult> GoogleSearch(string search_expression)
@@ -125,6 +201,7 @@ namespace Bot.Modules
  
             return results_list;
         }
+
     }
 
     public class SearchResult

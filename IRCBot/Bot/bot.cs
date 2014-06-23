@@ -362,9 +362,8 @@ namespace Bot
                         }
                         break;
                     case 6:
-                        BackgroundWorker work = new BackgroundWorker();
-                        work.DoWork += (sender, e) => joinChannels();
-                        work.RunWorkerAsync();
+                        Task join_channels = new Task(() => joinChannels());
+                        join_channels.Start();
                         bot_state = -1; // go to default case
                         break;
                     default:
@@ -372,9 +371,10 @@ namespace Bot
                         disconnected = false;
                         restart_attempts = 0;
                         data = read_stream_queue();
-                        if (!String.IsNullOrEmpty(data))
+                        if (!String.IsNullOrEmpty(data.Trim()))
                         {
-                            parse_stream(data.Trim());
+                            string parse_string = data.Trim();
+                            parse_stream(parse_string);
                         }
                         break;
                 }
@@ -1074,15 +1074,13 @@ namespace Bot
                     bool module_allowed = !module.Blacklist.Contains(line_nick) && !module.Blacklist.Contains(channel);
                     if (module_allowed == true)
                     {
-                        BackgroundWorker work = new BackgroundWorker();
-                        work.DoWork += (sender, e) => backgroundWorker_RunModule(sender, e, this, module, ex, command, nick_access, line_nick, channel, bot_command, type);
-                        work.RunWorkerAsync(2000);
+                        Task.Factory.StartNew(() => RunModule(this, module, ex, command, nick_access, line_nick, channel, bot_command, type), TaskCreationOptions.LongRunning);
                     }
                 }
             }
         }
 
-        private void backgroundWorker_RunModule(object sender, DoWorkEventArgs e, bot parent, Modules.Module module, string[] ex, string command, int nick_access, string nick, string channel, bool bot_command, string type)
+        private void RunModule(bot parent, Modules.Module module, string[] ex, string command, int nick_access, string nick, string channel, bool bot_command, string type)
         {
             module.control(parent, Conf, ex, command, nick_access, nick, channel, bot_command, type);
         }

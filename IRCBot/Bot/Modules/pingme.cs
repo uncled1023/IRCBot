@@ -41,13 +41,13 @@ namespace Bot.Modules
                                     if (nick_access >= tmp_command.Access)
                                     {
                                         int epoch = (int)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds;
-                                        ircbot.sendData("PRIVMSG", nick + " :\u0001PING " + epoch.ToString() + "\u0001");
                                         List<string> tmp_list = new List<string>();
                                         string current_time = DateTime.Now.ToLongTimeString();
                                         tmp_list.Add(nick);
                                         tmp_list.Add(channel);
                                         tmp_list.Add(current_time);
                                         ping_list.Add(tmp_list);
+                                        ircbot.sendData("PRIVMSG", nick + " :\u0001PING " + epoch.ToString() + "\u0001");
                                     }
                                     else
                                     {
